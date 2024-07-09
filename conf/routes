@@ -1,0 +1,9 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# https://www.playframework.com/documentation/latest/ScalaRouting
+# ~~~~
+
+GET     /individual/:id                           controllers.HomeController.showPerson(id: Int)
+GET     /switch-lang/:lang                        controllers.HomeController.languageSwitch(lang: String)
+
+GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)

@@ -1,0 +1,61 @@
+
+@this()
+
+@(title: String)(contentBlock: Html)
+
+<html lang="fr" >
+<head>
+    <title>Genealogie</title>
+    <meta name="Description" content="" />
+    <meta name="Keywords" content="genealogie, genealogy" />
+    <meta name="Author" content="Pascal Parois" />
+    <meta http-equiv="Content-language" content="fr" />
+    <meta charset=UTF-8" />
+
+    <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/main.css")">
+
+</head>
+<body>
+
+<div id="header">
+    <h1>Famille Parois</h1>
+</div>
+
+<div id="content">
+    <div class="box_title">
+        <h2>@title</h2>
+    </div>
+
+    @contentBlock
+</div>
+
+<ul class="menu" id="menu">
+    <li class="menu">Sommaire
+        <ul class="ssmenu">
+            <li class="ssmenu"><a href="index.php?base">Liste des bases</a></li>
+            <li class="ssmenu"><a href="liste_patronymes.php">Patronymes</a></li>
+            <li class="ssmenu"><a href="connect.php">Se connecter</a></li>
+            <li class="ssmenu"><a href="statistiques.php">Statistiques</a></li>
+            <li class="ssmenu"><a href="recherche.php">Rechercher</a></li>
+            <li class="ssmenu"><a href="profil.php">Mon profil</a></li>
+        </ul>
+    </li>
+    <li class="menu">Télécharger
+        <ul class="ssmenu">
+            <li class="ssmenu"><a href="download.php">Gedcoms et rapports</a></li>
+        </ul>
+    </li>
+    <li class="menu" style="text-align:center">Languages
+        <ul class="ssmenu">
+            <li class="ssmenu"><a href="@routes.HomeController.languageSwitch("fr")">Français</a></li>
+            <li class="ssmenu"><a href="@routes.HomeController.languageSwitch("en")">English</a></li>
+        </ul>
+    </li>
+</ul>
+
+<div id="footer">
+    <a href="mailto:genealogie@("@")parois.net">genealogie.parois.net </a>
+</div>
+
+
+</body></html>

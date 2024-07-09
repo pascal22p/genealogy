@@ -1,0 +1,18 @@
+@import models.Person
+@import views.html.components.{FamilyView, PersonDetails, IndividualEvents, Parents}
+
+@this(
+  main: Main,
+  familyView: FamilyView,
+  personDetails: PersonDetails,
+  individualEvents: IndividualEvents,
+  parents: Parents)
+
+@()(implicit request: Request[_], messages: Messages)
+
+
+@main("Service unavailable") {
+
+  Oops something is broken
+
+}

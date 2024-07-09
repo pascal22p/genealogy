@@ -1,0 +1,26 @@
+@import models.Person
+@import views.html.components.{FamilyView, PersonDetails, IndividualEvents, Parents}
+
+@this(
+  main: Main,
+  familyView: FamilyView,
+  personDetails: PersonDetails,
+  individualEvents: IndividualEvents,
+  parents: Parents)
+
+@(person: Person)(implicit request: Request[_], messages: Messages)
+
+
+@main(person.details.toString) {
+
+  @personDetails(person)
+
+  @individualEvents(person)
+
+  @for(family <- person.families) {
+    @familyView(family, person.findPartner(family.id))
+  }
+
+  @parents(person)
+
+}

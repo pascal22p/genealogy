@@ -1,0 +1,23 @@
+@import models.Person
+@import controllers.routes
+
+@this()
+
+@(person: Person)(implicit messages: Messages)
+
+<div class="box">
+    @for(parents <- person.parents) {
+    <div class="box_title">
+        <h3>Parents @parents.relaType</h3>
+    </div>
+
+    <ul style="list-style-type:none;padding:0;">
+        @for(parent <- parents.family.parent1) {
+        <li><a class="link_nom" href="@routes.HomeController.showPerson(parent.details.id)">@parent.details.toString</a> <span class="petit">@parent.events.birthAndDeathDate</span></li>
+        }
+        @for(parent <- parents.family.parent2) {
+        <li><a class="link_nom" href="@routes.HomeController.showPerson(parent.details.id)">@parent.details.toString</a> <span class="petit">@parent.events.birthAndDeathDate</span></li>
+        }
+    </ul>
+    }
+</div>

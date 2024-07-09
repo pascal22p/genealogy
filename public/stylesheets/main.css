@@ -1,0 +1,801 @@
+/* layout global */
+/* colour from http://www.colourlovers.com/palette/163356/Genealogy */
+
+
+html
+{
+	margin:0;
+	padding:0;
+	background: #6E6B40;
+	/*background-image:url(branche.png);
+	background-repeat:no-repeat;
+	background-position: 30px 10px;*/
+	color:black;
+}
+
+body
+{
+		font-size:0.9em;
+		margin:0;
+		padding:0;
+}
+
+p
+{
+	margin:0 10px 10px
+}
+
+dl
+{
+	margin-left:1em;
+}
+
+li
+{
+	margin-bottom:0.3em;
+	visibility: inherit;
+}
+
+div#content
+{
+	margin-top:10px;
+	margin-bottom:10px;
+	margin-left:30ex;
+	margin-right:10px;
+	background: #e3d2af;
+	border:1px solid #65381B;
+	padding:0;
+}
+
+div#header
+{
+	height:91px;
+	padding:0;
+    margin-left:10px;
+    margin-right:10px;
+    margin-bottom:40px;
+    margin-top:10px;
+	background: #F1EBDF;
+    border:2px ridge #65381B;
+    text-align: center;
+}
+
+div#footer
+{
+	background: #6E6B40;
+	color: #FFF;
+	clear:both;
+	text-align:center;
+	padding:5px;
+}
+
+div#footer a
+{
+	color: #FFF;
+}
+
+div#footer p
+{
+	margin:0;
+	padding:5px 10px
+}
+
+h1
+{
+	font-size:200%;
+    font-weight: bold;
+    color: #65381B;
+    letter-spacing : 2px;
+	display:block;
+	padding:0;
+	margin:0;
+	margin-top:20px;
+	font-family:serif;
+}
+
+h2
+{
+  font-size:130%;
+  font-weight:800;
+  color:inherit;
+  text-align:center;
+  text-indent:0;
+  padding:2px;
+  background-color:transparent;
+  margin:0;
+}
+
+h3
+{
+	color:#65381B;
+	font-weight:normal;
+	font-size:120%;
+	margin:0;
+	padding:2px;
+	text-indent:2em;
+}
+
+h4
+{
+	font-weight:normal;
+	font-size:110%;
+	color:black;
+	margin:0;
+	padding:2px;
+}
+
+/* liens */
+a:link
+{
+  padding:1px;
+  border:none;
+  color:inherit;
+  text-decoration:none;
+
+}
+a:visited
+{
+  padding:1px;
+  color : black;
+  text-decoration:none;
+
+}
+a:hover
+{
+  color : red;
+  text-decoration:underline;
+  border: none;
+}
+
+em
+{
+    text-indent : 0px;
+    font-style:italic;
+}
+
+ul
+{
+	list-style-type: none;
+	visibility: inherit;
+}
+
+dl.horizontal
+{
+	margin-bottom: 1em;
+}
+
+dl.horizontal dt
+{
+	font-style:italic;
+	float: left;
+	width: auto;
+	margin: 0;
+	margin-bottom:0.5ex;
+	padding: 0;
+}
+
+dl.horizontal dd
+{
+	float: none;
+	margin: 0;
+	margin-bottom:0.5ex;
+	padding: 0;
+}
+
+table
+{
+	margin-top:0.5em;
+	margin-bottom:1em;
+	border-collapse: collapse;
+	border-bottom: 1px solid black;
+}
+
+td
+{
+	padding-left:0.5em;
+	padding-right:0.5em;
+}
+
+thead
+{
+	border-top:1px solid black;
+	border-bottom:1px solid black;
+	font-style: italic ;
+}
+
+/* fin layout global */
+
+/* style pous le menu */
+
+li.ssmenu, li.ssmenu a
+{
+	display:block;
+	font-size:85%;
+	margin:0;
+	padding:2px;
+	border:0;
+	z-index:10;
+	background-color:#e3d2af;
+	width:auto;
+	text-indent:0;
+	font-style:normal;
+	line-height:100%;
+}
+
+
+ul.menu {
+	position:absolute;
+	top:140px;
+	left:0;
+	margin:5px;
+	list-style-type:none;
+	padding:0px;
+	z-index:1;
+	background:transparent;
+	margin-top:3px;
+}
+
+ul.ssmenu {
+	margin:0px;
+	padding:0px;
+	border-top:2px groove #65381B;
+	width:auto;
+	list-style-type:none;
+	background-color:transparent;
+	font-weight:normal;
+	z-index:10;
+	text-align:left;
+}
+
+li.menu {
+/*  font-size:0.9em; */
+	display:block;
+	list-style-type:none;
+	margin:2px;
+	padding:0;
+	padding-top:3px;
+	margin-bottom:10px;
+	text-align:center;
+	width:20ex;
+
+	background-color:#F1EBDF;
+	color:#6A3D21;
+	font-weight:bold;
+	font-size:130%;
+	border:1px solid #65381B;
+}
+
+/* hovers with specificity */
+li.ssmenu:hover, li.ssmenu:hover a
+{
+	background-color: #B9CAFF;
+	text-decoration:none;
+	color:black;
+}
+
+li.menu:hover
+{
+	z-index:10;
+}
+
+ul.menu ul.ssmenu
+{
+	display:block;
+}
+
+li.menu:hover ul.ssmenu
+{
+	display:block;
+	margin-bottom:0;
+}
+
+/* fin style menu */
+
+
+/* boxes */
+
+/* box title */
+DIV.box_title
+{
+	border:none;
+	border-bottom:2px groove #65381B;
+	background-color:#F1EBDF;
+	color:#65381B;
+	width:auto;
+	font-weight:bold;
+	padding:0.5em;
+	text-indent:5em;
+	margin-bottom:2em;
+}
+
+DIV.box DIV.box_title
+{
+	border:none;
+	border-bottom:2px groove #65381B;
+	background-color:#F1EBDF;
+	color:#65381B;
+	width:auto;
+	font-weight:normal;
+	margin:0;
+	padding:0.1em;
+	text-indent:5em;
+}
+
+/* box */
+.box
+{
+    text-align:left;
+    border:1px solid #65381B;
+    padding:0;
+    margin-top:0.2em;
+    margin-bottom:2.5em;
+    margin-left:5%;
+    margin-right:5%;
+    text-indent : 15px;
+    background-color:#e3d2af;
+}
+
+.box .box
+{
+    background-color:#f0ddb9;
+}
+
+.box .box .box
+{
+    background-color:#fce7c2;
+}
+
+/* fin boxes */
+
+/* menu admin pour l'edition des fiches, familles, notes ... */
+div.menu_interne
+{
+  border:none;
+  margin:0;
+  padding-bottom:0.1em;
+  padding-top:0.1em;
+  background:none;
+  text-align:center;
+  margin-bottom:0em;
+}
+
+a.admin:link
+{
+  line-height:170%;
+  color:red;
+  background-color:#FFC6C3;
+  padding:1px;
+  border:#65381B 1px solid;
+  font-size:0.8em;
+  vertical-align:middle;
+}
+a.admin:visited
+{
+  line-height:170%;
+  color:red;
+  background-color:#FFC6C3;
+  padding:1px;
+  border:#65381B 1px solid;
+  font-size:0.8em;
+  vertical-align:middle;
+}
+a.admin:hover
+{
+  line-height:170%;
+  color:red;
+  background-color:#d2eacc;
+  padding:1px;
+  border:#65381B 1px solid;
+    font-size:0.8em;
+  vertical-align:middle;
+}
+/* fin menu interne */
+
+/****** Collapsed dl *******/
+dl.collapsed
+{
+	margin-bottom: 1em;
+}
+
+.collapsed dt
+{
+	color:black;
+	font-style:italic;
+	float: left;
+	clear: both;
+	margin: 0;
+	padding: 0;
+	width: auto;
+}
+
+.collapsed dd
+{
+	padding: 0;
+	margin: 0;
+}
+
+
+/* style pour l'affichage de la fiche de la personne */
+
+
+dl.etat_civil
+{
+	margin-bottom: 1em;
+}
+
+dl.etat_civil dt
+{
+	font-style:italic;
+	float: left;
+	width: auto;
+	margin: 0;
+	margin-bottom:0.5ex;
+	padding: 0;
+}
+
+dl.etat_civil dd
+{
+	float: none;
+	margin: 0;
+	margin-bottom:0.5ex;
+	padding: 0;
+}
+
+/* styles pour les ��ements */
+
+DL.evenements
+{
+    text-align:left;
+    padding:0;
+    margin:0;
+	margin-bottom:1em;
+}
+
+DT
+{
+	margin-top:0.5em;
+}
+
+/* style pour l'affichage de la famille */
+div.famille
+{
+    text-align:left;
+    border:2px groove #65381B;
+    background-color:#CABB9C;
+    margin-left:auto;
+    margin-right:auto;
+    padding:10px;
+    width:80%;
+}
+
+/* style pour l'affichage de la liste des enfants */
+div.enfants
+{
+    text-align:left;
+    padding-left:1em;
+    margin-top:1em;
+    margin-bottom:1em;
+
+}
+
+div#accueil, div.page
+{
+    text-align:left;
+    border: 2px ridge #65381B;
+    padding:10px;
+    margin-top:20px;
+    margin-left:5%;
+    margin-right:5%;
+    margin-bottom:10px;
+    width:auto;
+}
+
+/* les parents */
+div.parents
+{
+    text-align:left;
+    padding:0.5em;
+    margin-top:1em;
+    margin-bottom:1em;
+
+}
+
+div.oncles, div.cousins, div.freres
+{
+    text-align:left;
+    padding-left:0.5em;
+    padding-top:1em;
+    padding-bottom:0em;
+    margin-top:0em;
+    margin-bottom:0em;
+
+}
+
+/* */
+div.notes, div.sources, div.multimedias
+{
+  margin-top:1.5em;
+  margin-bottom:0.5em;
+  padding:0.5em;
+  border:#65381B dashed 1px;
+}
+
+div.a_note, div.a_source, div.a_multimedia
+{
+    text-align:left;
+    border:1px dotted #65381B;
+    padding-top:0;
+	padding-bottom:0.5em;
+	padding-right:0em;
+	padding-left:0em;
+    margin-top:0em;
+    margin-bottom:1.5em;
+    margin-left:5%;
+    margin-right:5%;
+    text-indent : 15px;
+    font-size : 90%;
+    background-color:#CABB9C;
+}
+
+dl.source
+{
+	margin-bottom: 1em;
+}
+
+.source dt
+{
+	font-style:italic;
+	float: left;
+	clear: both;
+	margin: 0;
+	padding: 0;
+	width: auto;
+}
+
+.source dd
+{
+	padding: 0;
+	margin: 0;
+}
+
+
+/* fin style pour fiche individuelle */
+
+/* affichage de la date entre-parenth�e*/
+span.petit
+{
+    font-size: 90%;
+    font-style : italic;
+	margin-left:0.5em;
+	color:inherit;
+}
+
+/* Styles pour la liste des patronymes et des personnes */
+.colonne {
+    lfloat : left;
+    text-align : center;
+    lwidth : 49.5%;
+    margin:0;
+	padding:10px;
+    background-color:transparent;
+	lborder:1px solid #65381B;
+	column-width:200px;
+	lcolumn-count:3;
+	-moz-column-width:200px;
+	-webkit-column-width:200px;
+	lcolumn-gap: 10px;
+
+}
+
+div.conteneur_colonnes
+{
+  margin-left:auto;
+  margin-right:auto;
+  width:75%;
+  padding:5px;
+  background-color:transparent;
+  border:none;
+}
+
+ul.lettre
+{
+  text-align:center;
+  border-bottom:2px groove #65381B;
+  font-size:90%;
+  padding:5px;
+  letter-spacing:1px;
+}
+
+div.page_prenom
+{
+    text-align:center;
+    border: 2px ridge #65381B;
+    padding:10px;
+    margin-top:20px;
+    margin-left:5%;
+    margin-right:5%;
+    margin-bottom:10px;
+    background-color:#EFEFEF;
+    width:auto;
+}
+
+div.liste_prenoms
+{
+    margin-left:10%;
+    margin-right:10%;
+    margin-top:20px;
+    background-color:#EFEFEF;
+    border: 2px ridge #65381B;
+    padding:2%;
+    width:auto;
+    text-align:left;
+}
+
+/* liste de descendance */
+
+.liste_descendance
+{
+	margin-left:1px solid black;
+}
+
+/* modification event */
+/* style pour l'affichage de la fiche de la personne */
+
+
+dl.mod_event
+{
+	margin-bottom: 1em;
+	padding:0;
+	display:block;
+}
+
+dl.mod_event dt
+{
+	font-style:italic;
+	float: left;
+	display:block;
+	width: 25ex;
+	margin: 0;
+	padding: 2px 2px 0 0 ;
+	vertical-align:text-bottom;
+	height:1.7em;
+	line-height:1.7em;
+}
+
+dl.mod_event dd
+{
+	clear: right;
+	margin: 0;
+	padding: 2px 2px 0 0 ;
+	height:1.7em;
+}
+
+/* divers */
+
+.link_nom
+{
+	font-size:inherit;
+}
+
+form
+{
+		margin:1em;
+}
+
+select, input
+{
+	visibility: inherit;
+	display:inline;
+	vertical-align:middle;
+}
+
+DIV.error
+{
+	color:black;;
+	margin-left:auto;
+	margin-right:auto;
+	width:50%;
+	margin-bottom:1em;
+	border:1px solid red;
+	padding: 10px;
+	background-color:pink;
+}
+
+DIV.success
+{
+	color:black;
+	margin-left:auto;
+	margin-right:auto;
+	width:50%;
+	margin-bottom:1em;
+	border:1px solid green;
+	padding: 10px;
+	background-color:palegreen;
+}
+
+/* jquery autocomplete css */
+.ac_results {
+	padding: 0px;
+	border: 1px solid black;
+	background-color: white;
+	overflow: hidden;
+	z-index: 99999;
+}
+
+.ac_results ul {
+	width: 100%;
+	list-style-position: outside;
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+
+.ac_results li {
+	margin: 0px;
+	padding: 2px 5px;
+	cursor: default;
+	display: block;
+	/*
+	if width will be 100% horizontal scrollbar will apear
+	when scroll mode will be used
+	*/
+	/*width: 100%;*/
+	font: menu;
+	font-size: 12px;
+	/*
+	it is very important, if line-height not setted or setted
+	in relative units scroll will be broken in firefox
+	*/
+	line-height: 16px;
+	overflow: hidden;
+}
+
+.ac_loading {
+	background: white url('indicator.gif') right center no-repeat;
+}
+
+.ac_odd {
+	background-color: #eee;
+}
+
+.ac_over {
+	background-color: #0A246A;
+	color: white;
+}
+
+
+/* Style the tab */
+div.tab {
+    overflow: hidden;
+    border: 1px solid #ccc;
+    background-color: #f1f1f1;
+}
+
+/* Style the buttons inside the tab */
+div.tab button {
+    background-color: inherit;
+    float: left;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 14px 16px;
+    transition: 0.3s;
+}
+
+/* Change background color of buttons on hover */
+div.tab button:hover {
+    background-color: #ddd;
+}
+
+/* Create an active/current tablink class */
+div.tab button.active {
+    background-color: #ccc;
+}
+
+/* Style the tab content */
+.tabcontent {
+    display: none;
+    padding: 6px 12px;
+    border: 1px solid #ccc;
+    border-top: none;
+}

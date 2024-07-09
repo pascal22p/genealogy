@@ -1,0 +1,57 @@
+@import models.Family
+@import controllers.routes
+
+@this()
+
+@(family: Family, partnerOption: Option[Person])(implicit messages: Messages)
+
+<div class="box">
+    <div class="box_title">
+        <h3>Famille
+            @family.parent1.map(_.details.surname).getOrElse("Unknown") —
+            @family.parent2.map(_.details.surname).getOrElse("Unknown") </h3>
+    </div>
+    <span class="petit">Dernière modification : @family.timestamp</span>
+
+    @for(partner <- partnerOption) {
+        <dl class="collapsed">
+            <dt>Conjoint&nbsp;: </dt>
+            <dd><a class="link_nom" href="@routes.HomeController.showPerson(partner.details.id)">@partner.details.toString</a>
+                <span class="petit">(°8 Novembre 1798 – †14 Juillet 1844)</span></dd>
+        </dl>
+    }
+
+    <div class="box">
+        <div class="box_title">
+            <h3>Évènements</h3>
+        </div>
+
+        <dl class="evenements">
+        @for(event <- family.events.eventsDetails) {
+            <dt><em>@messages(event.tag) :</em>
+                <span class="date">@event.formatDate</span>
+                <span style="color: blue;
+                    font-size: x-small;">-S-</span>
+                <a href="detail_event.php?id_event=399" class="noprint">[détail]</a></dt>
+            @for(place <- event.place) {
+                <dd><em>Place : </em>
+                    @place.oneLiner</dd>
+            }
+        }
+        </dl>
+    </div>
+
+    <div class="box">
+        <div class="box_title">
+            <h3>Enfants issus de l'union</h3>
+        </div>
+
+        <ul style="list-style-type: none;
+            padding: 0;">
+        @for(child <- family.children) {
+            <li> <a class="link_nom" href="@routes.HomeController.showPerson(child.person.details.id)">@child.person.details.toString</a>
+                <span class="petit">@child.person.events.birthAndDeathDate</span></li>
+        }
+        </ul>
+    </div>
+</div>

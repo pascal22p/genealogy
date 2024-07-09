@@ -1,0 +1,24 @@
+@import models.Person
+
+@this()
+
+@(person: Person)(implicit messages: Messages)
+
+<div class="box">
+    <div class="box_title">
+        <h3>Évènements</h3>
+    </div>
+
+    <dl class="evenements">
+        @for(event <- person.events.eventsDetails) {
+            <dt><em>@messages(event.tag)</em> : <span class="date">@event.formatDate</span>
+                <span style="color: blue;
+                    font-size: x-small;">-S-</span>
+                <a href="detail_event.php?id_event=480" class="noprint">[détail]</a></dt>
+            @for(place <- event.place) {
+                <dd><em>Place : </em>
+                    @place.oneLiner</dd>
+            }
+        }
+    </dl>
+</div>

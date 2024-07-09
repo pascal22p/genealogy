@@ -1,0 +1,7 @@
+# https://www.playframework.com/documentation/latest/ScalaI18N
+
+surname = Nom:
+firstname = Prénom:
+sex = Sexe:
+id = Id:
+resn = Resn:
