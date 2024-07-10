@@ -1,17 +1,28 @@
-name := """genealogy"""
-organization := "parois.net"
+import com.typesafe.sbt.packager.docker.DockerChmodType
 
-version := "1.0-SNAPSHOT"
+ThisBuild / version := "0.1.0"
+ThisBuild / organization := "parois.net"
+ThisBuild / scalaVersion := "3.4.2"
+
+Universal / javaOptions ++= Seq(
+  "-Dpidfile.path=/dev/null"
+)
+
+Docker / packageName := "genealogie"
+Docker / version := version.value
+
+dockerBaseImage := "eclipse-temurin"
+dockerExposedPorts ++= Seq(9123)
+dockerChmodType := DockerChmodType.UserGroupWriteExecute
 
 lazy val root = (project in file("."))
   .enablePlugins(PlayScala)
+  .enablePlugins(JavaAppPackaging)
+  .enablePlugins(DockerPlugin)
   .settings(
     PlayKeys.playDefaultPort := 9123,
     libraryDependencies ++= LibDependencies.all,
   )
-
-scalaVersion := "3.4.2"
-
 
 
 // Adds additional packages into Twirl

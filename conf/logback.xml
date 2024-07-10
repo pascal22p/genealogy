@@ -10,14 +10,6 @@
   <import class="ch.qos.logback.core.FileAppender"/>
   <import class="ch.qos.logback.core.ConsoleAppender"/>
 
-  <appender name="FILE" class="FileAppender">
-    <file>${application.home:-.}/logs/application.log</file>
-    <encoder class="PatternLayoutEncoder">
-      <charset>UTF-8</charset>
-      <pattern>%d{yyyy-MM-dd HH:mm:ss} %highlight(%-5level) %cyan(%logger{36}) %magenta(%X{pekkoSource}) %msg%n</pattern>
-    </encoder>
-  </appender>
-
   <appender name="STDOUT" class="ConsoleAppender">
     <!--
          On Windows, enabling Jansi is recommended to benefit from color code interpretation on DOS command prompts,
@@ -31,24 +23,19 @@
     </encoder>
   </appender>
 
-  <appender name="ASYNCFILE" class="AsyncAppender">
-    <appender-ref ref="FILE"/>
-  </appender>
-
   <appender name="ASYNCSTDOUT" class="AsyncAppender">
     <appender-ref ref="STDOUT"/>
   </appender>
 
-  <logger name="play" level="INFO"/>
-  <logger name="application" level="DEBUG"/>
+  <logger name="play" level="WARN"/>
+  <logger name="application" level="WARN"/>
 
-  <logger name="org.jdbcdslog.ConnectionLogger" level="OFF"  /> <!-- Won' log connections -->
+  <logger name="org.jdbcdslog.ConnectionLogger" level="INFO"  /> <!-- Won' log connections -->
   <logger name="org.jdbcdslog.StatementLogger"  level="INFO" /> <!-- Will log all statements -->
   <logger name="org.jdbcdslog.ResultSetLogger"  level="OFF"  /> <!-- Won' log result sets -->
 
-  <root level="WARN">
-    <appender-ref ref="ASYNCFILE"/>
-    <appender-ref ref="ASYNCSTDOUT"/>
+  <root level="INFO">
+      <appender-ref ref="ASYNCSTDOUT"/>
   </root>
 
 </configuration>
