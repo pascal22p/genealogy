@@ -22,7 +22,11 @@ class HomeController @Inject()(
   def showPerson(id: Int): Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
     personService.getPerson(id).map { (personOption: Option[Person]) =>
       personOption.fold(NotFound("Nothing here")) { person =>
-        Ok(index(person))
+        if(person.details.privacyRestriction == Some("privacy")) {
+          Forbidden("Not allowed")
+        } else {
+          Ok(index(person))
+        }
       }
     }
   }
