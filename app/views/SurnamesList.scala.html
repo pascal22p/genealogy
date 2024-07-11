@@ -1,0 +1,21 @@
+@import models.GenealogyDatabase
+
+@this(
+        main: Main
+)
+
+@(surnames: List[String], dbId: Int)(implicit request: Request[?], messages: Messages)
+
+
+@main("Famille Parois", dbId) {
+
+    <div class="box">
+    <div class="box_title"><h2>Liste des Noms</h2></div>
+
+        <ul>
+    @for(name <- surnames) {
+        <li><a href="@controllers.routes.HomeController.showFirstnames(dbId, name)">@name</a></li>
+    }
+        </ul>
+    </div>
+}

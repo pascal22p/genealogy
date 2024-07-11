@@ -1,34 +1,35 @@
 package models
 
-import models.queryData.EventDetailQueryData
+import java.time.Instant
 
-import java.time.format.{DateTimeFormatter, DateTimeFormatterBuilder}
-import java.time.{Instant, LocalDate}
-import models.Calendar
+import models.queryData.EventDetailQueryData
 import play.api.i18n.Messages
 import utils.CalendarConstants
 
 case class EventDetail(
-                        base: Int,
-                        events_details_id: Int,
-                        place: Option[Place],
-                        addr_id: Option[Int],
-                        events_details_descriptor: String,
-                        events_details_gedcom_date: String,
-                        events_details_age: String,
-                        events_details_cause: String,
-                        jd_count: Option[Int],
-                        jd_precision: Option[Int],
-                        jd_calendar: Option[String],
-                        events_details_famc: Option[Int],
-                        events_details_adop: Option[String],
-                        events_details_timestamp: Instant,
-                        tag: String
-                      ) {
+    base: Int,
+    events_details_id: Int,
+    place: Option[Place],
+    addr_id: Option[Int],
+    events_details_descriptor: String,
+    events_details_gedcom_date: String,
+    events_details_age: String,
+    events_details_cause: String,
+    jd_count: Option[Int],
+    jd_precision: Option[Int],
+    jd_calendar: Option[String],
+    events_details_famc: Option[Int],
+    events_details_adop: Option[String],
+    events_details_timestamp: Instant,
+    tag: String
+) {
   def formatDate(implicit messages: Messages): String = {
-    CalendarConstants.allKeywords.foldLeft(events_details_gedcom_date) { case (formattedDate, replace) =>
-      replace._1.replaceAllIn(formattedDate, messages(replace._2))
-    }.trim
+    CalendarConstants.allKeywords
+      .foldLeft(events_details_gedcom_date) {
+        case (formattedDate, replace) =>
+          replace._1.replaceAllIn(formattedDate, messages(replace._2))
+      }
+      .trim
   }
 }
 

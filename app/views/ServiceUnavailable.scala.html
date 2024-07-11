@@ -1,17 +1,13 @@
 @import models.Person
-@import views.html.components.{FamilyView, PersonDetails, IndividualEvents, Parents}
 
 @this(
-  main: Main,
-  familyView: FamilyView,
-  personDetails: PersonDetails,
-  individualEvents: IndividualEvents,
-  parents: Parents)
+  main: Main
+)
 
-@()(implicit request: Request[_], messages: Messages)
+@()(implicit request: Request[?], messages: Messages)
 
 
-@main("Service unavailable") {
+@main("Service unavailable", 1) {
 
   Oops something is broken
 

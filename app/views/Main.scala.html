@@ -1,7 +1,7 @@
 
 @this()
 
-@(title: String)(contentBlock: Html)
+@(title: String, dbId: Int)(contentBlock: Html)
 
 <html lang="fr" >
 <head>
@@ -32,8 +32,8 @@
 <ul class="menu" id="menu">
     <li class="menu">Sommaire
         <ul class="ssmenu">
-            <li class="ssmenu"><a href="index.php?base">Liste des bases</a></li>
-            <li class="ssmenu"><a href="liste_patronymes.php">Patronymes</a></li>
+            <li class="ssmenu"><a href="@controllers.routes.HomeController.onload()">Liste des bases</a></li>
+            <li class="ssmenu"><a href="@controllers.routes.HomeController.showSurnames(dbId)">Patronymes</a></li>
             <li class="ssmenu"><a href="connect.php">Se connecter</a></li>
             <li class="ssmenu"><a href="statistiques.php">Statistiques</a></li>
             <li class="ssmenu"><a href="recherche.php">Rechercher</a></li>
@@ -47,8 +47,8 @@
     </li>
     <li class="menu" style="text-align:center">Languages
         <ul class="ssmenu">
-            <li class="ssmenu"><a href="@routes.HomeController.languageSwitch("fr")">Français</a></li>
-            <li class="ssmenu"><a href="@routes.HomeController.languageSwitch("en")">English</a></li>
+            <li class="ssmenu"><a href="@routes.IndividualController.languageSwitch("fr")">Français</a></li>
+            <li class="ssmenu"><a href="@routes.IndividualController.languageSwitch("en")">English</a></li>
         </ul>
     </li>
 </ul>

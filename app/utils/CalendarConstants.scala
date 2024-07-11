@@ -33,20 +33,19 @@ object CalendarConstants {
     "\\bTHER\\b".r -> "months.french.ther",
     "\\bFRUC\\b".r -> "months.french.fruc",
     "\\bCOMP\\b".r -> "months.french.comp",
-
   )
 
   val keywordsPeriod: Map[Regex, String] = Map(
-    "\\bBET\\b".r -> "date.period.bet",
-    "\\bAND\\b".r -> "date.period.and",
-    "\\bBEF\\b".r -> "date.period.bef",
-    "\\bAFT\\b".r -> "date.period.aft",
+    "\\bBET\\b".r  -> "date.period.bet",
+    "\\bAND\\b".r  -> "date.period.and",
+    "\\bBEF\\b".r  -> "date.period.bef",
+    "\\bAFT\\b".r  -> "date.period.aft",
     "\\bFROM\\b".r -> "date.period.from",
-    "\\bTO\\b".r -> "date.period.to",
-    "\\bABT\\b".r -> "date.period.abt"
+    "\\bTO\\b".r   -> "date.period.to",
+    "\\bABT\\b".r  -> "date.period.abt"
   )
 
-  val calendarTypes: Map[Regex, String] = Map (
+  val calendarTypes: Map[Regex, String] = Map(
     "@#[A-Z ]+@".r -> ""
   )
 

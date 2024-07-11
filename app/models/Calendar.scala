@@ -7,13 +7,13 @@ sealed trait Calendar {
 object Calendar {
   def fromString(s: String): Option[Calendar] = {
     s.match {
-      case UnknownCalendar.gedcom => Some(UnknownCalendar)
+      case UnknownCalendar.gedcom   => Some(UnknownCalendar)
       case GregorianCalendar.gedcom => Some(GregorianCalendar)
-      case JulianCalendar.gedcom => Some(JulianCalendar)
-      case FrenchCalendar.gedcom => Some(FrenchCalendar)
-      case HebrewCalendar.gedcom => Some(HebrewCalendar)
-      case RomanCalendar.gedcom => Some(RomanCalendar)
-      case _ => None
+      case JulianCalendar.gedcom    => Some(JulianCalendar)
+      case FrenchCalendar.gedcom    => Some(FrenchCalendar)
+      case HebrewCalendar.gedcom    => Some(HebrewCalendar)
+      case RomanCalendar.gedcom     => Some(RomanCalendar)
+      case _                        => None
     }
   }
 }
@@ -41,5 +41,3 @@ case object HebrewCalendar extends Calendar {
 case object RomanCalendar extends Calendar {
   val gedcom = "@#DROMAN@"
 }
-
-

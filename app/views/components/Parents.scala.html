@@ -1,4 +1,3 @@
-@import models.Person
 @import controllers.routes
 
 @this()
@@ -13,10 +12,10 @@
 
     <ul style="list-style-type:none;padding:0;">
         @for(parent <- parents.family.parent1) {
-        <li><a class="link_nom" href="@routes.HomeController.showPerson(parent.details.id)">@parent.details.toString</a> <span class="petit">@parent.events.birthAndDeathDate</span></li>
+        <li><a class="link_nom" href="@routes.IndividualController.showPerson(parent.details.id)">@parent.details.toString</a> <span class="petit">@parent.events.birthAndDeathDate</span></li>
         }
         @for(parent <- parents.family.parent2) {
-        <li><a class="link_nom" href="@routes.HomeController.showPerson(parent.details.id)">@parent.details.toString</a> <span class="petit">@parent.events.birthAndDeathDate</span></li>
+        <li><a class="link_nom" href="@routes.IndividualController.showPerson(parent.details.id)">@parent.details.toString</a> <span class="petit">@parent.events.birthAndDeathDate</span></li>
         }
     </ul>
     }

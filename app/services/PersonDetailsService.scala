@@ -1,17 +1,19 @@
 package services
 
-import models.*
-import queries.MariadbQueries
+import javax.inject.Inject
+import javax.inject.Singleton
+
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
+
 import cats.*
 import cats.implicits.*
-import models.queryData.EventDetailQueryData
-
-import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
+import models.*
+import queries.MariadbQueries
 
 @Singleton
-class PersonDetailsService @Inject()(mariadbQueries: MariadbQueries)(
-  implicit ec: ExecutionContext
+class PersonDetailsService @Inject() (mariadbQueries: MariadbQueries)(
+    implicit ec: ExecutionContext
 ) {
 
   def getPersonDetails(id: Int): Future[Option[PersonDetails]] =
@@ -40,57 +42,61 @@ class PersonDetailsService @Inject()(mariadbQueries: MariadbQueries)(
   def getParents(id: Int): Future[List[Parents]] = {
     mariadbQueries.getFamiliesFromIndividualId(id).flatMap { families =>
       families.map { familyQueryData =>
-          for {
-            parent1 <- familyQueryData.family.parent1.traverse(getPersonDetails).map(_.flatten)
-            events1 <- parent1.traverse(i => getIndividualEvents(i.id))
-            parent2 <- familyQueryData.family.parent2.traverse(getPersonDetails).map(_.flatten)
-            events2 <- parent2.traverse(i => getIndividualEvents(i.id))
-          } yield {
-            Parents(
-              familyQueryData,
-              parent1.map(Person(_, Events(events1.getOrElse(List.empty)), List.empty)),
-              parent2.map(Person(_, Events(events2.getOrElse(List.empty)), List.empty))
-            )
-          }
+        for {
+          parent1 <- familyQueryData.family.parent1.traverse(getPersonDetails).map(_.flatten)
+          events1 <- parent1.traverse(i => getIndividualEvents(i.id))
+          parent2 <- familyQueryData.family.parent2.traverse(getPersonDetails).map(_.flatten)
+          events2 <- parent2.traverse(i => getIndividualEvents(i.id))
+        } yield {
+          Parents(
+            familyQueryData,
+            parent1.map(Person(_, Events(events1.getOrElse(List.empty)), List.empty)),
+            parent2.map(Person(_, Events(events2.getOrElse(List.empty)), List.empty))
+          )
+        }
       }.sequence
     }
   }
 
-  
   def getFamiliesAsPartner(id: Int): Future[List[Family]] = {
     mariadbQueries.getFamiliesAsPartner(id).flatMap { families =>
-      families.traverse(family => getFamilyDetails(family.id)
-      .map(_.get))
-      .flatMap { families =>
-        families.traverse { family =>
-          for {
-            events <- getFamilyEvents(family.id)
-            children <- getChildren(family.id)
-          } yield {
-            family.copy(children = children, events = Events(events))
+      families
+        .traverse(family =>
+          getFamilyDetails(family.id)
+            .map(_.get)
+        )
+        .flatMap { families =>
+          families.traverse { family =>
+            for {
+              events   <- getFamilyEvents(family.id)
+              children <- getChildren(family.id)
+            } yield {
+              family.copy(children = children, events = Events(events))
+            }
           }
         }
-      }
-   }
+    }
   }
 
   def getFamilyDetails(id: Int): Future[Option[Family]] = {
-    mariadbQueries.getFamilyDetails(id).flatMap ( families =>
-      families.traverse { family =>
-        for {
-          parent1 <- family.parent1.traverse(getPersonDetails).map(_.flatten)
-          events1 <- parent1.traverse(i => getIndividualEvents(i.id))
-          parent2 <- family.parent2.traverse(getPersonDetails).map(_.flatten)
-          events2 <- parent2.traverse(i => getIndividualEvents(i.id))
-        } yield {
-         Family(
-            family,
-            parent1.map(Person(_, Events(events1.getOrElse(List.empty)), List.empty)),
-            parent2.map(Person(_, Events(events2.getOrElse(List.empty)), List.empty))
-         )
+    mariadbQueries
+      .getFamilyDetails(id)
+      .flatMap(families =>
+        families.traverse { family =>
+          for {
+            parent1 <- family.parent1.traverse(getPersonDetails).map(_.flatten)
+            events1 <- parent1.traverse(i => getIndividualEvents(i.id))
+            parent2 <- family.parent2.traverse(getPersonDetails).map(_.flatten)
+            events2 <- parent2.traverse(i => getIndividualEvents(i.id))
+          } yield {
+            Family(
+              family,
+              parent1.map(Person(_, Events(events1.getOrElse(List.empty)), List.empty)),
+              parent2.map(Person(_, Events(events2.getOrElse(List.empty)), List.empty))
+            )
+          }
         }
-      }
-    )
+      )
   }
 
   def getChildren(familyId: Int): Future[List[Child]] = {

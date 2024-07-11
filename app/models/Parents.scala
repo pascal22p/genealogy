@@ -2,14 +2,9 @@ package models
 
 import anorm._
 import anorm.SqlParser._
-import java.time.Instant
 import queryData.FamilyAsChildQueryData
 
-final case class Parents(
-  family: Family,
-  refnType: String,
-  relaType: String, 
-  relaStat: Option[String]) 
+final case class Parents(family: Family, refnType: String, relaType: String, relaStat: Option[String])
 
 object Parents {
   def apply(familyAsChildQueryData: FamilyAsChildQueryData, parent1: Option[Person], parent2: Option[Person]) = {
@@ -18,6 +13,6 @@ object Parents {
       familyAsChildQueryData.refnType,
       familyAsChildQueryData.relaType,
       familyAsChildQueryData.relaStat
-      )
+    )
   }
 }

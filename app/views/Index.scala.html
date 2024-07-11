@@ -1,26 +1,20 @@
-@import models.Person
-@import views.html.components.{FamilyView, PersonDetails, IndividualEvents, Parents}
-
 @this(
-  main: Main,
-  familyView: FamilyView,
-  personDetails: PersonDetails,
-  individualEvents: IndividualEvents,
-  parents: Parents)
+        main: Main
+)
 
-@(person: Person)(implicit request: Request[_], messages: Messages)
+@(dbs: List[GenealogyDatabase], dbId: Int)(implicit request: Request[?], messages: Messages)
 
 
-@main(person.details.toString) {
+@main("Famille Parois", dbId) {
 
-  @personDetails(person)
+    <div class="box">
+    <div class="box_title"><h2>Liste des bases de données</h2></div>
 
-  @individualEvents(person)
-
-  @for(family <- person.families) {
-    @familyView(family, person.findPartner(family.id))
-  }
-
-  @parents(person)
-
+    @for(db <- dbs) {
+        <dl>
+            <dt><a href="@controllers.routes.HomeController.showSurnames(db.id)">@db.name</a></dt>
+            <dd>@db.description</dd>
+        </dl>
+    }
+    </div>
 }
