@@ -9,4 +9,7 @@ GET     /firstnames/base/:id/name/:name           controllers.HomeController.sho
 GET     /individual/:id                           controllers.IndividualController.showPerson(id: Int)
 GET     /switch-lang/:lang                        controllers.IndividualController.languageSwitch(lang: String)
 
+GET     /login                                    controllers.LoginController.onLoad()
+POST    /login                                    controllers.LoginController.onSubmit()
+
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)

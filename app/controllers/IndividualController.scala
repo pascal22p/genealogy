@@ -30,7 +30,7 @@ class IndividualController @Inject() (
         if (person.details.privacyRestriction.contains("privacy")) {
           Forbidden("Not allowed")
         } else {
-          Ok(individualView(person, request.dbId))
+          Ok(individualView(person, request.localSession.sessionData.dbId))
         }
       }
     }

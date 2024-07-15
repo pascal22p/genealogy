@@ -8,6 +8,7 @@ import scala.concurrent.Future
 
 import cats.*
 import cats.implicits.*
+import models.AuthenticatedRequest
 import models.Events
 import models.GenealogyDatabase
 import models.Person
@@ -19,9 +20,12 @@ class GenealogyDatabaseService @Inject() (mariadbQueries: MariadbQueries, person
 ) {
   def getGenealogyDatabases: Future[List[GenealogyDatabase]] = mariadbQueries.getGenealogyDatabases
 
-  def getSurnamesList(id: Int): Future[List[String]] = mariadbQueries.getSurnamesList(id)
+  def getSurnamesList(id: Int)(implicit authenticatedRequest: AuthenticatedRequest[?]): Future[List[String]] =
+    mariadbQueries.getSurnamesList(id)
 
-  def getFirstnamesList(id: Int, name: String): Future[List[Person]] = {
+  def getFirstnamesList(id: Int, name: String)(
+      implicit authenticatedRequest: AuthenticatedRequest[?]
+  ): Future[List[Person]] = {
     mariadbQueries.getFirstnamesList(id, name).flatMap { personList =>
       personList.traverse { person =>
         personDetailsService.getIndividualEvents(person.id).map { events =>

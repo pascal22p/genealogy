@@ -1,0 +1,28 @@
+@import views.html.helper
+@import models.forms.UserDataForm
+
+@this(
+        main: Main
+)
+
+@(userForm: Form[UserDataForm])(implicit request: Request[?], messages: Messages)
+
+@main("Famille Parois", 1) {
+
+    <div class="box">
+    <div class="box_title"><h2>Login</h2></div>
+        @if(userForm.hasGlobalErrors) {
+            @for(error <- userForm.globalErrors) {
+                <span class="error-message">@error.format(messages)</span>
+            }
+        }
+
+        @helper.form(action = controllers.routes.LoginController.onSubmit() ) {
+            @helper.CSRF.formField
+            @helper.inputText(userForm("username"))
+            @helper.inputPassword(userForm("password"))
+            <button type="submit">Submit</button>
+        }
+
+    </div>
+}

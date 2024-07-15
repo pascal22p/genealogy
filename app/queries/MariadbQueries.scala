@@ -5,14 +5,12 @@ import javax.inject.Singleton
 
 import scala.concurrent.Future
 
-import anorm._
-import anorm.SqlParser._
-import models._
-import models.queryData.EventDetailQueryData
-import models.queryData.FamilyAsChildQueryData
-import models.queryData.FamilyQueryData
-import models.PersonDetails
+import anorm.*
+import anorm.SqlParser.*
+import models.*
+import models.queryData.*
 import play.api.db.Database
+import play.api.libs.json.Json
 
 @Singleton
 final class MariadbQueries @Inject() (db: Database, databaseExecutionContext: DatabaseExecutionContext) {
@@ -114,26 +112,87 @@ final class MariadbQueries @Inject() (db: Database, databaseExecutionContext: Da
     }
   }(databaseExecutionContext)
 
-  def getSurnamesList(id: Int): Future[List[String]] = Future {
+  def getSurnamesList(id: Int)(implicit authenticatedRequest: AuthenticatedRequest[?]): Future[List[String]] = Future {
     db.withConnection { implicit conn =>
-      SQL("""SELECT indi_nom
-            |FROM genea_individuals
-            |WHERE base = {id} AND indi_resn IS NULL
-            |GROUP BY indi_nom
-            |ORDER BY indi_nom""".stripMargin)
+      val excludePrivate = "AND indi_resn IS NULL"
+      authenticatedRequest.localSession.sessionData.userData.fold(excludePrivate) { userData =>
+        if (userData.seePrivacy) "" else excludePrivate
+      }
+      SQL(s"""SELECT indi_nom
+             |FROM genea_individuals
+             |WHERE base = {id} $excludePrivate
+             |GROUP BY indi_nom
+             |ORDER BY indi_nom""".stripMargin)
         .on("id" -> id)
         .as(SqlParser.str("indi_nom").*)
     }
   }(databaseExecutionContext)
 
-  def getFirstnamesList(id: Int, name: String): Future[List[PersonDetails]] = Future {
+  def getFirstnamesList(id: Int, name: String)(
+      implicit authenticatedRequest: AuthenticatedRequest[?]
+  ): Future[List[PersonDetails]] = Future {
     db.withConnection { implicit conn =>
-      SQL("""SELECT *
-            |FROM genea_individuals
-            |WHERE base = {id} AND indi_nom = {name} AND indi_resn IS NULL
-            |ORDER BY indi_prenom""".stripMargin)
+      val excludePrivate = "AND indi_resn IS NULL"
+      val isExcluded = authenticatedRequest.localSession.sessionData.userData.fold(excludePrivate) { userData =>
+        if (userData.seePrivacy) "" else excludePrivate
+      }
+      SQL(s"""SELECT *
+             |FROM genea_individuals
+             |WHERE base = {id} AND indi_nom = {name} $isExcluded
+             |ORDER BY indi_prenom""".stripMargin)
         .on("id" -> id, "name" -> name)
         .as(PersonDetails.mysqlParser.*)
+    }
+  }(databaseExecutionContext)
+
+  def getSessionData(sessionId: String): Future[Option[Session]] = Future {
+    db.withConnection { implicit conn =>
+      SQL("""SELECT *
+            |FROM genea_sessions
+            |WHERE sessionId = {id}""".stripMargin)
+        .on("id" -> sessionId)
+        .as(Session.mysqlParser.singleOpt)
+    }
+  }(databaseExecutionContext)
+
+  def putSessionData(session: Session): Future[Option[String]] = Future {
+    db.withConnection { implicit conn =>
+      SQL("""INSERT INTO genea_sessions (sessionId, sessionData)
+            |VALUES ({id}, {data})
+            |""".stripMargin)
+        .on("id" -> session.sessionId, "data" -> Json.toJson(session.sessionData).toString)
+        .executeInsert(str(1).singleOpt)
+    }
+  }(databaseExecutionContext)
+
+  def updateSessionData(session: Session): Future[Int] = Future {
+    db.withConnection { implicit conn =>
+      SQL("""UPDATE genea_sessions
+            |SET sessionData = {data}
+            |WHERE sessionId = {id}
+            |""".stripMargin)
+        .on("id" -> session.sessionId, "data" -> Json.toJson(session.sessionData).toString)
+        .executeUpdate()
+    }
+  }(databaseExecutionContext)
+
+  def sessionKeepAlive(sessionId: String): Future[Int] = Future {
+    db.withConnection { implicit conn =>
+      SQL("""UPDATE genea_sessions
+            |SET timeStamp = CURRENT_TIMESTAMP
+            |WHERE sessionId = {id}""".stripMargin)
+        .on("id" -> sessionId)
+        .executeUpdate()
+    }
+  }(databaseExecutionContext)
+
+  def getUserData(username: String): Future[Option[UserData]] = Future {
+    db.withConnection { implicit conn =>
+      SQL("""SELECT *
+            |FROM genea_membres
+            |WHERE email = {email}""".stripMargin)
+        .on("email" -> username)
+        .as(UserData.mysqlParser.singleOpt)
     }
   }(databaseExecutionContext)
 

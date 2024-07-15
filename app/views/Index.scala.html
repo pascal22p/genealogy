@@ -1,11 +1,17 @@
+@import models.SessionData
+
 @this(
         main: Main
 )
 
-@(dbs: List[GenealogyDatabase], dbId: Int)(implicit request: Request[?], messages: Messages)
+@(dbs: List[GenealogyDatabase], localSession: SessionData)(implicit request: Request[?], messages: Messages)
 
 
-@main("Famille Parois", dbId) {
+@main("Famille Parois", localSession.dbId) {
+
+  @for(userData <- localSession.userData) {
+      <h1>@userData.username</h1>
+  }
 
     <div class="box">
     <div class="box_title"><h2>Liste des bases de données</h2></div>
