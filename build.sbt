@@ -19,7 +19,8 @@ dockerChmodType := DockerChmodType.UserGroupWriteExecute
 lazy val scoverageSettings = {
   import scoverage.ScoverageKeys
   Seq(
-    ScoverageKeys.coverageExcludedPackages := "<empty>;Reverse.*;"
+    ScoverageKeys.coverageExcludedPackages := ".*Reverse.*",
+    ScoverageKeys.coverageExcludedFiles := ".*Routes.*",
     ScoverageKeys.coverageMinimumStmtTotal := 89.5,
     ScoverageKeys.coverageFailOnMinimum := false,
     ScoverageKeys.coverageHighlighting := true
