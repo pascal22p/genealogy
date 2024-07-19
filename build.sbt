@@ -12,7 +12,7 @@ Universal / javaOptions ++= Seq(
 
 
 
-packageName := "genealogie"
+packageName := "genealogy"
 dockerBaseImage := "eclipse-temurin:21"
 dockerExposedPorts ++= Seq(9123)
 dockerChmodType := DockerChmodType.UserGroupWriteExecute
