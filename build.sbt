@@ -1,5 +1,6 @@
 import com.typesafe.sbt.packager.docker.DockerChmodType
 
+
 ThisBuild / version := "0.1.0"
 ThisBuild / organization := "parois.net"
 ThisBuild / scalaVersion := "3.4.2"
@@ -9,12 +10,14 @@ Universal / javaOptions ++= Seq(
   "-Dpidfile.path=/dev/null"
 )
 
-Docker / packageName := "genealogie"
-Docker / version := version.value
 
-dockerBaseImage := "eclipse-temurin"
+
+packageName := "genealogie"
+dockerBaseImage := "eclipse-temurin:21"
 dockerExposedPorts ++= Seq(9123)
 dockerChmodType := DockerChmodType.UserGroupWriteExecute
+dockerUsername := Some("pascal22p")
+
 
 lazy val scoverageSettings = {
   import scoverage.ScoverageKeys
@@ -28,7 +31,7 @@ lazy val scoverageSettings = {
 }
 
 
-lazy val root = (project in file("."))
+lazy val genealogy = (project in file("."))
   .enablePlugins(PlayScala)
   .enablePlugins(JavaAppPackaging)
   .enablePlugins(DockerPlugin)
@@ -38,8 +41,3 @@ lazy val root = (project in file("."))
     scoverageSettings
   )
 
-
-// Adds additional packages into Twirl
-
-// Adds additional packages into conf/routes
-// play.sbt.routes.RoutesKeys.routesImport += "parois.net.binders._"
