@@ -1,4 +1,4 @@
-import com.typesafe.sbt.packager.docker.DockerChmodType
+import com.typesafe.sbt.packager.docker.{DockerChmodType, DockerVersion}
 
 ThisBuild / version := "0.1.0"
 ThisBuild / organization := "parois.net"
@@ -10,11 +10,12 @@ Universal / javaOptions ++= Seq(
 )
 
 Docker / packageName := "genealogie"
-Docker / version := version.value
+Docker / dockerVersion := Some(DockerVersion(0,1,0, None))
+Docker / dockerBaseImage := "eclipse-temurin"
+Docker / dockerExposedPorts ++= Seq(9123)
+Docker / dockerChmodType := DockerChmodType.UserGroupWriteExecute
+Docker / dockerUsername := Some("pascal22p")
 
-dockerBaseImage := "eclipse-temurin"
-dockerExposedPorts ++= Seq(9123)
-dockerChmodType := DockerChmodType.UserGroupWriteExecute
 
 lazy val scoverageSettings = {
   import scoverage.ScoverageKeys
@@ -28,7 +29,7 @@ lazy val scoverageSettings = {
 }
 
 
-lazy val root = (project in file("."))
+lazy val genealogy = (project in file("."))
   .enablePlugins(PlayScala)
   .enablePlugins(JavaAppPackaging)
   .enablePlugins(DockerPlugin)
