@@ -83,8 +83,7 @@ class individualControllerSpec extends BaseSpec {
   "returns not found" in {
     when(mockPersonService.getPerson(any())).thenReturn(
       Future.successful(None)
-    )/Users/pascal.parois/Documents/Personal/genealogy/target/scala-3.4.2/scoverage-report/index.html
-
+    )
 
     val result = sut.showPerson(1).apply(FakeRequest())
     status(result) mustBe NOT_FOUND
