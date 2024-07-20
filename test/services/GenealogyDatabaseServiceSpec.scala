@@ -38,12 +38,12 @@ class GenealogyDatabaseServiceSpec extends BaseSpec {
   lazy val mockMariadbQueries: MariadbQueries             = mock[MariadbQueries]
   lazy val mockPersonDetailsService: PersonDetailsService = mock[PersonDetailsService]
 
-  override def fakeApplication(): Application = new GuiceApplicationBuilder()
-    .bindings(
-      bind[MariadbQueries].toInstance(mockMariadbQueries),
-      bind[PersonDetailsService].toInstance(mockPersonDetailsService)
-    )
-    .build()
+  protected override def localGuiceApplicationBuilder(): GuiceApplicationBuilder =
+    GuiceApplicationBuilder()
+      .overrides(
+        bind[MariadbQueries].toInstance(mockMariadbQueries),
+        bind[PersonDetailsService].toInstance(mockPersonDetailsService)
+      )
 
   "getFirstnamesList" must {
     "Return a list of names with birth/death" in {
