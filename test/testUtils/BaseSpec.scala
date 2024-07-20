@@ -16,8 +16,10 @@ import play.api.test.Injecting
 import play.api.Application
 
 trait BaseSpec extends PlaySpec with GuiceOneAppPerSuite with ScalaFutures with Injecting with IntegrationPatience {
-  override def fakeApplication(): Application = new GuiceApplicationBuilder()
-    .build()
+  protected def localGuiceApplicationBuilder(): GuiceApplicationBuilder =
+    GuiceApplicationBuilder()
+
+  implicit override lazy val app: Application = localGuiceApplicationBuilder().build()
 
   def fakePersonDetails(
       base: Int = 1,

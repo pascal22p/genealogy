@@ -8,6 +8,9 @@ ThisBuild / organization := "parois.net"
 ThisBuild / scalaVersion := "3.4.2"
 ThisBuild / scalafmtOnCompile := true
 
+Test / parallelExecution := true
+Test / Keys.fork := true
+
 Universal / javaOptions ++= Seq(
   "-Dpidfile.path=/dev/null"
 )
