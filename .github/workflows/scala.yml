@@ -26,8 +26,6 @@ jobs:
           - "3306:3306"
         env:
           MARIADB_DATABASE: db
-          MARIADB_USER: root
-          MARIADB_PASSWORD: example
           MARIADB_ROOT_PASSWORD: example
         options: >-
           --health-cmd="healthcheck.sh --connect --innodb_initialized"
