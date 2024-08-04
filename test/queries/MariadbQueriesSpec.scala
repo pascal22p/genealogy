@@ -1,23 +1,19 @@
 package queries
 
-import java.time.Instant
-
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
+import scala.util.Failure
+import scala.util.Success
+import scala.util.Try
 
-import anorm.*
-import cats.implicits.*
-import cats.syntax.*
-import models.PersonDetails
-import org.scalatest.matchers.should.Matchers.should
-import org.scalatest.matchers.should.Matchers.shouldBe
+import anorm.execute
+import anorm.SQL
+import models.*
+import models.queryData.EventDetailQueryData
+import models.queryData.FamilyAsChildQueryData
+import models.queryData.FamilyQueryData
 import org.scalatest.BeforeAndAfterEach
-import org.scalatestplus.play.*
 import play.api.db.Database
-import play.api.i18n.Lang
-import play.api.i18n.Messages
-import play.api.i18n.MessagesApi
-import play.api.i18n.MessagesImpl
 import play.api.Application
 import testUtils.BaseSpec
 
@@ -35,12 +31,18 @@ class MariadbQueriesSpec extends BaseSpec with BeforeAndAfterEach {
     )
     .build()
 
-  def executeSql(queries: String): Future[Boolean] = Future {
+  def executeSql(queries: String, logMe: Boolean = false): Future[Boolean] = Future {
     db.withConnection { implicit conn =>
       queries.trim
         .split(";")
         .map { query =>
-          SQL(query).execute()
+          if (logMe) println("Query: " + query)
+          Try(SQL(query).execute()) match {
+            case Success(bool) => bool
+            case Failure(error) =>
+              println("Error with query: " + query)
+              throw error
+          }
         }
         .reduce(_ && _)
     }
@@ -64,22 +66,66 @@ class MariadbQueriesSpec extends BaseSpec with BeforeAndAfterEach {
     createTables().futureValue
   }
 
-  def sqlPersonDetails(id: Int): String =
+  def sqlPersonDetails(person: PersonDetails): String =
     s"""INSERT INTO `genea_individuals` (`indi_id`, `base`, `indi_nom`, `indi_prenom`, `indi_sexe`, `indi_npfx`, `indi_givn`, `indi_nick`, `indi_spfx`, `indi_nsfx`, `indi_resn`) VALUES
-       |($id,	1,	'PAROIS',	'Alphonse Auguste Joseph Marie',	'M',	'',	'',	'',	'',	'',	NULL);
+       |(${person.id},	${person.base},	'${person.surname}',	'${person.firstname}',	'${person.sex.gedcom}',	'${person.firstnamePrefix}',	'${person.nameGiven}',	'${person.nameNickname}',	'${person.surnamePrefix}',	'${person.nameSuffix}',	${person.privacyRestriction.fold("NULL")(r => s"'$r'")});
        |""".stripMargin
+
+  def sqlEventDetails(event: EventDetail): String =
+    s"""INSERT INTO `genea_events_details` (`events_details_id`, `place_id`, `addr_id`, `events_details_descriptor`, `events_details_gedcom_date`, `events_details_age`, `events_details_cause`, `jd_count`, `jd_precision`, `jd_calendar`, `events_details_famc`, `events_details_adop`, `base`) VALUES
+       |(${event.events_details_id},	1,	NULL,	'',	'15 MAY 1835',	'',	'',	2391414,	3,	'@#DGREGORIAN@',	NULL,	NULL,	1);
+       |""".stripMargin
+
+  def sqlFamilyDetails(id: Int, person1: PersonDetails, person2: PersonDetails): String =
+    sqlPersonDetails(person1) +
+      sqlPersonDetails(person2) +
+      s"""INSERT INTO `genea_familles` (`familles_id`, `base`, `familles_husb`, `familles_wife`, `familles_resn`, `familles_refn`, `familles_refn_type`) VALUES
+         |($id,	1,	${person1.id},	${person2.id},	NULL,	'',	'');""".stripMargin
+
+  def sqlIndividualEvent(person: PersonDetails, event: EventDetail, eventTag: String): String =
+    sqlPersonDetails(person) +
+      sqlEventDetails(event) +
+      s"""
+         |INSERT INTO `rel_indi_events` (`events_details_id`, `indi_id`, `events_tag`, `events_attestation`) VALUES
+         |(${event.events_details_id},	${person.id},	'$eventTag',	NULL);
+         |""".stripMargin
+
+  def sqlLinkFamilyEvent(idFamily: Int, event: EventDetail): String =
+    s"""
+       |INSERT INTO `rel_familles_events` (`events_details_id`, `familles_id`, `events_tag`, `events_attestation`) VALUES
+       |(${event.events_details_id},	$idFamily,	'${event.tag}',	NULL);
+       |""".stripMargin
+
+  def sqlChild(child: Child, idFamily: Int): String =
+    sqlPersonDetails(child.person.details) +
+      s"""
+         |INSERT INTO `rel_familles_indi` (`indi_id`, `familles_id`, `rela_type`) VALUES
+         |(${child.person.details.id},	$idFamily, '${child.relaType}');
+         |""".stripMargin
+
+  def sqlFamily(
+      idFamily: Int,
+      person1: PersonDetails,
+      person2: PersonDetails,
+      children: List[Child],
+      events: List[EventDetail]
+  ): String = {
+    sqlFamilyDetails(idFamily, person1, person2) +
+      events.foldLeft("") { case (sql, event) => sql + sqlEventDetails(event) + sqlLinkFamilyEvent(idFamily, event) } +
+      children.foldLeft("") { case (sql, child) => sql + sqlChild(child, idFamily) }
+  }
 
   "getPersonDetails" must {
     "returns person details" in {
-      val idPerson = 1
+      val person = fakePersonDetails(id = 1)
       val result = (for {
-        _      <- executeSql(sqlPersonDetails(idPerson))
-        result <- sut.getPersonDetails(idPerson)
+        _      <- executeSql(sqlPersonDetails(person))
+        result <- sut.getPersonDetails(person.id)
       } yield result).futureValue
 
       result mustBe a[List[PersonDetails]]
       result.size mustBe 1
-      result.head.id mustBe idPerson
+      result.head.id mustBe person.id
     }
 
     "returns nothing" in {
@@ -90,4 +136,141 @@ class MariadbQueriesSpec extends BaseSpec with BeforeAndAfterEach {
     }
   }
 
+  "getIndividualEvents" must {
+    "returns individual events" in {
+      val person   = fakePersonDetails(id = 1)
+      val event    = fakeEventDetail(events_details_id = 2)
+      val eventTag = "BIRT"
+      val result = (for {
+        _      <- executeSql(sqlIndividualEvent(person, event, eventTag))
+        result <- sut.getIndividualEvents(person.id)
+      } yield result).futureValue
+
+      result mustBe a[List[EventDetailQueryData]]
+      result.size mustBe 1
+      result.head.events_details_id mustBe event.events_details_id
+      result.head.tag mustBe eventTag
+    }
+
+    "returns nothing" in {
+      val idPerson = 1
+      val result   = sut.getIndividualEvents(idPerson).futureValue
+
+      result mustBe List.empty
+    }
+  }
+
+  "getFamilyEvents" must {
+    "returns family events" in {
+      val person1  = fakePersonDetails(id = 1)
+      val person2  = fakePersonDetails(id = 2)
+      val idFamily = 3
+      val event    = fakeEventDetail(events_details_id = 4, tag = "BIRT")
+      val result = (for {
+        _      <- executeSql(sqlFamily(idFamily, person1, person2, List.empty, List(event)))
+        result <- sut.getFamilyEvents(idFamily)
+      } yield result).futureValue
+
+      result mustBe a[List[EventDetailQueryData]]
+      result.size mustBe 1
+      result.head.events_details_id mustBe event.events_details_id
+      result.head.tag mustBe event.tag
+    }
+
+    "returns nothing" in {
+      val idPerson = 1
+      val result   = sut.getFamilyEvents(idPerson).futureValue
+
+      result mustBe List.empty
+    }
+  }
+
+  "getFamiliesFromIndividualId" must {
+    "returns families" in {
+      val person1  = fakePersonDetails(id = 1)
+      val person2  = fakePersonDetails(id = 2)
+      val idFamily = 3
+      val child    = Child(Person(fakePersonDetails(id = 5), Events(List.empty)), "adopted", None)
+      val result = (for {
+        _      <- executeSql(sqlFamily(idFamily, person1, person2, List(child), List.empty))
+        result <- sut.getFamiliesFromIndividualId(child.person.details.id)
+      } yield result).futureValue
+
+      result mustBe a[List[FamilyAsChildQueryData]]
+      result.size mustBe 1
+      result.head.family.parent1 mustBe Some(person1.id)
+      result.head.family.parent2 mustBe Some(person2.id)
+      result.head.relaType mustBe child.relaType
+    }
+
+    "returns nothing" in {
+      val idPerson = 1
+      val result   = sut.getFamiliesFromIndividualId(idPerson).futureValue
+
+      result mustBe List.empty
+    }
+  }
+
+  "getFamiliesAsPartner" must {
+    "returns family when person is husb" in {
+      val person1  = fakePersonDetails(id = 1)
+      val person2  = fakePersonDetails(id = 2)
+      val idFamily = 3
+      val result = (for {
+        _      <- executeSql(sqlFamily(idFamily, person1, person2, List.empty, List.empty))
+        result <- sut.getFamiliesAsPartner(person1.id)
+      } yield result).futureValue
+
+      result mustBe a[List[FamilyQueryData]]
+      result.size mustBe 1
+      result.head.parent1 mustBe Some(person1.id)
+      result.head.parent2 mustBe Some(person2.id)
+    }
+
+    "returns family when person is wife" in {
+      val person1  = fakePersonDetails(id = 1)
+      val person2  = fakePersonDetails(id = 2)
+      val idFamily = 3
+      val result = (for {
+        _      <- executeSql(sqlFamily(idFamily, person1, person2, List.empty, List.empty))
+        result <- sut.getFamiliesAsPartner(person2.id)
+      } yield result).futureValue
+
+      result mustBe a[List[FamilyQueryData]]
+      result.size mustBe 1
+      result.head.parent1 mustBe Some(person1.id)
+      result.head.parent2 mustBe Some(person2.id)
+    }
+
+    "returns nothing" in {
+      val idPerson = 1
+      val result   = sut.getFamiliesAsPartner(idPerson).futureValue
+
+      result mustBe List.empty
+    }
+  }
+
+  "getFamilyDetails" must {
+    "returns family" in {
+      val person1  = fakePersonDetails(id = 1)
+      val person2  = fakePersonDetails(id = 2)
+      val idFamily = 3
+      val result = (for {
+        _      <- executeSql(sqlFamily(idFamily, person1, person2, List.empty, List.empty))
+        result <- sut.getFamilyDetails(idFamily)
+      } yield result).futureValue
+
+      result mustBe a[Some[FamilyQueryData]]
+      result.size mustBe 1
+      result.head.parent1 mustBe Some(person1.id)
+      result.head.parent2 mustBe Some(person2.id)
+    }
+
+    "returns nothing" in {
+      val idPerson = 1
+      val result   = sut.getFamilyDetails(idPerson).futureValue
+
+      result mustBe None
+    }
+  }
 }
