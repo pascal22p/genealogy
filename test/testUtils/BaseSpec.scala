@@ -83,4 +83,19 @@ trait BaseSpec extends PlaySpec with GuiceOneAppPerSuite with ScalaFutures with 
     events_details_timestamp,
     tag
   )
+
+  def fakePlace(
+      id: Int = 1,
+      lieuDit: String = "Lieu Dit",
+      city: String = "City",
+      postCode: String = "Postcode",
+      inseeNumber: Option[Int] = None,
+      county: String = "County",
+      region: String = "Region",
+      country: String = "Country",
+      longitude: Option[Double] = None,
+      latitude: Option[Double] = None,
+      base: Int = 1
+  ): Place = Place(id, lieuDit, city, postCode, inseeNumber, county, region, country, longitude, latitude, base)
+
 }
