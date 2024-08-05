@@ -115,12 +115,12 @@ final class MariadbQueries @Inject() (db: Database, databaseExecutionContext: Da
   def getSurnamesList(id: Int)(implicit authenticatedRequest: AuthenticatedRequest[?]): Future[List[String]] = Future {
     db.withConnection { implicit conn =>
       val excludePrivate = "AND indi_resn IS NULL"
-      authenticatedRequest.localSession.sessionData.userData.fold(excludePrivate) { userData =>
+      val isExcluded = authenticatedRequest.localSession.sessionData.userData.fold(excludePrivate) { userData =>
         if (userData.seePrivacy) "" else excludePrivate
       }
       SQL(s"""SELECT indi_nom
              |FROM genea_individuals
-             |WHERE base = {id} $excludePrivate
+             |WHERE base = {id} $isExcluded
              |GROUP BY indi_nom
              |ORDER BY indi_nom""".stripMargin)
         .on("id" -> id)

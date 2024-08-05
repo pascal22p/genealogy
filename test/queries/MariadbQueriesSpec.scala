@@ -12,8 +12,10 @@ import models.*
 import models.queryData.EventDetailQueryData
 import models.queryData.FamilyAsChildQueryData
 import models.queryData.FamilyQueryData
+import models.AuthenticatedRequest
 import org.scalatest.BeforeAndAfterEach
 import play.api.db.Database
+import play.api.test.FakeRequest
 import play.api.Application
 import testUtils.BaseSpec
 
@@ -103,6 +105,12 @@ class MariadbQueriesSpec extends BaseSpec with BeforeAndAfterEach {
          |(${child.person.details.id},	$idFamily, '${child.relaType}');
          |""".stripMargin
 
+  def sqlGenealogyDatabases(id: Int): String =
+    s"""
+       |INSERT INTO `genea_infos` (`id`, `nom`, `descriptif`, `entetes`, `ged_corp`, `subm`) VALUES
+       |($id,	'Name',	'Description',	'',	'',	NULL);
+       |""".stripMargin
+
   def sqlFamily(
       idFamily: Int,
       person1: PersonDetails,
@@ -114,6 +122,11 @@ class MariadbQueriesSpec extends BaseSpec with BeforeAndAfterEach {
       events.foldLeft("") { case (sql, event) => sql + sqlEventDetails(event) + sqlLinkFamilyEvent(idFamily, event) } +
       children.foldLeft("") { case (sql, child) => sql + sqlChild(child, idFamily) }
   }
+
+  def sqlPlace(place: Place): String =
+    s"""
+       |INSERT INTO `genea_place` (`place_id`, `place_lieudit`, `place_ville`, `place_cp`, `place_insee`, `place_departement`, `place_region`, `place_pays`, `place_longitude`, `place_latitude`, `base`) VALUES
+       |(${place.id},	'${place.lieuDit}',	'${place.city}',	'${place.postCode}',	${place.inseeNumber.getOrElse("NULL")},	'${place.county}',	'${place.region}',	'${place.country}',	${place.longitude.getOrElse("NULL")},	${place.latitude.getOrElse("NULL")},	${place.base});""".stripMargin
 
   "getPersonDetails" must {
     "returns person details" in {
@@ -271,6 +284,172 @@ class MariadbQueriesSpec extends BaseSpec with BeforeAndAfterEach {
       val result   = sut.getFamilyDetails(idPerson).futureValue
 
       result mustBe None
+    }
+  }
+
+  "getChildren" must {
+    "returns list of children" in {
+      val person1  = fakePersonDetails(id = 1)
+      val person2  = fakePersonDetails(id = 2)
+      val idFamily = 3
+      val child    = Child(Person(fakePersonDetails(id = 4), Events(List.empty)), "adopted", None)
+      val result = (for {
+        _      <- executeSql(sqlFamily(idFamily, person1, person2, List(child), List.empty))
+        result <- sut.getChildren(idFamily)
+      } yield result).futureValue
+
+      result mustBe a[List[Child]]
+      result.size mustBe 1
+      result.head.person.details.id mustBe child.person.details.id
+      result.head.relaType mustBe "adopted"
+    }
+
+    "returns nothing" in {
+      val idPerson = 1
+      val result   = sut.getChildren(idPerson).futureValue
+
+      result mustBe List.empty
+    }
+  }
+
+  "getPlace" must {
+    "returns a place" in {
+      val place = fakePlace(id = 1)
+      val result = (for {
+        _      <- executeSql(sqlPlace(place))
+        result <- sut.getPlace(place.id)
+      } yield result).futureValue
+
+      result mustBe Some(place)
+    }
+
+    "returns nothing" in {
+      val idPerson = 1
+      val result   = sut.getPlace(idPerson).futureValue
+
+      result mustBe None
+    }
+  }
+
+  "getGenealogyDatabases" must {
+    "returns a list of databases" in {
+      val result = (for {
+        _      <- executeSql(sqlGenealogyDatabases(1))
+        result <- sut.getGenealogyDatabases
+      } yield result).futureValue
+
+      result mustBe a[List[GenealogyDatabase]]
+      result.size mustBe 1
+    }
+
+    "returns nothing" in {
+      val result = sut.getGenealogyDatabases.futureValue
+
+      result mustBe List.empty
+    }
+  }
+
+  "getSurnamesList" must {
+    "returns a list of names where restriction is None" in {
+      val result = (for {
+        _ <- executeSql(
+          sqlPersonDetails(fakePersonDetails(id = 1, surname = "D")) +
+            sqlPersonDetails(fakePersonDetails(id = 2, surname = "B")) +
+            sqlPersonDetails(fakePersonDetails(id = 3, surname = "C")) +
+            sqlPersonDetails(fakePersonDetails(id = 4, surname = "A", privacyRestriction = Some("privacy")))
+        )
+        result <- sut.getSurnamesList(1)(
+          AuthenticatedRequest(FakeRequest(), Session("sessionId", SessionData(1, None)))
+        )
+      } yield result).futureValue
+
+      result mustBe List("B", "C", "D")
+    }
+
+    "returns a list of names where restriction is not None" in {
+      val result = (for {
+        _ <- executeSql(
+          sqlPersonDetails(fakePersonDetails(id = 1, surname = "D")) +
+            sqlPersonDetails(fakePersonDetails(id = 2, surname = "B")) +
+            sqlPersonDetails(fakePersonDetails(id = 3, surname = "C")) +
+            sqlPersonDetails(fakePersonDetails(id = 4, surname = "A", privacyRestriction = Some("privacy")))
+        )
+        result <- sut.getSurnamesList(1)(
+          AuthenticatedRequest(
+            FakeRequest(),
+            Session("sessionId", SessionData(1, Some(UserData(0, "username", "hashed", true, false))))
+          )
+        )
+      } yield result).futureValue
+
+      result mustBe List("A", "B", "C", "D")
+    }
+
+    "returns nothing" in {
+      val result = sut
+        .getSurnamesList(1)(
+          AuthenticatedRequest(
+            FakeRequest(),
+            Session("sessionId", SessionData(1, Some(UserData(0, "username", "hashed", true, false))))
+          )
+        )
+        .futureValue
+
+      result mustBe List.empty
+    }
+  }
+
+  "getFirstnamesList" must {
+    "returns a list of names where restriction is None" in {
+      val result = (for {
+        _ <- executeSql(
+          sqlPersonDetails(fakePersonDetails(id = 1, surname = "Z", firstname = "D")) +
+            sqlPersonDetails(fakePersonDetails(id = 2, surname = "Z", firstname = "B")) +
+            sqlPersonDetails(fakePersonDetails(id = 3, surname = "X", firstname = "C")) +
+            sqlPersonDetails(
+              fakePersonDetails(id = 4, surname = "Z", firstname = "A", privacyRestriction = Some("privacy"))
+            )
+        )
+        result <- sut.getFirstnamesList(1, "Z")(
+          AuthenticatedRequest(FakeRequest(), Session("sessionId", SessionData(1, None)))
+        )
+      } yield result).futureValue
+
+      result.map(_.toString) mustBe List("B Z", "D Z")
+    }
+
+    "returns a list of names where restriction is not None" in {
+      val result = (for {
+        _ <- executeSql(
+          sqlPersonDetails(fakePersonDetails(id = 1, surname = "Z", firstname = "D")) +
+            sqlPersonDetails(fakePersonDetails(id = 2, surname = "Z", firstname = "B")) +
+            sqlPersonDetails(fakePersonDetails(id = 3, surname = "X", firstname = "C")) +
+            sqlPersonDetails(
+              fakePersonDetails(id = 4, surname = "Z", firstname = "A", privacyRestriction = Some("privacy"))
+            )
+        )
+        result <- sut.getFirstnamesList(1, "Z")(
+          AuthenticatedRequest(
+            FakeRequest(),
+            Session("sessionId", SessionData(1, Some(UserData(0, "username", "hashed", true, false))))
+          )
+        )
+      } yield result).futureValue
+
+      result.map(_.toString) mustBe List("A Z", "B Z", "D Z")
+    }
+
+    "returns nothing" in {
+      val result = sut
+        .getFirstnamesList(1, "Z")(
+          AuthenticatedRequest(
+            FakeRequest(),
+            Session("sessionId", SessionData(1, Some(UserData(0, "username", "hashed", true, false))))
+          )
+        )
+        .futureValue
+
+      result mustBe List.empty
     }
   }
 }
