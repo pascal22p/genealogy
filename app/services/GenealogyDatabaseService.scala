@@ -15,7 +15,7 @@ import models.Person
 import queries.MariadbQueries
 
 @Singleton
-class GenealogyDatabaseService @Inject() (mariadbQueries: MariadbQueries, personDetailsService: PersonDetailsService)(
+class GenealogyDatabaseService @Inject() (mariadbQueries: MariadbQueries, eventService: EventService)(
     implicit ec: ExecutionContext
 ) {
   def getGenealogyDatabases: Future[List[GenealogyDatabase]] = mariadbQueries.getGenealogyDatabases
@@ -28,7 +28,7 @@ class GenealogyDatabaseService @Inject() (mariadbQueries: MariadbQueries, person
   ): Future[List[Person]] = {
     mariadbQueries.getFirstnamesList(id, name).flatMap { personList =>
       personList.traverse { person =>
-        personDetailsService.getIndividualEvents(person.id).map { events =>
+        eventService.getIndividualEvents(person.id).map { events =>
           Person(person, Events(events), List.empty, List.empty)
         }
       }
