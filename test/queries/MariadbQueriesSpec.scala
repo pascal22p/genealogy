@@ -13,6 +13,8 @@ import models.queryData.EventDetailQueryData
 import models.queryData.FamilyAsChildQueryData
 import models.queryData.FamilyQueryData
 import models.AuthenticatedRequest
+import models.EventType.FamilyEvent
+import models.EventType.IndividualEvent
 import org.scalatest.BeforeAndAfterEach
 import play.api.db.Database
 import play.api.test.FakeRequest
@@ -95,7 +97,7 @@ class MariadbQueriesSpec extends BaseSpec with BeforeAndAfterEach {
   def sqlLinkFamilyEvent(idFamily: Int, event: EventDetail): String =
     s"""
        |INSERT INTO `rel_familles_events` (`events_details_id`, `familles_id`, `events_tag`, `events_attestation`) VALUES
-       |(${event.events_details_id},	$idFamily,	'${event.tag}',	NULL);
+       |(${event.events_details_id},	$idFamily,	${event.tag.fold("NULL")(t => s"'$t'")},	NULL);
        |""".stripMargin
 
   def sqlChild(child: Child, idFamily: Int): String =
@@ -156,18 +158,17 @@ class MariadbQueriesSpec extends BaseSpec with BeforeAndAfterEach {
       val eventTag = "BIRT"
       val result = (for {
         _      <- executeSql(sqlIndividualEvent(person, event, eventTag))
-        result <- sut.getIndividualEvents(person.id)
+        result <- sut.getEvents(person.id, IndividualEvent)
       } yield result).futureValue
 
       result mustBe a[List[EventDetailQueryData]]
       result.size mustBe 1
       result.head.events_details_id mustBe event.events_details_id
-      result.head.tag mustBe eventTag
+      result.head.tag mustBe Some(eventTag)
     }
 
     "returns nothing" in {
-      val idPerson = 1
-      val result   = sut.getIndividualEvents(idPerson).futureValue
+      val result = sut.getEvents(1, IndividualEvent).futureValue
 
       result mustBe List.empty
     }
@@ -178,10 +179,10 @@ class MariadbQueriesSpec extends BaseSpec with BeforeAndAfterEach {
       val person1  = fakePersonDetails(id = 1)
       val person2  = fakePersonDetails(id = 2)
       val idFamily = 3
-      val event    = fakeEventDetail(events_details_id = 4, tag = "BIRT")
+      val event    = fakeEventDetail(events_details_id = 4, tag = Some("BIRT"))
       val result = (for {
         _      <- executeSql(sqlFamily(idFamily, person1, person2, List.empty, List(event)))
-        result <- sut.getFamilyEvents(idFamily)
+        result <- sut.getEvents(idFamily, FamilyEvent)
       } yield result).futureValue
 
       result mustBe a[List[EventDetailQueryData]]
@@ -191,8 +192,7 @@ class MariadbQueriesSpec extends BaseSpec with BeforeAndAfterEach {
     }
 
     "returns nothing" in {
-      val idPerson = 1
-      val result   = sut.getFamilyEvents(idPerson).futureValue
+      val result = sut.getEvents(1, FamilyEvent).futureValue
 
       result mustBe List.empty
     }

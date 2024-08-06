@@ -9,6 +9,8 @@ import scala.concurrent.Future
 import cats.*
 import cats.implicits.*
 import models.*
+import models.EventType.FamilyEvent
+import models.EventType.IndividualEvent
 import queries.MariadbQueries
 
 @Singleton
@@ -20,7 +22,7 @@ class PersonDetailsService @Inject() (mariadbQueries: MariadbQueries)(
     mariadbQueries.getPersonDetails(id).map(_.headOption)
 
   def getIndividualEvents(personId: Int): Future[List[EventDetail]] = {
-    mariadbQueries.getIndividualEvents(personId).flatMap { events =>
+    mariadbQueries.getEvents(personId, IndividualEvent).flatMap { events =>
       events.traverse { event =>
         event.place_id.traverse(mariadbQueries.getPlace).map { place =>
           EventDetail(event, place.flatten)
@@ -30,7 +32,7 @@ class PersonDetailsService @Inject() (mariadbQueries: MariadbQueries)(
   }
 
   def getFamilyEvents(familyId: Int): Future[List[EventDetail]] = {
-    mariadbQueries.getFamilyEvents(familyId).flatMap { events =>
+    mariadbQueries.getEvents(familyId, FamilyEvent).flatMap { events =>
       events.traverse { event =>
         event.place_id.traverse(mariadbQueries.getPlace).map { place =>
           EventDetail(event, place.flatten)
