@@ -28,7 +28,7 @@
 
         <dl class="evenements">
         @for(event <- family.events.eventsDetails) {
-            <dt><em>@messages(event.tag) :</em>
+            <dt><em>@messages(event.tag.get) :</em>
                 <span class="date">@event.formatDate</span>
                 <span style="color: blue;
                     font-size: x-small;">-S-</span>

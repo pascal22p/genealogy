@@ -9,6 +9,10 @@ import anorm.*
 import anorm.SqlParser.*
 import models.*
 import models.queryData.*
+import models.EventType.EventType
+import models.EventType.FamilyEvent
+import models.EventType.IndividualEvent
+import models.EventType.UnknownEvent
 import play.api.db.Database
 import play.api.libs.json.Json
 
@@ -25,26 +29,49 @@ final class MariadbQueries @Inject() (db: Database, databaseExecutionContext: Da
     }
   }(databaseExecutionContext)
 
-  def getIndividualEvents(personId: Int): Future[List[EventDetailQueryData]] = Future {
+  def getEvents(id: Int, eventType: EventType): Future[List[EventDetailQueryData]] = Future {
     db.withConnection { implicit conn =>
-      SQL("""SELECT rel_indi_events.events_tag, genea_events_details.*
-            |FROM `rel_indi_events`
-            |LEFT JOIN genea_events_details
-            |ON genea_events_details.events_details_id = rel_indi_events.events_details_id
-            |WHERE indi_id = {id}""".stripMargin)
-        .on("id" -> personId)
-        .as[List[EventDetailQueryData]](EventDetailQueryData.mysqlParser.*)
-    }
-  }(databaseExecutionContext)
-
-  def getFamilyEvents(familyId: Int): Future[List[EventDetailQueryData]] = Future {
-    db.withConnection { implicit conn =>
-      SQL("""SELECT rel_familles_events.events_tag, genea_events_details.*
-            |FROM `rel_familles_events`
-            |LEFT JOIN genea_events_details
-            |ON genea_events_details.events_details_id = rel_familles_events.events_details_id
-            |WHERE familles_id = {id}""".stripMargin)
-        .on("id" -> familyId)
+      val where = eventType match {
+        case IndividualEvent => "WHERE rel_indi_events.indi_id = {id}"
+        case FamilyEvent     => "WHERE rel_familles_events.familles_id = {id}"
+        case _               => "WHERE genea_events_details.events_details_id = {id}"
+      }
+      SQL(s"""SELECT genea_events_details.*, rel_indi_events.*, rel_familles_events.*,
+             |       CASE
+             |           WHEN rel_indi_events.indi_id IS NOT NULL THEN CONCAT(genea_individuals.indi_prenom, ' ', genea_individuals.indi_nom)
+             |           WHEN rel_familles_events.familles_id IS NOT NULL THEN CONCAT(husb.indi_nom, ' - ', wife.indi_nom)
+             |           ELSE NULL
+             |       END AS description,
+             |       CASE
+             |           WHEN rel_indi_events.indi_id IS NOT NULL THEN rel_indi_events.events_tag
+             |           WHEN rel_familles_events.familles_id IS NOT NULL THEN rel_familles_events.events_tag
+             |           ELSE NULL
+             |       END AS tag,
+             |       CASE
+             |           WHEN rel_indi_events.indi_id IS NOT NULL THEN "${IndividualEvent.toString}"
+             |           WHEN rel_familles_events.familles_id IS NOT NULL THEN "${FamilyEvent.toString}"
+             |           ELSE "${UnknownEvent.toString}"
+             |       END AS event_type
+             |
+             |FROM `genea_events_details`
+             |LEFT JOIN `rel_indi_events`
+             |ON genea_events_details.events_details_id = rel_indi_events.events_details_id
+             |LEFT JOIN genea_individuals
+             |ON genea_individuals.indi_id = rel_indi_events.indi_id
+             |LEFT JOIN `rel_familles_events`
+             |ON genea_events_details.events_details_id = rel_familles_events.events_details_id
+             |LEFT JOIN `genea_familles`
+             |ON  genea_familles.familles_id = rel_familles_events.familles_id
+             |LEFT JOIN `genea_individuals` AS husb
+             |ON husb.indi_id = genea_familles.familles_husb
+             |LEFT JOIN `genea_individuals` AS wife
+             |ON wife.indi_id = genea_familles.familles_wife
+             |LEFT JOIN (
+             |    SELECT events_details_id , count(*) AS sourCount FROM rel_events_sources GROUP BY rel_events_sources.events_details_id
+             | ) r ON r.events_details_id = genea_events_details.events_details_id
+             |
+             | $where""".stripMargin)
+        .on("id" -> id)
         .as[List[EventDetailQueryData]](EventDetailQueryData.mysqlParser.*)
     }
   }(databaseExecutionContext)

@@ -3,6 +3,7 @@ package models
 import java.time.Instant
 
 import models.queryData.EventDetailQueryData
+import models.EventType.EventType
 import play.api.i18n.Messages
 import utils.CalendarConstants
 
@@ -21,7 +22,9 @@ case class EventDetail(
     events_details_famc: Option[Int],
     events_details_adop: Option[String],
     events_details_timestamp: Instant,
-    tag: String
+    tag: Option[String],
+    description: Option[String],
+    eventType: EventType
 ) {
   def formatDate(implicit messages: Messages): String = {
     CalendarConstants.allKeywords
@@ -50,7 +53,9 @@ object EventDetail {
       eventDetailQueryData.events_details_famc,
       eventDetailQueryData.events_details_adop,
       eventDetailQueryData.events_details_timestamp,
-      eventDetailQueryData.tag
+      eventDetailQueryData.tag,
+      eventDetailQueryData.description,
+      eventDetailQueryData.eventType
     )
   }
 }

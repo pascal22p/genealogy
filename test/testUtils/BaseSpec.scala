@@ -3,6 +3,8 @@ package testUtils
 import java.time.Instant
 
 import models.EventDetail
+import models.EventType.EventType
+import models.EventType.UnknownEvent
 import models.MaleSex
 import models.PersonDetails
 import models.Place
@@ -65,7 +67,9 @@ trait BaseSpec extends PlaySpec with GuiceOneAppPerSuite with ScalaFutures with 
       events_details_famc: Option[Int] = None,
       events_details_adop: Option[String] = None,
       events_details_timestamp: Instant = Instant.now,
-      tag: String = ""
+      tag: Option[String] = None,
+      description: Option[String] = None,
+      eventType: EventType = UnknownEvent
   ): EventDetail = EventDetail(
     base,
     events_details_id,
@@ -81,7 +85,9 @@ trait BaseSpec extends PlaySpec with GuiceOneAppPerSuite with ScalaFutures with 
     events_details_famc,
     events_details_adop,
     events_details_timestamp,
-    tag
+    tag,
+    description,
+    eventType
   )
 
   def fakePlace(
