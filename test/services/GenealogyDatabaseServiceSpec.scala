@@ -37,12 +37,14 @@ class GenealogyDatabaseServiceSpec extends BaseSpec {
 
   lazy val mockMariadbQueries: MariadbQueries             = mock[MariadbQueries]
   lazy val mockPersonDetailsService: PersonDetailsService = mock[PersonDetailsService]
+  lazy val mockEventService: EventService                 = mock[EventService]
 
   protected override def localGuiceApplicationBuilder(): GuiceApplicationBuilder =
     GuiceApplicationBuilder()
       .overrides(
         bind[MariadbQueries].toInstance(mockMariadbQueries),
-        bind[PersonDetailsService].toInstance(mockPersonDetailsService)
+        bind[PersonDetailsService].toInstance(mockPersonDetailsService),
+        bind[EventService].toInstance(mockEventService)
       )
 
   "getFirstnamesList" must {
@@ -58,13 +60,13 @@ class GenealogyDatabaseServiceSpec extends BaseSpec {
       when(mockMariadbQueries.getFirstnamesList(any(), any())(any())).thenReturn(
         Future.successful(List(fakePersonDetail1, fakePersonDetail2))
       )
-      when(mockPersonDetailsService.getIndividualEvents(any()))
+      when(mockEventService.getIndividualEvents(any()))
         .thenReturn(Future.successful(fakeEventDetails1))
         .thenReturn(Future.successful(fakeEventDetails2))
 
       val result: List[Person] = sut.getFirstnamesList(1, "Test")(fakeAuthenticatedRequest).futureValue
       result mustBe List(person1, person2)
-      verify(mockPersonDetailsService, times(2)).getIndividualEvents(argumentCaptor.capture())
+      verify(mockEventService, times(2)).getIndividualEvents(argumentCaptor.capture())
       val capturedPersonIds = argumentCaptor.getAllValues.asScala.toList
       capturedPersonIds mustBe List(1, 2)
     }

@@ -10,15 +10,17 @@ import models.*
 
 @Singleton
 class PersonService @Inject() (
-    personDetailsService: PersonDetailsService
+    personDetailsService: PersonDetailsService,
+    familyService: FamilyService,
+    eventService: EventService
 )(implicit ec: ExecutionContext) {
 
   def getPerson(id: Int): Future[Option[Person]] = {
     for {
       personDetails          <- personDetailsService.getPersonDetails(id)
-      events                 <- personDetailsService.getIndividualEvents(id)
+      events                 <- eventService.getIndividualEvents(id)
       parents                <- personDetailsService.getParents(id)
-      families: List[Family] <- personDetailsService.getFamiliesAsPartner(id)
+      families: List[Family] <- familyService.getFamiliesAsPartner(id)
     } yield {
       personDetails.map(Person(_, Events(events), parents, families))
     }
