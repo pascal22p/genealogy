@@ -36,7 +36,7 @@ final class MariadbQueries @Inject() (db: Database, databaseExecutionContext: Da
         case FamilyEvent     => "WHERE rel_familles_events.familles_id = {id}"
         case _               => "WHERE genea_events_details.events_details_id = {id}"
       }
-      SQL(s"""SELECT genea_events_details.*, rel_indi_events.*, rel_familles_events.*,
+      SQL(s"""SELECT genea_events_details.*, rel_indi_events.*, rel_familles_events.*, r.sourCount,
              |       CASE
              |           WHEN rel_indi_events.indi_id IS NOT NULL THEN CONCAT(genea_individuals.indi_prenom, ' ', genea_individuals.indi_nom)
              |           WHEN rel_familles_events.familles_id IS NOT NULL THEN CONCAT(husb.indi_nom, ' - ', wife.indi_nom)
@@ -51,7 +51,12 @@ final class MariadbQueries @Inject() (db: Database, databaseExecutionContext: Da
              |           WHEN rel_indi_events.indi_id IS NOT NULL THEN "${IndividualEvent.toString}"
              |           WHEN rel_familles_events.familles_id IS NOT NULL THEN "${FamilyEvent.toString}"
              |           ELSE "${UnknownEvent.toString}"
-             |       END AS event_type
+             |       END AS event_type,
+             |       CASE
+             |           WHEN rel_indi_events.indi_id IS NOT NULL THEN rel_indi_events.indi_id
+             |           WHEN rel_familles_events.familles_id IS NOT NULL THEN rel_familles_events.familles_id
+             |           ELSE NULL
+             |       END AS ownerId
              |
              |FROM `genea_events_details`
              |LEFT JOIN `rel_indi_events`
@@ -139,21 +144,29 @@ final class MariadbQueries @Inject() (db: Database, databaseExecutionContext: Da
     }
   }(databaseExecutionContext)
 
-  def getSurnamesList(id: Int)(implicit authenticatedRequest: AuthenticatedRequest[?]): Future[List[String]] = Future {
-    db.withConnection { implicit conn =>
-      val excludePrivate = "AND indi_resn IS NULL"
-      val isExcluded = authenticatedRequest.localSession.sessionData.userData.fold(excludePrivate) { userData =>
-        if (userData.seePrivacy) "" else excludePrivate
+  def getSurnamesList(id: Int)(implicit authenticatedRequest: AuthenticatedRequest[?]): Future[List[(String, Int)]] =
+    Future {
+      val mysqlParser: RowParser[(String, Int)] =
+        (get[String]("indi_nom") ~
+          get[Int]("count")).map {
+          case name ~ count =>
+            (name, count)
+        }
+
+      db.withConnection { implicit conn =>
+        val excludePrivate = "AND indi_resn IS NULL"
+        val isExcluded = authenticatedRequest.localSession.sessionData.userData.fold(excludePrivate) { userData =>
+          if (userData.seePrivacy) "" else excludePrivate
+        }
+        SQL(s"""SELECT indi_nom, count(*) as count
+               |FROM genea_individuals
+               |WHERE base = {id} $isExcluded
+               |GROUP BY indi_nom
+               |ORDER BY indi_nom""".stripMargin)
+          .on("id" -> id)
+          .as(mysqlParser.*)
       }
-      SQL(s"""SELECT indi_nom
-             |FROM genea_individuals
-             |WHERE base = {id} $isExcluded
-             |GROUP BY indi_nom
-             |ORDER BY indi_nom""".stripMargin)
-        .on("id" -> id)
-        .as(SqlParser.str("indi_nom").*)
-    }
-  }(databaseExecutionContext)
+    }(databaseExecutionContext)
 
   def getFirstnamesList(id: Int, name: String)(
       implicit authenticatedRequest: AuthenticatedRequest[?]

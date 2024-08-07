@@ -7,6 +7,7 @@ GET     /                                         controllers.HomeController.onl
 GET     /surnames/base/:id                        controllers.HomeController.showSurnames(id: Int)
 GET     /firstnames/base/:id/name/:name           controllers.HomeController.showFirstnames(id: Int, name: String)
 GET     /individual/:id                           controllers.IndividualController.showPerson(id: Int)
+GET     /event/:id                                controllers.EventController.showEvent(id: Int)
 GET     /switch-lang/:lang                        controllers.IndividualController.languageSwitch(lang: String)
 
 GET     /login                                    controllers.LoginController.onLoad()

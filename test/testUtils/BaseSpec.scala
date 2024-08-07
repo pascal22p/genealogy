@@ -69,7 +69,9 @@ trait BaseSpec extends PlaySpec with GuiceOneAppPerSuite with ScalaFutures with 
       events_details_timestamp: Instant = Instant.now,
       tag: Option[String] = None,
       description: Option[String] = None,
-      eventType: EventType = UnknownEvent
+      eventType: EventType = UnknownEvent,
+      sourCount: Int = 0,
+      ownerId: Option[Int] = None
   ): EventDetail = EventDetail(
     base,
     events_details_id,
@@ -87,7 +89,9 @@ trait BaseSpec extends PlaySpec with GuiceOneAppPerSuite with ScalaFutures with 
     events_details_timestamp,
     tag,
     description,
-    eventType
+    eventType,
+    sourCount,
+    ownerId
   )
 
   def fakePlace(

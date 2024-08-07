@@ -1,0 +1,50 @@
+@import models.Person
+@import views.html.components.{FamilyView, PersonDetails, IndividualEvents, Parents}
+@import models.EventType.{IndividualEvent, FamilyEvent, UnknownEvent}
+
+@this(
+  main: Main)
+
+@(event: EventDetail, dbId: Int)(implicit request: Request[?], messages: Messages)
+
+
+@main(event.description.getOrElse("Event"), dbId) {
+
+  @if(event.eventType == IndividualEvent) {
+    @for(ownerId <- event.ownerId) {
+      <div style="padding-left:10em;"><a href="@controllers.routes.IndividualController.showPerson(ownerId)">Return to @event.description page</a></div>
+    }
+  }
+  @if(event.eventType == FamilyEvent) {
+    @for(ownerId <- event.ownerId) {
+      <div style="padding-left:10em;"><a href="controllers.routes.FamilyController.showPerson(ownerId)">Return to @event.description page</a></div>
+    }
+  }
+  @if(event.eventType == UnknownEvent) {
+    <div style="padding-left:10em;">Orphan event</div>
+  }
+  <div class="box">
+    <div class="box_title">
+      <h3>Event details</h3>
+    </div>
+
+    <ul>
+      @for(tag <- event.tag) {
+        <li>Type: @messages(tag)</li>
+      }
+      @for(place <- event.place) {
+        <li>Place: @place.oneLiner</li>
+      }
+      @for(description <- event.description) {
+        <li>Description: @description</li>
+      }
+      <li>events_details_descriptor: @event.events_details_descriptor</li>
+      <li>Date: @event.formatDate</li>
+      <li>Age: @event.events_details_age</li>
+      <li>Cause: @event.events_details_cause</li>
+      <li>Timestamp: @event.events_details_timestamp</li>
+    </ul>
+
+  </div>
+
+}
