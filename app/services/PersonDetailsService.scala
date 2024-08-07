@@ -16,7 +16,6 @@ import queries.MariadbQueries
 @Singleton
 class PersonDetailsService @Inject() (
     mariadbQueries: MariadbQueries,
-    familyService: FamilyService,
     eventService: EventService
 )(
     implicit ec: ExecutionContext
