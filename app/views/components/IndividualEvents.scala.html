@@ -11,8 +11,8 @@
         @for(event <- person.events.eventsDetails) {
             <dt><em>@messages(event.tag.get)</em> : <span class="date">@event.formatDate</span>
                 <span style="color: blue;
-                    font-size: x-small;">-S-</span>
-                <a href="detail_event.php?id_event=480" class="noprint">[détail]</a></dt>
+                    font-size: x-small;">@if(event.sourCount>0){-S-}</span>
+                <a href="@controllers.routes.EventController.showEvent(event.events_details_id)" class="noprint">[détail]</a></dt>
             @for(place <- event.place) {
                 <dd><em>Place : </em>
                     @place.oneLiner</dd>

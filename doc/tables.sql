@@ -20,7 +20,7 @@ CREATE TABLE `agregats_noms` (
   KEY `longueur` (`longueur`),
   KEY `base` (`base`),
   CONSTRAINT `agregats_noms_ibfk_1` FOREIGN KEY (`base`) REFERENCES `genea_infos` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci COMMENT='Tbale de prÃ©calul pour l''affichage de la liste des patronym';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Tbale de prÃ©calul pour l''affichage de la liste des patronym';
 
 
 DROP TABLE IF EXISTS `genea_address`;
@@ -47,7 +47,7 @@ CREATE TABLE `genea_address` (
   PRIMARY KEY (`addr_id`),
   KEY `base` (`base`),
   CONSTRAINT `genea_address_ibfk_1` FOREIGN KEY (`base`) REFERENCES `genea_infos` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci COMMENT='Table de stockage des adresses';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Table de stockage des adresses';
 
 
 DROP TABLE IF EXISTS `genea_cache_deps`;
@@ -58,7 +58,7 @@ CREATE TABLE `genea_cache_deps` (
   KEY `indi_dep` (`indi_dep`),
   CONSTRAINT `genea_cache_deps_ibfk_1` FOREIGN KEY (`indi_id`) REFERENCES `genea_individuals` (`indi_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `genea_cache_deps_ibfk_2` FOREIGN KEY (`indi_dep`) REFERENCES `genea_individuals` (`indi_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 DROP TABLE IF EXISTS `genea_download`;
@@ -72,7 +72,7 @@ CREATE TABLE `genea_download` (
   PRIMARY KEY (`download_id`),
   KEY `base` (`base`),
   CONSTRAINT `genea_download_ibfk_1` FOREIGN KEY (`base`) REFERENCES `genea_infos` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci COMMENT='Table contenant les fichiers Ã  tÃ©lÃ©charger';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Table contenant les fichiers Ã  tÃ©lÃ©charger';
 
 
 DROP TABLE IF EXISTS `genea_events_details`;
@@ -100,7 +100,7 @@ CREATE TABLE `genea_events_details` (
   CONSTRAINT `genea_events_details_ibfk_2` FOREIGN KEY (`place_id`) REFERENCES `genea_place` (`place_id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `genea_events_details_ibfk_3` FOREIGN KEY (`addr_id`) REFERENCES `genea_address` (`addr_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `genea_events_details_ibfk_4` FOREIGN KEY (`events_details_famc`) REFERENCES `genea_familles` (`familles_id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci COMMENT='Tables contenant tous les Ã©vÃ¨nements';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Tables contenant tous les Ã©vÃ¨nements';
 
 
 DROP TABLE IF EXISTS `genea_familles`;
@@ -120,7 +120,7 @@ CREATE TABLE `genea_familles` (
   CONSTRAINT `genea_familles_ibfk_1` FOREIGN KEY (`familles_husb`) REFERENCES `genea_individuals` (`indi_id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `genea_familles_ibfk_2` FOREIGN KEY (`familles_wife`) REFERENCES `genea_individuals` (`indi_id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `genea_familles_ibfk_3` FOREIGN KEY (`base`) REFERENCES `genea_infos` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci COMMENT='Table contenant les familles';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Table contenant les familles';
 
 
 DROP TABLE IF EXISTS `genea_individuals`;
@@ -142,7 +142,7 @@ CREATE TABLE `genea_individuals` (
   KEY `indi_prenom` (`indi_prenom`),
   KEY `base` (`base`),
   CONSTRAINT `genea_individuals_ibfk_1` FOREIGN KEY (`base`) REFERENCES `genea_infos` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci COMMENT='Table contenant les individus';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Table contenant les individus';
 
 
 DROP TABLE IF EXISTS `genea_infos`;
@@ -156,7 +156,7 @@ CREATE TABLE `genea_infos` (
   PRIMARY KEY (`id`),
   KEY `subm` (`subm`),
   CONSTRAINT `genea_infos_ibfk_1` FOREIGN KEY (`subm`) REFERENCES `genea_submitters` (`sub_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci COMMENT='ParamÃ¨tres gÃ©nÃ©raux des bases de donnÃ©es gÃ©nÃ©alogiques';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='ParamÃ¨tres gÃ©nÃ©raux des bases de donnÃ©es gÃ©nÃ©alogiques';
 
 
 DROP TABLE IF EXISTS `genea_membres`;
@@ -171,7 +171,7 @@ CREATE TABLE `genea_membres` (
   `is_admin` tinyint(1) unsigned zerofill NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `email` (`email`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci COMMENT='Liste des utilisateurs du site';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Liste des utilisateurs du site';
 
 
 DROP TABLE IF EXISTS `genea_multimedia`;
@@ -185,7 +185,7 @@ CREATE TABLE `genea_multimedia` (
   PRIMARY KEY (`media_id`),
   KEY `base` (`base`),
   CONSTRAINT `genea_multimedia_ibfk_1` FOREIGN KEY (`base`) REFERENCES `genea_infos` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci COMMENT='Liste des documents multimÃ©dia';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Liste des documents multimÃ©dia';
 
 
 DROP TABLE IF EXISTS `genea_notes`;
@@ -197,7 +197,7 @@ CREATE TABLE `genea_notes` (
   PRIMARY KEY (`notes_id`),
   KEY `base` (`base`),
   CONSTRAINT `genea_notes_ibfk_1` FOREIGN KEY (`base`) REFERENCES `genea_infos` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci COMMENT='Liste des notes';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Liste des notes';
 
 
 DROP TABLE IF EXISTS `genea_permissions`;
@@ -211,7 +211,7 @@ CREATE TABLE `genea_permissions` (
   UNIQUE KEY `unicite` (`membre_id`,`permission_type`,`permission_value`,`base`),
   KEY `type` (`permission_type`),
   KEY `base` (`base`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci COMMENT='Gestion des permissions des diffÃ©rents membres';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Gestion des permissions des diffÃ©rents membres';
 
 
 DROP TABLE IF EXISTS `genea_place`;
@@ -230,7 +230,7 @@ CREATE TABLE `genea_place` (
   PRIMARY KEY (`place_id`),
   KEY `base` (`base`),
   CONSTRAINT `genea_place_ibfk_1` FOREIGN KEY (`base`) REFERENCES `genea_infos` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci COMMENT='Liste des lieux gÃ©ographiques de la gÃ©nÃ©alogie';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Liste des lieux gÃ©ographiques de la gÃ©nÃ©alogie';
 
 
 DROP TABLE IF EXISTS `genea_refn`;
@@ -240,7 +240,7 @@ CREATE TABLE `genea_refn` (
   `refn_num` varchar(255) NOT NULL,
   `refn_type` varchar(255) NOT NULL,
   PRIMARY KEY (`refn_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 DROP TABLE IF EXISTS `genea_repository`;
@@ -254,7 +254,7 @@ CREATE TABLE `genea_repository` (
   PRIMARY KEY (`repo_id`),
   KEY `base` (`base`),
   KEY `addr_id` (`addr_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci COMMENT='liste des dÃ©pots d''archives';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='liste des dÃ©pots d''archives';
 
 
 SET NAMES utf8mb4;
@@ -263,8 +263,8 @@ DROP TABLE IF EXISTS `genea_sessions`;
 CREATE TABLE `genea_sessions` (
   `sessionId` varchar(36) NOT NULL,
   `sessionData` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`sessionData`)),
-  `timeStamp` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+  `timeStamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 DROP TABLE IF EXISTS `genea_sour_citations`;
@@ -283,7 +283,7 @@ CREATE TABLE `genea_sour_citations` (
   PRIMARY KEY (`sour_citations_id`),
   KEY `sour_records_id` (`sour_records_id`),
   KEY `base` (`base`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 DROP TABLE IF EXISTS `genea_sour_records`;
@@ -303,7 +303,7 @@ CREATE TABLE `genea_sour_records` (
   PRIMARY KEY (`sour_records_id`),
   KEY `base` (`base`),
   KEY `repo_id` (`repo_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 DROP TABLE IF EXISTS `genea_submitters`;
@@ -321,7 +321,7 @@ CREATE TABLE `genea_submitters` (
   `sub_phon3` varchar(100) NOT NULL DEFAULT '',
   `sub_lang` varchar(100) NOT NULL DEFAULT '',
   PRIMARY KEY (`sub_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci COMMENT='Liste des auteurs - NON UTILISE';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Liste des auteurs - NON UTILISE';
 
 
 DROP TABLE IF EXISTS `gns_ADM1`;
@@ -330,7 +330,7 @@ CREATE TABLE `gns_ADM1` (
   `ADM1` varchar(2) NOT NULL DEFAULT '0',
   `name` varchar(200) NOT NULL DEFAULT '',
   PRIMARY KEY (`CC`,`ADM1`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci COMMENT='Liste des rÃ©gions des pays chargÃ© dans la base de donnÃ©es';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Liste des rÃ©gions des pays chargÃ© dans la base de donnÃ©es';
 
 
 DROP TABLE IF EXISTS `gns_CC`;
@@ -340,7 +340,7 @@ CREATE TABLE `gns_CC` (
   `import` int(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`RC`,`CC`),
   KEY `CC` (`CC`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci COMMENT='Liste des pays disponibles pour la base de donnÃ©es des lieu';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Liste des pays disponibles pour la base de donnÃ©es des lieu';
 
 
 DROP TABLE IF EXISTS `gns_lieux`;
@@ -359,7 +359,7 @@ CREATE TABLE `gns_lieux` (
   KEY `RC` (`RC`,`CC1`,`ADM1`),
   KEY `CC1` (`CC1`),
   KEY `FULL_NAME` (`FULL_NAME`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci COMMENT='Base de donnÃ©es de lieux gÃ©ographiques';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Base de donnÃ©es de lieux gÃ©ographiques';
 
 
 DROP TABLE IF EXISTS `ign_rgc`;
@@ -387,7 +387,7 @@ CREATE TABLE `ign_rgc` (
   `zchl` smallint(6) NOT NULL,
   `carte` varchar(6) NOT NULL,
   KEY `dep` (`dep`,`nom`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 DROP TABLE IF EXISTS `insee_communes`;
@@ -413,7 +413,7 @@ CREATE TABLE `insee_communes` (
   KEY `dep` (`dep`),
   KEY `com` (`com`),
   KEY `ncc` (`ncc`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 DROP TABLE IF EXISTS `rel_alias`;
@@ -424,7 +424,7 @@ CREATE TABLE `rel_alias` (
   KEY `alias2` (`alias2`),
   CONSTRAINT `rel_alias_ibfk_1` FOREIGN KEY (`alias1`) REFERENCES `genea_individuals` (`indi_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `rel_alias_ibfk_2` FOREIGN KEY (`alias2`) REFERENCES `genea_individuals` (`indi_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci COMMENT='Stockage des alias des individus';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Stockage des alias des individus';
 
 
 DROP TABLE IF EXISTS `rel_asso_events`;
@@ -436,7 +436,7 @@ CREATE TABLE `rel_asso_events` (
   KEY `events_id` (`events_details_id`),
   CONSTRAINT `rel_asso_events_ibfk_1` FOREIGN KEY (`events_details_id`) REFERENCES `genea_events_details` (`events_details_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `rel_asso_events_ibfk_2` FOREIGN KEY (`indi_id`) REFERENCES `genea_individuals` (`indi_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci COMMENT='Association d''un tÃ©moin Ã  un Ã©vÃ¨nement';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Association d''un tÃ©moin Ã  un Ã©vÃ¨nement';
 
 
 DROP TABLE IF EXISTS `rel_asso_familles`;
@@ -448,7 +448,7 @@ CREATE TABLE `rel_asso_familles` (
   KEY `familles_id` (`familles_id`),
   CONSTRAINT `rel_asso_familles_ibfk_1` FOREIGN KEY (`indi_id`) REFERENCES `genea_individuals` (`indi_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `rel_asso_familles_ibfk_2` FOREIGN KEY (`familles_id`) REFERENCES `genea_familles` (`familles_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci COMMENT='Association d''une relation non familiale Ã  une famille';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Association d''une relation non familiale Ã  une famille';
 
 
 DROP TABLE IF EXISTS `rel_asso_indi`;
@@ -458,7 +458,7 @@ CREATE TABLE `rel_asso_indi` (
   `description` varchar(255) NOT NULL DEFAULT '',
   PRIMARY KEY (`indi_id1`,`indi_id2`),
   KEY `indi_id2` (`indi_id2`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci COMMENT='Association d''une relation non familiale Ã  un individu';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Association d''une relation non familiale Ã  un individu';
 
 
 DROP TABLE IF EXISTS `rel_events_multimedia`;
@@ -469,7 +469,7 @@ CREATE TABLE `rel_events_multimedia` (
   KEY `media_id` (`media_id`),
   CONSTRAINT `rel_events_multimedia_ibfk_1` FOREIGN KEY (`media_id`) REFERENCES `genea_multimedia` (`media_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `rel_events_multimedia_ibfk_2` FOREIGN KEY (`events_details_id`) REFERENCES `genea_events_details` (`events_details_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci COMMENT='Association d''un objet multimedia Ã  un Ã©vÃ¨nement';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Association d''un objet multimedia Ã  un Ã©vÃ¨nement';
 
 
 DROP TABLE IF EXISTS `rel_events_notes`;
@@ -480,7 +480,7 @@ CREATE TABLE `rel_events_notes` (
   KEY `notes_id` (`notes_id`),
   CONSTRAINT `rel_events_notes_ibfk_1` FOREIGN KEY (`events_details_id`) REFERENCES `genea_events_details` (`events_details_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `rel_events_notes_ibfk_2` FOREIGN KEY (`notes_id`) REFERENCES `genea_notes` (`notes_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci COMMENT='Association d''une note Ã  un Ã©vÃ¨nement';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Association d''une note Ã  un Ã©vÃ¨nement';
 
 
 DROP TABLE IF EXISTS `rel_events_sources`;
@@ -489,7 +489,7 @@ CREATE TABLE `rel_events_sources` (
   `sour_citations_id` mediumint(8) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`events_details_id`,`sour_citations_id`),
   KEY `sources_id` (`sour_citations_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci COMMENT='Association d''une source Ã  un Ã©vÃ¨nement';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Association d''une source Ã  un Ã©vÃ¨nement';
 
 
 DROP TABLE IF EXISTS `rel_familles_events`;
@@ -503,7 +503,7 @@ CREATE TABLE `rel_familles_events` (
   KEY `events_id` (`events_details_id`),
   CONSTRAINT `rel_familles_events_ibfk_1` FOREIGN KEY (`events_details_id`) REFERENCES `genea_events_details` (`events_details_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `rel_familles_events_ibfk_2` FOREIGN KEY (`familles_id`) REFERENCES `genea_familles` (`familles_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci COMMENT='Association d''un Ã©vÃ¨nement Ã§ une famille';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Association d''un Ã©vÃ¨nement Ã§ une famille';
 
 
 DROP TABLE IF EXISTS `rel_familles_indi`;
@@ -516,7 +516,7 @@ CREATE TABLE `rel_familles_indi` (
   KEY `indi_id` (`indi_id`),
   CONSTRAINT `rel_familles_indi_ibfk_1` FOREIGN KEY (`indi_id`) REFERENCES `genea_individuals` (`indi_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `rel_familles_indi_ibfk_2` FOREIGN KEY (`familles_id`) REFERENCES `genea_familles` (`familles_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci COMMENT='Association d''un enfant Ã  une famille';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Association d''un enfant Ã  une famille';
 
 
 DROP TABLE IF EXISTS `rel_familles_multimedia`;
@@ -527,7 +527,7 @@ CREATE TABLE `rel_familles_multimedia` (
   KEY `media_id` (`media_id`),
   CONSTRAINT `rel_familles_multimedia_ibfk_1` FOREIGN KEY (`media_id`) REFERENCES `genea_multimedia` (`media_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `rel_familles_multimedia_ibfk_2` FOREIGN KEY (`familles_id`) REFERENCES `genea_familles` (`familles_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci COMMENT='Association d''un objet multimedia Ã  une famille';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Association d''un objet multimedia Ã  une famille';
 
 
 DROP TABLE IF EXISTS `rel_familles_notes`;
@@ -538,7 +538,7 @@ CREATE TABLE `rel_familles_notes` (
   KEY `notes_id` (`notes_id`),
   CONSTRAINT `rel_familles_notes_ibfk_1` FOREIGN KEY (`familles_id`) REFERENCES `genea_familles` (`familles_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `rel_familles_notes_ibfk_2` FOREIGN KEY (`notes_id`) REFERENCES `genea_notes` (`notes_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci COMMENT='Association d''une note Ã  une famille';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Association d''une note Ã  une famille';
 
 
 DROP TABLE IF EXISTS `rel_familles_sources`;
@@ -547,7 +547,7 @@ CREATE TABLE `rel_familles_sources` (
   `familles_id` mediumint(8) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`familles_id`,`sour_citations_id`),
   KEY `sources_id` (`sour_citations_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci COMMENT='Association d''une source Ã  une famille';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Association d''une source Ã  une famille';
 
 
 DROP TABLE IF EXISTS `rel_indi_attributes`;
@@ -561,7 +561,7 @@ CREATE TABLE `rel_indi_attributes` (
   KEY `events_id` (`events_details_id`),
   CONSTRAINT `rel_indi_attributes_ibfk_1` FOREIGN KEY (`indi_id`) REFERENCES `genea_individuals` (`indi_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `rel_indi_attributes_ibfk_2` FOREIGN KEY (`events_details_id`) REFERENCES `genea_events_details` (`events_details_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci COMMENT='Association d''un Ã©vÃ¨nement Ã§ une famille';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Association d''un Ã©vÃ¨nement Ã§ une famille';
 
 
 DROP TABLE IF EXISTS `rel_indi_events`;
@@ -575,7 +575,7 @@ CREATE TABLE `rel_indi_events` (
   KEY `events_id` (`events_details_id`),
   CONSTRAINT `rel_indi_events_ibfk_1` FOREIGN KEY (`indi_id`) REFERENCES `genea_individuals` (`indi_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `rel_indi_events_ibfk_2` FOREIGN KEY (`events_details_id`) REFERENCES `genea_events_details` (`events_details_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci COMMENT='Association d''un Ã©vÃ¨nement Ã§ une famille';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Association d''un Ã©vÃ¨nement Ã§ une famille';
 
 
 DROP TABLE IF EXISTS `rel_indi_multimedia`;
@@ -586,7 +586,7 @@ CREATE TABLE `rel_indi_multimedia` (
   KEY `media_id` (`media_id`),
   CONSTRAINT `rel_indi_multimedia_ibfk_1` FOREIGN KEY (`media_id`) REFERENCES `genea_multimedia` (`media_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `rel_indi_multimedia_ibfk_2` FOREIGN KEY (`indi_id`) REFERENCES `genea_individuals` (`indi_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 DROP TABLE IF EXISTS `rel_indi_notes`;
@@ -595,7 +595,7 @@ CREATE TABLE `rel_indi_notes` (
   `indi_id` mediumint(8) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`indi_id`,`notes_id`),
   KEY `notes_id` (`notes_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 DROP TABLE IF EXISTS `rel_indi_refn`;
@@ -613,7 +613,7 @@ CREATE TABLE `rel_indi_sources` (
   `indi_id` mediumint(8) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`indi_id`,`sour_citations_id`),
   KEY `sources_id` (`sour_citations_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 DROP TABLE IF EXISTS `rel_multimedia_notes`;
@@ -622,7 +622,7 @@ CREATE TABLE `rel_multimedia_notes` (
   `media_id` mediumint(8) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`notes_id`,`media_id`),
   KEY `media_id` (`media_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci COMMENT='Association d''un objet multimedia Ã  une source';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Association d''un objet multimedia Ã  une source';
 
 
 DROP TABLE IF EXISTS `rel_place_notes`;
@@ -631,7 +631,7 @@ CREATE TABLE `rel_place_notes` (
   `notes_id` mediumint(8) unsigned NOT NULL,
   PRIMARY KEY (`place_id`,`notes_id`),
   KEY `note_id` (`notes_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 DROP TABLE IF EXISTS `rel_repo_notes`;
@@ -640,7 +640,7 @@ CREATE TABLE `rel_repo_notes` (
   `repo_id` mediumint(8) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`notes_id`,`repo_id`),
   KEY `media_id` (`repo_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci COMMENT='Association d''un objet multimedia Ã  une source';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Association d''un objet multimedia Ã  une source';
 
 
 DROP TABLE IF EXISTS `rel_sour_citations_multimedia`;
@@ -649,7 +649,7 @@ CREATE TABLE `rel_sour_citations_multimedia` (
   `media_id` mediumint(8) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`sour_citations_id`,`media_id`),
   KEY `media_id` (`media_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci COMMENT='Association d''un objet multimedia Ã  une source';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Association d''un objet multimedia Ã  une source';
 
 
 DROP TABLE IF EXISTS `rel_sour_citations_notes`;
@@ -658,7 +658,7 @@ CREATE TABLE `rel_sour_citations_notes` (
   `sour_citations_id` mediumint(8) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`notes_id`,`sour_citations_id`),
   KEY `media_id` (`sour_citations_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci COMMENT='Association d''un objet multimedia Ã  une source';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Association d''un objet multimedia Ã  une source';
 
 
 DROP TABLE IF EXISTS `rel_sour_records_notes`;
@@ -667,7 +667,7 @@ CREATE TABLE `rel_sour_records_notes` (
   `sour_records_id` mediumint(8) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`notes_id`,`sour_records_id`),
   KEY `media_id` (`sour_records_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci COMMENT='Association d''un objet multimedia Ã  une source';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Association d''un objet multimedia Ã  une source';
 
 
 

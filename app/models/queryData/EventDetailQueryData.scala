@@ -24,7 +24,9 @@ case class EventDetailQueryData(
     events_details_timestamp: Instant,
     tag: Option[String],
     description: Option[String],
-    eventType: EventType
+    eventType: EventType,
+    sourCount: Int,
+    ownerId: Option[Int]
 )
 
 object EventDetailQueryData {
@@ -45,11 +47,14 @@ object EventDetailQueryData {
       get[Instant]("events_details_timestamp") ~
       get[Option[String]]("tag") ~
       get[Option[String]]("description") ~
-      get[String]("event_type")).map {
+      get[String]("event_type") ~
+      get[Option[Int]]("sourCount") ~
+      get[Option[Int]]("ownerId")).map {
       case base ~ events_details_id ~ place_id ~ addr_id ~
           events_details_descriptor ~ events_details_gedcom_date ~ events_details_age ~ events_details_cause ~
           jd_count ~ jd_precision ~ jd_calendar ~
-          events_details_famc ~ events_details_adop ~ events_details_timestamp ~ tag ~ description ~ eventType =>
+          events_details_famc ~ events_details_adop ~ events_details_timestamp ~ tag ~ description ~ eventType ~
+          sourCount ~ ownerId =>
         EventDetailQueryData(
           base,
           events_details_id,
@@ -67,7 +72,9 @@ object EventDetailQueryData {
           events_details_timestamp,
           tag,
           description,
-          EventType.fromString(eventType)
+          EventType.fromString(eventType),
+          sourCount.getOrElse(0),
+          ownerId
         )
     }
 }

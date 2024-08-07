@@ -20,7 +20,7 @@ class GenealogyDatabaseService @Inject() (mariadbQueries: MariadbQueries, eventS
 ) {
   def getGenealogyDatabases: Future[List[GenealogyDatabase]] = mariadbQueries.getGenealogyDatabases
 
-  def getSurnamesList(id: Int)(implicit authenticatedRequest: AuthenticatedRequest[?]): Future[List[String]] =
+  def getSurnamesList(id: Int)(implicit authenticatedRequest: AuthenticatedRequest[?]): Future[List[(String, Int)]] =
     mariadbQueries.getSurnamesList(id)
 
   def getFirstnamesList(id: Int, name: String)(

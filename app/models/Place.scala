@@ -17,6 +17,10 @@ case class Place(
     base: Int
 ) {
   def oneLiner: String = {
+    val location = (latitude, longitude) match {
+      case (Some(latitude), Some(longitude)) => s" ($latitude, $longitude)"
+      case _                                 => ""
+    }
     List(lieuDit, city, postCode, county, region, country)
       .flatMap { el =>
         if (el.trim == "") {
@@ -25,7 +29,7 @@ case class Place(
           Some(el)
         }
       }
-      .mkString(", ")
+      .mkString(", ") + location
   }
 }
 

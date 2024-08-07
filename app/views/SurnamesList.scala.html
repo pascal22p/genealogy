@@ -4,7 +4,7 @@
         main: Main
 )
 
-@(surnames: List[String], dbId: Int)(implicit request: Request[?], messages: Messages)
+@(surnames: List[(String, Int)], dbId: Int)(implicit request: Request[?], messages: Messages)
 
 
 @main("Famille Parois", dbId) {
@@ -14,7 +14,7 @@
 
         <ul>
     @for(name <- surnames) {
-        <li><a href="@controllers.routes.HomeController.showFirstnames(dbId, name)">@name</a></li>
+        <li><a href="@controllers.routes.HomeController.showFirstnames(dbId, name._1)">@name._1 (@name._2)</a></li>
     }
         </ul>
     </div>

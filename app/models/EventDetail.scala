@@ -24,7 +24,9 @@ case class EventDetail(
     events_details_timestamp: Instant,
     tag: Option[String],
     description: Option[String],
-    eventType: EventType
+    eventType: EventType,
+    sourCount: Int,
+    ownerId: Option[Int]
 ) {
   def formatDate(implicit messages: Messages): String = {
     CalendarConstants.allKeywords
@@ -55,7 +57,9 @@ object EventDetail {
       eventDetailQueryData.events_details_timestamp,
       eventDetailQueryData.tag,
       eventDetailQueryData.description,
-      eventDetailQueryData.eventType
+      eventDetailQueryData.eventType,
+      eventDetailQueryData.sourCount,
+      eventDetailQueryData.ownerId
     )
   }
 }
