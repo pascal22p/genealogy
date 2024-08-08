@@ -46,7 +46,7 @@ jobs:
       uses: scalacenter/sbt-dependency-submission@42bf43dc46fff6fbf7db41a313075d9ba7fd3a68
 
     - name: Run upload container
-      uses: pascal22p/github-docker-sbt@v0.1.0
+      uses: pascal22p/github-docker-sbt@v0.2.0
       with:
         command: sbt Docker/publish
         docker-login-username: "${{ secrets.DOCKER_HUB_LOGIN }}"
