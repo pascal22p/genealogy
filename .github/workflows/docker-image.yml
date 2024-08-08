@@ -51,4 +51,4 @@ jobs:
         command: sbt Docker/publish
         docker-login-username: "${{ secrets.DOCKER_HUB_LOGIN }}"
         docker-login-password: "${{ secrets.DOCKER_HUB_PASSWORD }}"
-        docker-registry: "${{ registry-1.docker.io }}"
+        docker-registry: "registry-1.docker.io"
