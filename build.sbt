@@ -3,7 +3,7 @@ import com.typesafe.sbt.packager.docker.DockerChmodType
 import scala.sys.process.Process
 
 
-ThisBuild / version := "0.1.0"
+ThisBuild / version := "latest"
 ThisBuild / organization := "parois.net"
 ThisBuild / scalaVersion := "3.4.2"
 ThisBuild / scalafmtOnCompile := true
