@@ -49,5 +49,5 @@ jobs:
       uses: pascal22p/github-docker-sbt@v0.1.0
       with:
         command: sbt Docker/publish
-        docker-login-username: "${{DOCKER_HUB_LOGIN}}"
-        docker-login-password: "${{DOCKER_HUB_PASSWORD}}"
+        docker-login-username: "${{ secrets.DOCKER_HUB_LOGIN }}"
+        docker-login-password: "${{ secrets.DOCKER_HUB_PASSWORD }}"
