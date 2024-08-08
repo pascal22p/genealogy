@@ -48,7 +48,7 @@ jobs:
     - name: Run upload container
       uses: pascal22p/github-docker-sbt@v0.2.0
       with:
-        command: sbt Docker/publish
+        command: sbt Docker/publish -d -v
         docker-login-username: "${{ secrets.DOCKER_HUB_LOGIN }}"
         docker-login-password: "${{ secrets.DOCKER_HUB_PASSWORD }}"
         docker-registry: "registry-1.docker.io"
