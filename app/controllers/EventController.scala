@@ -30,7 +30,16 @@ class EventController @Inject() (
     implicit authenticatedRequest: AuthenticatedRequest[AnyContent] =>
       eventService.getEvent(id).map { eventOption =>
         eventOption.fold(NotFound("Event could not be found")) { event =>
-          Ok(eventView(event, authenticatedRequest.localSession.sessionData.dbId))
+          if (event.privacyRestriction.contains("privacy")) {
+            authenticatedRequest.localSession.sessionData.userData.fold(Forbidden("Not allowed")) { userData =>
+              if (userData.seePrivacy)
+                Ok(eventView(event, authenticatedRequest.localSession.sessionData.dbId))
+              else
+                Forbidden("Not allowed")
+            }
+          } else {
+            Ok(eventView(event, authenticatedRequest.localSession.sessionData.dbId))
+          }
         }
       }
   }

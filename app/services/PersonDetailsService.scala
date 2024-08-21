@@ -35,8 +35,8 @@ class PersonDetailsService @Inject() (
         } yield {
           Parents(
             familyQueryData,
-            parent1.map(Person(_, Events(events1.getOrElse(List.empty)), List.empty)),
-            parent2.map(Person(_, Events(events2.getOrElse(List.empty)), List.empty))
+            parent1.map(Person(_, Events(events1.getOrElse(List.empty[EventDetail])), List.empty)),
+            parent2.map(Person(_, Events(events2.getOrElse(List.empty[EventDetail])), List.empty))
           )
         }
       }.sequence

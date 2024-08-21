@@ -30,7 +30,9 @@ class AuthActionImpl @Inject() (
   protected override val executionContext: ExecutionContext = cc.executionContext
 
   override def invokeBlock[A](request: Request[A], block: AuthenticatedRequest[A] => Future[Result]): Future[Result] = {
-    val sessionId = request.session.get("sessionId").getOrElse(UUID.randomUUID().toString)
+    @SuppressWarnings(Array("org.wartremover.warts.ToString"))
+    val uuid      = UUID.randomUUID().toString
+    val sessionId = request.session.get("sessionId").getOrElse(uuid)
     mariadbQueries.getSessionData(sessionId).flatMap {
       case Some(session) =>
         mariadbQueries.sessionKeepAlive(sessionId).flatMap { _ =>

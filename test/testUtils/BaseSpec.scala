@@ -71,7 +71,8 @@ trait BaseSpec extends PlaySpec with GuiceOneAppPerSuite with ScalaFutures with 
       description: Option[String] = None,
       eventType: EventType = UnknownEvent,
       sourCount: Int = 0,
-      ownerId: Option[Int] = None
+      ownerId: Option[Int] = None,
+      privacyRestriction: Option[String] = None
   ): EventDetail = EventDetail(
     base,
     events_details_id,
@@ -91,7 +92,8 @@ trait BaseSpec extends PlaySpec with GuiceOneAppPerSuite with ScalaFutures with 
     description,
     eventType,
     sourCount,
-    ownerId
+    ownerId,
+    privacyRestriction
   )
 
   def fakePlace(

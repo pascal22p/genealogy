@@ -3,7 +3,7 @@ package models
 import anorm._
 import anorm.SqlParser._
 
-case class Place(
+final case class Place(
     id: Int,
     lieuDit: String,
     city: String,

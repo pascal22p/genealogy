@@ -7,7 +7,7 @@ import anorm.SqlParser.*
 import models.EventType
 import models.EventType.EventType
 
-case class EventDetailQueryData(
+final case class EventDetailQueryData(
     base: Int,
     events_details_id: Int,
     place_id: Option[Int],
@@ -26,7 +26,8 @@ case class EventDetailQueryData(
     description: Option[String],
     eventType: EventType,
     sourCount: Int,
-    ownerId: Option[Int]
+    ownerId: Option[Int],
+    resn: Option[String]
 )
 
 object EventDetailQueryData {
@@ -49,12 +50,13 @@ object EventDetailQueryData {
       get[Option[String]]("description") ~
       get[String]("event_type") ~
       get[Option[Int]]("sourCount") ~
-      get[Option[Int]]("ownerId")).map {
+      get[Option[Int]]("ownerId") ~
+      get[Option[String]]("resn")).map {
       case base ~ events_details_id ~ place_id ~ addr_id ~
           events_details_descriptor ~ events_details_gedcom_date ~ events_details_age ~ events_details_cause ~
           jd_count ~ jd_precision ~ jd_calendar ~
           events_details_famc ~ events_details_adop ~ events_details_timestamp ~ tag ~ description ~ eventType ~
-          sourCount ~ ownerId =>
+          sourCount ~ ownerId ~ resn =>
         EventDetailQueryData(
           base,
           events_details_id,
@@ -74,7 +76,8 @@ object EventDetailQueryData {
           description,
           EventType.fromString(eventType),
           sourCount.getOrElse(0),
-          ownerId
+          ownerId,
+          resn
         )
     }
 }
