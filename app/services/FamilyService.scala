@@ -37,12 +37,9 @@ class FamilyService @Inject() (
   def getFamiliesAsPartner(id: Int): Future[List[Family]] = {
     mariadbQueries.getFamiliesAsPartner(id).flatMap { families =>
       families
-        .traverse(family =>
-          getFamilyDetails(family.id)
-            .map(_.get)
-        )
+        .traverse(family => getFamilyDetails(family.id))
         .flatMap { families =>
-          families.traverse { family =>
+          families.flatten.traverse { family =>
             for {
               events   <- eventService.getFamilyEvents(family.id)
               children <- getChildren(family.id)
@@ -67,8 +64,8 @@ class FamilyService @Inject() (
           } yield {
             Family(
               family,
-              parent1.map(Person(_, Events(events1.getOrElse(List.empty)), List.empty)),
-              parent2.map(Person(_, Events(events2.getOrElse(List.empty)), List.empty))
+              parent1.map(Person(_, Events(events1.getOrElse(List.empty[EventDetail])), List.empty)),
+              parent2.map(Person(_, Events(events2.getOrElse(List.empty[EventDetail])), List.empty))
             )
           }
         }

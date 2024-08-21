@@ -5,13 +5,13 @@ import anorm.SqlParser.*
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 
-case class SessionData(dbId: Int, userData: Option[UserData] = None)
+final case class SessionData(dbId: Int, userData: Option[UserData] = None)
 
 object SessionData {
   implicit val format: OFormat[SessionData] = Json.format[SessionData]
 }
 
-case class Session(sessionId: String, sessionData: SessionData)
+final case class Session(sessionId: String, sessionData: SessionData)
 
 object Session {
   val mysqlParser: RowParser[Session] =

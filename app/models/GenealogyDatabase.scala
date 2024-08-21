@@ -4,7 +4,7 @@ import anorm.~
 import anorm.RowParser
 import anorm.SqlParser.get
 
-case class GenealogyDatabase(id: Int, name: String, description: String)
+final case class GenealogyDatabase(id: Int, name: String, description: String)
 
 object GenealogyDatabase {
   val mysqlParser: RowParser[GenealogyDatabase] =

@@ -7,10 +7,14 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
 import cats.implicits.*
+import models.queryData.EventDetailQueryData
 import models.EventDetail
 import models.EventType.FamilyEvent
 import models.EventType.IndividualEvent
 import models.EventType.UnknownEvent
+import models.Place
+import models.SourCitationQueryData
+import models.SourCitationType.EventSourCitation
 import models.UserData
 import org.mindrot.jbcrypt.BCrypt
 import queries.MariadbQueries
@@ -22,9 +26,7 @@ class EventService @Inject() (mariadbQueries: MariadbQueries)(
   def getIndividualEvents(personId: Int): Future[List[EventDetail]] = {
     mariadbQueries.getEvents(personId, IndividualEvent).flatMap { events =>
       events.traverse { event =>
-        event.place_id.traverse(mariadbQueries.getPlace).map { place =>
-          EventDetail(event, place.flatten)
-        }
+        fillExtraData(event)
       }
     }
   }
@@ -32,9 +34,7 @@ class EventService @Inject() (mariadbQueries: MariadbQueries)(
   def getFamilyEvents(familyId: Int): Future[List[EventDetail]] = {
     mariadbQueries.getEvents(familyId, FamilyEvent).flatMap { events =>
       events.traverse { event =>
-        event.place_id.traverse(mariadbQueries.getPlace).map { place =>
-          EventDetail(event, place.flatten)
-        }
+        fillExtraData(event)
       }
     }
   }
@@ -42,10 +42,20 @@ class EventService @Inject() (mariadbQueries: MariadbQueries)(
   def getEvent(eventId: Int): Future[Option[EventDetail]] = {
     mariadbQueries.getEvents(eventId, UnknownEvent).flatMap { events =>
       events.headOption.traverse { event =>
-        event.place_id.traverse(mariadbQueries.getPlace).map { place =>
-          EventDetail(event, place.flatten)
-        }
+        fillExtraData(event)
       }
+    }
+  }
+
+  private def fillExtraData(event: EventDetailQueryData): Future[EventDetail] = {
+    for {
+      place: Option[Option[Place]] <- event.place_id.traverse(mariadbQueries.getPlace)
+      sources: List[SourCitationQueryData] <- mariadbQueries.getSourCitations(
+        event.events_details_id,
+        EventSourCitation
+      )
+    } yield {
+      EventDetail(event, place.flatten, sources)
     }
   }
 

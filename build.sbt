@@ -1,4 +1,5 @@
 import com.typesafe.sbt.packager.docker.DockerChmodType
+import wartremover.Wart.{DefaultArguments, Equals, ImplicitParameter, Overloading}
 
 import scala.sys.process.Process
 
@@ -55,7 +56,6 @@ lazy val scoverageSettings = {
   )
 }
 
-
 lazy val genealogy = (project in file("."))
   .enablePlugins(PlayScala)
   .enablePlugins(JavaAppPackaging)
@@ -64,6 +64,8 @@ lazy val genealogy = (project in file("."))
     PlayKeys.playDefaultPort := 9123,
     libraryDependencies ++= LibDependencies.all,
     scoverageSettings,
-    dockerBuildxSettings
+    dockerBuildxSettings,
+    wartremoverErrors in (Compile, compile) ++= Warts.allBut(DefaultArguments, ImplicitParameter, Overloading, Equals),
+    wartremoverExcluded ++= (Compile / routes).value
   )
 

@@ -5,7 +5,7 @@ import anorm.SqlParser.*
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 
-case class UserData(id: Int, username: String, hashedPassword: String, seePrivacy: Boolean, isAdmin: Boolean)
+final case class UserData(id: Int, username: String, hashedPassword: String, seePrivacy: Boolean, isAdmin: Boolean)
 
 object UserData {
   implicit val format: OFormat[UserData] = Json.format[UserData]

@@ -13,6 +13,17 @@ import models.EventType.EventType
 import models.EventType.FamilyEvent
 import models.EventType.IndividualEvent
 import models.EventType.UnknownEvent
+import models.MediaType.EventMedia
+import models.MediaType.FamilyMedia
+import models.MediaType.IndividualMedia
+import models.MediaType.MediaType
+import models.MediaType.SourCitationMedia
+import models.MediaType.UnknownMedia
+import models.SourCitationType.EventSourCitation
+import models.SourCitationType.FamilySourCitation
+import models.SourCitationType.IndividualSourCitation
+import models.SourCitationType.SourCitationType
+import models.SourCitationType.UnknownSourCitation
 import play.api.db.Database
 import play.api.libs.json.Json
 
@@ -56,7 +67,12 @@ final class MariadbQueries @Inject() (db: Database, databaseExecutionContext: Da
              |           WHEN rel_indi_events.indi_id IS NOT NULL THEN rel_indi_events.indi_id
              |           WHEN rel_familles_events.familles_id IS NOT NULL THEN rel_familles_events.familles_id
              |           ELSE NULL
-             |       END AS ownerId
+             |       END AS ownerId,
+             |       CASE
+             |           WHEN rel_indi_events.indi_id IS NOT NULL THEN genea_individuals.indi_resn
+             |           WHEN rel_familles_events.familles_id IS NOT NULL THEN genea_familles.familles_resn
+             |           ELSE NULL
+             |       END AS resn
              |
              |FROM `genea_events_details`
              |LEFT JOIN `rel_indi_events`
@@ -132,6 +148,79 @@ final class MariadbQueries @Inject() (db: Database, databaseExecutionContext: Da
             |WHERE place_id = {id}""".stripMargin)
         .on("id" -> id)
         .as[Option[Place]](Place.mysqlParser.singleOpt)
+    }
+  }(databaseExecutionContext)
+
+  def getSourCitations(id: Int, typeCitation: SourCitationType): Future[List[SourCitationQueryData]] = Future {
+    db.withConnection { implicit conn =>
+      val where = typeCitation match {
+        case EventSourCitation      => "WHERE rel_events_sources.events_details_id = {id}"
+        case IndividualSourCitation => "WHERE rel_indi_sources.indi_id = {id}"
+        case FamilySourCitation     => "WHERE rel_familles_sources.familles_id = {id}"
+        case UnknownSourCitation    => "WHERE genea_sour_citations.sour_citations_id = {id}"
+      }
+
+      SQL(s"""SELECT *,
+             |       CASE
+             |           WHEN rel_events_sources.events_details_id IS NOT NULL THEN "${EventSourCitation.toString}"
+             |           WHEN rel_indi_sources.indi_id IS NOT NULL THEN "${IndividualSourCitation.toString}"
+             |           WHEN rel_familles_sources.familles_id IS NOT NULL THEN "${FamilySourCitation.toString}"
+             |           ELSE "${UnknownSourCitation.toString}"
+             |       END AS source_type,
+             |       CASE
+             |           WHEN rel_events_sources.events_details_id IS NOT NULL THEN rel_events_sources.events_details_id
+             |           WHEN rel_indi_sources.indi_id IS NOT NULL THEN rel_indi_sources.indi_id
+             |           WHEN rel_familles_sources.familles_id IS NOT NULL THEN rel_familles_sources.familles_id
+             |           ELSE NULL
+             |       END AS owner_id
+             |
+             |FROM genea_sour_citations
+             |LEFT JOIN genea_sour_records ON genea_sour_records.sour_records_id = genea_sour_citations.sour_records_id
+             |LEFT JOIN rel_events_sources ON rel_events_sources.sour_citations_id = genea_sour_citations.sour_citations_id
+             |LEFT JOIN rel_indi_sources ON rel_indi_sources.sour_citations_id = genea_sour_citations.sour_citations_id
+             |LEFT JOIN rel_familles_sources ON rel_familles_sources.sour_citations_id = genea_sour_citations.sour_citations_id
+             |$where""".stripMargin)
+        .on("id" -> id)
+        .as[List[SourCitationQueryData]](SourCitationQueryData.mysqlParser.*)
+    }
+  }(databaseExecutionContext)
+
+  def getMedias(id: Int, typeMedia: MediaType): Future[List[Media]] = Future {
+    db.withConnection { implicit conn =>
+      val where = typeMedia match {
+        case EventMedia        => "WHERE rel_events_multimedia.events_details_id = {id}"
+        case IndividualMedia   => "WHERE rel_indi_multimedia.indi_id = {id}"
+        case FamilyMedia       => "WHERE rel_familles_multimedia.familles_id = {id}"
+        case SourCitationMedia => "WHERE rel_sour_citations_multimedia.sour_citations_id = {id}"
+        case UnknownMedia      => "WHERE genea_multimedia.media_id = {id}"
+      }
+
+      SQL(
+        s"""SELECT *,
+           |       CASE
+           |           WHEN rel_events_multimedia.events_details_id IS NOT NULL THEN "${EventMedia.toString}"
+           |           WHEN rel_indi_multimedia.indi_id IS NOT NULL THEN "${IndividualMedia.toString}"
+           |           WHEN rel_familles_multimedia.familles_id IS NOT NULL THEN "${FamilyMedia.toString}"
+           |           WHEN rel_sour_citations_multimedia.sour_citations_id IS NOT NULL THEN "${SourCitationMedia.toString}"
+           |           ELSE "${UnknownMedia.toString}"
+           |       END AS media_type,
+           |       CASE
+           |           WHEN rel_events_multimedia.events_details_id IS NOT NULL THEN rel_events_multimedia.events_details_id
+           |           WHEN rel_indi_multimedia.indi_id IS NOT NULL THEN rel_indi_multimedia.indi_id
+           |           WHEN rel_familles_multimedia.familles_id IS NOT NULL THEN rel_familles_multimedia.familles_id
+           |           WHEN rel_sour_citations_multimedia.sour_citations_id IS NOT NULL THEN rel_sour_citations_multimedia.sour_citations_id
+           |           ELSE NULL
+           |       END AS owner_id
+           |
+           |FROM genea_multimedia
+           |LEFT JOIN rel_events_multimedia ON rel_events_multimedia.media_id = genea_multimedia.media_id
+           |LEFT JOIN rel_indi_multimedia ON rel_indi_multimedia.media_id = genea_multimedia.media_id
+           |LEFT JOIN rel_familles_multimedia ON rel_familles_multimedia.media_id = genea_multimedia.media_id
+           |LEFT JOIN rel_sour_citations_multimedia ON rel_sour_citations_multimedia.media_id = genea_multimedia.media_id
+           |$where""".stripMargin
+      )
+        .on("id" -> id)
+        .as[List[Media]](Media.mysqlParser.*)
     }
   }(databaseExecutionContext)
 

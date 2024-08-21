@@ -7,7 +7,7 @@ import models.EventType.EventType
 import play.api.i18n.Messages
 import utils.CalendarConstants
 
-case class EventDetail(
+final case class EventDetail(
     base: Int,
     events_details_id: Int,
     place: Option[Place],
@@ -26,7 +26,9 @@ case class EventDetail(
     description: Option[String],
     eventType: EventType,
     sourCount: Int,
-    ownerId: Option[Int]
+    ownerId: Option[Int],
+    privacyRestriction: Option[String],
+    sourCitations: List[SourCitationQueryData] = List.empty
 ) {
   def formatDate(implicit messages: Messages): String = {
     CalendarConstants.allKeywords
@@ -39,7 +41,11 @@ case class EventDetail(
 }
 
 object EventDetail {
-  def apply(eventDetailQueryData: EventDetailQueryData, place: Option[Place]): EventDetail = {
+  def apply(
+      eventDetailQueryData: EventDetailQueryData,
+      place: Option[Place],
+      sourCitations: List[SourCitationQueryData]
+  ): EventDetail = {
     new EventDetail(
       eventDetailQueryData.base,
       eventDetailQueryData.events_details_id,
@@ -59,7 +65,9 @@ object EventDetail {
       eventDetailQueryData.description,
       eventDetailQueryData.eventType,
       eventDetailQueryData.sourCount,
-      eventDetailQueryData.ownerId
+      eventDetailQueryData.ownerId,
+      eventDetailQueryData.resn,
+      sourCitations = sourCitations
     )
   }
 }
