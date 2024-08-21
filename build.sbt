@@ -6,7 +6,7 @@ import scala.sys.process.Process
 
 ThisBuild / version := "latest"
 ThisBuild / organization := "parois.net"
-ThisBuild / scalaVersion := "3.4.2"
+ThisBuild / scalaVersion := "3.4.3"
 ThisBuild / scalafmtOnCompile := true
 
 Test / parallelExecution := true
