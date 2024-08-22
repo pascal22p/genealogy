@@ -20,10 +20,10 @@ final case class Media(
 object Media {
   val mysqlParser: RowParser[Media] =
     (get[Int]("genea_multimedia.media_id") ~
-      get[String]("media_title ") ~
+      get[String]("media_title") ~
       get[String]("media_format") ~
       get[String]("media_file") ~
-      get[Option[Instant]]("media_timestamp ") ~
+      get[Option[Instant]]("media_timestamp") ~
       get[Option[Int]]("owner_id") ~
       get[String]("media_type")).map {
       case id ~ title ~ format ~ filename ~ timestamp ~ ownerId ~ mediaType =>
