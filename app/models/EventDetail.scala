@@ -28,7 +28,7 @@ final case class EventDetail(
     sourCount: Int,
     ownerId: Option[Int],
     privacyRestriction: Option[String],
-    sourCitations: List[SourCitationQueryData] = List.empty
+    sourCitations: List[SourCitation] = List.empty
 ) {
   def formatDate(implicit messages: Messages): String = {
     CalendarConstants.allKeywords
@@ -44,7 +44,7 @@ object EventDetail {
   def apply(
       eventDetailQueryData: EventDetailQueryData,
       place: Option[Place],
-      sourCitations: List[SourCitationQueryData]
+      sourCitations: List[SourCitation]
   ): EventDetail = {
     new EventDetail(
       eventDetailQueryData.base,

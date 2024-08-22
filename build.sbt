@@ -65,7 +65,7 @@ lazy val genealogy = (project in file("."))
     libraryDependencies ++= LibDependencies.all,
     scoverageSettings,
     dockerBuildxSettings,
-    wartremoverErrors in (Compile, compile) ++= Warts.allBut(DefaultArguments, ImplicitParameter, Overloading, Equals),
+    Compile / compile / wartremoverErrors ++= Warts.allBut(DefaultArguments, ImplicitParameter, Overloading, Equals),
     wartremoverExcluded ++= (Compile / routes).value
   )
 
