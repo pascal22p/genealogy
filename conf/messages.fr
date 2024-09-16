@@ -5,3 +5,12 @@ firstname = Prénom:
 sex = Sexe:
 id = Id:
 resn = Resn:
+
+date.period.bet = Entre
+date.period.and = et
+date.period.bef = Avant
+date.period.aft = Après
+date.period.from = Depuis
+date.period.to = Jusque
+date.period.abt = Environ
+date.period.cal = Calculé

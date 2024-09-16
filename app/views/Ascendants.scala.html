@@ -1,0 +1,23 @@
+@import models.Person
+@import views.html.components.{FamilyView, PersonDetails, IndividualEvents, Parents, NameLink}
+
+
+@this(
+  main: Main,
+        nameLink: NameLink)
+
+@(flatTree: List[(Int, List[Person])], dbId: Int)(implicit request: Request[?], messages: Messages)
+
+
+@main("todo", dbId) {
+
+  @for(gen <- flatTree) {
+    <h3>Generation @{gen._1}</h3>
+    <ul>
+    @for(person <- gen._2) {
+      <li>@nameLink(person)</li>
+    }
+    </ul>
+  }
+
+}

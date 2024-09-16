@@ -15,12 +15,33 @@ class PersonService @Inject() (
     eventService: EventService
 )(implicit ec: ExecutionContext) {
 
-  def getPerson(id: Int): Future[Option[Person]] = {
+  private def getParents(id: Int, omitParents: Boolean): Future[List[Parents]] = {
+    if (omitParents) {
+      Future.successful(List.empty[Parents])
+    } else {
+      personDetailsService.getParents(id)
+    }
+  }
+
+  private def getFamilies(id: Int, omitSources: Boolean, omitFamilies: Boolean): Future[List[Family]] = {
+    if (omitFamilies) {
+      Future.successful(List.empty[Family])
+    } else {
+      familyService.getFamiliesAsPartner(id, omitSources)
+    }
+  }
+
+  def getPerson(
+      id: Int,
+      omitSources: Boolean = false,
+      omitFamilies: Boolean = false,
+      omitParents: Boolean = false
+  ): Future[Option[Person]] = {
     for {
       personDetails          <- personDetailsService.getPersonDetails(id)
-      events                 <- eventService.getIndividualEvents(id)
-      parents                <- personDetailsService.getParents(id)
-      families: List[Family] <- familyService.getFamiliesAsPartner(id)
+      events                 <- eventService.getIndividualEvents(id, omitSources)
+      parents                <- getParents(id, omitParents)
+      families: List[Family] <- getFamilies(id, omitSources, omitFamilies)
     } yield {
       personDetails.map(Person(_, Events(events), parents, families))
     }

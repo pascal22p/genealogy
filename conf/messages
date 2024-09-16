@@ -92,6 +92,7 @@ date.period.aft = After
 date.period.from = From
 date.period.to = to
 date.period.abt = About
+date.period.cal = Calculated
 
 sex.unknown = Unknown
 sex.male = Male

@@ -24,18 +24,18 @@ import queries.MariadbQueries
 class EventService @Inject() (mariadbQueries: MariadbQueries, sourCitationService: SourCitationService)(
     implicit ec: ExecutionContext
 ) {
-  def getIndividualEvents(personId: Int): Future[List[EventDetail]] = {
+  def getIndividualEvents(personId: Int, omitSources: Boolean = false): Future[List[EventDetail]] = {
     mariadbQueries.getEvents(personId, IndividualEvent).flatMap { events =>
       events.traverse { event =>
-        fillExtraData(event)
+        fillExtraData(event, omitSources)
       }
     }
   }
 
-  def getFamilyEvents(familyId: Int): Future[List[EventDetail]] = {
+  def getFamilyEvents(familyId: Int, omitSources: Boolean = false): Future[List[EventDetail]] = {
     mariadbQueries.getEvents(familyId, FamilyEvent).flatMap { events =>
       events.traverse { event =>
-        fillExtraData(event)
+        fillExtraData(event, omitSources)
       }
     }
   }
@@ -48,13 +48,21 @@ class EventService @Inject() (mariadbQueries: MariadbQueries, sourCitationServic
     }
   }
 
-  private def fillExtraData(event: EventDetailQueryData): Future[EventDetail] = {
+  private def fillExtraData(event: EventDetailQueryData, omitSources: Boolean = false): Future[EventDetail] = {
+    def getSourCitations: Future[List[SourCitation]] = {
+      if (omitSources) {
+        Future.successful(List.empty[SourCitation])
+      } else {
+        sourCitationService.getSourCitations(
+          event.events_details_id,
+          EventSourCitation
+        )
+      }
+    }
+
     for {
       place: Option[Option[Place]] <- event.place_id.traverse(mariadbQueries.getPlace)
-      sources: List[SourCitation] <- sourCitationService.getSourCitations(
-        event.events_details_id,
-        EventSourCitation
-      )
+      sources: List[SourCitation]  <- getSourCitations
     } yield {
       EventDetail(event, place.flatten, sources)
     }

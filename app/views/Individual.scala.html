@@ -11,7 +11,7 @@
 @(person: Person, dbId: Int)(implicit request: Request[?], messages: Messages)
 
 
-@main(person.details.toString, dbId) {
+@main(person.details.shortName, dbId) {
 
   @personDetails(person)
 

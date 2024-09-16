@@ -9,15 +9,23 @@ import models.MaleSex
 import models.PersonDetails
 import models.Place
 import models.Sex
+import org.mockito.Mockito
 import org.scalatest.concurrent.IntegrationPatience
 import org.scalatest.concurrent.ScalaFutures
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import org.scalatestplus.play.PlaySpec
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Injecting
 import play.api.Application
 
-trait BaseSpec extends PlaySpec with GuiceOneAppPerSuite with ScalaFutures with Injecting with IntegrationPatience {
+trait BaseSpec
+    extends PlaySpec
+    with GuiceOneAppPerSuite
+    with ScalaFutures
+    with Injecting
+    with IntegrationPatience
+    with MockitoSugar {
   protected def localGuiceApplicationBuilder(): GuiceApplicationBuilder =
     GuiceApplicationBuilder()
 

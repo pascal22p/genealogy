@@ -1,0 +1,39 @@
+@import models.Person
+@import views.html.components.{FamilyView, PersonDetails, IndividualEvents, Parents, NameLink}
+
+
+@this(
+  main: Main,
+        nameLink: NameLink)
+
+@(person: Person, dbId: Int)(implicit request: Request[?], messages: Messages)
+
+@aDescendant(person: Person, depth: Int = 1): Html = @{
+
+    val children = if(person.families.isEmpty) {
+        ""
+    } else {
+        "<ul>" +
+                person.families.map { family =>
+                    val first = person.findPartner(family.id).fold(""){ partner =>
+                        "<li style=\"margin:0;padding:0\">x " + nameLink(partner).toString + "</li>"
+                    }
+                    val last = family.children.reverse.headOption
+                    val allButLast = family.children.dropRight(1)
+                    first + allButLast.map { child =>
+                        s"<li style=\"margin:0;padding:0\">├${aDescendant(child.person, depth + 1)}</li>"
+                    }.mkString("\n") + last.fold("") { child =>
+                        s"<li style=\"margin:0;padding:0\">└${aDescendant(child.person, depth + 1)}</li>"
+                    }
+                }.mkString("\n") + "</ul>"
+    }
+
+    Html(s"<span style=\"font-size:x-small\">[$depth]</span>" + nameLink(person).toString + children)
+}
+
+@main(person.details.toString, dbId) {
+
+  <ul><li style="margin:0;padding:0">
+      @aDescendant(person)
+  </li></ul>
+}
