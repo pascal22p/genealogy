@@ -1,7 +1,8 @@
 @import models.Family
 @import controllers.routes
+@import views.html.components.NameLink
 
-@this()
+@this(nameLink: NameLink)
 
 @(family: Family, partnerOption: Option[Person])(implicit messages: Messages)
 
@@ -16,8 +17,7 @@
     @for(partner <- partnerOption) {
         <dl class="collapsed">
             <dt>Conjoint&nbsp;: </dt>
-            <dd><a class="link_nom" href="@routes.IndividualController.showPerson(partner.details.id)">@partner.details.toString</a>
-                <span class="petit">(°8 Novembre 1798 – †14 Juillet 1844)</span></dd>
+          <dd>@nameLink(partner)</dd>
         </dl>
     }
 
@@ -49,8 +49,7 @@
         <ul style="list-style-type: none;
             padding: 0;">
         @for(child <- family.children) {
-            <li> <a class="link_nom" href="@routes.IndividualController.showPerson(child.person.details.id)">@child.person.details.toString</a>
-                <span class="petit">@child.person.events.birthAndDeathDate</span></li>
+          <li>@nameLink(child.person)</li>
         }
         </ul>
     </div>

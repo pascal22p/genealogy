@@ -39,7 +39,7 @@ class individualControllerSpec extends BaseSpec {
   "showPerson" must {
     "display person details" when {
       "privacy is set and see_privacy is true" in {
-        when(mockPersonService.getPerson(any())).thenReturn(
+        when(mockPersonService.getPerson(any(), any[Boolean], any[Boolean], any[Boolean])).thenReturn(
           Future.successful(Some(Person(fakePersonDetails(privacyRestriction = Some("privacy")), Events(List.empty))))
         )
 
@@ -50,7 +50,7 @@ class individualControllerSpec extends BaseSpec {
     }
 
     "privacy is not set and see_privacy is false" in {
-      when(mockPersonService.getPerson(any())).thenReturn(
+      when(mockPersonService.getPerson(any(), any[Boolean], any[Boolean], any[Boolean])).thenReturn(
         Future.successful(Some(Person(fakePersonDetails(privacyRestriction = None), Events(List.empty))))
       )
 
@@ -62,7 +62,7 @@ class individualControllerSpec extends BaseSpec {
 
   "not display person details" when {
     "privacy is set and see_privacy is false" in {
-      when(mockPersonService.getPerson(any())).thenReturn(
+      when(mockPersonService.getPerson(any(), any[Boolean], any[Boolean], any[Boolean])).thenReturn(
         Future.successful(Some(Person(fakePersonDetails(privacyRestriction = Some("privacy")), Events(List.empty))))
       )
 
@@ -71,7 +71,7 @@ class individualControllerSpec extends BaseSpec {
     }
 
     "privacy is set and UserData is None" in {
-      when(mockPersonService.getPerson(any())).thenReturn(
+      when(mockPersonService.getPerson(any(), any[Boolean], any[Boolean], any[Boolean])).thenReturn(
         Future.successful(Some(Person(fakePersonDetails(privacyRestriction = Some("privacy")), Events(List.empty))))
       )
 
@@ -81,7 +81,7 @@ class individualControllerSpec extends BaseSpec {
   }
 
   "returns not found" in {
-    when(mockPersonService.getPerson(any())).thenReturn(
+    when(mockPersonService.getPerson(any(), any[Boolean], any[Boolean], any[Boolean])).thenReturn(
       Future.successful(None)
     )
 

@@ -1,5 +1,7 @@
 package models
 
+import play.api.i18n.Messages
+
 final case class Person(
     details: PersonDetails,
     events: Events,
@@ -16,5 +18,14 @@ final case class Person(
         None
       }
     }
+  }
+
+  def prettyPrint(implicit messages: Messages): String = {
+    val partners: List[Person] = families.flatMap { family =>
+      findPartner(family.id)
+    }
+    s"${details.firstname} ${details.surname} " +
+      events.birthAndDeathDate +
+      " x " + partners.map(person => s"${person.details.firstname} ${person.details.surname} ").mkString(" x ")
   }
 }

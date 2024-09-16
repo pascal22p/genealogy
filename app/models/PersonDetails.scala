@@ -20,7 +20,7 @@ final case class PersonDetails(
     privacyRestriction: Option[String] // RESN
 
 ) {
-  override def toString: String = (firstname + " " + surname).trim
+  def shortName: String = (firstname + " " + surname).trim
 }
 
 object PersonDetails {

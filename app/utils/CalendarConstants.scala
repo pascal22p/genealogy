@@ -42,7 +42,8 @@ object CalendarConstants {
     "\\bAFT\\b".r  -> "date.period.aft",
     "\\bFROM\\b".r -> "date.period.from",
     "\\bTO\\b".r   -> "date.period.to",
-    "\\bABT\\b".r  -> "date.period.abt"
+    "\\bABT\\b".r  -> "date.period.abt",
+    "\\bCAL\\b".r  -> "date.period.cal"
   )
 
   val calendarTypes: Map[Regex, String] = Map(

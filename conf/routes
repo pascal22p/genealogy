@@ -8,6 +8,8 @@ GET     /surnames/base/:id                        controllers.HomeController.sho
 GET     /firstnames/base/:id/name/:name           controllers.HomeController.showFirstnames(id: Int, name: String)
 GET     /individual/:id                           controllers.IndividualController.showPerson(id: Int)
 GET     /event/:id                                controllers.EventController.showEvent(id: Int)
+GET     /descendant/:id                           controllers.DescendanceController.showDescendant(id: Int)
+GET     /ascendant/:id                            controllers.AscendanceController.showAscendant(id: Int)
 GET     /switch-lang/:lang                        controllers.IndividualController.languageSwitch(lang: String)
 
 GET     /login                                    controllers.LoginController.onLoad()

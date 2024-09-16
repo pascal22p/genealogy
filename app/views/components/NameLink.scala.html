@@ -1,0 +1,7 @@
+@import controllers.routes
+
+@this()
+
+@(person: Person)(implicit messages: Messages)
+
+<a style="padding:0;margin:0" href="@controllers.routes.IndividualController.showPerson(person.details.id)">@person.details.shortName</a> @person.events.birthAndDeathDate

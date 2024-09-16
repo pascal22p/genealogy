@@ -60,13 +60,13 @@ class GenealogyDatabaseServiceSpec extends BaseSpec {
       when(mockMariadbQueries.getFirstnamesList(any(), any())(any())).thenReturn(
         Future.successful(List(fakePersonDetail1, fakePersonDetail2))
       )
-      when(mockEventService.getIndividualEvents(any()))
+      when(mockEventService.getIndividualEvents(any(), any[Boolean]))
         .thenReturn(Future.successful(fakeEventDetails1))
         .thenReturn(Future.successful(fakeEventDetails2))
 
       val result: List[Person] = sut.getFirstnamesList(1, "Test")(fakeAuthenticatedRequest).futureValue
       result mustBe List(person1, person2)
-      verify(mockEventService, times(2)).getIndividualEvents(argumentCaptor.capture())
+      verify(mockEventService, times(2)).getIndividualEvents(argumentCaptor.capture(), any[Boolean])
       val capturedPersonIds = argumentCaptor.getAllValues.asScala.toList
       capturedPersonIds mustBe List(1, 2)
     }

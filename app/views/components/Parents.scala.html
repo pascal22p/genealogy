@@ -1,6 +1,7 @@
 @import controllers.routes
+@import views.html.components.NameLink
 
-@this()
+@this(nameLink: NameLink)
 
 @(person: Person)(implicit messages: Messages)
 
@@ -12,10 +13,10 @@
 
     <ul style="list-style-type:none;padding:0;">
         @for(parent <- parents.family.parent1) {
-        <li><a class="link_nom" href="@routes.IndividualController.showPerson(parent.details.id)">@parent.details.toString</a> <span class="petit">@parent.events.birthAndDeathDate</span></li>
+          <li>@nameLink(parent)</li>
         }
         @for(parent <- parents.family.parent2) {
-        <li><a class="link_nom" href="@routes.IndividualController.showPerson(parent.details.id)">@parent.details.toString</a> <span class="petit">@parent.events.birthAndDeathDate</span></li>
+            <li>@nameLink(parent)</li>
         }
     </ul>
     }

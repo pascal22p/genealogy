@@ -415,7 +415,7 @@ class MariadbQueriesSpec extends BaseSpec with BeforeAndAfterEach {
         )
       } yield result).futureValue
 
-      result.map(_.toString) mustBe List("B Z", "D Z")
+      result.map(_.shortName) mustBe List("B Z", "D Z")
     }
 
     "returns a list of names where restriction is not None" in {
@@ -436,7 +436,7 @@ class MariadbQueriesSpec extends BaseSpec with BeforeAndAfterEach {
         )
       } yield result).futureValue
 
-      result.map(_.toString) mustBe List("A Z", "B Z", "D Z")
+      result.map(_.shortName) mustBe List("A Z", "B Z", "D Z")
     }
 
     "returns nothing" in {

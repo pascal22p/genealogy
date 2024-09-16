@@ -23,10 +23,10 @@ class FamilyService @Inject() (
 )(
     implicit ec: ExecutionContext
 ) {
-  def getChildren(familyId: Int): Future[List[Child]] = {
+  def getChildren(familyId: Int, omitSources: Boolean = false): Future[List[Child]] = {
     mariadbQueries.getChildren(familyId).flatMap { children =>
       children.traverse { (child: Child) =>
-        eventService.getIndividualEvents(child.person.details.id).map { (events: List[EventDetail]) =>
+        eventService.getIndividualEvents(child.person.details.id, omitSources).map { (events: List[EventDetail]) =>
           child.copy(person = child.person.copy(events = Events(events)))
         }
 
@@ -34,15 +34,18 @@ class FamilyService @Inject() (
     }
   }
 
-  def getFamiliesAsPartner(id: Int): Future[List[Family]] = {
+  def getFamiliesAsPartner(
+      id: Int,
+      omitSources: Boolean = false
+  ): Future[List[Family]] = {
     mariadbQueries.getFamiliesAsPartner(id).flatMap { families =>
       families
-        .traverse(family => getFamilyDetails(family.id))
+        .traverse(family => getFamilyDetails(family.id, omitSources))
         .flatMap { families =>
           families.flatten.traverse { family =>
             for {
-              events   <- eventService.getFamilyEvents(family.id)
-              children <- getChildren(family.id)
+              events   <- eventService.getFamilyEvents(family.id, omitSources)
+              children <- getChildren(family.id, omitSources)
             } yield {
               family.copy(children = children, events = Events(events))
             }
@@ -51,16 +54,16 @@ class FamilyService @Inject() (
     }
   }
 
-  def getFamilyDetails(id: Int): Future[Option[Family]] = {
+  def getFamilyDetails(id: Int, omitSources: Boolean = false): Future[Option[Family]] = {
     mariadbQueries
       .getFamilyDetails(id)
       .flatMap(families =>
         families.traverse { family =>
           for {
             parent1 <- family.parent1.traverse(personDetailsService.getPersonDetails).map(_.flatten)
-            events1 <- parent1.traverse(i => eventService.getIndividualEvents(i.id))
+            events1 <- parent1.traverse(i => eventService.getIndividualEvents(i.id, omitSources))
             parent2 <- family.parent2.traverse(personDetailsService.getPersonDetails).map(_.flatten)
-            events2 <- parent2.traverse(i => eventService.getIndividualEvents(i.id))
+            events2 <- parent2.traverse(i => eventService.getIndividualEvents(i.id, omitSources))
           } yield {
             Family(
               family,

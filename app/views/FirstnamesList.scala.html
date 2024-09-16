@@ -1,5 +1,8 @@
+@import views.html.components.NameLink
+
 @this(
-        main: Main
+        main: Main,
+        nameLink: NameLink
 )
 
 @(names: List[Person], dbId: Int)(implicit request: Request[?], messages: Messages)
@@ -12,7 +15,7 @@
 
         <ul>
     @for(name <- names) {
-        <li><a href="@controllers.routes.IndividualController.showPerson(name.details.id)">@name.details.toString</a> @name.events.birthAndDeathDate</li>
+        <li>@nameLink(name)</li>
     }
         </ul>
     </div>

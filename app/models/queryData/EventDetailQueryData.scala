@@ -45,7 +45,7 @@ object EventDetailQueryData {
       get[Option[String]]("jd_calendar") ~
       get[Option[Int]]("events_details_famc") ~
       get[Option[String]]("events_details_adop") ~
-      get[Instant]("events_details_timestamp") ~
+      get[Option[Instant]]("events_details_timestamp") ~
       get[Option[String]]("tag") ~
       get[Option[String]]("description") ~
       get[String]("event_type") ~
@@ -71,7 +71,7 @@ object EventDetailQueryData {
           jd_calendar,
           events_details_famc,
           events_details_adop,
-          events_details_timestamp,
+          events_details_timestamp.getOrElse(Instant.now),
           tag,
           description,
           EventType.fromString(eventType),
