@@ -16,7 +16,7 @@
         "<ul>" +
                 person.families.map { family =>
                     val first = person.findPartner(family.id).fold(""){ partner =>
-                        "<li style=\"margin:0;padding:0\">x " + nameLink(partner).toString + "</li>"
+                        "<li style=\"margin:0;padding:0\">x " + nameLink(partner) + "</li>"
                     }
                     val last = family.children.reverse.headOption
                     val allButLast = family.children.dropRight(1)
@@ -28,10 +28,10 @@
                 }.mkString("\n") + "</ul>"
     }
 
-    Html(s"<span style=\"font-size:x-small\">[$depth]</span>" + nameLink(person).toString + children)
+    Html(s"<span style=\"font-size:x-small\">[$depth]</span>" + nameLink(person) + children)
 }
 
-@main(person.details.toString, dbId) {
+@main(person.prettyPrint, dbId) {
 
   <ul><li style="margin:0;padding:0">
       @aDescendant(person)

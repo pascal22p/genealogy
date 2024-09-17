@@ -2,6 +2,7 @@ package models
 
 sealed trait Sex {
   val gedcom: String
+  override def toString: String
 }
 
 object Sex {
