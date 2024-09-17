@@ -68,6 +68,6 @@ lazy val genealogy = (project in file("."))
     dockerBuildxSettings,
     Compile / compile / wartremoverErrors ++= Warts.allBut(DefaultArguments, ImplicitParameter, Overloading, Equals, Recursion),
     wartremoverExcluded ++= (Compile / routes).value,
-    wartremoverExcluded += (target in TwirlKeys.compileTemplates).value
+    wartremoverExcluded += (TwirlKeys.compileTemplates / target).value
   )
 
