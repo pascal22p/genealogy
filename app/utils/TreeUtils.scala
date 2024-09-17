@@ -2,6 +2,7 @@ package utils
 
 import javax.inject.Inject
 
+import models.Parents
 import models.Person
 
 class TreeUtils @Inject() () {
@@ -30,7 +31,7 @@ class TreeUtils @Inject() () {
       Map.empty[Int, List[Person]]
     } else {
       val flatMapTree: Map[Int, List[Person]] = Map(
-        depth -> allParents.map(_.copy(parents = List.empty))
+        depth -> allParents.map(_.copy(parents = List.empty[Parents]))
       )
 
       allParents.foldLeft(flatMapTree) {

@@ -39,7 +39,7 @@ class AscendanceController @Inject() (
       ascendanceService.getAscendant(id, 0).map {
         case None => NotFound("Nothing here")
         case Some(tree) =>
-          val flattenTree = Map(0 -> List(tree.copy(parents = List.empty))) ++ treeUtils.flattenTree(tree)
+          val flattenTree = Map(0 -> List(tree.copy(parents = List.empty[Parents]))) ++ treeUtils.flattenTree(tree)
           val deduplicate = treeUtils.deduplicate(flattenTree)
           Ok(ascendants(deduplicate.toList.sortBy(_._1), 1))
       }
