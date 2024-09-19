@@ -7,7 +7,7 @@
 @(dbs: List[GenealogyDatabase], localSession: SessionData)(implicit request: Request[?], messages: Messages)
 
 
-@main("Famille Parois", localSession.dbId) {
+@main("Famille Parois", localSession.dbId, None) {
 
   @for(userData <- localSession.userData) {
       <h1>@userData.username</h1>

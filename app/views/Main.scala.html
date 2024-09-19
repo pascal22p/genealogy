@@ -1,7 +1,7 @@
 
 @this()
 
-@(title: String, dbId: Int)(contentBlock: Html)
+@(title: String, dbId: Int, personOption: Option[Person])(contentBlock: Html)
 
 <html lang="fr" >
 <head>
@@ -40,6 +40,15 @@
             <li class="ssmenu"><a href="profil.php">Mon profil</a></li>
         </ul>
     </li>
+    @for(person <- personOption) {
+    <li class="menu">Détails
+        <ul class="ssmenu">
+            <li class="ssmenu"><a href="@controllers.routes.IndividualController.showPerson(person.details.id)">Personal details</a></li>
+            <li class="ssmenu"><a href="@controllers.routes.DescendanceController.showDescendant(person.details.id)">Descendants</a></li>
+            <li class="ssmenu"><a href="@controllers.routes.AscendanceController.showAscendant(person.details.id)">Ascendants</a></li>
+        </ul>
+    </li>
+    }
     <li class="menu">Télécharger
         <ul class="ssmenu">
             <li class="ssmenu"><a href="download.php">Gedcoms et rapports</a></li>

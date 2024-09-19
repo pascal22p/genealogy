@@ -44,7 +44,7 @@ class AuthActionImpl @Inject() (
           }
         }
       case None =>
-        val session = Session(sessionId, SessionData(1))
+        val session = Session(sessionId, SessionData(1, None))
         mariadbQueries.putSessionData(session).map(_ => Redirect(request.uri).withSession("sessionId" -> sessionId))
     }
   }

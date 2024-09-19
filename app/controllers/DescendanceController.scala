@@ -44,7 +44,6 @@ class DescendanceController @Inject() (
     implicit authenticatedRequest: AuthenticatedRequest[AnyContent] =>
       descendanceService.getDescendant(id, 0).map {
         case Some(tree) =>
-          println(tree)
           Ok(descendantsView(tree, 1))
         case None => NotFound("Nothing here")
       }

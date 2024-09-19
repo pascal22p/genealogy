@@ -9,9 +9,9 @@
 @(flatTree: List[(Int, List[Person])], dbId: Int)(implicit request: Request[?], messages: Messages)
 
 
-@main("todo", dbId) {
+@main("todo", dbId, flatTree.headOption.flatMap(_._2.headOption)) {
 
-  @for(gen <- flatTree) {
+  @for(gen <- flatTree) {  
     <h3>Generation @{gen._1}</h3>
     <ul>
     @for(person <- gen._2) {

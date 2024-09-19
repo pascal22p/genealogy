@@ -31,7 +31,7 @@
     Html(s"<span style=\"font-size:x-small\">[$depth]</span>" + nameLink(person) + children)
 }
 
-@main(person.prettyPrint, dbId) {
+@main(person.name, dbId, Some(person)) {
 
   <ul><li style="margin:0;padding:0">
       @aDescendant(person)
