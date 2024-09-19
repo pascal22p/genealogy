@@ -6,10 +6,10 @@
 @this(
   main: Main)
 
-@(event: EventDetail, dbId: Int)(implicit request: Request[?], messages: Messages)
+@(event: EventDetail, dbId: Int, person: Option[Person])(implicit request: Request[?], messages: Messages)
 
 
-@main(event.description.getOrElse("Event"), dbId) {
+@main(event.description.getOrElse("Event"), dbId, person) {
 
   @if(event.eventType == IndividualEvent) {
     @for(ownerId <- event.ownerId) {

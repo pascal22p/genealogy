@@ -20,7 +20,7 @@ final case class Person(
     }
   }
 
-  def prettyPrint(implicit messages: Messages): String = {
+  def nameBirthDeathAndRelations(implicit messages: Messages): String = {
     val partners: List[Person] = families.flatMap { family =>
       findPartner(family.id)
     }
@@ -28,4 +28,12 @@ final case class Person(
       events.birthAndDeathDate +
       " x " + partners.map(person => s"${person.details.firstname} ${person.details.surname} ").mkString(" x ")
   }
+
+  def name(implicit messages: Messages): String = {
+    val partners: List[Person] = families.flatMap { family =>
+      findPartner(family.id)
+    }
+    s"${details.firstname} ${details.surname}"
+  }
+
 }
