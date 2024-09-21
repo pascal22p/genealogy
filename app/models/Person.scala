@@ -29,10 +29,7 @@ final case class Person(
       " x " + partners.map(person => s"${person.details.firstname} ${person.details.surname} ").mkString(" x ")
   }
 
-  def name(implicit messages: Messages): String = {
-    val partners: List[Person] = families.flatMap { family =>
-      findPartner(family.id)
-    }
+  def name: String = {
     s"${details.firstname} ${details.surname}"
   }
 

@@ -4,7 +4,7 @@
   main: Main
 )
 
-@()(implicit request: Request[?], messages: Messages)
+@()(implicit request: AuthenticatedRequest[?], messages: Messages)
 
 
 @main("Service unavailable", 1, None) {

@@ -5,7 +5,7 @@
         main: Main
 )
 
-@(userForm: Form[UserDataForm])(implicit request: Request[?], messages: Messages)
+@(userForm: Form[UserDataForm])(implicit request: AuthenticatedRequest[?], messages: Messages)
 
 @main("Famille Parois", 1, None) {
 
