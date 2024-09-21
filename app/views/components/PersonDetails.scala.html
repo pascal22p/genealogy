@@ -1,4 +1,4 @@
-@this()
+@this(lastModified: LastModified)
 
 @(person: Person)(implicit messages: Messages)
 
@@ -7,7 +7,7 @@
         <h3>État civil</h3>
     </div>
 
-    <span class="petit">Dernière modification&nbsp;: @person.details.timestamp</span><br />
+    @lastModified(person.details.timestamp)
     <dl class="etat_civil">
         <dt>@messages("id")</dt><dd>@person.details.id</dd>
         <dt>@messages("surname")</dt><dd>@person.details.surname</dd>

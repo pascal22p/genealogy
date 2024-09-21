@@ -1,10 +1,12 @@
 @import models.Person
-@import views.html.components.{FamilyView, PersonDetails, IndividualEvents, Parents}
+@import views.html.components.{FamilyView, PersonDetails, IndividualEvents, Parents, LastModified, SourCitation}
 @import models.EventType.{IndividualEvent, FamilyEvent, UnknownEvent}
 @import controllers.routes.Assets
 
 @this(
-  main: Main)
+  main: Main,
+  sourCitation: SourCitation,
+  lastModified: LastModified)
 
 @(event: EventDetail, dbId: Int, person: Option[Person])(implicit request: AuthenticatedRequest[?], messages: Messages)
 
@@ -29,6 +31,8 @@
       <h3>Event details</h3>
     </div>
 
+    @lastModified(event.events_details_timestamp)
+
     <ul>
       @for(tag <- event.tag) {
         <li>Type: @messages(tag)</li>
@@ -40,40 +44,10 @@
       <li>Date: @event.formatDate</li>
       <li>Age: @event.events_details_age</li>
       <li>Cause: @event.events_details_cause</li>
-      <li>Timestamp: @event.events_details_timestamp</li>
     </ul>
 
-
-        @for(source <- event.sourCitations) {
-          <div class="box">
-            <div class="box_title">
-              <h3>Source</h3>
-            </div>
-
-          <ul>
-            <li>id: @source.id</li>
-            <li>Date: @source.dates</li>
-            <li>Event: @source.even</li>
-            <li>Submitter: @source.subm</li>
-            <li>text: @source.text</li>
-            <li>Page: @source.page</li>
-            <li>==========</li>
-            @for(record <- source.record) {
-              <li>title: @record.title</li>
-              <li>Agency: @record.agnc</li>
-              <li>Author: @record.auth</li>
-              <li>Abbreviation: @record.abbr</li>
-            }
-          </ul>
-
-          @for(media <- source.medias) {
-            <ul>
-              <li>@media.title</li>
-              <li>@media.filename</li>
-            </ul>
-            <div style="width:90%;margin-left:auto;margin-right:auto;padding:1em;"><img src="@routes.Assets.versioned(s"Medias/Parois/${media.filename}")" /></div>
-          }
-          </div>
-        }
-      </div>
+    @for(source <- event.sourCitations) {
+      @sourCitation(source)
+    }
+  </div>
 }
