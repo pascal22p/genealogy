@@ -8,7 +8,7 @@
   individualEvents: IndividualEvents,
   parents: Parents)
 
-@(person: Person, dbId: Int)(implicit request: Request[?], messages: Messages)
+@(person: Person, dbId: Int)(implicit request: AuthenticatedRequest[?], messages: Messages)
 
 
 @main(person.details.shortName, dbId, Some(person)) {

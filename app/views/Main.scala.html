@@ -1,7 +1,8 @@
+@import models.AuthenticatedRequest
 
 @this()
 
-@(title: String, dbId: Int, personOption: Option[Person])(contentBlock: Html)
+@(title: String, dbId: Int, personOption: Option[Person])(contentBlock: Html)(implicit request: AuthenticatedRequest[?])
 
 <html lang="fr" >
 <head>
@@ -49,11 +50,15 @@
         </ul>
     </li>
     }
-    <li class="menu">Télécharger
+    @if(request.localSession.sessionData.history.nonEmpty) {
+    <li class="menu">History
         <ul class="ssmenu">
-            <li class="ssmenu"><a href="download.php">Gedcoms et rapports</a></li>
+            @for(el <- request.localSession.sessionData.history) {
+                <li class="ssmenu"><a href="@controllers.routes.IndividualController.showPerson(el.personId)">@el.name</a></li>
+            }
         </ul>
     </li>
+    }
     <li class="menu" style="text-align:center">Languages
         <ul class="ssmenu">
             <li class="ssmenu"><a href="@routes.IndividualController.languageSwitch("fr")">Français</a></li>

@@ -23,6 +23,7 @@ import play.api.mvc.*
 import play.api.Logging
 import services.DescendanceService
 import services.PersonService
+import services.SessionService
 import views.html.Descendants
 import views.html.Individual
 
@@ -31,6 +32,7 @@ class DescendanceController @Inject() (
     authAction: AuthAction,
     personService: PersonService,
     descendanceService: DescendanceService,
+    sessionService: SessionService,
     individualView: Individual,
     descendantsView: Descendants,
     val controllerComponents: ControllerComponents
@@ -44,6 +46,7 @@ class DescendanceController @Inject() (
     implicit authenticatedRequest: AuthenticatedRequest[AnyContent] =>
       descendanceService.getDescendant(id, 0).map {
         case Some(tree) =>
+          sessionService.insertPersonInHistory(tree.copy(families = List.empty[Family]))
           Ok(descendantsView(tree, 1))
         case None => NotFound("Nothing here")
       }

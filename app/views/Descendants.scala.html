@@ -6,7 +6,7 @@
   main: Main,
         nameLink: NameLink)
 
-@(person: Person, dbId: Int)(implicit request: Request[?], messages: Messages)
+@(person: Person, dbId: Int)(implicit request: AuthenticatedRequest[?], messages: Messages)
 
 @aDescendant(person: Person, depth: Int = 1): Html = @{
 

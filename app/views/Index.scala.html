@@ -4,7 +4,7 @@
         main: Main
 )
 
-@(dbs: List[GenealogyDatabase], localSession: SessionData)(implicit request: Request[?], messages: Messages)
+@(dbs: List[GenealogyDatabase], localSession: SessionData)(implicit request: AuthenticatedRequest[?], messages: Messages)
 
 
 @main("Famille Parois", localSession.dbId, None) {

@@ -4,7 +4,7 @@
         main: Main
 )
 
-@(surnames: List[(String, Int)], dbId: Int)(implicit request: Request[?], messages: Messages)
+@(surnames: List[(String, Int)], dbId: Int)(implicit request: AuthenticatedRequest[?], messages: Messages)
 
 
 @main("Famille Parois", dbId, None) {

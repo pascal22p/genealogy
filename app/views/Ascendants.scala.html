@@ -6,7 +6,7 @@
   main: Main,
         nameLink: NameLink)
 
-@(flatTree: List[(Int, List[Person])], dbId: Int)(implicit request: Request[?], messages: Messages)
+@(flatTree: List[(Int, List[Person])], dbId: Int)(implicit request: AuthenticatedRequest[?], messages: Messages)
 
 
 @main("todo", dbId, flatTree.headOption.flatMap(_._2.headOption)) {

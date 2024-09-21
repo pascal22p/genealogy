@@ -11,12 +11,14 @@ import models.Person
 import play.api.i18n.*
 import play.api.mvc.*
 import services.PersonService
+import services.SessionService
 import views.html.Individual
 
 @Singleton
 class IndividualController @Inject() (
     authAction: AuthAction,
     personService: PersonService,
+    sessionService: SessionService,
     individualView: Individual,
     val controllerComponents: ControllerComponents
 )(
@@ -28,15 +30,13 @@ class IndividualController @Inject() (
     implicit authenticatedRequest: AuthenticatedRequest[AnyContent] =>
       personService.getPerson(id).map { (personOption: Option[Person]) =>
         personOption.fold(NotFound("Nothing here")) { person =>
-          if (person.details.privacyRestriction.contains("privacy")) {
-            authenticatedRequest.localSession.sessionData.userData.fold(Forbidden("Not allowed")) { userData =>
-              if (userData.seePrivacy)
-                Ok(individualView(person, authenticatedRequest.localSession.sessionData.dbId))
-              else
-                Forbidden("Not allowed")
-            }
-          } else {
+          val isAllowedToSee = authenticatedRequest.localSession.sessionData.userData.fold(false)(_.seePrivacy)
+
+          if (!person.details.privacyRestriction.contains("privacy") || isAllowedToSee) {
+            sessionService.insertPersonInHistory(person)
             Ok(individualView(person, authenticatedRequest.localSession.sessionData.dbId))
+          } else {
+            Forbidden("Not allowed")
           }
         }
       }

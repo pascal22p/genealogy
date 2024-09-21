@@ -15,6 +15,7 @@ import play.api.i18n.*
 import play.api.mvc.*
 import services.EventService
 import services.PersonService
+import services.SessionService
 import views.html.Event
 
 @Singleton
@@ -22,6 +23,7 @@ class EventController @Inject() (
     authAction: AuthAction,
     eventService: EventService,
     personService: PersonService,
+    sessionService: SessionService,
     eventView: Event,
     val controllerComponents: ControllerComponents
 )(
@@ -34,15 +36,13 @@ class EventController @Inject() (
       eventService.getEvent(id).flatMap { eventOption =>
         eventOption.fold(Future.successful(NotFound("Event could not be found"))) { event =>
           event.ownerId.traverse(personId => personService.getPerson(personId)).map { person =>
-            if (event.privacyRestriction.contains("privacy")) {
-              authenticatedRequest.localSession.sessionData.userData.fold(Forbidden("Not allowed")) { userData =>
-                if (userData.seePrivacy)
-                  Ok(eventView(event, authenticatedRequest.localSession.sessionData.dbId, person.flatten))
-                else
-                  Forbidden("Not allowed")
-              }
-            } else {
+            val isAllowedToSee = authenticatedRequest.localSession.sessionData.userData.fold(false)(_.seePrivacy)
+
+            if (!event.privacyRestriction.contains("privacy") || isAllowedToSee) {
+              person.flatten.map(sessionService.insertPersonInHistory)
               Ok(eventView(event, authenticatedRequest.localSession.sessionData.dbId, person.flatten))
+            } else {
+              Forbidden("Not allowed")
             }
           }
         }

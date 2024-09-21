@@ -5,7 +5,7 @@
         nameLink: NameLink
 )
 
-@(names: List[Person], dbId: Int)(implicit request: Request[?], messages: Messages)
+@(names: List[Person], dbId: Int)(implicit request: AuthenticatedRequest[?], messages: Messages)
 
 
 @main("Famille Parois", dbId, None) {

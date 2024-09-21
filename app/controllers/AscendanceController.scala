@@ -15,6 +15,7 @@ import play.api.mvc.*
 import play.api.Logging
 import services.AscendanceService
 import services.PersonService
+import services.SessionService
 import utils.TreeUtils
 import views.html.Ascendants
 import views.html.Individual
@@ -24,6 +25,7 @@ class AscendanceController @Inject() (
     authAction: AuthAction,
     personService: PersonService,
     ascendanceService: AscendanceService,
+    sessionService: SessionService,
     treeUtils: TreeUtils,
     individualView: Individual,
     ascendants: Ascendants,
@@ -39,6 +41,7 @@ class AscendanceController @Inject() (
       ascendanceService.getAscendant(id, 0).map {
         case None => NotFound("Nothing here")
         case Some(tree) =>
+          sessionService.insertPersonInHistory(tree.copy(parents = List.empty[Parents]))
           val flattenTree = Map(0 -> List(tree.copy(parents = List.empty[Parents]))) ++ treeUtils.flattenTree(tree)
           val deduplicate = treeUtils.deduplicate(flattenTree)
           Ok(ascendants(deduplicate.toList.sortBy(_._1), 1))
