@@ -12,7 +12,7 @@ final case class Media(
     title: String,
     format: String,
     filename: String,
-    timeStamp: Instant,
+    timestamp: Instant,
     ownerId: Option[Int],
     sourceType: MediaType
 )

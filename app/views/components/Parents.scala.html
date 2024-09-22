@@ -1,7 +1,7 @@
 @import controllers.routes
-@import views.html.components.NameLink
+@import views.html.components.{NameLink, LastModified}
 
-@this(nameLink: NameLink)
+@this(nameLink: NameLink, lastModified: LastModified)
 
 @(person: Person)(implicit messages: Messages)
 
@@ -10,6 +10,8 @@
     <div class="box_title">
         <h3>Parents @parents.relaType</h3>
     </div>
+
+    @lastModified(parents.family.timestamp)
 
     <ul style="list-style-type:none;padding:0;">
         @for(parent <- parents.family.parent1) {

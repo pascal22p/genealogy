@@ -1,0 +1,34 @@
+@import models.{SourCitation => ModelSourCitation}
+@import views.html.components.{Media, LastModified}
+
+@this(mediaComponent: Media, lastModified: LastModified)
+
+@(source: ModelSourCitation)(implicit messages: Messages)
+
+<div class="box">
+  <div class="box_title">
+    <h3>Source</h3>
+  </div>
+
+  @lastModified(source.timestamp)
+
+  <ul>
+    <li>id: @source.id</li>
+    <li>Date: @source.dates</li>
+    <li>Event: @source.even</li>
+    <li>Submitter: @source.subm</li>
+    <li>text: @source.text</li>
+    <li>Page: @source.page</li>
+    <li>==========</li>
+    @for(record <- source.record) {
+      <li>title: @record.title</li>
+      <li>Agency: @record.agnc</li>
+      <li>Author: @record.auth</li>
+      <li>Abbreviation: @record.abbr</li>
+    }
+  </ul>
+
+  @for(media <- source.medias) {
+    @mediaComponent(media)
+  }
+</div>

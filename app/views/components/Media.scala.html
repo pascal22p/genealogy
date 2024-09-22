@@ -1,0 +1,21 @@
+@import models.{Media => ModelMedia}
+@import views.html.components.LastModified
+
+@this(lastModified: LastModified)
+
+@(media: ModelMedia)(implicit messages: Messages)
+
+<div class="box">
+  <div class="box_title">
+    <h3>Media</h3>
+  </div>
+
+  @lastModified(media.timestamp)
+
+  <ul>
+    <li>@media.title</li>
+    <li>@media.filename</li>
+  </ul>
+  <div style="width:90%;margin-left:auto;margin-right:auto;padding:1em;"><img src="@routes.Assets.versioned(s"Medias/Parois/${media.filename}")" /></div>
+
+ </div>
