@@ -40,6 +40,39 @@ final class MariadbQueries @Inject() (db: Database, databaseExecutionContext: Da
     }
   }(databaseExecutionContext)
 
+  def updatePersonDetails(personDetails: PersonDetails): Future[Int] = Future {
+    db.withConnection { implicit conn =>
+      SQL("""UPDATE genea_individuals
+            |SET base = {base},
+            |indi_nom = {surname},
+            |indi_prenom = {firstname},
+            |indi_sexe = {sex},
+            |indi_timestamp = {timestamp},
+            |indi_npfx = {npfx},
+            |indi_givn = {nameGiven},
+            |indi_nick = {nickname},
+            |indi_spfx = {spfx},
+            |indi_nsfx = {nsfx},
+            |indi_resn = {resn}
+            |WHERE indi_id = {id}""".stripMargin)
+        .on(
+          "base"      -> personDetails.base,
+          "surname"   -> personDetails.surname,
+          "firstname" -> personDetails.firstname,
+          "sex"       -> personDetails.sex.gedcom,
+          "timestamp" -> personDetails.timestamp,
+          "npfx"      -> personDetails.firstnamePrefix,
+          "nameGiven" -> personDetails.nameGiven,
+          "nickname"  -> personDetails.nameNickname,
+          "spfx"      -> personDetails.surnamePrefix,
+          "nsfx"      -> personDetails.nameSuffix,
+          "resn"      -> personDetails.privacyRestriction,
+          "id"        -> personDetails.id
+        )
+        .executeUpdate()
+    }
+  }(databaseExecutionContext)
+
   def getEvents(id: Int, eventType: EventType): Future[List[EventDetailQueryData]] = Future {
     db.withConnection { implicit conn =>
       val where = eventType match {

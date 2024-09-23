@@ -1,10 +1,10 @@
-@this(lastModified: LastModified)
+@this(lastModified: LastModified, editLink: EditLink)
 
-@(person: Person)(implicit messages: Messages)
+@(person: Person)(implicit authenticatedRequest: AuthenticatedRequest[?], messages: Messages)
 
 <div class="box">
     <div class="box_title">
-        <h3>État civil</h3>
+        <h3>@editLink(controllers.edit.routes.EditPersonDetailsController.showForm(person.details.id)) État civil</h3>
     </div>
 
     @lastModified(person.details.timestamp)

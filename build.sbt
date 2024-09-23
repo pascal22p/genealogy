@@ -68,6 +68,9 @@ lazy val genealogy = (project in file("."))
     dockerBuildxSettings,
     Compile / compile / wartremoverErrors ++= Warts.allBut(DefaultArguments, ImplicitParameter, Overloading, Equals, Recursion),
     wartremoverExcluded ++= (Compile / routes).value,
-    wartremoverExcluded += (TwirlKeys.compileTemplates / target).value
+    wartremoverExcluded += (TwirlKeys.compileTemplates / target).value,
+    resolvers ++= Seq(
+      Resolver.jcenterRepo
+    ),
   )
 

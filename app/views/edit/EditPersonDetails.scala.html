@@ -1,0 +1,44 @@
+@import models.forms.PersonDetailsForm
+@import views.html.helper
+@import models.forms.UserDataForm
+@import helper._
+
+@this(
+        main: Main
+)
+
+@(personDetailsForm: Form[PersonDetailsForm])(implicit request: AuthenticatedRequest[?], messages: Messages)
+
+@main("Famille Parois", 1, None) {
+
+
+<div class="box">
+    <div class="box_title">
+        <h3>État civil</h3>
+    </div>
+
+    @if(personDetailsForm.hasGlobalErrors) {
+        @for(error <- personDetailsForm.globalErrors) {
+            <span class="error-message">@error.format(messages)</span>
+        }
+    }
+
+    @helper.form(action = controllers.edit.routes.EditPersonDetailsController.onSubmit ) {
+        @helper.CSRF.formField
+        <input type="hidden" value="@personDetailsForm("id").value" name="id" />
+        @helper.inputText(personDetailsForm("base"), Symbol("_label") -> "Database")
+        @helper.inputText(personDetailsForm("surname"), Symbol("_label") -> "Surname")
+        @helper.inputText(personDetailsForm("firstname"), Symbol("_label") -> "Firstname")
+        @helper.select(personDetailsForm("sex"), options = Seq("" -> "", "M" -> "Male", "F" -> "Female"), Symbol("_label") -> "Sex")
+        @helper.inputText(personDetailsForm("firstnamePrefix"), Symbol("_label") -> "Name Prefix")
+        @helper.inputText(personDetailsForm("nameGiven"), Symbol("_label") -> "Given name")
+        @helper.inputText(personDetailsForm("nameNickname"), Symbol("_label") -> "Nickname")
+        @helper.inputText(personDetailsForm("surnamePrefix"), Symbol("_label") -> "Surname Prefix")
+        @helper.inputText(personDetailsForm("nameSuffix"), Symbol("_label") -> "Name Suffix")
+        @helper.select(personDetailsForm("privacyRestriction"), options = Seq("" -> "", "locked" -> "locked", "privacy" -> "privacy", "confidential" -> "confidential"), Symbol("_label") -> "Privacy restriction")
+        <button type="submit">Submit</button>
+    }
+
+</div>
+
+}

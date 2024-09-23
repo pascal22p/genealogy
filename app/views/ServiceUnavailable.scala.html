@@ -4,11 +4,11 @@
   main: Main
 )
 
-@()(implicit request: AuthenticatedRequest[?], messages: Messages)
+@(content: String)(implicit request: AuthenticatedRequest[?], messages: Messages)
 
 
 @main("Service unavailable", 1, None) {
 
-  Oops something is broken
+  @content
 
 }

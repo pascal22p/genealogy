@@ -4,6 +4,7 @@ import java.time.Instant
 
 import anorm._
 import anorm.SqlParser._
+import models.forms.PersonDetailsForm
 
 final case class PersonDetails(
     base: Int,
@@ -21,6 +22,22 @@ final case class PersonDetails(
 
 ) {
   def shortName: String = (firstname + " " + surname).trim
+
+  def toForm = {
+    PersonDetailsForm(
+      base: Int,
+      id: Int,
+      firstname: String,
+      surname: String,                   // SURN
+      sex.gedcom: String,                // SEX
+      firstnamePrefix: String,           // NPFX
+      surnamePrefix: String,             // SPFX
+      nameSuffix: String,                // NSFX
+      nameGiven: String,                 // GIVN
+      nameNickname: String,              // NICK
+      privacyRestriction: Option[String] // RESN
+    )
+  }
 }
 
 object PersonDetails {

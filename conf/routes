@@ -12,6 +12,9 @@ GET     /descendant/:id                           controllers.DescendanceControl
 GET     /ascendant/:id                            controllers.AscendanceController.showAscendant(id: Int)
 GET     /switch-lang/:lang                        controllers.IndividualController.languageSwitch(lang: String)
 
+GET     /edit/person-details/:id                  controllers.edit.EditPersonDetailsController.showForm(id: Int)
+POST    /edit/person-details                      controllers.edit.EditPersonDetailsController.onSubmit
+
 GET     /login                                    controllers.LoginController.onLoad()
 POST    /login                                    controllers.LoginController.onSubmit()
 
