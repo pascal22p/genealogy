@@ -4,7 +4,7 @@
 
 @this(nameLink: NameLink, lastModified: LastModified)
 
-@(family: Family, partnerOption: Option[Person])(implicit messages: Messages)
+@(family: Family, partnerOption: Option[Person])(implicit authenticatedRequest: AuthenticatedRequest[?], messages: Messages)
 
 <div class="box">
     <div class="box_title">

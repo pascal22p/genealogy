@@ -1,0 +1,7 @@
+@import play.api.mvc.Call
+
+@this()
+
+@(link: Call)(implicit authenticatedRequest: AuthenticatedRequest[?], messages: Messages)
+
+<a href="@link"><button class="link-button" role="button">Edit</button></a>

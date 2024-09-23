@@ -571,32 +571,6 @@ span.petit
 }
 
 /* Styles pour la liste des patronymes et des personnes */
-.colonne {
-    lfloat : left;
-    text-align : center;
-    lwidth : 49.5%;
-    margin:0;
-	padding:10px;
-    background-color:transparent;
-	lborder:1px solid #65381B;
-	column-width:200px;
-	lcolumn-count:3;
-	-moz-column-width:200px;
-	-webkit-column-width:200px;
-	lcolumn-gap: 10px;
-
-}
-
-div.conteneur_colonnes
-{
-  margin-left:auto;
-  margin-right:auto;
-  width:75%;
-  padding:5px;
-  background-color:transparent;
-  border:none;
-}
-
 ul.lettre
 {
   text-align:center;
@@ -657,7 +631,6 @@ dl.mod_event dt
 	width: 25ex;
 	margin: 0;
 	padding: 2px 2px 0 0 ;
-	vertical-align:text-bottom;
 	height:1.7em;
 	line-height:1.7em;
 }
@@ -799,3 +772,27 @@ div.tab button.active {
     border: 1px solid #ccc;
     border-top: none;
 }
+
+.link-button {
+  border: none;
+  color: white;
+  padding: 4px 8px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 14px;
+  margin: 4px 2px;
+  transition-duration: 0.4s;
+  cursor: pointer;
+  background-color: white;
+  color: black;
+  border: 2px solid #555555;
+  -webkit-appearance: button;
+  -moz-appearance: button;
+  appearance: button;
+}
+  
+  .link-button:hover {
+	background-color: #65381B;
+	color: white;
+  }

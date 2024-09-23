@@ -3,7 +3,7 @@
 
 @this(nameLink: NameLink, lastModified: LastModified)
 
-@(person: Person)(implicit messages: Messages)
+@(person: Person)(implicit authenticatedRequest: AuthenticatedRequest[?], messages: Messages)
 
 <div class="box">
     @for(parents <- person.parents) {
