@@ -15,6 +15,9 @@ GET     /switch-lang/:lang                        controllers.IndividualControll
 GET     /edit/person-details/:id                  controllers.edit.EditPersonDetailsController.showForm(id: Int)
 POST    /edit/person-details                      controllers.edit.EditPersonDetailsController.onSubmit
 
+GET     /edit/event-details/:id                   controllers.edit.EditEventDetailsController.showForm(id: Int)
+POST    /edit/event-details                       controllers.edit.EditEventDetailsController.onSubmit
+
 GET     /login                                    controllers.LoginController.onLoad()
 POST    /login                                    controllers.LoginController.onSubmit()
 

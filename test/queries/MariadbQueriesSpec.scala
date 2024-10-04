@@ -19,9 +19,10 @@ import org.scalatest.BeforeAndAfterEach
 import play.api.db.Database
 import play.api.test.FakeRequest
 import play.api.Application
+import play.api.Logging
 import testUtils.BaseSpec
 
-class MariadbQueriesSpec extends BaseSpec with BeforeAndAfterEach {
+class MariadbQueriesSpec extends BaseSpec with BeforeAndAfterEach with Logging {
 
   lazy val db: Database                  = app.injector.instanceOf[Database]
   implicit lazy val ec: ExecutionContext = app.injector.instanceOf[ExecutionContext]
@@ -40,11 +41,11 @@ class MariadbQueriesSpec extends BaseSpec with BeforeAndAfterEach {
       queries.trim
         .split(";")
         .map { query =>
-          if (logMe) println("Query: " + query)
+          if (logMe) logger.error("Query: " + query)
           Try(SQL(query).execute()) match {
             case Success(bool) => bool
             case Failure(error) =>
-              println("Error with query: " + query)
+              logger.error("Error with query: " + query)
               throw error
           }
         }

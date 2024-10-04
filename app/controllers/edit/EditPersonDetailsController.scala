@@ -6,22 +6,23 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
 import actions.AuthAction
+import actions.AuthJourney
+import models.forms.PersonDetailsForm
 import models.AuthenticatedRequest
 import models.Person
-import models.forms.PersonDetailsForm
+import play.api.data.Form
 import play.api.i18n.*
 import play.api.mvc.*
+import play.api.Logging
+import queries.MariadbQueries
 import services.PersonService
 import services.SessionService
 import views.html.edit.EditPersonDetails
-import play.api.data.Form
-import queries.MariadbQueries
-import play.api.Logging
 import views.html.ServiceUnavailable
 
 @Singleton
 class EditPersonDetailsController @Inject() (
-    authAction: AuthAction,
+    authJourney: AuthJourney,
     personService: PersonService,
     sessionService: SessionService,
     mariadbQueries: MariadbQueries,
@@ -34,7 +35,7 @@ class EditPersonDetailsController @Inject() (
     with I18nSupport
     with Logging {
 
-  def showForm(id: Int): Action[AnyContent] = authAction.async {
+  def showForm(id: Int): Action[AnyContent] = authJourney.authWithAdminRight.async {
     implicit authenticatedRequest: AuthenticatedRequest[AnyContent] =>
       personService.getPerson(id).map { (personOption: Option[Person]) =>
         personOption.fold(NotFound("Nothing here")) { person =>
@@ -51,19 +52,18 @@ class EditPersonDetailsController @Inject() (
       }
   }
 
-  def onSubmit: Action[AnyContent] = authAction.async { implicit authenticatedRequest =>
+  def onSubmit: Action[AnyContent] = authJourney.authWithAdminRight.async { implicit authenticatedRequest =>
     val errorFunction: Form[PersonDetailsForm] => Future[Result] = { (formWithErrors: Form[PersonDetailsForm]) =>
       // This is the bad case, where the form had validation errors.
       // Let's show the user the form again, with the errors highlighted.
       // Note how we pass the form with errors to the template.
-      logger.error(s"XXXXXXXX $formWithErrors")
       Future.successful(BadRequest(editPersonDetails(formWithErrors)))
     }
 
     val successFunction: PersonDetailsForm => Future[Result] = { (dataForm: PersonDetailsForm) =>
-      mariadbQueries.updatePersonDetails(dataForm.toPersonalDetails).map { 
+      mariadbQueries.updatePersonDetails(dataForm.toPersonalDetails).map {
         case 1 => Redirect(controllers.routes.IndividualController.showPerson(dataForm.id))
-        case _ => InternalServerError(serviceUnavailableView("No record was updated")) 
+        case _ => InternalServerError(serviceUnavailableView("No record was updated"))
       }
     }
 
