@@ -1,5 +1,6 @@
 package queries
 
+import java.time.Instant
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -8,6 +9,7 @@ import scala.concurrent.Future
 import anorm.*
 import anorm.SqlParser.*
 import models.*
+import models.forms.EventDetailForm
 import models.queryData.*
 import models.EventType.EventType
 import models.EventType.FamilyEvent
@@ -130,6 +132,64 @@ final class MariadbQueries @Inject() (db: Database, databaseExecutionContext: Da
     }
   }(databaseExecutionContext)
 
+  def updateEventDetails(event: EventDetailForm) = Future {
+    db.withTransaction { implicit conn =>
+      SQL("""UPDATE genea_events_details
+            |SET place_id = {place_id},
+            |addr_id = {addr_id},
+            |events_details_descriptor = {events_details_descriptor},
+            |events_details_gedcom_date = {events_details_gedcom_date},
+            |events_details_age = {events_details_age},
+            |events_details_cause = {events_details_cause},
+            |base = {base},
+            |events_details_timestamp = {timestamp}
+            |WHERE events_details_id = {id}
+            |""".stripMargin)
+        .on(
+          "id"                         -> event.events_details_id,
+          "place_id"                   -> event.place,
+          "addr_id"                    -> event.addr_id,
+          "events_details_descriptor"  -> event.events_details_descriptor,
+          "events_details_gedcom_date" -> event.events_details_gedcom_date,
+          "events_details_age"         -> event.events_details_age,
+          "events_details_cause"       -> event.events_details_cause,
+          "base"                       -> event.base,
+          "timestamp"                  -> Instant.now
+        )
+        .executeUpdate()
+
+      event.eventType match {
+        case FamilyEvent =>
+          SQL("""UPDATE rel_familles_events
+                |SET events_tag = {tag},
+                |timestamp = {timestamp}
+                |WHERE events_details_id = {id}
+                |""".stripMargin)
+            .on(
+              "id"        -> event.events_details_id,
+              "tag"       -> event.events_tag,
+              "timestamp" -> Instant.now
+            )
+            .executeUpdate()
+        case IndividualEvent =>
+          SQL("""UPDATE rel_indi_events
+                |SET events_tag = {tag},
+                |timestamp = {timestamp}
+                |WHERE events_details_id = {id}
+                |""".stripMargin)
+            .on(
+              "id"        -> event.events_details_id,
+              "tag"       -> event.events_tag,
+              "timestamp" -> Instant.now
+            )
+            .executeUpdate()
+
+        case UnknownEvent => 0
+      }
+
+    }
+  }(databaseExecutionContext)
+
   def getFamiliesFromIndividualId(individualId: Int): Future[List[FamilyAsChildQueryData]] = Future {
     db.withConnection { implicit conn =>
       SQL("""SELECT *
@@ -181,6 +241,14 @@ final class MariadbQueries @Inject() (db: Database, databaseExecutionContext: Da
             |WHERE place_id = {id}""".stripMargin)
         .on("id" -> id)
         .as[Option[Place]](Place.mysqlParser.singleOpt)
+    }
+  }(databaseExecutionContext)
+
+  def getAllPlaces: Future[List[Place]] = Future {
+    db.withConnection { implicit conn =>
+      SQL("""SELECT *
+            |FROM genea_place""".stripMargin)
+        .as[List[Place]](Place.mysqlParser.*)
     }
   }(databaseExecutionContext)
 

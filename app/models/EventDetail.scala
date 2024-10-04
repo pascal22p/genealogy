@@ -2,6 +2,7 @@ package models
 
 import java.time.Instant
 
+import models.forms.EventDetailForm
 import models.queryData.EventDetailQueryData
 import models.EventType.EventType
 import play.api.i18n.Messages
@@ -38,6 +39,20 @@ final case class EventDetail(
       }
       .trim
   }
+
+  def toForm =
+    EventDetailForm(
+      base,
+      events_details_id,
+      place.map(_.id),
+      addr_id,
+      tag.getOrElse(""),
+      events_details_descriptor,
+      events_details_gedcom_date,
+      events_details_age,
+      events_details_cause,
+      eventType
+    )
 }
 
 object EventDetail {

@@ -1,25 +1,27 @@
 package models.forms
 
+import java.time.Instant
+
 import anorm._
 import anorm.SqlParser._
+import models.MaleSex
+import models.PersonDetails
+import models.Sex
 import play.api.data.format.Formats._
 import play.api.data.FieldMapping
 import play.api.data.Form
 import play.api.data.Forms.ignored
 import play.api.data.Forms.mapping
 import play.api.data.Forms.number
-import play.api.data.Forms.{text, optional}
-import models.Sex
-import models.MaleSex
-import models.PersonDetails
-import java.time.Instant
+import play.api.data.Forms.optional
+import play.api.data.Forms.text
 
 final case class PersonDetailsForm(
     base: Int,
     id: Int,
     firstname: String,
-    surname: String, // SURN
-    sex: String,        // SEX
+    surname: String,                   // SURN
+    sex: String,                       // SEX
     firstnamePrefix: String,           // NPFX
     surnamePrefix: String,             // SPFX
     nameSuffix: String,                // NSFX
@@ -28,7 +30,7 @@ final case class PersonDetailsForm(
     privacyRestriction: Option[String] // RESN
 
 ) {
-    def toPersonalDetails: PersonDetails = {
+  def toPersonalDetails: PersonDetails = {
     PersonDetails(
       base,
       id,
@@ -49,7 +51,9 @@ final case class PersonDetailsForm(
 
 object PersonDetailsForm {
 
-  def unapply(u: PersonDetailsForm): Some[(Int, Int, String, String, String, String, String, String, String, String, Option[String])] = Some(
+  def unapply(
+      u: PersonDetailsForm
+  ): Some[(Int, Int, String, String, String, String, String, String, String, String, Option[String])] = Some(
     (
       u.base,
       u.id,
