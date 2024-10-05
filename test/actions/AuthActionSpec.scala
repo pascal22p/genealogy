@@ -24,12 +24,13 @@ import play.api.test.Helpers.contentAsString
 import play.api.test.Helpers.defaultAwaitTimeout
 import play.api.test.Helpers.session
 import play.api.test.Helpers.status
-import queries.MariadbQueries
+import queries.GetSqlQueries
+import queries.SessionSqlQueries
 import testUtils.BaseSpec
 
 class AuthActionSpec extends BaseSpec {
 
-  val mockMariadbQueries: MariadbQueries                         = mock[MariadbQueries]
+  val mockSqlQueries: SessionSqlQueries                          = mock[SessionSqlQueries]
   def messagesControllerComponents: MessagesControllerComponents = inject[MessagesControllerComponents]
 
   class Harness(authAction: AuthAction) extends InjectedController {
@@ -42,15 +43,15 @@ class AuthActionSpec extends BaseSpec {
 
   def fakeController: Harness = {
     val authAction =
-      new AuthActionImpl(mockMariadbQueries, messagesControllerComponents)(global)
+      new AuthActionImpl(mockSqlQueries, messagesControllerComponents)(global)
     new Harness(authAction)
   }
 
   "A user with no existing session" in {
-    when(mockMariadbQueries.getSessionData(any())).thenReturn(
+    when(mockSqlQueries.getSessionData(any())).thenReturn(
       Future.successful(None)
     )
-    when(mockMariadbQueries.putSessionData(any())).thenReturn(
+    when(mockSqlQueries.putSessionData(any())).thenReturn(
       Future.successful(None)
     )
 
@@ -62,10 +63,10 @@ class AuthActionSpec extends BaseSpec {
   "A user with existing session" in {
     val sessionId = "123456-123456"
     val userData  = UserData(1, "name", "hashedPassword", true, true)
-    when(mockMariadbQueries.getSessionData(any())).thenReturn(
+    when(mockSqlQueries.getSessionData(any())).thenReturn(
       Future.successful(Some(Session(sessionId, SessionData(1, Some(userData)))))
     )
-    when(mockMariadbQueries.sessionKeepAlive(any())).thenReturn(
+    when(mockSqlQueries.sessionKeepAlive(any())).thenReturn(
       Future.successful(1)
     )
 
@@ -73,7 +74,7 @@ class AuthActionSpec extends BaseSpec {
     status(result) mustBe OK
     contentAsString(result) must include(sessionId)
     contentAsString(result) must include(userData.toString)
-    verify(mockMariadbQueries, times(1)).sessionKeepAlive(any())
+    verify(mockSqlQueries, times(1)).sessionKeepAlive(any())
   }
 
 }

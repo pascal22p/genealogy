@@ -18,10 +18,10 @@ import play.api.mvc.MessagesControllerComponents
 import play.api.mvc.Request
 import play.api.mvc.Result
 import play.api.mvc.Results.Redirect
-import queries.MariadbQueries
+import queries.SessionSqlQueries
 
 class AuthActionImpl @Inject() (
-    mariadbQueries: MariadbQueries,
+    sqlQueries: SessionSqlQueries,
     cc: MessagesControllerComponents,
 )(implicit val ec: ExecutionContext)
     extends AuthAction {
@@ -33,9 +33,9 @@ class AuthActionImpl @Inject() (
     @SuppressWarnings(Array("org.wartremover.warts.ToString"))
     val uuid      = UUID.randomUUID().toString
     val sessionId = request.session.get("sessionId").getOrElse(uuid)
-    mariadbQueries.getSessionData(sessionId).flatMap {
+    sqlQueries.getSessionData(sessionId).flatMap {
       case Some(session) =>
-        mariadbQueries.sessionKeepAlive(sessionId).flatMap { _ =>
+        sqlQueries.sessionKeepAlive(sessionId).flatMap { _ =>
           block {
             AuthenticatedRequest(
               request,
@@ -45,7 +45,7 @@ class AuthActionImpl @Inject() (
         }
       case None =>
         val session = Session(sessionId, SessionData(1, None))
-        mariadbQueries.putSessionData(session).map(_ => Redirect(request.uri).withSession("sessionId" -> sessionId))
+        sqlQueries.putSessionData(session).map(_ => Redirect(request.uri).withSession("sessionId" -> sessionId))
     }
   }
 

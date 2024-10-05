@@ -26,7 +26,7 @@ class MariadbQueriesSpec extends BaseSpec with BeforeAndAfterEach with Logging {
 
   lazy val db: Database                  = app.injector.instanceOf[Database]
   implicit lazy val ec: ExecutionContext = app.injector.instanceOf[ExecutionContext]
-  lazy val sut: MariadbQueries           = app.injector.instanceOf[MariadbQueries]
+  lazy val sut: GetSqlQueries            = app.injector.instanceOf[GetSqlQueries]
 
   val testDataBase: String = "genealogie-test"
 

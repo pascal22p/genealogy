@@ -12,10 +12,10 @@ import models.AuthenticatedRequest
 import models.Events
 import models.GenealogyDatabase
 import models.Person
-import queries.MariadbQueries
+import queries.GetSqlQueries
 
 @Singleton
-class GenealogyDatabaseService @Inject() (mariadbQueries: MariadbQueries, eventService: EventService)(
+class GenealogyDatabaseService @Inject() (mariadbQueries: GetSqlQueries, eventService: EventService)(
     implicit ec: ExecutionContext
 ) {
   def getGenealogyDatabases: Future[List[GenealogyDatabase]] = mariadbQueries.getGenealogyDatabases

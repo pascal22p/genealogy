@@ -14,7 +14,7 @@ import play.api.data.Form
 import play.api.i18n.*
 import play.api.mvc.*
 import play.api.Logging
-import queries.MariadbQueries
+import queries.UpdateSqlQueries
 import services.PersonService
 import services.SessionService
 import views.html.edit.EditPersonDetails
@@ -25,7 +25,7 @@ class EditPersonDetailsController @Inject() (
     authJourney: AuthJourney,
     personService: PersonService,
     sessionService: SessionService,
-    mariadbQueries: MariadbQueries,
+    updateSqlQueries: UpdateSqlQueries,
     editPersonDetails: EditPersonDetails,
     serviceUnavailableView: ServiceUnavailable,
     val controllerComponents: ControllerComponents
@@ -61,7 +61,7 @@ class EditPersonDetailsController @Inject() (
     }
 
     val successFunction: PersonDetailsForm => Future[Result] = { (dataForm: PersonDetailsForm) =>
-      mariadbQueries.updatePersonDetails(dataForm.toPersonalDetails).map {
+      updateSqlQueries.updatePersonDetails(dataForm.toPersonalDetails).map {
         case 1 => Redirect(controllers.routes.IndividualController.showPerson(dataForm.id))
         case _ => InternalServerError(serviceUnavailableView("No record was updated"))
       }
