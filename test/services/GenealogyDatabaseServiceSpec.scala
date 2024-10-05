@@ -27,7 +27,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import play.api.Application
-import queries.MariadbQueries
+import queries.GetSqlQueries
 import testUtils.BaseSpec
 
 class GenealogyDatabaseServiceSpec extends BaseSpec {
@@ -35,14 +35,14 @@ class GenealogyDatabaseServiceSpec extends BaseSpec {
   val fakeAuthenticatedRequest: AuthenticatedRequest[AnyContentAsEmpty.type] =
     AuthenticatedRequest(FakeRequest(), Session("id", SessionData(1, None)))
 
-  lazy val mockMariadbQueries: MariadbQueries             = mock[MariadbQueries]
+  lazy val mockMariadbQueries: GetSqlQueries              = mock[GetSqlQueries]
   lazy val mockPersonDetailsService: PersonDetailsService = mock[PersonDetailsService]
   lazy val mockEventService: EventService                 = mock[EventService]
 
   protected override def localGuiceApplicationBuilder(): GuiceApplicationBuilder =
     GuiceApplicationBuilder()
       .overrides(
-        bind[MariadbQueries].toInstance(mockMariadbQueries),
+        bind[GetSqlQueries].toInstance(mockMariadbQueries),
         bind[PersonDetailsService].toInstance(mockPersonDetailsService),
         bind[EventService].toInstance(mockEventService)
       )

@@ -30,7 +30,7 @@ import play.api.db.Database
 import play.api.libs.json.Json
 
 @Singleton
-final class MariadbQueries @Inject() (db: Database, databaseExecutionContext: DatabaseExecutionContext) {
+final class GetSqlQueries @Inject() (db: Database, databaseExecutionContext: DatabaseExecutionContext) {
 
   def getPersonDetails(id: Int): Future[List[PersonDetails]] = Future {
     db.withConnection { implicit conn =>
@@ -39,39 +39,6 @@ final class MariadbQueries @Inject() (db: Database, databaseExecutionContext: Da
             |WHERE indi_id = {id}""".stripMargin)
         .on("id" -> id)
         .as[List[PersonDetails]](PersonDetails.mysqlParser.*)
-    }
-  }(databaseExecutionContext)
-
-  def updatePersonDetails(personDetails: PersonDetails): Future[Int] = Future {
-    db.withConnection { implicit conn =>
-      SQL("""UPDATE genea_individuals
-            |SET base = {base},
-            |indi_nom = {surname},
-            |indi_prenom = {firstname},
-            |indi_sexe = {sex},
-            |indi_timestamp = {timestamp},
-            |indi_npfx = {npfx},
-            |indi_givn = {nameGiven},
-            |indi_nick = {nickname},
-            |indi_spfx = {spfx},
-            |indi_nsfx = {nsfx},
-            |indi_resn = {resn}
-            |WHERE indi_id = {id}""".stripMargin)
-        .on(
-          "base"      -> personDetails.base,
-          "surname"   -> personDetails.surname,
-          "firstname" -> personDetails.firstname,
-          "sex"       -> personDetails.sex.gedcom,
-          "timestamp" -> personDetails.timestamp,
-          "npfx"      -> personDetails.firstnamePrefix,
-          "nameGiven" -> personDetails.nameGiven,
-          "nickname"  -> personDetails.nameNickname,
-          "spfx"      -> personDetails.surnamePrefix,
-          "nsfx"      -> personDetails.nameSuffix,
-          "resn"      -> personDetails.privacyRestriction,
-          "id"        -> personDetails.id
-        )
-        .executeUpdate()
     }
   }(databaseExecutionContext)
 
@@ -129,64 +96,6 @@ final class MariadbQueries @Inject() (db: Database, databaseExecutionContext: Da
              | $where""".stripMargin)
         .on("id" -> id)
         .as[List[EventDetailQueryData]](EventDetailQueryData.mysqlParser.*)
-    }
-  }(databaseExecutionContext)
-
-  def updateEventDetails(event: EventDetailForm) = Future {
-    db.withTransaction { implicit conn =>
-      SQL("""UPDATE genea_events_details
-            |SET place_id = {place_id},
-            |addr_id = {addr_id},
-            |events_details_descriptor = {events_details_descriptor},
-            |events_details_gedcom_date = {events_details_gedcom_date},
-            |events_details_age = {events_details_age},
-            |events_details_cause = {events_details_cause},
-            |base = {base},
-            |events_details_timestamp = {timestamp}
-            |WHERE events_details_id = {id}
-            |""".stripMargin)
-        .on(
-          "id"                         -> event.events_details_id,
-          "place_id"                   -> event.place,
-          "addr_id"                    -> event.addr_id,
-          "events_details_descriptor"  -> event.events_details_descriptor,
-          "events_details_gedcom_date" -> event.events_details_gedcom_date,
-          "events_details_age"         -> event.events_details_age,
-          "events_details_cause"       -> event.events_details_cause,
-          "base"                       -> event.base,
-          "timestamp"                  -> Instant.now
-        )
-        .executeUpdate()
-
-      event.eventType match {
-        case FamilyEvent =>
-          SQL("""UPDATE rel_familles_events
-                |SET events_tag = {tag},
-                |timestamp = {timestamp}
-                |WHERE events_details_id = {id}
-                |""".stripMargin)
-            .on(
-              "id"        -> event.events_details_id,
-              "tag"       -> event.events_tag,
-              "timestamp" -> Instant.now
-            )
-            .executeUpdate()
-        case IndividualEvent =>
-          SQL("""UPDATE rel_indi_events
-                |SET events_tag = {tag},
-                |timestamp = {timestamp}
-                |WHERE events_details_id = {id}
-                |""".stripMargin)
-            .on(
-              "id"        -> event.events_details_id,
-              "tag"       -> event.events_tag,
-              "timestamp" -> Instant.now
-            )
-            .executeUpdate()
-
-        case UnknownEvent => 0
-      }
-
     }
   }(databaseExecutionContext)
 
@@ -372,47 +281,6 @@ final class MariadbQueries @Inject() (db: Database, databaseExecutionContext: Da
              |ORDER BY indi_prenom""".stripMargin)
         .on("id" -> id, "name" -> name)
         .as(PersonDetails.mysqlParser.*)
-    }
-  }(databaseExecutionContext)
-
-  def getSessionData(sessionId: String): Future[Option[Session]] = Future {
-    db.withConnection { implicit conn =>
-      SQL("""SELECT *
-            |FROM genea_sessions
-            |WHERE sessionId = {id}""".stripMargin)
-        .on("id" -> sessionId)
-        .as(Session.mysqlParser.singleOpt)
-    }
-  }(databaseExecutionContext)
-
-  def putSessionData(session: Session): Future[Option[String]] = Future {
-    db.withConnection { implicit conn =>
-      SQL("""INSERT INTO genea_sessions (sessionId, sessionData)
-            |VALUES ({id}, {data})
-            |""".stripMargin)
-        .on("id" -> session.sessionId, "data" -> Json.toJson(session.sessionData).toString)
-        .executeInsert(str(1).singleOpt)
-    }
-  }(databaseExecutionContext)
-
-  def updateSessionData(session: Session): Future[Int] = Future {
-    db.withConnection { implicit conn =>
-      SQL("""UPDATE genea_sessions
-            |SET sessionData = {data}
-            |WHERE sessionId = {id}
-            |""".stripMargin)
-        .on("id" -> session.sessionId, "data" -> Json.toJson(session.sessionData).toString)
-        .executeUpdate()
-    }
-  }(databaseExecutionContext)
-
-  def sessionKeepAlive(sessionId: String): Future[Int] = Future {
-    db.withConnection { implicit conn =>
-      SQL("""UPDATE genea_sessions
-            |SET timeStamp = CURRENT_TIMESTAMP
-            |WHERE sessionId = {id}""".stripMargin)
-        .on("id" -> sessionId)
-        .executeUpdate()
     }
   }(databaseExecutionContext)
 

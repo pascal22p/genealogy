@@ -16,7 +16,7 @@ import play.api.mvc.BaseController
 import play.api.mvc.ControllerComponents
 import play.api.mvc.Result
 import play.api.mvc.Results.Redirect
-import queries.MariadbQueries
+import queries.SessionSqlQueries
 import services.LoginService
 import views.html.Login
 
@@ -24,7 +24,7 @@ import views.html.Login
 class LoginController @Inject() (
     authAction: AuthAction,
     loginService: LoginService,
-    mariadbQueries: MariadbQueries,
+    sqlQueries: SessionSqlQueries,
     loginView: Login,
     val controllerComponents: ControllerComponents
 )(
@@ -50,7 +50,7 @@ class LoginController @Inject() (
         resultOption.fold(Future.successful(Redirect(routes.LoginController.onLoad()))) { result =>
           val newLocalSession = authenticatedRequest.localSession
             .copy(sessionData = authenticatedRequest.localSession.sessionData.copy(userData = Some(result)))
-          mariadbQueries.updateSessionData(newLocalSession).map { _ =>
+          sqlQueries.updateSessionData(newLocalSession).map { _ =>
             Redirect(routes.HomeController.onload())
           }
         }

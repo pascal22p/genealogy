@@ -13,11 +13,11 @@ import models.EventType.FamilyEvent
 import models.Events
 import models.Family
 import models.Person
-import queries.MariadbQueries
+import queries.GetSqlQueries
 
 @Singleton
 class FamilyService @Inject() (
-    mariadbQueries: MariadbQueries,
+    mariadbQueries: GetSqlQueries,
     personDetailsService: PersonDetailsService,
     eventService: EventService
 )(

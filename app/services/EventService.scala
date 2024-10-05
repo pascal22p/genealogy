@@ -18,10 +18,10 @@ import models.SourCitationQueryData
 import models.SourCitationType.EventSourCitation
 import models.UserData
 import org.mindrot.jbcrypt.BCrypt
-import queries.MariadbQueries
+import queries.GetSqlQueries
 
 @Singleton
-class EventService @Inject() (mariadbQueries: MariadbQueries, sourCitationService: SourCitationService)(
+class EventService @Inject() (mariadbQueries: GetSqlQueries, sourCitationService: SourCitationService)(
     implicit ec: ExecutionContext
 ) {
   def getIndividualEvents(personId: Int, omitSources: Boolean = false): Future[List[EventDetail]] = {

@@ -11,11 +11,11 @@ import cats.implicits.*
 import models.*
 import models.EventType.FamilyEvent
 import models.EventType.IndividualEvent
-import queries.MariadbQueries
+import queries.GetSqlQueries
 
 @Singleton
 class PersonDetailsService @Inject() (
-    mariadbQueries: MariadbQueries,
+    mariadbQueries: GetSqlQueries,
     eventService: EventService
 )(
     implicit ec: ExecutionContext

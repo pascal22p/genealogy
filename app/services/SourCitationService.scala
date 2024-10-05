@@ -12,10 +12,10 @@ import models.MediaType.SourCitationMedia
 import models.SourCitation
 import models.SourCitationQueryData
 import models.SourCitationType.SourCitationType
-import queries.MariadbQueries
+import queries.GetSqlQueries
 
 @Singleton
-class SourCitationService @Inject() (mariadbQueries: MariadbQueries)(
+class SourCitationService @Inject() (mariadbQueries: GetSqlQueries)(
     implicit ec: ExecutionContext
 ) {
   def getSourCitations(sourCitationId: Int, sourCitationType: SourCitationType): Future[List[SourCitation]] = {

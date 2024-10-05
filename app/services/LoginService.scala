@@ -8,10 +8,10 @@ import scala.concurrent.Future
 
 import models.UserData
 import org.mindrot.jbcrypt.BCrypt
-import queries.MariadbQueries
+import queries.GetSqlQueries
 
 @Singleton
-class LoginService @Inject() (mariadbQueries: MariadbQueries)(
+class LoginService @Inject() (mariadbQueries: GetSqlQueries)(
     implicit ec: ExecutionContext
 ) {
   def getUserData(username: String, password: String): Future[Option[UserData]] = {

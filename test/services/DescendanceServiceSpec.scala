@@ -21,7 +21,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import play.api.Application
-import queries.MariadbQueries
+import queries.GetSqlQueries
 import testUtils.BaseSpec
 
 class DescendanceServiceSpec extends BaseSpec {
