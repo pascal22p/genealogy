@@ -19,6 +19,7 @@
 
         @helper.form(action = controllers.routes.LoginController.onSubmit() ) {
             @helper.CSRF.formField
+            <input type="hidden" value="@userForm("returnUrl").value" name="returnUrl" />
             @helper.inputText(userForm("username"))
             @helper.inputPassword(userForm("password"))
             <button type="submit">Submit</button>

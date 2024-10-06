@@ -38,7 +38,7 @@
             @if(request.localSession.sessionData.userData.isEmpty) {
                 <li class="ssmenu"><a href="@controllers.routes.LoginController.onLoad()">Login</a></li>
             } else {
-                <li class="ssmenu"><a href="">Logout</a></li>
+                <li class="ssmenu"><a href="@controllers.routes.LogoutController.onLoad()">Logout</a></li>
             }
         </ul>
     </li>

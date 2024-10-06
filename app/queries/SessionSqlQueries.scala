@@ -63,6 +63,16 @@ final class SessionSqlQueries @Inject() (db: Database, databaseExecutionContext:
     }
   }(databaseExecutionContext)
 
+  def removeSessionData(session: Session): Future[Int] = Future {
+    db.withConnection { implicit conn =>
+      SQL("""DELETE FROM genea_sessions
+            |WHERE sessionId = {id}
+            |""".stripMargin)
+        .on("id" -> session.sessionId)
+        .executeUpdate()
+    }
+  }(databaseExecutionContext)
+
   def sessionKeepAlive(sessionId: String): Future[Int] = Future {
     db.withConnection { implicit conn =>
       SQL("""UPDATE genea_sessions

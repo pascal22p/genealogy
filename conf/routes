@@ -20,5 +20,6 @@ POST    /edit/event-details                       controllers.edit.EditEventDeta
 
 GET     /login                                    controllers.LoginController.onLoad()
 POST    /login                                    controllers.LoginController.onSubmit()
+GET     /logout                                   controllers.LogoutController.onLoad()
 
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)

@@ -1,5 +1,6 @@
 package controllers
 
+import java.nio.file.Paths
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -8,7 +9,9 @@ import scala.concurrent.Future
 
 import actions.AuthAction
 import models.forms.UserDataForm
+import models.AuthenticatedRequest
 import play.api.data.Form
+import play.api.http.HeaderNames
 import play.api.i18n.I18nSupport
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
@@ -33,25 +36,27 @@ class LoginController @Inject() (
     with I18nSupport {
 
   def onLoad: Action[AnyContent] = authAction.async { implicit authenticatedRequest =>
-    Future.successful(Ok(loginView(UserDataForm.userForm)))
+    val returnUrl = authenticatedRequest.request.headers
+      .get(HeaderNames.REFERER)
+      .getOrElse(controllers.routes.HomeController.onload().url)
+    Future.successful(Ok(loginView(UserDataForm.userForm.fill(UserDataForm("", "", returnUrl)))))
   }
 
   def onSubmit: Action[AnyContent] = authAction.async { implicit authenticatedRequest =>
     val errorFunction: Form[UserDataForm] => Future[Result] = { (formWithErrors: Form[UserDataForm]) =>
-      // This is the bad case, where the form had validation errors.
-      // Let's show the user the form again, with the errors highlighted.
-      // Note how we pass the form with errors to the template.
       Future.successful(BadRequest(loginView(formWithErrors)))
     }
 
     val successFunction: UserDataForm => Future[Result] = { (userDataForm: UserDataForm) =>
-      // This is the good case, where the form was successfully parsed as a Data object.
       loginService.getUserData(userDataForm.username, userDataForm.password).flatMap { resultOption =>
+        val returnUrl = new java.net.URI(
+          Option(userDataForm.returnUrl).filter(_.trim.nonEmpty).getOrElse(routes.HomeController.onload().url)
+        ).getPath()
         resultOption.fold(Future.successful(Redirect(routes.LoginController.onLoad()))) { result =>
           val newLocalSession = authenticatedRequest.localSession
             .copy(sessionData = authenticatedRequest.localSession.sessionData.copy(userData = Some(result)))
           sqlQueries.updateSessionData(newLocalSession).map { _ =>
-            Redirect(routes.HomeController.onload())
+            Redirect(returnUrl)
           }
         }
       }
