@@ -43,7 +43,7 @@ jobs:
       run: sbt test
       # Optional: This step uploads information to the GitHub dependency graph and unblocking Dependabot alerts for the repository
     - name: Upload dependency graph
-      uses: scalacenter/sbt-dependency-submission@22e5b581223b53216ce01f896ce773e9e247633a
+      uses: scalacenter/sbt-dependency-submission@563a7a658b01d8523df1e7fcb13b6d43d8f6d292
 
     - name: Run upload container
       uses: pascal22p/github-docker-sbt@v0.3.0
