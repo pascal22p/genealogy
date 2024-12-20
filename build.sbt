@@ -1,5 +1,5 @@
 import com.typesafe.sbt.packager.docker.DockerChmodType
-import wartremover.Wart.{DefaultArguments, Equals, ImplicitParameter, Overloading, Recursion}
+import wartremover.Wart.{DefaultArguments, Equals, ImplicitParameter, Overloading, Recursion, Any}
 import play.twirl.sbt.Import.TwirlKeys
 
 import scala.sys.process.Process
@@ -7,7 +7,7 @@ import scala.sys.process.Process
 
 ThisBuild / version := "latest"
 ThisBuild / organization := "parois.net"
-ThisBuild / scalaVersion := "3.5.2"
+ThisBuild / scalaVersion := "3.6.2"
 ThisBuild / scalafmtOnCompile := true
 
 Test / parallelExecution := true
@@ -66,7 +66,7 @@ lazy val genealogy = (project in file("."))
     libraryDependencies ++= LibDependencies.all,
     scoverageSettings,
     dockerBuildxSettings,
-    Compile / compile / wartremoverErrors ++= Warts.allBut(DefaultArguments, ImplicitParameter, Overloading, Equals, Recursion),
+    Compile / compile / wartremoverErrors ++= Warts.allBut(DefaultArguments, ImplicitParameter, Overloading, Equals, Recursion, Any),
     wartremoverExcluded ++= (Compile / routes).value,
     wartremoverExcluded += (TwirlKeys.compileTemplates / target).value,
     resolvers ++= Seq(
