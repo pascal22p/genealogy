@@ -6,7 +6,6 @@ import scala.util.Failure
 import scala.util.Success
 import scala.util.Try
 
-import anorm.execute
 import anorm.SQL
 import models.*
 import models.queryData.EventDetailQueryData
