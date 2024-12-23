@@ -6,12 +6,16 @@ import javax.inject.Singleton
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
-import actions.AuthAction
 import actions.AuthJourney
 import cats.implicits.*
 import models.forms.EventDetailForm
+import models.AuthenticatedRequest
+import models.EventDetail
+import models.Person
+import models.Place
 import play.api.data.Form
 import play.api.i18n.I18nSupport
+import play.api.mvc.AnyContent
 import play.api.mvc.BaseController
 import play.api.mvc.ControllerComponents
 import play.api.mvc.Result
@@ -21,18 +25,18 @@ import queries.UpdateSqlQueries
 import services.EventService
 import services.PersonService
 import services.SessionService
-import views.html.edit.EditEventDetails
+import views.html.edit.EditEventDetail
 import views.html.ServiceUnavailable
 
 @Singleton
-class EditEventDetailsController @Inject() (
+class EditEventDetailController @Inject() (
     authJourney: AuthJourney,
     eventService: EventService,
     personService: PersonService,
     sessionService: SessionService,
     getSqlQueries: GetSqlQueries,
     updateSqlQueries: UpdateSqlQueries,
-    editEventDetails: EditEventDetails,
+    editEventDetail: EditEventDetail,
     serviceUnavailableView: ServiceUnavailable,
     val controllerComponents: ControllerComponents
 )(
@@ -42,39 +46,25 @@ class EditEventDetailsController @Inject() (
     with Logging {
 
   def showForm(id: Int) = authJourney.authWithAdminRight.async { implicit request =>
-    eventService.getEvent(id).flatMap { eventOption =>
-      getSqlQueries.getAllPlaces.flatMap { allPlace =>
-        eventOption.fold(Future.successful(NotFound("Event could not be found"))) { event =>
-          event.ownerId.traverse(personId => personService.getPerson(personId)).map { person =>
-            val isAllowedToSee = request.localSession.sessionData.userData.fold(false)(_.seePrivacy)
-
-            if (!event.privacyRestriction.contains("privacy") || isAllowedToSee) {
-              person.flatten.map(sessionService.insertPersonInHistory)
-              val form = EventDetailForm.eventDetailForm.fill(event.toForm)
-              Ok(editEventDetails(form, allPlace))
-            } else {
-              Forbidden("Not allowed")
-            }
-          }
-        }
-      }
+    handleEvent(id) { (event, person, allPlace) =>
+      val form = EventDetailForm.eventDetailForm.fill(event.toForm)
+      Future.successful(Ok(editEventDetail(form, allPlace, event)))
     }
   }
 
-  def onSubmit = authJourney.authWithAdminRight.async { implicit request =>
+  def onSubmit(id: Int) = authJourney.authWithAdminRight.async { implicit request =>
     def errorFunction: Form[EventDetailForm] => Future[Result] = { (formWithErrors: Form[EventDetailForm]) =>
-      // This is the bad case, where the form had validation errors.
-      // Let's show the user the form again, with the errors highlighted.
-      // Note how we pass the form with errors to the template.
-      getSqlQueries.getAllPlaces.map { allPlace =>
-        BadRequest(editEventDetails(formWithErrors, allPlace))
+      handleEvent(id) { (event, person, allPlace) =>
+        Future.successful(BadRequest(editEventDetail(formWithErrors, allPlace, event)))
       }
     }
 
     val successFunction: EventDetailForm => Future[Result] = { (dataForm: EventDetailForm) =>
-      updateSqlQueries.updateEventDetails(dataForm).map {
-        case 1 => Redirect(controllers.routes.EventController.showEvent(dataForm.events_details_id))
-        case _ => InternalServerError(serviceUnavailableView("No record was updated"))
+      handleEvent(id) { (event, person, allPlace) =>
+        updateSqlQueries.updateEventDetails(event.fromForm(dataForm, allPlace)).map {
+          case 1 => Redirect(controllers.routes.EventController.showEvent(id))
+          case _ => InternalServerError(serviceUnavailableView("No record was updated"))
+        }
       }
     }
 
@@ -82,4 +72,24 @@ class EditEventDetailsController @Inject() (
     formValidationResult.fold(errorFunction, successFunction)
   }
 
+  private def handleEvent(id: Int)(
+      result: (EventDetail, Option[Person], List[Place]) => Future[Result]
+  )(implicit request: AuthenticatedRequest[AnyContent]): Future[Result] = {
+    eventService.getEvent(id).flatMap { eventOption =>
+      getSqlQueries.getAllPlaces.flatMap { allPlace =>
+        eventOption.fold(Future.successful(NotFound("Event could not be found"))) { event =>
+          event.ownerId.traverse(personId => personService.getPerson(personId)).flatMap { person =>
+            val isAllowedToSee = request.localSession.sessionData.userData.fold(false)(_.seePrivacy)
+
+            if (!event.privacyRestriction.contains("privacy") || isAllowedToSee) {
+              person.flatten.map(sessionService.insertPersonInHistory)
+              result(event, person.flatten, allPlace)
+            } else {
+              Future.successful(Forbidden("Not allowed"))
+            }
+          }
+        }
+      }
+    }
+  }
 }

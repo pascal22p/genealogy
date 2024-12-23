@@ -2,6 +2,7 @@ package models
 
 import java.time.Instant
 
+import models.forms.SourCitationForm
 import models.SourCitationType.SourCitationType
 
 final case class SourCitation(
@@ -18,7 +19,16 @@ final case class SourCitation(
     ownerId: Option[Int],
     sourceType: SourCitationType,
     medias: List[Media] = List.empty
-)
+) {
+  def toForm =
+    SourCitationForm(
+      dates,
+      even,
+      subm,
+      text,
+      page
+    )
+}
 
 object SourCitation {
   def apply(sourCitationQueryData: SourCitationQueryData, medias: List[Media]): SourCitation = {

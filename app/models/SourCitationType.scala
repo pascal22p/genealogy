@@ -14,18 +14,18 @@ object SourCitationType {
   sealed trait SourCitationType
 
   case object EventSourCitation extends SourCitationType {
-    override def toString = "eventSourCitation"
+    override def toString = "event-source"
   }
 
   case object IndividualSourCitation extends SourCitationType {
-    override def toString = "individualSourCitation"
+    override def toString = "individual-source"
   }
 
   case object FamilySourCitation extends SourCitationType {
-    override def toString = "familySourCitation"
+    override def toString = "family-source"
   }
 
   case object UnknownSourCitation extends SourCitationType {
-    override def toString = "unknownSourCitation"
+    override def toString = "unknown-source"
   }
 }

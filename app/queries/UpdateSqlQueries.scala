@@ -65,7 +65,7 @@ final class UpdateSqlQueries @Inject() (db: Database, databaseExecutionContext: 
     }
   }(databaseExecutionContext)
 
-  def updateEventDetails(event: EventDetailForm) = Future {
+  def updateEventDetails(event: EventDetail) = Future {
     db.withTransaction { implicit conn =>
       SQL("""UPDATE genea_events_details
             |SET place_id = {place_id},
@@ -80,7 +80,7 @@ final class UpdateSqlQueries @Inject() (db: Database, databaseExecutionContext: 
             |""".stripMargin)
         .on(
           "id"                         -> event.events_details_id,
-          "place_id"                   -> event.place,
+          "place_id"                   -> event.place.map(_.id),
           "addr_id"                    -> event.addr_id,
           "events_details_descriptor"  -> event.events_details_descriptor,
           "events_details_gedcom_date" -> event.events_details_gedcom_date,
@@ -100,7 +100,7 @@ final class UpdateSqlQueries @Inject() (db: Database, databaseExecutionContext: 
                 |""".stripMargin)
             .on(
               "id"        -> event.events_details_id,
-              "tag"       -> event.events_tag,
+              "tag"       -> event.tag,
               "timestamp" -> Instant.now
             )
             .executeUpdate()
@@ -112,7 +112,7 @@ final class UpdateSqlQueries @Inject() (db: Database, databaseExecutionContext: 
                 |""".stripMargin)
             .on(
               "id"        -> event.events_details_id,
-              "tag"       -> event.events_tag,
+              "tag"       -> event.tag,
               "timestamp" -> Instant.now
             )
             .executeUpdate()

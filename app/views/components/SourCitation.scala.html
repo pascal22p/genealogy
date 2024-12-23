@@ -1,13 +1,13 @@
 @import models.{SourCitation => ModelSourCitation}
-@import views.html.components.{Media, LastModified}
+@import views.html.components.{Media, LastModified, EditLink}
 
-@this(mediaComponent: Media, lastModified: LastModified)
+@this(mediaComponent: Media, lastModified: LastModified, editLink: EditLink)
 
-@(source: ModelSourCitation)(implicit messages: Messages)
+@(source: ModelSourCitation)(implicit request: AuthenticatedRequest[?], messages: Messages)
 
 <div class="box">
   <div class="box_title">
-    <h3>Source</h3>
+    <h3>@editLink(controllers.edit.routes.EditSourCitationController.showForm(source.id)) Source</h3>
   </div>
 
   @lastModified(source.timestamp)
