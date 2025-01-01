@@ -10,29 +10,29 @@ import actions.AuthAction
 import actions.AuthJourney
 import cats.implicits.*
 import models.forms.SourRecordForm
+import models.AuthenticatedRequest
+import models.SourCitationType.EventSourCitation
+import models.SourCitationType.FamilySourCitation
+import models.SourCitationType.IndividualSourCitation
+import models.SourCitationType.SourCitationType
+import models.SourCitationType.UnknownSourCitation
+import models.SourRecord
 import play.api.data.Form
+import play.api.data.FormError
 import play.api.i18n.I18nSupport
+import play.api.mvc.AnyContent
 import play.api.mvc.BaseController
 import play.api.mvc.ControllerComponents
 import play.api.mvc.Result
 import play.api.Logging
 import queries.GetSqlQueries
 import queries.UpdateSqlQueries
-import services.SourRecordService
 import services.PersonService
 import services.SessionService
+import services.SourCitationService
+import services.SourRecordService
 import views.html.edit.EditSourRecord
 import views.html.ServiceUnavailable
-import services.SourCitationService
-import models.SourRecord
-import models.AuthenticatedRequest
-import play.api.mvc.AnyContent
-import play.api.data.FormError
-import models.SourCitationType.SourCitationType
-import models.SourCitationType.EventSourCitation
-import models.SourCitationType.IndividualSourCitation
-import models.SourCitationType.FamilySourCitation
-import models.SourCitationType.UnknownSourCitation
 
 @Singleton
 class EditSourRecordController @Inject() (
@@ -60,12 +60,13 @@ class EditSourRecordController @Inject() (
     }
   }
 
-  def showForm(sourRecordId: Int, sourCitationType: SourCitationType, sourCitationId: Int) = authJourney.authWithAdminRight.async { implicit request =>
-    handleSourRecord(sourRecordId) { sourRecord =>
-      val form = SourRecordForm.sourRecordForm.fill(sourRecord.toForm(sourCitationId, sourCitationType))
-      Future.successful(Ok(sourRecordView(form, sourRecord)))
+  def showForm(sourRecordId: Int, sourCitationType: SourCitationType, sourCitationId: Int) =
+    authJourney.authWithAdminRight.async { implicit request =>
+      handleSourRecord(sourRecordId) { sourRecord =>
+        val form = SourRecordForm.sourRecordForm.fill(sourRecord.toForm(sourCitationId, sourCitationType))
+        Future.successful(Ok(sourRecordView(form, sourRecord)))
+      }
     }
-  }
 
   def onSubmit(sourRecordId: Int) = authJourney.authWithAdminRight.async { implicit request =>
     def errorFunction(formWithErrors: Form[SourRecordForm]): Future[Result] = {
@@ -77,22 +78,25 @@ class EditSourRecordController @Inject() (
     val successFunction: SourRecordForm => Future[Result] = { dataForm =>
       handleSourRecord(sourRecordId) { sourRecord =>
         updateSqlQueries.updateSourRecord(sourRecord.fromForm(dataForm)).flatMap {
-          case 1 => dataForm.parentType match {
-            case EventSourCitation => 
-              sourCitationService.getSourCitations(dataForm.parentId, UnknownSourCitation).map { sourCitationList =>
-                sourCitationList.headOption.fold(NotFound("SourCitation could not be found")) { sourCitation =>
-                  Redirect(controllers.routes.EventController.showEvent(sourCitation.ownerId.getOrElse(0)))
+          case 1 =>
+            dataForm.parentType match {
+              case EventSourCitation =>
+                sourCitationService.getSourCitations(dataForm.parentId, UnknownSourCitation).map { sourCitationList =>
+                  sourCitationList.headOption.fold(NotFound("SourCitation could not be found")) { sourCitation =>
+                    Redirect(controllers.routes.EventController.showEvent(sourCitation.ownerId.getOrElse(0)))
+                  }
                 }
-              }
-            case IndividualSourCitation => 
-              sourCitationService.getSourCitations(dataForm.parentId, UnknownSourCitation).map { sourCitationList =>
-                sourCitationList.headOption.fold(NotFound("SourCitation could not be found")) { sourCitation =>
-                  Redirect(controllers.routes.IndividualController.showPerson(sourCitation.ownerId.getOrElse(0)))
+              case IndividualSourCitation =>
+                sourCitationService.getSourCitations(dataForm.parentId, UnknownSourCitation).map { sourCitationList =>
+                  sourCitationList.headOption.fold(NotFound("SourCitation could not be found")) { sourCitation =>
+                    Redirect(controllers.routes.IndividualController.showPerson(sourCitation.ownerId.getOrElse(0)))
+                  }
                 }
-              }
-            case FamilySourCitation => Future.successful(NotImplemented(serviceUnavailableView("Family edit Not implemented")))
-            case UnknownSourCitation => Future.successful(InternalServerError(serviceUnavailableView("Unknown sour citation type")))
-          }
+              case FamilySourCitation =>
+                Future.successful(NotImplemented(serviceUnavailableView("Family edit Not implemented")))
+              case UnknownSourCitation =>
+                Future.successful(InternalServerError(serviceUnavailableView("Unknown sour citation type")))
+            }
           case _ => Future.successful(InternalServerError(serviceUnavailableView("No record was updated")))
         }
       }

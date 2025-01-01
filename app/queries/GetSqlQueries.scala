@@ -243,13 +243,17 @@ final class GetSqlQueries @Inject() (db: Database, databaseExecutionContext: Dat
     }
   }(databaseExecutionContext)
 
-  def getSurnamesList(id: Int)(implicit authenticatedRequest: AuthenticatedRequest[?]): Future[List[(String, Int)]] =
+  def getSurnamesList(
+      id: Int
+  )(implicit authenticatedRequest: AuthenticatedRequest[?]): Future[List[(String, Int, Option[Int], Option[Int])]] =
     Future {
-      val mysqlParser: RowParser[(String, Int)] =
+      val mysqlParser: RowParser[(String, Int, Option[Int], Option[Int])] =
         (get[String]("indi_nom") ~
-          get[Int]("count")).map {
-          case name ~ count =>
-            (name, count)
+          get[Int]("count") ~
+          get[Option[Int]]("min_jd_count") ~
+          get[Option[Int]]("max_jd_count")).map {
+          case name ~ count ~ minDayCount ~ maxDayCount =>
+            (name, count, minDayCount, maxDayCount)
         }
 
       db.withConnection { implicit conn =>
@@ -257,11 +261,15 @@ final class GetSqlQueries @Inject() (db: Database, databaseExecutionContext: Dat
         val isExcluded = authenticatedRequest.localSession.sessionData.userData.fold(excludePrivate) { userData =>
           if (userData.seePrivacy) "" else excludePrivate
         }
-        SQL(s"""SELECT indi_nom, count(*) as count
-               |FROM genea_individuals
-               |WHERE base = {id} $isExcluded
-               |GROUP BY indi_nom
-               |ORDER BY indi_nom""".stripMargin)
+        SQL(
+          s"""SELECT MIN(jd_count) AS min_jd_count, MAX(jd_count) AS max_jd_count, indi_nom, COUNT(*) AS count
+             | FROM genea_individuals
+             | LEFT JOIN rel_indi_events ON genea_individuals.indi_id = rel_indi_events.indi_id
+             | LEFT JOIN genea_events_details ON genea_events_details.events_details_id = rel_indi_events.events_details_id
+             | WHERE genea_individuals.base = {id} $isExcluded
+             | GROUP BY genea_individuals.indi_nom
+             | ORDER BY genea_individuals.indi_nom""".stripMargin
+        )
           .on("id" -> id)
           .as(mysqlParser.*)
       }
@@ -291,6 +299,24 @@ final class GetSqlQueries @Inject() (db: Database, databaseExecutionContext: Dat
             |WHERE email = {email}""".stripMargin)
         .on("email" -> username)
         .as(UserData.mysqlParser.singleOpt)
+    }
+  }(databaseExecutionContext)
+
+  def getSourRecord(id: Int): Future[Option[SourRecord]] = Future {
+    db.withConnection { implicit conn =>
+      SQL("""SELECT *
+            |FROM genea_sour_records
+            |WHERE sour_records_id = {id}""".stripMargin)
+        .on("id" -> id)
+        .as[Option[SourRecord]](SourRecord.mysqlParser.singleOpt)
+    }
+  }(databaseExecutionContext)
+
+  def getAllEvents: Future[List[EventDetailOnlyQueryData]] = Future {
+    db.withConnection { implicit conn =>
+      SQL("""SELECT *
+            |FROM genea_events_details""".stripMargin)
+        .as[List[EventDetailOnlyQueryData]](EventDetailOnlyQueryData.mysqlParser.*)
     }
   }(databaseExecutionContext)
 

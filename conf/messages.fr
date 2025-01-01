@@ -14,3 +14,5 @@ date.period.from = Depuis
 date.period.to = Jusque
 date.period.abt = Environ
 date.period.cal = Calculé
+date.period.est = Estimaté
+

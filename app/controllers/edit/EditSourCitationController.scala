@@ -10,9 +10,17 @@ import actions.AuthAction
 import actions.AuthJourney
 import cats.implicits.*
 import models.forms.SourCitationForm
+import models.AuthenticatedRequest
 import models.SourCitation
+import models.SourCitationType
+import models.SourCitationType.EventSourCitation
+import models.SourCitationType.FamilySourCitation
+import models.SourCitationType.IndividualSourCitation
+import models.SourCitationType.UnknownSourCitation
+import org.apache.pekko.http.scaladsl.model.HttpCharsetRange.*
 import play.api.data.Form
 import play.api.i18n.I18nSupport
+import play.api.mvc.AnyContent
 import play.api.mvc.BaseController
 import play.api.mvc.ControllerComponents
 import play.api.mvc.Result
@@ -22,17 +30,9 @@ import queries.UpdateSqlQueries
 import services.EventService
 import services.PersonService
 import services.SessionService
+import services.SourCitationService
 import views.html.edit.EditSourCitation
 import views.html.ServiceUnavailable
-import services.SourCitationService
-import models.SourCitationType.IndividualSourCitation
-import models.SourCitationType
-import models.SourCitationType.UnknownSourCitation
-import org.apache.pekko.http.scaladsl.model.HttpCharsetRange.*
-import models.AuthenticatedRequest
-import play.api.mvc.AnyContent
-import models.SourCitationType.EventSourCitation
-import models.SourCitationType.FamilySourCitation
 
 @Singleton
 class EditSourCitationController @Inject() (
@@ -77,15 +77,17 @@ class EditSourCitationController @Inject() (
     val successFunction: SourCitationForm => Future[Result] = { dataForm =>
       handleSourCitation(id) { sourCitation =>
         updateSqlQueries.updateSourCitation(sourCitation.fromForm(dataForm)).map {
-          case 1 => 
+          case 1 =>
             sourCitation.sourceType match {
-              case EventSourCitation => sourCitation.ownerId.fold(NotFound("Record updated but parent not found"))(
-                eventId => Redirect(controllers.routes.EventController.showEvent(eventId))
-              )
-              case IndividualSourCitation => sourCitation.ownerId.fold(NotFound("Record updated but parent not found"))(
-                personId => Redirect(controllers.routes.IndividualController.showPerson(personId))
-              )
-              //case FamilySourCitation => Redirect(controllers.routes.FamilyController.showFamily(sourCitation.ownerId.get))
+              case EventSourCitation =>
+                sourCitation.ownerId.fold(NotFound("Record updated but parent not found"))(eventId =>
+                  Redirect(controllers.routes.EventController.showEvent(eventId))
+                )
+              case IndividualSourCitation =>
+                sourCitation.ownerId.fold(NotFound("Record updated but parent not found"))(personId =>
+                  Redirect(controllers.routes.IndividualController.showPerson(personId))
+                )
+              // case FamilySourCitation => Redirect(controllers.routes.FamilyController.showFamily(sourCitation.ownerId.get))
               case _ => NotImplemented(serviceUnavailableView("Record updated no view implemented yet"))
             }
           case _ => InternalServerError(serviceUnavailableView("No record was updated"))
@@ -98,6 +100,3 @@ class EditSourCitationController @Inject() (
   }
 
 }
-
-
-

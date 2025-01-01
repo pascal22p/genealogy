@@ -74,26 +74,68 @@ class AscendanceControllerSpec extends BaseSpec {
 
       val expected =
         """
-          |    <h3>Generation0</h3>
-          |    <ul>
-          |      <li><astyle="padding:0;margin:0"href="/individual/1">Firstname1Surname</a></li>
-          |    </ul>
-          |
-          |  <h3>Generation1</h3>
-          |  <ul>
-          |    <li><astyle="padding:0;margin:0"href="/individual/2">Firstname2Surname</a></li>
-          |  </ul>
-          |
-          |  <h3>Generation2</h3>
-          |  <ul>
-          |    <li><astyle="padding:0;margin:0"href="/individual/3">Firstname3Surname</a></li>
-          |    <li><astyle="padding:0;margin:0"href="/individual/4">Firstname4Surname</a></li>
-          |  </ul>
-          |
-          |  <h3>Generation3</h3>
-          |  <ul>
-          |    <li><astyle="padding:0;margin:0"href="/individual/5">Firstname5Surname</a></li>
-          |  </ul>
+          |<divclass="govuk-!-padding-4box">
+          |  <divclass="govuk-summary-cardgovuk-!-margin-4">
+          |    <divclass="govuk-summary-card__title-wrapper">
+          |      <h2class="govuk-summary-card__title">Generation0</h2>
+          |    </div>
+          |    <divclass="govuk-summary-card__content">
+          |      <dlclass="govuk-summary-list">
+          |        <divclass="govuk-summary-list__rowgovuk-summary-list__row--no-border">
+          |          <dtclass="govuk-summary-list__key">Firstname1Surname</dt>
+          |          <ddclass="govuk-summary-list__value"></dd>
+          |          <ddclass="govuk-summary-list__actions"><aclass="govuk-link"href="/individual/1">Details<spanclass="govuk-visually-hidden">(Generation0)</span></a></dd>
+          |        </div>
+          |      </dl>
+          |    </div>
+          |  </div>
+          |  <divclass="govuk-summary-cardgovuk-!-margin-4">
+          |    <divclass="govuk-summary-card__title-wrapper">
+          |      <h2class="govuk-summary-card__title">Generation1</h2>
+          |    </div>
+          |    <divclass="govuk-summary-card__content">
+          |      <dlclass="govuk-summary-list">
+          |        <divclass="govuk-summary-list__rowgovuk-summary-list__row--no-border">
+          |          <dtclass="govuk-summary-list__key">Firstname2Surname</dt>
+          |          <ddclass="govuk-summary-list__value"></dd>
+          |          <ddclass="govuk-summary-list__actions"><aclass="govuk-link"href="/individual/2">Details<spanclass="govuk-visually-hidden">(Generation1)</span></a></dd>
+          |        </div>
+          |      </dl>
+          |    </div>
+          |  </div>
+          |  <divclass="govuk-summary-cardgovuk-!-margin-4">
+          |    <divclass="govuk-summary-card__title-wrapper">
+          |      <h2class="govuk-summary-card__title">Generation2</h2>
+          |    </div>
+          |    <divclass="govuk-summary-card__content">
+          |      <dlclass="govuk-summary-list">
+          |        <divclass="govuk-summary-list__rowgovuk-summary-list__row--no-border">
+          |          <dtclass="govuk-summary-list__key">Firstname3Surname</dt>
+          |          <ddclass="govuk-summary-list__value"></dd><ddclass="govuk-summary-list__actions"><aclass="govuk-link"href="/individual/3">Details<spanclass="govuk-visually-hidden">(Generation2)</span></a></dd>
+          |        </div>
+          |        <divclass="govuk-summary-list__rowgovuk-summary-list__row--no-border">
+          |          <dtclass="govuk-summary-list__key">Firstname4Surname</dt>
+          |          <ddclass="govuk-summary-list__value"></dd>
+          |          <ddclass="govuk-summary-list__actions"><aclass="govuk-link"href="/individual/4">Details<spanclass="govuk-visually-hidden">(Generation2)</span></a></dd>
+          |        </div>
+          |      </dl>
+          |    </div>
+          |  </div>
+          |  <divclass="govuk-summary-cardgovuk-!-margin-4">
+          |    <divclass="govuk-summary-card__title-wrapper">
+          |      <h2class="govuk-summary-card__title">Generation3</h2>
+          |    </div>
+          |    <divclass="govuk-summary-card__content">
+          |      <dlclass="govuk-summary-list">
+          |        <divclass="govuk-summary-list__rowgovuk-summary-list__row--no-border">
+          |          <dtclass="govuk-summary-list__key">Firstname5Surname</dt>
+          |          <ddclass="govuk-summary-list__value"></dd>
+          |          <ddclass="govuk-summary-list__actions"><aclass="govuk-link"href="/individual/5">Details<spanclass="govuk-visually-hidden">(Generation3)</span></a></dd>
+          |        </div>
+          |      </dl>
+          |    </div>
+          |  </div>
+          |</div>
           |""".stripMargin.filterNot(_.isWhitespace)
 
       val result = sut.showAscendant(1).apply(FakeRequest())
@@ -131,27 +173,74 @@ class AscendanceControllerSpec extends BaseSpec {
 
       val expected =
         """
-          |    <h3>Generation0</h3>
-          |    <ul>
-          |      <li><astyle="padding:0;margin:0"href="/individual/1">Firstname1Surname</a></li>
-          |    </ul>
+          | <divclass="govuk-!-padding-4box">
+          |  <divclass="govuk-summary-cardgovuk-!-margin-4">
+          |    <divclass="govuk-summary-card__title-wrapper">
+          |      <h2class="govuk-summary-card__title">Generation0</h2>
+          |    </div>
+          |    <divclass="govuk-summary-card__content">
+          |      <dlclass="govuk-summary-list">
+          |        <divclass="govuk-summary-list__rowgovuk-summary-list__row--no-border">
+          |          <dtclass="govuk-summary-list__key">Firstname1Surname</dt>
+          |          <ddclass="govuk-summary-list__value"></dd>
+          |          <ddclass="govuk-summary-list__actions"><aclass="govuk-link"href="/individual/1">Details<spanclass="govuk-visually-hidden">(Generation0)</span></a></dd>
+          |        </div>
+          |      </dl>
+          |    </div>
+          |  </div>
+          |  <divclass="govuk-summary-cardgovuk-!-margin-4">
+          |    <divclass="govuk-summary-card__title-wrapper">
+          |      <h2class="govuk-summary-card__title">Generation1</h2>
+          |    </div>
+          |    <divclass="govuk-summary-card__content">
+          |      <dlclass="govuk-summary-list">
+          |        <divclass="govuk-summary-list__rowgovuk-summary-list__row--no-border">
+          |          <dtclass="govuk-summary-list__key">Firstname2Surname</dt>
+          |          <ddclass="govuk-summary-list__value"></dd>
+          |          <ddclass="govuk-summary-list__actions"><aclass="govuk-link"href="/individual/2">Details<spanclass="govuk-visually-hidden">(Generation1)</span></a></dd>
+          |        </div>
+          |        <divclass="govuk-summary-list__rowgovuk-summary-list__row--no-border">
+          |          <dtclass="govuk-summary-list__key">Firstname22Surname</dt>
+          |            <ddclass="govuk-summary-list__value"></dd><ddclass="govuk-summary-list__actions"><aclass="govuk-link"href="/individual/2">Details<spanclass="govuk-visually-hidden">(Generation1)</span></a></dd>
+          |        </div>
+          |      </dl>
+          |    </div>
+          |  </div>
+          |  <divclass="govuk-summary-cardgovuk-!-margin-4">
+          |    <divclass="govuk-summary-card__title-wrapper">
+          |      <h2class="govuk-summary-card__title">Generation2</h2>
+          |    </div>
+          |    <divclass="govuk-summary-card__content">
+          |      <dlclass="govuk-summary-list">
+          |        <divclass="govuk-summary-list__rowgovuk-summary-list__row--no-border">
+          |          <dtclass="govuk-summary-list__key">Firstname3Surname</dt>
+          |          <ddclass="govuk-summary-list__value"></dd>
+          |          <ddclass="govuk-summary-list__actions"><aclass="govuk-link"href="/individual/3">Details<spanclass="govuk-visually-hidden">(Generation2)</span></a></dd>
+          |        </div>
+          |        <divclass="govuk-summary-list__rowgovuk-summary-list__row--no-border">
+          |          <dtclass="govuk-summary-list__key">Firstname4Surname</dt>
+          |          <ddclass="govuk-summary-list__value"></dd>
+          |          <ddclass="govuk-summary-list__actions"><aclass="govuk-link"href="/individual/4">Details<spanclass="govuk-visually-hidden">(Generation2)</span></a></dd>
+          |        </div>
+          |      </dl>
+          |    </div>
+          |  </div>
+          |  <divclass="govuk-summary-cardgovuk-!-margin-4">
+          |    <divclass="govuk-summary-card__title-wrapper">
+          |      <h2class="govuk-summary-card__title">Generation3</h2>
+          |    </div>
+          |    <divclass="govuk-summary-card__content">
+          |      <dlclass="govuk-summary-list">
+          |        <divclass="govuk-summary-list__rowgovuk-summary-list__row--no-border">
+          |          <dtclass="govuk-summary-list__key">Firstname5Surname</dt>
+          |          <ddclass="govuk-summary-list__value"></dd>
+          |          <ddclass="govuk-summary-list__actions"><aclass="govuk-link"href="/individual/5">Details<spanclass="govuk-visually-hidden">(Generation3)</span></a></dd>
+          |        </div>
+          |      </dl>
+          |    </div>
+          |  </div>
+          |</div>
           |
-          |    <h3>Generation 1</h3>
-          |    <ul>
-          |      <li><a style="padding:0;margin:0" href="/individual/2">Firstname2 Surname</a> </li>
-          |      <li><a style="padding:0;margin:0" href="/individual/2">Firstname22 Surname</a> </li>
-          |    </ul>
-          |
-          |    <h3>Generation 2</h3>
-          |    <ul>
-          |      <li><a style="padding:0;margin:0" href="/individual/3">Firstname3 Surname</a> </li>
-          |      <li><a style="padding:0;margin:0" href="/individual/4">Firstname4 Surname</a> </li>
-          |    </ul>
-          |
-          |    <h3>Generation 3</h3>
-          |    <ul>
-          |      <li><a style="padding:0;margin:0" href="/individual/5">Firstname5 Surname</a> </li>
-          |    </ul>
           |""".stripMargin.filterNot(_.isWhitespace)
 
       val result = sut.showAscendant(1).apply(FakeRequest())

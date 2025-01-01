@@ -77,7 +77,7 @@ class MariadbQueriesSpec extends BaseSpec with BeforeAndAfterEach with Logging {
 
   def sqlEventDetails(event: EventDetail): String =
     s"""INSERT INTO `genea_events_details` (`events_details_id`, `place_id`, `addr_id`, `events_details_descriptor`, `events_details_gedcom_date`, `events_details_age`, `events_details_cause`, `jd_count`, `jd_precision`, `jd_calendar`, `events_details_famc`, `events_details_adop`, `base`) VALUES
-       |(${event.events_details_id},	1,	NULL,	'',	'15 MAY 1835',	'',	'',	2391414,	3,	'@#DGREGORIAN@',	NULL,	NULL,	1);
+       |(${event.events_details_id},	1,	NULL,	'',	'${event.events_details_gedcom_date}',	'',	'',	${event.jd_count.getOrElse("NULL")},	3,	'@#DGREGORIAN@',	NULL,	NULL,	1);
        |""".stripMargin
 
   def sqlFamilyDetails(id: Int, person1: PersonDetails, person2: PersonDetails): String =
@@ -93,6 +93,19 @@ class MariadbQueriesSpec extends BaseSpec with BeforeAndAfterEach with Logging {
          |INSERT INTO `rel_indi_events` (`events_details_id`, `indi_id`, `events_tag`, `events_attestation`) VALUES
          |(${event.events_details_id},	${person.id},	'$eventTag',	NULL);
          |""".stripMargin
+
+  def sqlIndividualEvents(person: PersonDetails, events: List[EventDetail], eventTag: String): String = {
+    sqlPersonDetails(person) +
+      events
+        .map { event =>
+          sqlEventDetails(event) +
+            s"""
+               |INSERT INTO `rel_indi_events` (`events_details_id`, `indi_id`, `events_tag`, `events_attestation`) VALUES
+               |(${event.events_details_id},	${person.id},	'$eventTag',	NULL);
+               |""".stripMargin
+        }
+        .mkString("\n")
+  }
 
   def sqlLinkFamilyEvent(idFamily: Int, event: EventDetail): String =
     s"""
@@ -363,7 +376,38 @@ class MariadbQueriesSpec extends BaseSpec with BeforeAndAfterEach with Logging {
         )
       } yield result).futureValue
 
-      result mustBe List(("B", 1), ("C", 1), ("D", 1))
+      result mustBe List(("B", 1, None, None), ("C", 1, None, None), ("D", 1, None, None))
+    }
+
+    "returns a list of names with start year and end year" in {
+      val eventTag = "BIRT"
+      val person1  = fakePersonDetails(id = 1, surname = "D")
+      val event1   = fakeEventDetail(events_details_id = 11)
+      val person2  = fakePersonDetails(id = 2, surname = "B")
+      val event2   = fakeEventDetail(events_details_id = 22)
+      val person3  = fakePersonDetails(id = 3, surname = "C")
+      val event3   = fakeEventDetail(events_details_id = 33, jd_count = None)
+      val person4  = fakePersonDetails(id = 4, surname = "A")
+      val event4   = fakeEventDetail(events_details_id = 44, jd_count = Some(100))
+      val event5   = fakeEventDetail(events_details_id = 55, jd_count = Some(1000))
+      val event6   = fakeEventDetail(events_details_id = 66, jd_count = Some(10000))
+
+      val result = (for {
+        _ <- executeSql(sqlIndividualEvent(person1, event1, eventTag))
+        _ <- executeSql(sqlIndividualEvent(person2, event2, eventTag))
+        _ <- executeSql(sqlIndividualEvent(person3, event3, eventTag))
+        _ <- executeSql(sqlIndividualEvents(person4, List(event4, event5, event6), eventTag))
+        result <- sut.getSurnamesList(1)(
+          AuthenticatedRequest(FakeRequest(), Session("sessionId", SessionData(1, None)))
+        )
+      } yield result).futureValue
+
+      result mustBe List(
+        ("A", 3, Some(100), Some(10000)),
+        ("B", 1, None, None),
+        ("C", 1, None, None),
+        ("D", 1, None, None)
+      )
     }
 
     "returns a list of names where restriction is not None" in {
@@ -382,7 +426,7 @@ class MariadbQueriesSpec extends BaseSpec with BeforeAndAfterEach with Logging {
         )
       } yield result).futureValue
 
-      result mustBe List(("A", 1), ("B", 1), ("C", 1), ("D", 1))
+      result mustBe List(("A", 1, None, None), ("B", 1, None, None), ("C", 1, None, None), ("D", 1, None, None))
     }
 
     "returns nothing" in {
