@@ -1,21 +1,53 @@
 @import models.GenealogyDatabase
+@import models.SurnameElement
 
 @this(
-        main: Main
+        main: Main,
+        govukSummaryList: GovukSummaryList
 )
 
-@(surnames: List[(String, Int)], dbId: Int)(implicit request: AuthenticatedRequest[?], messages: Messages)
+@(surnames: List[SurnameElement], dbId: Int)(implicit request: AuthenticatedRequest[?], messages: Messages)
 
+@nameText(name: SurnameElement) = @{
+    val plural = if(name.count > 1) "s" else ""
+    (name.startYear, name.endYear) match {
+        case (None, None) => s"${name._2} Individual$plural"
+        case (Some(startYear), Some(endYear)) if startYear == endYear => s"${name.count} Individual$plural in $startYear"
+        case (Some(startYear), Some(endYear)) => s"${name.count} Individual$plural from $startYear to $endYear"
+        case (Some(startYear), None) => s"${name.count} Individual$plural from $startYear"
+        case (None, Some(endYear)) => s"${name.count} Individual$plural until $endYear"
+    }
+}
 
 @main("Famille Parois", dbId, None) {
 
-    <div class="box">
-    <div class="box_title"><h2>Liste des Noms</h2></div>
 
-        <ul>
-    @for(name <- surnames) {
-        <li><a href="@controllers.routes.HomeController.showFirstnames(dbId, name._1)">@name._1 (@name._2)</a></li>
-    }
-        </ul>
-    </div>
+    @govukSummaryList(
+        SummaryList(
+            rows = surnames.map { name =>
+                SummaryListRow(
+                    key = Key(Text(name._1)),
+                    value = Value(Text(nameText(name).toString)),
+                    classes = "govuk-summary-list__row--no-border",
+                    actions = Some(Actions(
+                        items = Seq(
+                            ActionItem(
+                                href = controllers.routes.HomeController.showFirstnames(dbId, name._1).url,
+                                content = Text("View")
+                            )
+                        )
+                    ))
+                )
+            },
+            card = Some(Card(
+                title = Some(CardTitle(content = Text("Surnames"))),
+                actions = None,
+                classes = "govuk-!-margin-4",
+                attributes = Map.empty
+            )),
+            classes = "",
+            attributes = Map.empty
+        )
+    )
+
 }

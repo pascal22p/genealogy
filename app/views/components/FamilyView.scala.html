@@ -1,57 +1,93 @@
 @import models.Family
 @import controllers.routes
-@import views.html.components.NameLink
+@import views.html.components.{IndividualEvents, NameLink}
 
-@this(nameLink: NameLink, lastModified: LastModified)
+@this(
+    nameLink: NameLink, 
+    individualEvents: IndividualEvents,
+    lastModified: LastModified,
+    block: Block,
+    govukSummaryList: GovukSummaryList)
 
 @(family: Family, partnerOption: Option[Person])(implicit authenticatedRequest: AuthenticatedRequest[?], messages: Messages)
 
-<div class="box">
-    <div class="box_title">
-        <h3>Famille
-            @family.parent1.map(_.details.surname).getOrElse("Unknown") —
-            @family.parent2.map(_.details.surname).getOrElse("Unknown") </h3>
-    </div>
+@title = {
+    Family 
+    @family.parent1.map(_.details.surname).getOrElse("Unknown") —
+    @family.parent2.map(_.details.surname).getOrElse("Unknown")
+}
 
-    @lastModified(family.timestamp)
+@nameWithDate(person: Person) = {
+    @person.details.shortName @person.events.birthAndDeathDate
+}
 
-    @for(partner <- partnerOption) {
-        <dl class="collapsed">
-            <dt>Conjoint&nbsp;: </dt>
-          <dd>@nameLink(partner)</dd>
-        </dl>
-    }
+@block(title.toString, None) {
 
-    <div class="box">
-        <div class="box_title">
-            <h3>Évènements</h3>
-        </div>
+@for(partner <- partnerOption) {
+    @govukSummaryList(
+        SummaryList(
+            rows = Seq(
+                SummaryListRow(
+                    key = Key(Text(partner.details.shortName)),
+                    value = Value(HtmlContent(partner.events.birthAndDeathDate)),
+                    classes = "govuk-summary-list__row--no-border",
+                    actions = Some(Actions(
+                        items = Seq(
+                            ActionItem(
+                                href = controllers.routes.IndividualController.showPerson(partner.details.id).url,
+                                content = Text("Details")
+                            )
+                        )
+                    ))
+                )
+            ),
+            card = Some(Card(
+                title = Some(CardTitle(content = Text("Partner"))),
+                actions = None,
+                classes = "govuk-!-margin-4",
+                attributes = Map.empty
+            )),
+            classes = "",
+            attributes = Map.empty
+        )
+    )
+}
 
-        <dl class="evenements">
-        @for(event <- family.events.eventsDetails) {
-            <dt><em>@messages(event.tag.get) :</em>
-                <span class="date">@event.formatDate</span>
-                <span style="color: blue;
-                    font-size: x-small;">@if(event.sourCount>0){-S-}</span>
-                <a href="@controllers.routes.EventController.showEvent(event.events_details_id)" class="noprint">[détail]</a></dt>
-            @for(place <- event.place) {
-                <dd><em>Place : </em>
-                    @place.oneLiner</dd>
-            }
-        }
-        </dl>
-    </div>
+@individualEvents(family.events.eventsDetails)
 
-    <div class="box">
-        <div class="box_title">
-            <h3>Enfants issus de l'union</h3>
-        </div>
+@govukSummaryList(
+    SummaryList(
+        rows =  family.children.map { child =>
+            SummaryListRow(
+                key = Key(Text(child.person.details.shortName)),
+                value = Value(HtmlContent(child.person.events.birthAndDeathDate)),
+                classes = "govuk-summary-list__row--no-border",
+                actions = Some(Actions(
+                    items = Seq(
+                        ActionItem(
+                            href = controllers.routes.IndividualController.showPerson(child.person.details.id).url,
+                            content = Text("Details")
+                        )
+                    )
+                ))
+            )
+        },
+        card = Some(Card(
+            title = Some(CardTitle(content = Text("Children"))),
+            actions = Some(Actions(
+                items = Seq(
+                    ActionItem(
+                        href = controllers.edit.routes.EditPersonDetailsController.showForm(1).url,
+                        content = Text("Add")
+                    )
+                )
+            )),
+            classes = "govuk-!-margin-4",
+            attributes = Map.empty
+        )),
+        classes = "",
+        attributes = Map.empty
+    )
+)
 
-        <ul style="list-style-type: none;
-            padding: 0;">
-        @for(child <- family.children) {
-          <li>@nameLink(child.person)</li>
-        }
-        </ul>
-    </div>
-</div>
+}

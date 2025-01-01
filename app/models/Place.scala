@@ -16,20 +16,32 @@ final case class Place(
     latitude: Option[Double],
     base: Int
 ) {
-  def oneLiner: String = {
-    val location = (latitude, longitude) match {
-      case (Some(latitude), Some(longitude)) => s" ($latitude, $longitude)"
-      case _                                 => ""
-    }
-    List(lieuDit, city, postCode, county, region, country)
-      .flatMap { el =>
-        if (el.trim == "") {
-          None
-        } else {
-          Some(el)
+  def oneLiner(short: Boolean = true): String = {
+    if (short) {
+      List(lieuDit, city, postCode, country)
+        .flatMap { el =>
+          if (el.trim == "") {
+            None
+          } else {
+            Some(el)
+          }
         }
+        .mkString(", ")
+    } else {
+      val location = (latitude, longitude) match {
+        case (Some(latitude), Some(longitude)) => s" ($latitude, $longitude)"
+        case _                                 => ""
       }
-      .mkString(", ") + location
+      List(lieuDit, city, postCode, county, region, country)
+        .flatMap { el =>
+          if (el.trim == "") {
+            None
+          } else {
+            Some(el)
+          }
+        }
+        .mkString(", ") + location
+    }
   }
 }
 

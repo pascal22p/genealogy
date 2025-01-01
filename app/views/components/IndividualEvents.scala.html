@@ -1,22 +1,42 @@
-@this()
+@this(
+    block: Block, 
+    lastModified: LastModified,
+    govukSummaryList: GovukSummaryList
+)
 
-@(person: Person)(implicit messages: Messages)
+@(events: List[EventDetail])(implicit authenticatedRequest: AuthenticatedRequest[?], messages: Messages)
 
-<div class="box">
-    <div class="box_title">
-        <h3>Évènements</h3>
-    </div>
+@eventDetailRow(event: EventDetail) = {
+    @event.formatDate @for(place <- event.place) {
+        at @place.oneLiner()
+    }
+    <span style="color: blue; font-size: x-small;">@if(event.sourCount>0){-S-}</span>
+}
 
-    <dl class="evenements">
-        @for(event <- person.events.eventsDetails) {
-            <dt><em>@messages(event.tag.get)</em> : <span class="date">@event.formatDate</span>
-                <span style="color: blue;
-                    font-size: x-small;">@if(event.sourCount>0){-S-}</span>
-                <a href="@controllers.routes.EventController.showEvent(event.events_details_id)" class="noprint">[détail]</a></dt>
-            @for(place <- event.place) {
-                <dd><em>Place : </em>
-                    @place.oneLiner</dd>
-            }
-        }
-    </dl>
-</div>
+@govukSummaryList(
+    SummaryList(
+        rows = events.map { event =>
+            SummaryListRow(
+                key = Key(Text(messages(event.tag.get))),
+                value = Value(HtmlContent(eventDetailRow(event))),
+                classes = "govuk-summary-list__row--no-border",
+                actions = Some(Actions(
+                    items = Seq(
+                        ActionItem(
+                            href = controllers.routes.EventController.showEvent(event.events_details_id).url,
+                            content = Text("Details")
+                        )
+                    )
+                ))
+            )
+        },
+        card = Some(Card(
+            title = Some(CardTitle(content = Text("Events"))),
+            actions = None,
+            classes = "govuk-!-margin-4",
+            attributes = Map.empty
+          )),
+        classes = "",
+        attributes = Map.empty
+    )
+)

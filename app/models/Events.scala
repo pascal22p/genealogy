@@ -11,9 +11,9 @@ final case class Events(eventsDetails: List[EventDetail]) {
     val deathDate = eventsDetails.find(event => deathTags.contains(event.tag.getOrElse(""))).map(_.formatDate)
     (birthDate, deathDate) match {
       case (None, None)               => Html("")
-      case (Some(date), None)         => Html(s"<span style=\"font-size:small\">(°$date)</span>")
-      case (None, Some(date))         => Html(s"<span style=\"font-size:small\">(†$date)</span>")
-      case (Some(date1), Some(date2)) => Html(s"<span style=\"font-size:small\">(°$date1 – †$date2)</span>")
+      case (Some(date), None)         => Html(s"(°$date)")
+      case (None, Some(date))         => Html(s"(†$date)")
+      case (Some(date1), Some(date2)) => Html(s"(°$date1 – †$date2)")
     }
   }
 }

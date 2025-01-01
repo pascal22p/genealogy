@@ -15,7 +15,7 @@
 
   @personDetails(person)
 
-  @individualEvents(person)
+  @individualEvents(person.events.eventsDetails)
 
   @for(family <- person.families) {
     @familyView(family, person.findPartner(family.id))

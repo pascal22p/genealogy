@@ -1,0 +1,114 @@
+@import models.forms.SourCitationForm
+@import views.html.helper
+@import views.html.components.Block
+@import helper._
+@import uk.gov.hmrc.govukfrontend.views.Implicits.*
+
+@this(
+        main: Main,
+        block: Block,
+        govukTextarea: GovukTextarea,
+        govukInput: GovukInput,
+        govukButton: GovukButton
+)
+
+@(sourCitationForm: Form[SourCitationForm], sourCitation: SourCitation)(implicit request: AuthenticatedRequest[?], messages: Messages)
+
+@main("Famille Parois", 1, None) {
+
+    @if(sourCitation.sourceType == SourCitationType.EventSourCitation) {
+        @for(id <- sourCitation.ownerId) {
+            <div style="padding-left:10em;"><a href="@controllers.routes.EventController.showEvent(id)">Return to Event</a></div>
+        }
+    }
+
+    @block("Edit source details") {
+
+    @if(sourCitationForm.hasGlobalErrors) {
+        @for(error <- sourCitationForm.globalErrors) {
+            <span class="error-message">@error.format(messages)</span>
+        }
+    }
+
+    @helper.form(action = controllers.edit.routes.EditSourCitationController.onSubmit(sourCitation.id)) {
+        @helper.CSRF.formField
+
+        @govukInput(
+            Input(
+                label = Label(content = Text("Date")),
+                hint = Some(Hint(
+                    content = HtmlContent("The date that this event data was entered into the original source document.")
+                )),
+                classes = "govuk-!-width-one-half"
+            ).withFormField(sourCitationForm("date"))
+        )
+
+        @govukInput(
+            Input(
+                label = Label(content = Text("Event")),
+                hint = Some(Hint(
+                    content = HtmlContent("A code that indicates the type of event which was responsible for the source entry being recorded.")
+                )),
+                classes = "govuk-!-width-one-half"
+            ).withFormField(sourCitationForm("even"))
+        )
+
+        @govukInput(
+            Input(
+                label = Label(content = Text("Role")),
+                hint = Some(Hint(
+                    content = HtmlContent("A value indicating what role this person played in an event or person's life.")
+                )),
+                classes = "govuk-!-width-one-half"
+            ).withFormField(sourCitationForm("role"))
+        )
+
+        @govukInput(
+            Input(
+                label = Label(content = Text("Submitter")),
+                hint = Some(Hint(
+                    content = HtmlContent("Not present in Gedcom specification.")
+                )),
+                classes = "govuk-!-width-one-half"
+            ).withFormField(sourCitationForm("submitter"))
+        )
+
+        @govukTextarea(
+            Textarea(
+                label = Label(content = Text("Text")),
+                hint = Some(Hint(
+                    content = HtmlContent("A verbatim copy of any description contained within the source.")
+                )),
+                classes = "govuk-!-width-one-half"
+            ).withFormField(sourCitationForm("text"))
+        )
+
+        @govukInput(
+            Input(
+                label = Label(content = Text("Page")),
+                hint = Some(Hint(
+                    content = HtmlContent("Specific location with in the information referenced.")
+                )),
+                classes = "govuk-!-width-one-half"
+            ).withFormField(sourCitationForm("page"))
+        )
+
+        @govukInput(
+            Input(
+                label = Label(content = Text("Quay")),
+                hint = Some(Hint(
+                    content = HtmlContent("an estimation of the reliability of the source in regard to these claims. 0 Unreliable evidence or estimated data 1 Questionable reliability 2 Secondary evidence 3 Direct and primary evidence.")
+                )),
+                classes = "govuk-!-width-one-half"
+            ).withFormField(sourCitationForm("quay"))
+        )
+
+        @govukButton(
+            Button(
+                element = Some("button"),
+                content = Text("Submit")
+            )
+        )
+    }
+    }
+}

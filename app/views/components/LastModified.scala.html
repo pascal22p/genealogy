@@ -6,4 +6,4 @@
 
 @(timeStamp: Instant)(implicit messages: Messages)
 
-<span class="petit">Dernière modification : @{DateTimeFormatter.RFC_1123_DATE_TIME.format(timeStamp.atZone(ZoneId.of("Europe/London")))}</span>
+<div class="govuk-!-static-padding-bottom-3">Dernière modification : @{DateTimeFormatter.RFC_1123_DATE_TIME.format(timeStamp.atZone(ZoneId.of("Europe/London")))}</div>

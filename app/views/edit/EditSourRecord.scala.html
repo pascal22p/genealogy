@@ -1,0 +1,121 @@
+@import models.forms.SourRecordForm
+@import models.SourRecord
+@import views.html.helper
+@import views.html.components.Block
+@import helper._
+@import uk.gov.hmrc.govukfrontend.views.Implicits.*
+
+@this(
+        main: Main,
+        govukButton: GovukButton,
+        govukInput: GovukInput,
+        block: Block
+)
+
+@(sourRecordForm: Form[SourRecordForm], sourRecord: SourRecord)(implicit request: AuthenticatedRequest[?], messages: Messages)
+
+@main("Famille Parois", 1, None) {
+
+    @block("Edit source record") {
+
+    @if(sourRecordForm.hasGlobalErrors) {
+        @for(error <- sourRecordForm.globalErrors) {
+            <span class="error-message">@error.format(messages)</span>
+        }
+    }
+
+    @helper.form(action = controllers.edit.routes.EditSourRecordController.onSubmit(sourRecord.id)) {
+        @helper.CSRF.formField
+
+        <input type="hidden" name="parentType" value="@sourRecordForm("parentType").value.getOrElse("Unknown")">
+        <input type="hidden" name="parentId" value="@sourRecordForm("parentId").value.getOrElse("Unknown")">
+        
+        @govukInput(
+            Input(
+                label = Label(content = Text("Author")),
+                hint = Some(Hint(
+                    content = HtmlContent("The person, agency, or entity who created the record.")
+                )),
+                classes = "govuk-!-width-one-half"
+            ).withFormField(sourRecordForm("auth"))
+        )
+
+        @govukInput(
+            Input(
+                label = Label(content = Text("Title")),
+                hint = Some(Hint(
+                    content = HtmlContent("The title of the work, record, or item.")
+                )),
+                classes = "govuk-!-width-one-half"
+            ).withFormField(sourRecordForm("title"))
+        )
+
+        @govukInput(
+            Input(
+                label = Label(content = Text("Abbreviation")),
+                hint = Some(Hint(
+                    content = HtmlContent("This entry is to provide a short title used for sorting, filing, and retrieving source records.")
+                )),
+                classes = "govuk-!-width-one-half"
+            ).withFormField(sourRecordForm("abbr"))
+        )
+
+        @govukInput(
+            Input(
+                label = Label(content = Text("Publication")),
+                hint = Some(Hint(
+                    content = HtmlContent("When and where the record was created.")
+                )),
+                classes = "govuk-!-width-one-half"
+            ).withFormField(sourRecordForm("publ"))
+        )
+
+        @govukInput(
+            Input(
+                label = Label(content = Text("Agency")),
+                hint = Some(Hint(
+                    content = HtmlContent("The organization, institution, corporation, person, or other entity that has responsibility for the associated context.")
+                )),
+                classes = "govuk-!-width-one-half"
+            ).withFormField(sourRecordForm("agnc"))
+        )
+
+        @govukInput(
+            Input(
+                label = Label(content = Text("Record id number")),
+                hint = Some(Hint(
+                    content = HtmlContent("A unique record identification number assigned to the record by the source system.")
+                )),
+                classes = "govuk-!-width-one-half"
+            ).withFormField(sourRecordForm("rin"))
+        )
+
+        @govukInput(
+            Input(
+                label = Label(content = Text("Call number")),
+                hint = Some(Hint(
+                    content = HtmlContent("An identification or reference description used to file and retrieve items from the holdings of a repository.")
+                )),
+                classes = "govuk-!-width-one-half"
+            ).withFormField(sourRecordForm("repoCaln"))
+        )
+
+        @govukInput(
+            Input(
+                label = Label(content = Text("Media type")),
+                hint = Some(Hint(
+                    content = HtmlContent("A description of the form or type of the media associated with the source.")
+                )),
+                classes = "govuk-!-width-one-half"
+            ).withFormField(sourRecordForm("repoMedi"))
+        )
+
+        @govukButton(
+            Button(
+                element = Some("button"),
+                content = Text("Submit")
+            )
+        )
+    }
+}
+}

@@ -43,7 +43,7 @@ final case class PersonDetailsForm(
       nameSuffix,
       nameGiven,
       nameNickname,
-      privacyRestriction
+      if (privacyRestriction.isEmpty) None else privacyRestriction
     )
   }
 

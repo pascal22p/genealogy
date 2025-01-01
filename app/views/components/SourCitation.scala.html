@@ -1,34 +1,88 @@
 @import models.{SourCitation => ModelSourCitation}
-@import views.html.components.{Media, LastModified, EditLink}
+@import views.html.components.{Media, LastModified, Block, SourRecord}
 
-@this(mediaComponent: Media, lastModified: LastModified, editLink: EditLink)
+@this(
+  mediaComponent: Media, 
+  lastModified: LastModified, 
+  block: Block, 
+  sourRecord: SourRecord,
+  govukSummaryList: GovukSummaryList)
 
 @(source: ModelSourCitation)(implicit request: AuthenticatedRequest[?], messages: Messages)
 
-<div class="box">
-  <div class="box_title">
-    <h3>@editLink(controllers.edit.routes.EditSourCitationController.showForm(source.id)) Source</h3>
-  </div>
-
+@block("Source", None) {
   @lastModified(source.timestamp)
 
-  <ul>
-    <li>id: @source.id</li>
-    <li>Date: @source.dates</li>
-    <li>Event: @source.even</li>
-    <li>Submitter: @source.subm</li>
-    <li>text: @source.text</li>
-    <li>Page: @source.page</li>
-    <li>==========</li>
-    @for(record <- source.record) {
-      <li>title: @record.title</li>
-      <li>Agency: @record.agnc</li>
-      <li>Author: @record.auth</li>
-      <li>Abbreviation: @record.abbr</li>
-    }
-  </ul>
+  @govukSummaryList(
+    SummaryList(
+        rows = Seq(
+          SummaryListRow(
+              key = Key(Text("Id")),
+              value = Value(Text(source.id.toString)),
+              classes = "govuk-summary-list__row--no-border",
+              actions = None
+          ),
+          SummaryListRow(
+              key = Key(Text("Date")),
+              value = Value(Text(source.dates)),
+              classes = "govuk-summary-list__row--no-border",
+              actions = None
+          ),
+          SummaryListRow(
+                key = Key(Text("Role")),
+                value = Value(Text(source.role)),
+                classes = "govuk-summary-list__row--no-border",
+                actions = None
+            ),
+            SummaryListRow(
+              key = Key(Text("Submitter")),
+              value = Value(Text(source.subm)),
+              classes = "govuk-summary-list__row--no-border",
+              actions = None
+            ),
+            SummaryListRow(
+              key = Key(Text("Text")),
+              value = Value(Text(source.text)),
+              classes = "govuk-summary-list__row--no-border",
+              actions = None
+            ),
+            SummaryListRow(
+              key = Key(Text("Page")),
+              value = Value(Text(source.page)),
+              classes = "govuk-summary-list__row--no-border",
+              actions = None
+            ), 
+            SummaryListRow(
+              key = Key(Text("Quay")),
+              value = Value(Text(source.quay.fold("Unknown")(_.toString))),
+              classes = "govuk-summary-list__row--no-border",
+              actions = None
+            )
+        ),
+        card = Some(Card(
+            title = Some(CardTitle(content = Text("Source citation"))),
+            actions = Some(Actions(
+              items = Seq(
+                  ActionItem(
+                      href = controllers.edit.routes.EditSourCitationController.showForm(source.id).url,
+                      content = Text("Edit")
+                  )
+              )
+          )),
+            classes = "govuk-!-margin-4",
+            attributes = Map.empty
+        )),
+        classes = "",
+        attributes = Map.empty
+    )
+  )
+
+  @for(record <- source.record) {
+    @sourRecord(record, source.sourceType, source.id) 
+  }
 
   @for(media <- source.medias) {
     @mediaComponent(media)
   }
-</div>
+
+}

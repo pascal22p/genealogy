@@ -4,20 +4,46 @@
 
 @this(
   main: Main,
-        nameLink: NameLink)
+  govukSummaryList: GovukSummaryList,
+  nameLink: NameLink
+)
 
 @(flatTree: List[(Int, List[Person])], dbId: Int)(implicit request: AuthenticatedRequest[?], messages: Messages)
+
+@header(depth: Int) = @{
+  s"""Generation $depth"""
+}
 
 
 @main("todo", dbId, flatTree.headOption.flatMap(_._2.headOption)) {
 
   @for(gen <- flatTree) {  
-    <h3>Generation @{gen._1}</h3>
-    <ul>
-    @for(person <- gen._2) {
-      <li>@nameLink(person)</li>
-    }
-    </ul>
+      @govukSummaryList(
+        SummaryList(
+          rows = gen._2.map { person =>
+              SummaryListRow(
+                  key = Key(Text(person.details.shortName)),
+                  value = Value(HtmlContent(person.events.birthAndDeathDate)),
+                  classes = "govuk-summary-list__row--no-border",
+                  actions = Some(Actions(
+                      items = Seq(
+                          ActionItem(
+                              href = controllers.routes.IndividualController.showPerson(person.details.id).url,
+                              content = Text("Details")
+                          )
+                      )
+                  ))
+              )
+          },
+          card = Some(Card(
+              title = Some(CardTitle(content = Text(header(gen._1)))),
+              actions = None,
+              classes = "govuk-!-margin-4",
+              attributes = Map.empty
+          )),
+          classes = "",
+          attributes = Map.empty
+      )
+      )
   }
-
 }

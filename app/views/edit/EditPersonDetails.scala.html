@@ -1,9 +1,17 @@
 @import models.forms.PersonDetailsForm
 @import views.html.helper
+@import views.html.components.Block
 @import helper._
+@import uk.gov.hmrc.govukfrontend.views.Implicits.*
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits.*
+
 
 @this(
-        main: Main
+        main: Main,
+        block: Block,
+        govukInput: GovukInput,
+        govukSelect: GovukSelect,
+        govukButton: GovukButton
 )
 
 @(personDetailsForm: Form[PersonDetailsForm])(implicit request: AuthenticatedRequest[?], messages: Messages)
@@ -11,10 +19,7 @@
 @main("Famille Parois", 1, None) {
 
 
-<div class="box">
-    <div class="box_title">
-        <h3>État civil</h3>
-    </div>
+  @block("Edit person details") {
 
     @if(personDetailsForm.hasGlobalErrors) {
         @for(error <- personDetailsForm.globalErrors) {
@@ -25,19 +30,85 @@
     @helper.form(action = controllers.edit.routes.EditPersonDetailsController.onSubmit ) {
         @helper.CSRF.formField
         <input type="hidden" value="@personDetailsForm("id").value" name="id" />
-        @helper.inputText(personDetailsForm("base"), Symbol("_label") -> "Database")
-        @helper.inputText(personDetailsForm("surname"), Symbol("_label") -> "Surname")
-        @helper.inputText(personDetailsForm("firstname"), Symbol("_label") -> "Firstname")
-        @helper.select(personDetailsForm("sex"), options = Seq("" -> "", "M" -> "Male", "F" -> "Female"), Symbol("_label") -> "Sex")
-        @helper.inputText(personDetailsForm("firstnamePrefix"), Symbol("_label") -> "Name Prefix")
-        @helper.inputText(personDetailsForm("nameGiven"), Symbol("_label") -> "Given name")
-        @helper.inputText(personDetailsForm("nameNickname"), Symbol("_label") -> "Nickname")
-        @helper.inputText(personDetailsForm("surnamePrefix"), Symbol("_label") -> "Surname Prefix")
-        @helper.inputText(personDetailsForm("nameSuffix"), Symbol("_label") -> "Name Suffix")
-        @helper.select(personDetailsForm("privacyRestriction"), options = Seq("" -> "", "locked" -> "locked", "privacy" -> "privacy", "confidential" -> "confidential"), Symbol("_label") -> "Privacy restriction")
-        <button type="submit">Submit</button>
+        @govukInput(
+            Input(
+                label = Label(content = Text("Database")),
+                hint = Some(Hint(
+                    content = HtmlContent("The database where the event is stored")
+                )),
+                classes = "govuk-!-width-one-half"
+            ).withFormField(personDetailsForm("base"))
+        )
+        @govukInput(
+            Input(
+                label = Label(content = Text("Surname")),
+                classes = "govuk-!-width-one-half"
+            ).withFormField(personDetailsForm("surname"))
+        )
+        @govukInput(
+            Input(
+                label = Label(content = Text("Firstname")),
+                classes = "govuk-!-width-one-half"
+            ).withFormField(personDetailsForm("firstname"))
+        )
+        @govukSelect(
+            Select(
+                items =
+                    Seq(SelectItem(value = None, text = "Unknown")) ++ Seq(SelectItem(value = Some("M"), text = "Male"), SelectItem(value = Some("F"), text = "Female")),
+                label = Label(
+                    content = Text("Sex")
+                ),
+                classes = "govuk-!-width-one-half"
+            ).withFormField(personDetailsForm("sex"))
+        )
+        @govukInput(
+            Input(
+                label = Label(content = Text("Name Prefix")),
+                classes = "govuk-!-width-one-half"
+            ).withFormField(personDetailsForm("firstnamePrefix"))
+        )
+        @govukInput(
+            Input(
+                label = Label(content = Text("Given name")),
+                classes = "govuk-!-width-one-half"
+            ).withFormField(personDetailsForm("nameGiven"))
+        )
+        @govukInput(
+            Input(
+                label = Label(content = Text("Nickname")),
+                classes = "govuk-!-width-one-half"
+            ).withFormField(personDetailsForm("nameNickname"))
+        )
+        @govukInput(
+            Input(
+                label = Label(content = Text("Surname Prefix")),
+                classes = "govuk-!-width-one-half"
+            ).withFormField(personDetailsForm("surnamePrefix"))
+        )
+        @govukInput(
+            Input(
+                label = Label(content = Text("Name Suffix")),
+                classes = "govuk-!-width-one-half"
+            ).withFormField(personDetailsForm("nameSuffix"))
+        )
+        @govukSelect(
+            Select(
+                items =
+                    Seq(SelectItem(value = Some(""), text = "None (Public)")) ++ Seq(SelectItem(value = Some("locked"), text = "locked"), SelectItem(value = Some("privacy"), text = "privacy"), SelectItem(value = Some("confidential"), text = "confidential")),
+                label = Label(
+                    content = Text("Privacy restriction")
+                ),
+                classes = "govuk-!-width-one-half"
+            ).withFormField(personDetailsForm("privacyRestriction"))
+        )
+        @govukButton(
+            Button(
+                element = Some("button"),
+                content = Text("Submit")
+            )
+        )
     }
 
-</div>
+  }
 
 }

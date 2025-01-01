@@ -1,0 +1,24 @@
+
+@this(editLink: EditLink)
+
+@(title: String, actions: Option[Actions] = None)(contentBlock: Html)(implicit authenticatedRequest: AuthenticatedRequest[?], messages: Messages)
+
+  <div class="govuk-summary-card">
+    <div class="govuk-summary-card__title-wrapper"> 
+      <h2 class="govuk-summary-card__title">
+        @title
+      </h2>
+      @for(someActions <- actions) {
+        <ul class="govuk-summary-card__actions">
+          @for(action <- someActions.items) {
+            <li class="govuk-summary-card__action">
+              <a class="govuk-link" href="@action.href">Add<span class="govuk-visually-hidden"> (@action.content)</span></a>
+            </li>
+          }
+        </ul>
+      }
+    </div>
+    <div class="govuk-!-padding-4 box">
+      @contentBlock
+    </div>
+  </div>

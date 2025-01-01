@@ -34,27 +34,6 @@ final case class EventDetailForm(
 
 object EventDetailForm {
 
-  def apply(
-      base: Int,
-      place: Option[Int],
-      addr_id: Option[Int],
-      events_tag: String,
-      events_details_descriptor: String,
-      events_details_gedcom_date: String,
-      events_details_age: String,
-      events_details_cause: String
-  ): EventDetailForm =
-    new EventDetailForm(
-      base,
-      place,
-      addr_id,
-      events_tag,
-      events_details_descriptor,
-      events_details_gedcom_date,
-      events_details_age,
-      events_details_cause
-    )
-
   def unapply(
       u: EventDetailForm
   ): Some[(Int, Option[Int], Option[Int], String, String, String, String, String)] = Some(
@@ -72,7 +51,7 @@ object EventDetailForm {
 
   val eventDetailForm: Form[EventDetailForm] = Form(
     mapping(
-      "base"                       -> number,
+      "base"                       -> number(min = 1),
       "place"                      -> optional(number),
       "addr_id"                    -> optional(number),
       "events_tag"                 -> text,

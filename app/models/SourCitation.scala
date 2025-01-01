@@ -24,10 +24,27 @@ final case class SourCitation(
     SourCitationForm(
       dates,
       even,
+      role,
       subm,
       text,
-      page
+      page,
+      quay
     )
+
+  def fromForm(sourCitationForm: SourCitationForm): SourCitation = SourCitation(
+    id,
+    record,
+    sourCitationForm.page,
+    sourCitationForm.even,
+    sourCitationForm.role,
+    sourCitationForm.date,
+    sourCitationForm.text,
+    sourCitationForm.quay,
+    sourCitationForm.submitter,
+    timestamp,
+    ownerId,
+    sourceType
+  )
 }
 
 object SourCitation {
