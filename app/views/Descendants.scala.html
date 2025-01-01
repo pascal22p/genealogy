@@ -13,7 +13,7 @@
     val children = if(person.families.isEmpty) {
         ""
     } else {
-        "<ul>" +
+        """<ul class="govuk-list govuk-!-margin-top-0 govuk-!-margin-bottom-0" style="padding-left:40px">""" +
                 person.families.map { family =>
                     val first = person.findPartner(family.id).fold(""){ partner =>
                         "<li style=\"margin:0;padding:0\">x " + nameLink(partner) + "</li>"
@@ -28,12 +28,12 @@
                 }.mkString("\n") + "</ul>"
     }
 
-    Html(s"<span style=\"font-size:x-small\">[$depth]</span>" + nameLink(person) + children)
+    Html(s"<span class=\"govuk-!-font-size-16\">[$depth]</span>" + nameLink(person) + children)
 }
 
 @main(person.name, dbId, Some(person)) {
 
-  <ul><li style="margin:0;padding:0">
+  <ul class="govuk-list"><li style="margin:0;padding:0">
       @aDescendant(person)
   </li></ul>
 }

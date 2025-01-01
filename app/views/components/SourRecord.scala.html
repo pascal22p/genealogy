@@ -1,0 +1,88 @@
+@import models.{SourRecord => SourRecordModel}
+@import models.SourCitationType.SourCitationType
+@import views.html.components.{Media, LastModified, Block}
+
+@this(
+  mediaComponent: Media, 
+  lastModified: LastModified, 
+  block: Block,
+  govukSummaryList: GovukSummaryList)
+
+@(record: SourRecordModel, sourceType: SourCitationType, sourceId: Int)(implicit request: AuthenticatedRequest[?], messages: Messages)
+
+
+@govukSummaryList(
+  SummaryList(
+      rows = Seq(
+        SummaryListRow(
+            key = Key(Text("Author")),
+            value = Value(Text(record.auth)),
+            classes = "govuk-summary-list__row--no-border",
+            actions = None
+        ),
+        SummaryListRow(
+            key = Key(Text("Title")),
+            value = Value(Text(record.title)),
+            classes = "govuk-summary-list__row--no-border",
+            actions = None
+        ),
+        SummaryListRow(
+              key = Key(Text("Short title")),
+              value = Value(Text(record.abbr)),
+              classes = "govuk-summary-list__row--no-border",
+              actions = None
+          ),
+          SummaryListRow(
+            key = Key(Text("Publication")),
+            value = Value(Text(record.publ)),
+            classes = "govuk-summary-list__row--no-border",
+            actions = None
+          ),
+          SummaryListRow(
+            key = Key(Text("Agency")),
+            value = Value(Text(record.agnc)),
+            classes = "govuk-summary-list__row--no-border",
+            actions = None
+          ),
+          SummaryListRow(
+            key = Key(Text("Rin")),
+            value = Value(Text(record.rin)),
+            classes = "govuk-summary-list__row--no-border",
+            actions = None
+          ), 
+          SummaryListRow(
+            key = Key(Text("Repo id")),
+            value = Value(Text(record.repoId.fold("N/A")(_.toString))),
+            classes = "govuk-summary-list__row--no-border",
+            actions = None
+          ),
+          SummaryListRow(
+            key = Key(Text("Repo caln")),
+            value = Value(Text(record.repoCaln)),
+            classes = "govuk-summary-list__row--no-border",
+            actions = None
+          ),
+          SummaryListRow(
+            key = Key(Text("Repo medi")),
+            value = Value(Text(record.repoMedi)),
+            classes = "govuk-summary-list__row--no-border",
+            actions = None
+          )
+      ),
+      card = Some(Card(
+          title = Some(CardTitle(content = Text("Source record"))),
+          actions = Some(Actions(
+            items = Seq(
+                ActionItem(
+                    href = controllers.edit.routes.EditSourRecordController.showForm(record.id, sourceType, sourceId).url,
+                    content = Text("Edit")
+                )
+            )
+        )),
+          classes = "govuk-!-margin-4",
+          attributes = Map.empty
+      )),
+      classes = "",
+      attributes = Map.empty
+  )
+)

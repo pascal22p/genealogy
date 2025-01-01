@@ -1,8 +1,10 @@
 @import models.AuthenticatedRequest
+@import views.html.components.{Block}
+@import uk.gov.hmrc.hmrcfrontend.config.AssetsConfig
 
-@this()
+@this(block: Block, assetConfig: AssetsConfig)
 
-@(title: String, dbId: Int, personOption: Option[Person])(contentBlock: Html)(implicit request: AuthenticatedRequest[?])
+@(title: String, dbId: Int, personOption: Option[Person])(contentBlock: Html)(implicit request: AuthenticatedRequest[?], messages: Messages)
 
 <html lang="fr" >
 <head>
@@ -11,66 +13,77 @@
     <meta name="Keywords" content="genealogie, genealogy" />
     <meta name="Author" content="Pascal Parois" />
     <meta http-equiv="Content-language" content="fr" />
-    <meta charset=UTF-8" />
+    <meta charset="UTF-8" />
 
     <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/main.css")">
+    <link rel="stylesheet" media="screen" href="@assetConfig.hmrcFrontendCssUrl">
+    <script src="@assetConfig.hmrcFrontendJsUrl" type="text/javascript"></script>
 
 </head>
 <body>
 
-<div id="header">
-    <h1>Famille Parois</h1>
-</div>
-
-<div id="content">
-    <div class="box_title">
-        <h2>@title</h2>
+<div class="govuk-grid-row box_title govuk-!-margin-2">
+    <div class="govuk-grid-column-full">
+        <div class="govuk-header__logo">&nbsp;</div>
+        <div class="govuk-header__content">
+            <h1 class="govuk-heading-xl govuk-!-margin-4">Famille Parois</h1>
+        </div>
     </div>
+  </div>
 
-    @contentBlock
-</div>
-
-<ul class="menu" id="menu">
-    <li class="menu">Sommaire
-        <ul class="ssmenu">
-            <li class="ssmenu"><a href="@controllers.routes.HomeController.onload()">Liste des bases</a></li>
-            <li class="ssmenu"><a href="@controllers.routes.HomeController.showSurnames(dbId)">Patronymes</a></li>
-            @if(request.localSession.sessionData.userData.isEmpty) {
-                <li class="ssmenu"><a href="@controllers.routes.LoginController.onLoad()">Login</a></li>
-            } else {
-                <li class="ssmenu"><a href="@controllers.routes.LogoutController.onLoad()">Logout</a></li>
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-one-quarter govuk-!-padding-0 govuk-!-padding-left-3">
+        <ul class="govuk-!-padding-0 govuk-!-margin-0" style="width:15em;">
+            <li class="menu">Sommaire
+                <ul class="ssmenu">
+                    <li class="ssmenu"><a href="@controllers.routes.HomeController.onload()">Liste des bases</a></li>
+                    <li class="ssmenu"><a href="@controllers.routes.HomeController.showSurnames(dbId)">Patronymes</a></li>
+                    @if(request.localSession.sessionData.userData.isEmpty) {
+                        <li class="ssmenu"><a href="@controllers.routes.LoginController.onLoad()?returnUrl=@request.request.uri">Login</a></li>
+                    } else {
+                        <li class="ssmenu"><a href="@controllers.routes.LogoutController.onLoad()">Logout</a></li>
+                    }
+                </ul>
+            </li>
+            @for(person <- personOption) {
+            <li class="menu">Détails
+                <ul class="ssmenu">
+                    <li class="ssmenu"><a href="@controllers.routes.IndividualController.showPerson(person.details.id)">Personal details</a></li>
+                    <li class="ssmenu"><a href="@controllers.routes.DescendanceController.showDescendant(person.details.id)">Descendants</a></li>
+                    <li class="ssmenu"><a href="@controllers.routes.AscendanceController.showAscendant(person.details.id)">Ascendants</a></li>
+                </ul>
+            </li>
             }
-        </ul>
-    </li>
-    @for(person <- personOption) {
-    <li class="menu">Détails
-        <ul class="ssmenu">
-            <li class="ssmenu"><a href="@controllers.routes.IndividualController.showPerson(person.details.id)">Personal details</a></li>
-            <li class="ssmenu"><a href="@controllers.routes.DescendanceController.showDescendant(person.details.id)">Descendants</a></li>
-            <li class="ssmenu"><a href="@controllers.routes.AscendanceController.showAscendant(person.details.id)">Ascendants</a></li>
-        </ul>
-    </li>
-    }
-    @if(request.localSession.sessionData.history.nonEmpty) {
-    <li class="menu">History
-        <ul class="ssmenu">
-            @for(el <- request.localSession.sessionData.history) {
-                <li class="ssmenu"><a href="@controllers.routes.IndividualController.showPerson(el.personId)">@el.name</a></li>
+            @if(request.localSession.sessionData.history.nonEmpty) {
+            <li class="menu">History
+                <ul class="ssmenu">
+                    @for(el <- request.localSession.sessionData.history) {
+                        <li class="ssmenu"><a href="@controllers.routes.IndividualController.showPerson(el.personId)">@el.name</a></li>
+                    }
+                </ul>
+            </li>
             }
+            <li class="menu" style="text-align:center">Languages
+                <ul class="ssmenu">
+                    <li class="ssmenu"><a href="@routes.IndividualController.languageSwitch("fr")">Français</a></li>
+                    <li class="ssmenu"><a href="@routes.IndividualController.languageSwitch("en")">English</a></li>
+                </ul>
+            </li>
         </ul>
-    </li>
-    }
-    <li class="menu" style="text-align:center">Languages
-        <ul class="ssmenu">
-            <li class="ssmenu"><a href="@routes.IndividualController.languageSwitch("fr")">Français</a></li>
-            <li class="ssmenu"><a href="@routes.IndividualController.languageSwitch("en")">English</a></li>
-        </ul>
-    </li>
-</ul>
+    </div>
+    <div class="govuk-grid-column-three-quarters govuk-!-padding-left-0 govuk-!-margin-left-0">
+        @block(title, None) {
+            @contentBlock
+        }
+    </div>
+  </div>
 
-<div id="footer">
-    <a href="mailto:genealogie@("@")parois.net">genealogie.parois.net </a>
-</div>
+
+  <div class="govuk-grid-row box_title govuk-!-margin-2">
+    <div class="govuk-grid-column-full">
+        <a href="mailto:genealogie@("@")parois.net">genealogie.parois.net </a>
+    </div>
+  </div>
 
 
 </body></html>

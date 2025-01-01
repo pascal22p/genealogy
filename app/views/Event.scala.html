@@ -1,12 +1,15 @@
 @import models.Person
-@import views.html.components.{FamilyView, PersonDetails, IndividualEvents, Parents, LastModified, SourCitation}
+@import play.twirl.api.HtmlFormat
+@import views.html.components.{Block, FamilyView, PersonDetails, IndividualEvents, Parents, LastModified, SourCitation}
 @import models.EventType.{IndividualEvent, FamilyEvent, UnknownEvent}
 @import controllers.routes.Assets
 
 @this(
   main: Main,
+  block: Block,
   sourCitation: SourCitation,
-  lastModified: LastModified)
+  lastModified: LastModified,
+  govukSummaryList: GovukSummaryList)
 
 @(event: EventDetail, dbId: Int, person: Option[Person])(implicit request: AuthenticatedRequest[?], messages: Messages)
 
@@ -26,28 +29,73 @@
   @if(event.eventType == UnknownEvent) {
     <div style="padding-left:10em;">Orphan event</div>
   }
-  <div class="box">
-    <div class="box_title">
-      <h3>Event details</h3>
-    </div>
 
-    @lastModified(event.events_details_timestamp)
+  @lastModified(event.events_details_timestamp)
 
-    <ul>
-      @for(tag <- event.tag) {
-        <li>Type: @messages(tag)</li>
-      }
-      @for(place <- event.place) {
-        <li>Place: @place.oneLiner</li>
-      }
-      <li>events_details_descriptor: @event.events_details_descriptor</li>
-      <li>Date: @event.formatDate</li>
-      <li>Age: @event.events_details_age</li>
-      <li>Cause: @event.events_details_cause</li>
-    </ul>
+  @govukSummaryList(
+    SummaryList(
+        rows = Seq(
+          event.tag.map { tag =>
+            SummaryListRow(
+                key = Key(Text("Type")),
+                value = Value(Text(messages(tag))),
+                classes = "govuk-summary-list__row--no-border",
+                actions = None
+            )
+          },
+          event.place.map { place =>
+            SummaryListRow(
+                key = Key(Text("Place")),
+                value = Value(Text(place.oneLiner(false))),
+                classes = "govuk-summary-list__row--no-border",
+                actions = None
+            )
+          },
+          Some(SummaryListRow(
+                key = Key(Text("Description")),
+                value = Value(Text(event.events_details_descriptor)),
+                classes = "govuk-summary-list__row--no-border",
+                actions = None
+            )),
+            Some(SummaryListRow(
+              key = Key(Text("Date")),
+              value = Value(Text(event.formatDate)),
+              classes = "govuk-summary-list__row--no-border",
+              actions = None
+            )),
+            Some(SummaryListRow(
+              key = Key(Text("Age")),
+              value = Value(Text(event.events_details_age)),
+              classes = "govuk-summary-list__row--no-border",
+              actions = None
+            )),
+            Some(SummaryListRow(
+              key = Key(Text("Cause")),
+              value = Value(Text(event.events_details_cause)),
+              classes = "govuk-summary-list__row--no-border",
+              actions = None
+            )) 
+        ).flatten,
+        card = Some(Card(
+            title = Some(CardTitle(content = Text("Event details"))),
+            actions = Some(Actions(
+              items = Seq(
+                  ActionItem(
+                      href = controllers.edit.routes.EditEventDetailController.showForm(event.events_details_id).url,
+                      content = Text("Edit")
+                  )
+              )
+          )),
+            classes = "govuk-!-margin-4",
+            attributes = Map.empty
+        )),
+        classes = "",
+        attributes = Map.empty
+    )
+  )
 
-    @for(source <- event.sourCitations) {
-      @sourCitation(source)
-    }
-  </div>
+  @for(source <- event.sourCitations) {
+    @sourCitation(source)
+  }
+
 }

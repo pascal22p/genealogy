@@ -61,14 +61,24 @@ class DescendanceControllerSpec extends BaseSpec {
 
       val expected =
         """
-          |       <ul><li style="margin:0;padding:0">
-          |          <span style="font-size:x-small">[1]</span>
-          |          <a style="padding:0;margin:0" href="/individual/1">Firstname1 Surname</a> <ul><li style="margin:0;padding:0">└<span style="font-size:x-small">[2]</span>
-          |          <a style="padding:0;margin:0" href="/individual/2">Firstname2 Surname</a> <ul><li style="margin:0;padding:0">├<span style="font-size:x-small">[3]</span>
-          |          <a style="padding:0;margin:0" href="/individual/3">Firstname3 Surname</a> <ul><li style="margin:0;padding:0">└<span style="font-size:x-small">[4]</span>
-          |          <a style="padding:0;margin:0" href="/individual/5">Firstname5 Surname</a> </li></ul></li><li style="margin:0;padding:0">└<span style="font-size:x-small">[3]</span>
-          |          <a style="padding:0;margin:0" href="/individual/4">Firstname4 Surname</a> </li></ul></li></ul>
-          |       </li></ul>
+          |<divclass="govuk-!-padding-4box">
+          |<ulclass="govuk-list">
+          |  <listyle="margin:0;padding:0"><spanclass="govuk-!-font-size-16">[1]</span><astyle="padding:0;margin:0"href="/individual/1">Firstname1Surname</a>
+          |    <ulclass="govuk-listgovuk-!-margin-top-0govuk-!-margin-bottom-0"style="padding-left:40px">
+          |      <listyle="margin:0;padding:0">└<spanclass="govuk-!-font-size-16">[2]</span><astyle="padding:0;margin:0"href="/individual/2">Firstname2Surname</a>
+          |        <ulclass="govuk-listgovuk-!-margin-top-0govuk-!-margin-bottom-0"style="padding-left:40px">
+          |          <listyle="margin:0;padding:0">├<spanclass="govuk-!-font-size-16">[3]</span><astyle="padding:0;margin:0"href="/individual/3">Firstname3Surname</a>
+          |            <ulclass="govuk-listgovuk-!-margin-top-0govuk-!-margin-bottom-0"style="padding-left:40px">
+          |              <listyle="margin:0;padding:0">└<spanclass="govuk-!-font-size-16">[4]</span><astyle="padding:0;margin:0"href="/individual/5">Firstname5Surname</a></li>
+          |            </ul>
+          |          </li>
+          |          <listyle="margin:0;padding:0">└<spanclass="govuk-!-font-size-16">[3]</span><astyle="padding:0;margin:0"href="/individual/4">Firstname4Surname</a></li>
+          |        </ul>
+          |      </li>
+          |    </ul>
+          |  </li>
+          |</ul>
+          |</div>
           |""".stripMargin.filterNot(_.isWhitespace)
 
       val result = sut.showDescendant(1).apply(FakeRequest())

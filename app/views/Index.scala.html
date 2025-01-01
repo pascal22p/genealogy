@@ -1,7 +1,8 @@
 @import models.SessionData
 
 @this(
-        main: Main
+        main: Main,
+        govukSummaryList: GovukSummaryList
 )
 
 @(dbs: List[GenealogyDatabase], localSession: SessionData)(implicit request: AuthenticatedRequest[?], messages: Messages)
@@ -13,14 +14,32 @@
       <h1>@userData.username</h1>
   }
 
-    <div class="box">
-    <div class="box_title"><h2>Liste des bases de données</h2></div>
+    @govukSummaryList(
+        SummaryList(
+            rows = dbs.map { db =>
+                SummaryListRow(
+                    key = Key(Text(db.name)),
+                    value = Value(Text(db.description)),
+                    classes = "govuk-summary-list__row--no-border",
+                    actions = Some(Actions(
+                        items = Seq(
+                            ActionItem(
+                                href = controllers.routes.HomeController.showSurnames(db.id).url,
+                                content = Text("View")
+                            )
+                        )
+                    ))
+                )
+            },
+            card = Some(Card(
+                title = Some(CardTitle(content = Text("Events"))),
+                actions = None,
+                classes = "govuk-!-margin-4",
+                attributes = Map.empty
+            )),
+            classes = "",
+            attributes = Map.empty
+        )
+    )
 
-    @for(db <- dbs) {
-        <dl>
-            <dt><a href="@controllers.routes.HomeController.showSurnames(db.id)">@db.name</a></dt>
-            <dd>@db.description</dd>
-        </dl>
-    }
-    </div>
 }

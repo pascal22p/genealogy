@@ -1,0 +1,34 @@
+@import models.forms.SourRecordForm
+@import models.SourRecord
+@import views.html.helper
+@import views.html.components.Block
+@import helper._
+
+@this(
+        main: Main,
+        block: Block,
+        govukButton: GovukButton,
+        govukFileUpload: GovukFileUpload
+)
+
+@()(implicit request: AuthenticatedRequest[?], messages: Messages)
+
+@main("Famille Parois", 1, None) {
+
+    @block("Add new media file") {
+        @helper.form(action = controllers.edit.routes.EditMediaController.upload(), Symbol("enctype") -> "multipart/form-data") {
+            @helper.CSRF.formField
+
+            @govukFileUpload(FileUpload(
+                name="picture",
+                id="picture"
+            ))
+
+            @govukButton(Button(
+                content = Text("Submit"),
+                name = Some("submit"),
+                href = None,
+                inputType = Some("submit")))
+        }
+    }
+}

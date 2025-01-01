@@ -1,21 +1,28 @@
 @import models.{Media => ModelMedia}
 @import views.html.components.LastModified
 
-@this(lastModified: LastModified)
+@this(
+  lastModified: LastModified, 
+  block: Block,
+  govukSummaryList: GovukSummaryList)
 
-@(media: ModelMedia)(implicit messages: Messages)
+@(media: ModelMedia)(implicit authenticatedRequest: AuthenticatedRequest[?], messages: Messages)
 
-<div class="box">
-  <div class="box_title">
-    <h3>Media</h3>
-  </div>
+@displayMedia(filename: String) = @{
+  s"""<div style="width:90%;margin-left:auto;margin-right:auto;padding:1em;"><img src="${routes.Assets.versioned(s"Medias/Parois/$filename")}" /></div>"""
+}
 
-  @lastModified(media.timestamp)
-
-  <ul>
-    <li>@media.title</li>
-    <li>@media.filename</li>
-  </ul>
-  <div style="width:90%;margin-left:auto;margin-right:auto;padding:1em;"><img src="@routes.Assets.versioned(s"Medias/Parois/${media.filename}")" /></div>
-
- </div>
+@block(
+  title = "Medias", 
+  actions = Some(Actions(
+    items = Seq(
+        ActionItem(
+            href = "#",
+            content = Text("Add")
+        )
+    )
+  ))
+) {
+  <h3 class="govuk-!-padding-2">@media.title</h3>
+  <div style="width:90%;margin-left:auto;margin-right:auto;padding:1em;"><img style="width:100% " src="@routes.Assets.versioned(s"Medias/Parois/${media.filename}")" /></div>
+}

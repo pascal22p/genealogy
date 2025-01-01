@@ -1,5 +1,7 @@
 package utils
 
+import java.time.LocalDate
+
 import scala.util.matching.Regex
 
 object CalendarConstants {
@@ -43,7 +45,8 @@ object CalendarConstants {
     "\\bFROM\\b".r -> "date.period.from",
     "\\bTO\\b".r   -> "date.period.to",
     "\\bABT\\b".r  -> "date.period.abt",
-    "\\bCAL\\b".r  -> "date.period.cal"
+    "\\bCAL\\b".r  -> "date.period.cal",
+    "\\bEST\\b".r  -> "date.period.est"
   )
 
   val calendarTypes: Map[Regex, String] = Map(
@@ -52,4 +55,20 @@ object CalendarConstants {
 
   val allKeywords: Map[Regex, String] = gregorianMonths ++ frenchMonths ++ keywordsPeriod ++ calendarTypes
 
+  val gregorianMonthsToInt = Map(
+    "JAN" -> 1,
+    "FEB" -> 2,
+    "MAR" -> 3,
+    "APR" -> 4,
+    "MAY" -> 5,
+    "JUN" -> 6,
+    "JUL" -> 7,
+    "AUG" -> 8,
+    "SEP" -> 9,
+    "OCT" -> 10,
+    "NOV" -> 11,
+    "DEC" -> 12
+  )
+
+  val startOfAllTime = LocalDate.of(0, 1, 1)
 }

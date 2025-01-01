@@ -43,16 +43,38 @@ final case class EventDetail(
   def toForm =
     EventDetailForm(
       base,
-      events_details_id,
       place.map(_.id),
       addr_id,
       tag.getOrElse(""),
       events_details_descriptor,
       events_details_gedcom_date,
       events_details_age,
-      events_details_cause,
-      eventType
+      events_details_cause
     )
+
+  def fromForm(form: EventDetailForm, allPlaces: List[Place]): EventDetail = EventDetail(
+    base,
+    events_details_id,
+    form.place.map(formId => allPlaces.find(_.id == formId)).flatten,
+    form.addr_id,
+    form.events_details_descriptor,
+    form.events_details_gedcom_date,
+    form.events_details_age,
+    form.events_details_cause,
+    jd_count,
+    jd_precision,
+    jd_calendar,
+    events_details_famc,
+    events_details_adop,
+    Instant.now,
+    Some(form.events_tag),
+    description,
+    eventType,
+    sourCount,
+    ownerId,
+    privacyRestriction,
+    sourCitations
+  )
 }
 
 object EventDetail {

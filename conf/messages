@@ -1,10 +1,10 @@
 # https://www.playframework.com/documentation/latest/ScalaI18N
 
-surname = Surname:
-firstname = Firstname:
-sex = Sex:
-id = Id:
-resn = Resn:
+surname = Surname
+firstname = Firstname
+sex = Sex
+id = Id
+resn = Privacy restriction
 
 ABBR = Titre, description...
 ADDR = Adresse
@@ -41,7 +41,7 @@ MARB = Publication des bans de mariage
 MARC = Contrat de mariage
 MARL = Autorisation de mariage
 MARS = Contrat avant mariage
-PROB = Validation d\un testament
+PROB = Validation d’un testament
 WILL = Testament
 BLES = Bénédiction
 BARM = BAR MITZVAH (garçon)
@@ -93,6 +93,7 @@ date.period.from = From
 date.period.to = to
 date.period.abt = About
 date.period.cal = Calculated
+date.period.est = Estimated
 
 sex.unknown = Unknown
 sex.male = Male

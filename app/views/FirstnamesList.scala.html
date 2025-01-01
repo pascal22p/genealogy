@@ -2,21 +2,45 @@
 
 @this(
         main: Main,
-        nameLink: NameLink
+        govukSummaryList: GovukSummaryList
 )
 
 @(names: List[Person], dbId: Int)(implicit request: AuthenticatedRequest[?], messages: Messages)
 
+@boxTitle(names: List[Person]) = @{
+    names.headOption.fold("Individuals") { name =>
+        s"People with lastname ${name.details.surname}"
+    }
+}
 
 @main("Famille Parois", dbId, None) {
 
-    <div class="box">
-    <div class="box_title"><h2>Liste des Noms</h2></div>
+    @govukSummaryList(
+        SummaryList(
+            rows = names.map { name =>
+                SummaryListRow(
+                    key = Key(Text(name.details.firstname.toString)),
+                    value = Value(Text(name.events.birthAndDeathDate.toString)),
+                    classes = "govuk-summary-list__row--no-border",
+                    actions = Some(Actions(
+                        items = Seq(
+                            ActionItem(
+                                href = controllers.routes.IndividualController.showPerson(name.details.id).url,
+                                content = Text("View")
+                            )
+                        )
+                    ))
+                )
+            },
+            card = Some(Card(
+                title = Some(CardTitle(content = Text(boxTitle(names)))),
+                actions = None,
+                classes = "govuk-!-margin-4",
+                attributes = Map.empty
+            )),
+            classes = "",
+            attributes = Map.empty
+        )
+    )
 
-        <ul>
-    @for(name <- names) {
-        <li>@nameLink(name)</li>
-    }
-        </ul>
-    </div>
 }

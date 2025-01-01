@@ -1,18 +1,57 @@
-@this(lastModified: LastModified, editLink: EditLink)
+@this(lastModified: LastModified, block: Block, govukSummaryList: GovukSummaryList)
 
 @(person: Person)(implicit authenticatedRequest: AuthenticatedRequest[?], messages: Messages)
 
-<div class="box">
-    <div class="box_title">
-        <h3>@editLink(controllers.edit.routes.EditPersonDetailsController.showForm(person.details.id)) État civil</h3>
-    </div>
-
     @lastModified(person.details.timestamp)
-    <dl class="etat_civil">
-        <dt>@messages("id")</dt><dd>@person.details.id</dd>
-        <dt>@messages("surname")</dt><dd>@person.details.surname</dd>
-        <dt>@messages("firstname")</dt><dd>@person.details.firstname</dd>
-        <dt>@messages("sex") </dt><dd>@messages(person.details.sex.toString)</dd>
-        <dt>@messages("resn")</dt><dd>@person.details.privacyRestriction.getOrElse("Unknown") </dd>
-    </dl>
-</div>
+
+    @govukSummaryList(
+        SummaryList(
+            rows = Seq(
+                SummaryListRow(
+                    key = Key(Text(messages("id"))),
+                    value = Value(Text(person.details.id.toString)),
+                    classes = "govuk-summary-list__row--no-border govuk-summary-list__row--no-actions",
+                    actions = None
+                ),
+                SummaryListRow(
+                    key = Key(Text(messages("surname"))),
+                    value = Value(Text(person.details.surname)),
+                    classes = "govuk-summary-list__row--no-border govuk-summary-list__row--no-actions",
+                    actions = None
+                ),
+                SummaryListRow(
+                    key = Key(Text(messages("firstname"))),
+                    value = Value(Text(person.details.firstname)),
+                    classes = "govuk-summary-list__row--no-border govuk-summary-list__row--no-actions",
+                    actions = None
+                ),
+                SummaryListRow(
+                    key = Key(Text(messages("sex"))),
+                    value = Value(Text(messages(person.details.sex.toString))),
+                    classes = "govuk-summary-list__row--no-border govuk-summary-list__row--no-actions",
+                    actions = None
+                ),
+                SummaryListRow(
+                    key = Key(Text(messages("resn"))),
+                    value = Value(Text(person.details.privacyRestriction.getOrElse("Unknown"))),
+                    classes = "govuk-summary-list__row--no-border govuk-summary-list__row--no-actions",
+                    actions = None
+                ),
+            ),
+            card = Some(Card(
+                title = Some(CardTitle(content = Text("Person details"))),
+                actions = Some(Actions(
+                    items = Seq(
+                        ActionItem(
+                            href = controllers.edit.routes.EditPersonDetailsController.showForm(person.details.id).url,
+                            content = Text("Edit")
+                        )
+                    )
+                )),
+                classes = "govuk-!-margin-4",
+                attributes = Map.empty
+              )),
+            classes = "",
+            attributes = Map.empty
+        )
+    )

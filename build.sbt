@@ -72,5 +72,14 @@ lazy val genealogy = (project in file("."))
     resolvers ++= Seq(
       Resolver.jcenterRepo
     ),
+    routesImport ++= Seq("models.SourCitationType.SourCitationType", "models.SourCitationType"),
+    resolvers ++=Seq(
+      MavenRepository("HMRC-open-artefacts-maven2", "https://open.artefacts.tax.service.gov.uk/maven2"), 
+      Resolver.url("HMRC-open-artefacts-ivy2", url("https://open.artefacts.tax.service.gov.uk/ivy2"))(Resolver.ivyStylePatterns),
+    ),
+    TwirlKeys.templateImports ++= Seq(
+      "uk.gov.hmrc.govukfrontend.views.html.components._"
+      )
   )
 
+  

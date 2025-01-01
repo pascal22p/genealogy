@@ -36,9 +36,8 @@ class LoginController @Inject() (
     with I18nSupport {
 
   def onLoad: Action[AnyContent] = authAction.async { implicit authenticatedRequest =>
-    val returnUrl = authenticatedRequest.request.headers
-      .get(HeaderNames.REFERER)
-      .getOrElse(controllers.routes.HomeController.onload().url)
+    val returnUrl =
+      authenticatedRequest.request.getQueryString("returnUrl").getOrElse(controllers.routes.HomeController.onload().url)
     Future.successful(Ok(loginView(UserDataForm.userForm.fill(UserDataForm("", "", returnUrl)))))
   }
 
@@ -55,8 +54,9 @@ class LoginController @Inject() (
         resultOption.fold(Future.successful(Redirect(routes.LoginController.onLoad()))) { result =>
           val newLocalSession = authenticatedRequest.localSession
             .copy(sessionData = authenticatedRequest.localSession.sessionData.copy(userData = Some(result)))
-          sqlQueries.updateSessionData(newLocalSession).map { _ =>
-            Redirect(returnUrl)
+          sqlQueries.updateSessionData(newLocalSession).map {
+            case 1 => Redirect(returnUrl)
+            case _ => InternalServerError("Could not update session data")
           }
         }
       }
