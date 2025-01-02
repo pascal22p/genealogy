@@ -15,6 +15,7 @@ import scala.util.Try
 class GedcomDateLibrary @Inject() (
     republicanDate: RepublicanDate
 ) {
+
   def extractDate(gedcomDate: String): Option[LocalDate] = {
     val dateFormatter: DateTimeFormatter = new DateTimeFormatterBuilder()
       .parseCaseInsensitive()

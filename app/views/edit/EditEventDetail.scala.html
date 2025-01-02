@@ -19,7 +19,7 @@
 
 @main("Famille Parois", 1, None) {
 
-<div style="padding-left:10em;"><a href="@controllers.routes.EventController.showEvent(event.events_details_id)">Return to Event</a></div>
+<div style="padding-left:10em;"><a class="govuk-link" href="@controllers.routes.EventController.showEvent(event.events_details_id)">Return to Event</a></div>
 
 
 @block("Event") {
@@ -43,7 +43,7 @@
         @govukSelect(
             Select(
                 items =
-                    Seq(SelectItem(value = None, text = "Unknown")) ++ allPlaces.map(p => SelectItem(value = Some(p.id.toString), text = p.oneLiner())).sortBy(_.text),
+                    Seq(SelectItem(value = None, text = "Unknown")) ++ allPlaces.map(p => SelectItem(value = Some(p.id.toString), text = p.oneLinerString)).sortBy(_.text),
                 label = Label(
                     content = Text("Location")),
                 hint = Some(Hint(
