@@ -2,6 +2,8 @@ package models
 
 import anorm._
 import anorm.SqlParser._
+import play.twirl.api.Html
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 
 final case class Place(
     id: Int,
@@ -16,9 +18,21 @@ final case class Place(
     latitude: Option[Double],
     base: Int
 ) {
-  def oneLiner(short: Boolean = true): String = {
+  def oneLinerString: String = {
+    List(lieuDit, city, postCode, country)
+      .flatMap { el =>
+        if (el.trim == "") {
+          None
+        } else {
+          Some(el)
+        }
+      }
+      .mkString(", ")
+  }
+
+  def oneLiner(short: Boolean = true): Html = {
     if (short) {
-      List(lieuDit, city, postCode, country)
+      val placeString = List(lieuDit, city, postCode, country)
         .flatMap { el =>
           if (el.trim == "") {
             None
@@ -27,12 +41,14 @@ final case class Place(
           }
         }
         .mkString(", ")
+      Html(s"""<p class="govuk-body">$placeString</p>""")
     } else {
       val location = (latitude, longitude) match {
-        case (Some(latitude), Some(longitude)) => s" ($latitude, $longitude)"
-        case _                                 => ""
+        case (Some(latitude), Some(longitude)) =>
+          s"""<p class="govuk-body"><a class="govuk-link" href="https://www.google.com/maps/search/?api=1&query=$latitude,$longitude">location: ($latitude, $longitude)</a></p>"""
+        case _ => ""
       }
-      List(lieuDit, city, postCode, county, region, country)
+      val placeString = List(lieuDit, city, postCode, county, region, country)
         .flatMap { el =>
           if (el.trim == "") {
             None
@@ -40,7 +56,8 @@ final case class Place(
             Some(el)
           }
         }
-        .mkString(", ") + location
+        .mkString(", ")
+      Html(s"""<p class="govuk-body">$placeString</p>$location""")
     }
   }
 }

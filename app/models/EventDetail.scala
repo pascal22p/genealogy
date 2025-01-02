@@ -32,6 +32,11 @@ final case class EventDetail(
     sourCitations: List[SourCitation] = List.empty
 ) {
   def formatDate(implicit messages: Messages): String = {
+    val dateRegex = ".*([0-9]{1,2} [a-zA-Z]{3,4} [0-9]{1,4}).*".r
+    events_details_gedcom_date match {
+      case dateRegex(exactDate) =>
+      case _                    => events_details_gedcom_date
+    }
     CalendarConstants.allKeywords
       .foldLeft(events_details_gedcom_date) {
         case (formattedDate, replace) =>

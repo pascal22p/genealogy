@@ -63,16 +63,16 @@ class DescendanceControllerSpec extends BaseSpec {
         """
           |<divclass="govuk-!-padding-4box">
           |<ulclass="govuk-list">
-          |  <listyle="margin:0;padding:0"><spanclass="govuk-!-font-size-16">[1]</span><astyle="padding:0;margin:0"href="/individual/1">Firstname1Surname</a>
+          |  <listyle="margin:0;padding:0"><spanclass="govuk-!-font-size-16">[1]</span><aclass="govuk-link"style="padding:0;margin:0"href="/individual/1">Firstname1Surname</a>
           |    <ulclass="govuk-listgovuk-!-margin-top-0govuk-!-margin-bottom-0"style="padding-left:40px">
-          |      <listyle="margin:0;padding:0">└<spanclass="govuk-!-font-size-16">[2]</span><astyle="padding:0;margin:0"href="/individual/2">Firstname2Surname</a>
+          |      <listyle="margin:0;padding:0">└<spanclass="govuk-!-font-size-16">[2]</span><aclass="govuk-link"style="padding:0;margin:0"href="/individual/2">Firstname2Surname</a>
           |        <ulclass="govuk-listgovuk-!-margin-top-0govuk-!-margin-bottom-0"style="padding-left:40px">
-          |          <listyle="margin:0;padding:0">├<spanclass="govuk-!-font-size-16">[3]</span><astyle="padding:0;margin:0"href="/individual/3">Firstname3Surname</a>
+          |          <listyle="margin:0;padding:0">├<spanclass="govuk-!-font-size-16">[3]</span><aclass="govuk-link"style="padding:0;margin:0"href="/individual/3">Firstname3Surname</a>
           |            <ulclass="govuk-listgovuk-!-margin-top-0govuk-!-margin-bottom-0"style="padding-left:40px">
-          |              <listyle="margin:0;padding:0">└<spanclass="govuk-!-font-size-16">[4]</span><astyle="padding:0;margin:0"href="/individual/5">Firstname5Surname</a></li>
+          |              <listyle="margin:0;padding:0">└<spanclass="govuk-!-font-size-16">[4]</span><aclass="govuk-link"style="padding:0;margin:0"href="/individual/5">Firstname5Surname</a></li>
           |            </ul>
           |          </li>
-          |          <listyle="margin:0;padding:0">└<spanclass="govuk-!-font-size-16">[3]</span><astyle="padding:0;margin:0"href="/individual/4">Firstname4Surname</a></li>
+          |          <listyle="margin:0;padding:0">└<spanclass="govuk-!-font-size-16">[3]</span><aclass="govuk-link"style="padding:0;margin:0"href="/individual/4">Firstname4Surname</a></li>
           |        </ul>
           |      </li>
           |    </ul>

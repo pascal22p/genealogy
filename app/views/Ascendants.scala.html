@@ -1,11 +1,10 @@
 @import models.Person
-@import views.html.components.{FamilyView, PersonDetails, IndividualEvents, Parents, NameLink}
+@import views.html.components.{FamilyView, PersonDetails, IndividualEvents, Parents}
 
 
 @this(
   main: Main,
-  govukSummaryList: GovukSummaryList,
-  nameLink: NameLink
+  govukSummaryList: GovukSummaryList
 )
 
 @(flatTree: List[(Int, List[Person])], dbId: Int)(implicit request: AuthenticatedRequest[?], messages: Messages)

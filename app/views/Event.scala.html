@@ -18,12 +18,12 @@
 
   @if(event.eventType == IndividualEvent) {
     @for(ownerId <- event.ownerId) {
-      <div style="padding-left:10em;"><a href="@controllers.routes.IndividualController.showPerson(ownerId)">Return to @event.description page</a></div>
+      <div style="padding-left:10em;"><a class="govuk-link" href="@controllers.routes.IndividualController.showPerson(ownerId)">Return to @event.description page</a></div>
     }
   }
   @if(event.eventType == FamilyEvent) {
     @for(ownerId <- event.ownerId) {
-      <div style="padding-left:10em;"><a href="controllers.routes.FamilyController.showPerson(ownerId)">Return to @event.description page</a></div>
+      <div style="padding-left:10em;"><a class="govuk-link" href="controllers.routes.FamilyController.showPerson(ownerId)">Return to @event.description page</a></div>
     }
   }
   @if(event.eventType == UnknownEvent) {
@@ -46,7 +46,7 @@
           event.place.map { place =>
             SummaryListRow(
                 key = Key(Text("Place")),
-                value = Value(Text(place.oneLiner(false))),
+                value = Value(HtmlContent(place.oneLiner(false))),
                 classes = "govuk-summary-list__row--no-border",
                 actions = None
             )
