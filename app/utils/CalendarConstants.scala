@@ -70,5 +70,5 @@ object CalendarConstants {
     "DEC" -> 12
   )
 
-  val startOfAllTime = LocalDate.of(0, 1, 1)
+  val startOfAllTime = LocalDate.of(-4712, 1, 1).minusDays(38)
 }
