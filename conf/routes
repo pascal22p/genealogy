@@ -36,3 +36,4 @@ GET     /logout                                   controllers.LogoutController.o
 GET     /admin/calculate-day-counts               controllers.admin.DatabaseFixes.calculateDaysForDates
 
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
+GET     /medias/:filename                         controllers.MediaController.serveMedia(filename: String)
