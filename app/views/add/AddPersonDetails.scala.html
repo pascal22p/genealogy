@@ -4,6 +4,7 @@
 @import helper._
 @import uk.gov.hmrc.govukfrontend.views.Implicits.*
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits.*
+@import uk.gov.hmrc.hmrcfrontend.views.Implicits.*
 
 
 @this(
@@ -11,7 +12,8 @@
         block: Block,
         govukInput: GovukInput,
         govukSelect: GovukSelect,
-        govukButton: GovukButton
+        govukButton: GovukButton,
+        govukErrorSummary: GovukErrorSummary
 )
 
 @(personDetailsForm: Form[PersonDetailsForm])(implicit request: AuthenticatedRequest[?], messages: Messages)
@@ -19,7 +21,7 @@
 @main(1, None) {
 
 
-  @block("Edit person details") {
+  @block("Add new person details") {
 
     @if(personDetailsForm.hasGlobalErrors) {
         @for(error <- personDetailsForm.globalErrors) {
@@ -27,9 +29,12 @@
         }
     }
 
-    @helper.form(action = controllers.edit.routes.EditPersonDetailsController.onSubmit ) {
+    @if(personDetailsForm.errors.nonEmpty) {
+        @govukErrorSummary(ErrorSummary().withFormErrorsAsHtml(personDetailsForm))
+    }
+    
+    @helper.form(action = controllers.add.routes.AddPersonDetailsController.onSubmit ) {
         @helper.CSRF.formField
-        <input type="hidden" value="@personDetailsForm("id").value" name="id" />
         @govukInput(
             Input(
                 label = Label(content = Text("Database")),

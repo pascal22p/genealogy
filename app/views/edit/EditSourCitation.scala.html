@@ -14,7 +14,7 @@
 
 @(sourCitationForm: Form[SourCitationForm], sourCitation: SourCitation)(implicit request: AuthenticatedRequest[?], messages: Messages)
 
-@main("Famille Parois", 1, None) {
+@main(1, None) {
 
     @if(sourCitation.sourceType == SourCitationType.EventSourCitation) {
         @for(id <- sourCitation.ownerId) {

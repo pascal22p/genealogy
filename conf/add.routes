@@ -1,0 +1,11 @@
+GET     /media  controllers.add.AddMediaController.showForm()
+POST    /media  controllers.add.AddMediaController.upload()
+
+GET     /person-details                       controllers.add.AddPersonDetailsController.showForm
+POST    /person-details                       controllers.add.AddPersonDetailsController.onSubmit
+
+GET     /event/person/:id                       controllers.add.AddIndividualEventDetailController.showForm(id: Int)
+POST    /event/person/:id                       controllers.add.AddIndividualEventDetailController.onSubmit(id: Int)
+
+GET     /event/family/:id                       controllers.add.AddFamilyEventDetailController.showForm(id: Int)
+POST    /event/family/:id                       controllers.add.AddFamilyEventDetailController.onSubmit(id: Int)

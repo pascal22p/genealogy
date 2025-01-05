@@ -1,6 +1,6 @@
 @import models.Person
 @import play.twirl.api.HtmlFormat
-@import views.html.components.{Block, FamilyView, PersonDetails, IndividualEvents, Parents, LastModified, SourCitation}
+@import views.html.components.{Block, FamilyView, PersonDetails, EventsDetails, Parents, LastModified, SourCitation}
 @import models.EventType.{IndividualEvent, FamilyEvent, UnknownEvent}
 @import controllers.routes.Assets
 
@@ -14,18 +14,19 @@
 @(event: EventDetail, dbId: Int, person: Option[Person])(implicit request: AuthenticatedRequest[?], messages: Messages)
 
 
-@main(event.description.getOrElse("Event"), dbId, person) {
+@main(dbId, person) {
 
   @if(event.eventType == IndividualEvent) {
     @for(ownerId <- event.ownerId) {
       <div style="padding-left:10em;"><a class="govuk-link" href="@controllers.routes.IndividualController.showPerson(ownerId)">Return to @event.description page</a></div>
     }
   }
-  @if(event.eventType == FamilyEvent) {
-    @for(ownerId <- event.ownerId) {
-      <div style="padding-left:10em;"><a class="govuk-link" href="controllers.routes.FamilyController.showPerson(ownerId)">Return to @event.description page</a></div>
-    }
-  }
+  @* @if(event.eventType == FamilyEvent) {
+   *   @for(ownerId <- event.ownerId) {
+   *     <div style="padding-left:10em;"><a class="govuk-link" href="@controllers.routes.FamilyController.showFamily(ownerId)">Return to @event.description page</a></div>
+   *   }
+   * }
+   *@
   @if(event.eventType == UnknownEvent) {
     <div style="padding-left:10em;">Orphan event</div>
   }
@@ -83,6 +84,10 @@
                   ActionItem(
                       href = controllers.edit.routes.EditEventDetailController.showForm(event.events_details_id).url,
                       content = Text("Edit")
+                  ),
+                  ActionItem(
+                      href = "#",
+                      content = Text("Delete")
                   )
               )
           )),

@@ -1,0 +1,109 @@
+@import models.Person
+@import views.html.components.{FamilyView, PersonDetails, EventsDetails, Parents}
+
+@this(
+  main: Main,
+  familyView: FamilyView,
+  individualEvents: EventsDetails,
+  parents: Parents,
+  govukButton: GovukButton,
+  govukSummaryList: GovukSummaryList)
+
+@(person: Person, dbId: Int)(implicit request: AuthenticatedRequest[?], messages: Messages)
+
+
+@main(dbId, Some(person)) {
+
+  @govukSummaryList(
+    SummaryList(
+        rows = (Seq(
+            SummaryListRow(
+                key = Key(Text(messages("id"))),
+                value = Value(Text(person.details.id.toString)),
+                classes = "govuk-summary-list__row--no-border govuk-summary-list__row--no-actions",
+                actions = None
+            ),
+            SummaryListRow(
+                key = Key(Text(messages("surname"))),
+                value = Value(Text(person.details.surname)),
+                classes = "govuk-summary-list__row--no-border govuk-summary-list__row--no-actions",
+                actions = None
+            ),
+            SummaryListRow(
+                key = Key(Text(messages("firstname"))),
+                value = Value(Text(person.details.firstname)),
+                classes = "govuk-summary-list__row--no-border govuk-summary-list__row--no-actions",
+                actions = None
+            ),
+            SummaryListRow(
+                key = Key(Text(messages("sex"))),
+                value = Value(Text(messages(person.details.sex.toString))),
+                classes = "govuk-summary-list__row--no-border govuk-summary-list__row--no-actions",
+                actions = None
+            ),
+            SummaryListRow(
+                key = Key(Text("Firstname prefix")),
+                value = Value(Text(messages(person.details.firstnamePrefix))),
+                classes = "govuk-summary-list__row--no-border govuk-summary-list__row--no-actions",
+                actions = None
+            ),
+            SummaryListRow(
+                key = Key(Text("Given name")),
+                value = Value(Text(messages(person.details.nameGiven))),
+                classes = "govuk-summary-list__row--no-border govuk-summary-list__row--no-actions",
+                actions = None
+            ),
+            SummaryListRow(
+                key = Key(Text("Nickname")),
+                value = Value(Text(messages(person.details.nameNickname))),
+                classes = "govuk-summary-list__row--no-border govuk-summary-list__row--no-actions",
+                actions = None
+            ),
+            SummaryListRow(
+                key = Key(Text("Surname prefix")),
+                value = Value(Text(messages(person.details.surnamePrefix))),
+                classes = "govuk-summary-list__row--no-border govuk-summary-list__row--no-actions",
+                actions = None
+            ),
+            SummaryListRow(
+                key = Key(Text("Name suffix")),
+                value = Value(Text(messages(person.details.nameSuffix))),
+                classes = "govuk-summary-list__row--no-border govuk-summary-list__row--no-actions",
+                actions = None
+            ),
+            SummaryListRow(
+                key = Key(Text(messages("resn"))),
+                value = Value(Text(person.details.privacyRestriction.getOrElse("None (public)"))),
+                classes = "govuk-summary-list__row--no-actions",
+                actions = None
+            )
+        )  ++ 
+        person.events.eventsDetails.sortBy(_.jd_count).map { event =>
+          SummaryListRow(
+              key = Key(Text(messages(event.tag.get))),
+              value = Value(HtmlContent(event.formatDate)),
+              classes = "govuk-summary-list__row--no-border",
+              actions = None
+            )
+        }).filter(_.value.content != Text("")),
+        card = Some(Card(
+            title = Some(CardTitle(content = Text("Person to be deleted"))),
+            actions = None,
+            classes = "govuk-!-margin-4",
+            attributes = Map.empty
+          )),
+        classes = "",
+        attributes = Map.empty
+    )
+  )
+
+  @helper.form(action = controllers.delete.routes.DeleteIndividualController.deletePersonAction(person.details.id) ) {
+    @helper.CSRF.formField
+    @govukButton(Button(
+      inputType = Some("submit"),
+      content = Text("Delete this person"),
+      classes = "govuk-button--warning"
+    ))
+  }
+  
+}

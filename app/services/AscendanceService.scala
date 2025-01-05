@@ -6,6 +6,9 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
 import cats.implicits.*
+import models.EventType.EventType
+import models.EventType.FamilyEvent
+import models.Events
 import models.Family
 import models.Parents
 import models.Person
@@ -34,7 +37,9 @@ class AscendanceService @Inject() (personService: PersonService)(implicit val ec
                   parent2.flatten,
                   parent.family.timestamp,
                   parent.family.privacyRestriction,
-                  parent.family.refn
+                  parent.family.refn,
+                  List.empty,
+                  Events(List.empty, Some(parent.family.id), FamilyEvent)
                 ),
                 parent.refnType,
                 parent.relaType,

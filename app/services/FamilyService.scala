@@ -10,6 +10,7 @@ import cats.implicits.*
 import models.Child
 import models.EventDetail
 import models.EventType.FamilyEvent
+import models.EventType.IndividualEvent
 import models.Events
 import models.Family
 import models.Person
@@ -27,9 +28,9 @@ class FamilyService @Inject() (
     mariadbQueries.getChildren(familyId).flatMap { children =>
       children.traverse { (child: Child) =>
         eventService.getIndividualEvents(child.person.details.id, omitSources).map { (events: List[EventDetail]) =>
-          child.copy(person = child.person.copy(events = Events(events)))
+          child
+            .copy(person = child.person.copy(events = Events(events, Some(child.person.details.id), IndividualEvent)))
         }
-
       }
     }
   }
@@ -47,7 +48,7 @@ class FamilyService @Inject() (
               events   <- eventService.getFamilyEvents(family.id, omitSources)
               children <- getChildren(family.id, omitSources)
             } yield {
-              family.copy(children = children, events = Events(events))
+              family.copy(children = children, events = Events(events, Some(family.id), FamilyEvent))
             }
           }
         }
@@ -67,8 +68,12 @@ class FamilyService @Inject() (
           } yield {
             Family(
               family,
-              parent1.map(Person(_, Events(events1.getOrElse(List.empty[EventDetail])), List.empty)),
-              parent2.map(Person(_, Events(events2.getOrElse(List.empty[EventDetail])), List.empty))
+              parent1.map(
+                Person(_, Events(events1.getOrElse(List.empty[EventDetail]), Some(family.id), FamilyEvent), List.empty)
+              ),
+              parent2.map(
+                Person(_, Events(events2.getOrElse(List.empty[EventDetail]), Some(family.id), FamilyEvent), List.empty)
+              )
             )
           }
         }

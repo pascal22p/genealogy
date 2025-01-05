@@ -1,0 +1,11 @@
+GET     /person-details/:id                  controllers.edit.EditPersonDetailsController.showForm(id: Int)
+POST    /person-details                      controllers.edit.EditPersonDetailsController.onSubmit
+
+GET     /event-detail/:id                   controllers.edit.EditEventDetailController.showForm(id: Int)
+POST    /event-detail/:id                   controllers.edit.EditEventDetailController.onSubmit(id: Int)
+
+GET     /source-citation/:id                controllers.edit.EditSourCitationController.showForm(id: Int)
+POST    /source-citation/:id                controllers.edit.EditSourCitationController.onSubmit(id: Int)
+
+GET     /source-record/:sourRecordId/:sourCitationType/:sourCitationId                controllers.edit.EditSourRecordController.showForm(sourRecordId: Int, sourCitationType: SourCitationType, sourCitationId: Int)
+POST    /source-record/:id                controllers.edit.EditSourRecordController.onSubmit(id: Int)

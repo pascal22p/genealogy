@@ -7,6 +7,7 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
 import models.*
+import models.EventType.IndividualEvent
 
 @Singleton
 class PersonService @Inject() (
@@ -43,7 +44,7 @@ class PersonService @Inject() (
       parents                <- getParents(id, omitParents)
       families: List[Family] <- getFamilies(id, omitSources, omitFamilies)
     } yield {
-      personDetails.map(Person(_, Events(events), parents, families))
+      personDetails.map(person => Person(person, Events(events, Some(person.id), IndividualEvent), parents, families))
     }
   }
 

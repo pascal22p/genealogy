@@ -1,9 +1,9 @@
 @import models.Family
 @import controllers.routes
-@import views.html.components.{IndividualEvents}
+@import views.html.components.EventsDetails
 
 @this(
-    individualEvents: IndividualEvents,
+    familyEvents: EventsDetails,
     lastModified: LastModified,
     block: Block,
     govukSummaryList: GovukSummaryList)
@@ -20,7 +20,13 @@
     @person.details.shortName @person.events.birthAndDeathDate
 }
 
-@block(title.toString, None) {
+@block(title.toString, 
+Some(Actions(
+    items = Seq(ActionItem(
+            href = "#",
+            content = Text("Delete")
+        ))
+))) {
 
 @for(partner <- partnerOption) {
     @govukSummaryList(
@@ -34,7 +40,11 @@
                         items = Seq(
                             ActionItem(
                                 href = controllers.routes.IndividualController.showPerson(partner.details.id).url,
-                                content = Text("Details")
+                                content = Text("View")
+                            ),
+                                ActionItem(
+                                href = "#",
+                                content = Text("Delete")
                             )
                         )
                     ))
@@ -52,7 +62,7 @@
     )
 }
 
-@individualEvents(family.events.eventsDetails)
+@familyEvents(family.events)
 
 @govukSummaryList(
     SummaryList(
@@ -65,7 +75,11 @@
                     items = Seq(
                         ActionItem(
                             href = controllers.routes.IndividualController.showPerson(child.person.details.id).url,
-                            content = Text("Details")
+                            content = Text("View")
+                        ),
+                        ActionItem(
+                            href = "#",
+                            content = Text("Delete")
                         )
                     )
                 ))

@@ -12,7 +12,7 @@ final case class Family(
     privacyRestriction: Option[String],
     refn: String,
     children: List[Child] = List.empty,
-    events: Events = Events(List.empty)
+    events: Events
 )
 
 object Family {
@@ -23,7 +23,9 @@ object Family {
       parent2,
       familyQueryData.timestamp,
       familyQueryData.privacyRestriction,
-      familyQueryData.refn
+      familyQueryData.refn,
+      List.empty,
+      Events(List.empty, Some(familyQueryData.id), EventType.FamilyEvent)
     )
   }
 }

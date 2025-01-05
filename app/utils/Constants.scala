@@ -41,4 +41,8 @@ object Constants {
     "TITL",
     "FACT"
   )
+
+  val familyEvents = List(
+    "MARR"
+  )
 }

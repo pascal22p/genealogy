@@ -1,0 +1,2 @@
+GET     /calculate-day-counts               controllers.admin.DatabaseFixes.calculateDaysForDates
+

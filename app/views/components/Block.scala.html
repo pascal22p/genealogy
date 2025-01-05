@@ -12,7 +12,7 @@
         <ul class="govuk-summary-card__actions">
           @for(action <- someActions.items) {
             <li class="govuk-summary-card__action">
-              <a class="govuk-link" href="@action.href">Add<span class="govuk-visually-hidden"> (@action.content)</span></a>
+              <a class="govuk-link" href="@action.href">@action.content.asHtml<span class="govuk-visually-hidden"> (@action.content.asHtml)</span></a>
             </li>
           }
         </ul>

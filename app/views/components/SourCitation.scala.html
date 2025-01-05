@@ -1,8 +1,8 @@
 @import models.{SourCitation => ModelSourCitation}
-@import views.html.components.{Media, LastModified, Block, SourRecord}
+@import views.html.components.{Medias, LastModified, Block, SourRecord}
 
 @this(
-  mediaComponent: Media, 
+  mediasComponent: Medias, 
   lastModified: LastModified, 
   block: Block, 
   sourRecord: SourRecord,
@@ -81,8 +81,6 @@
     @sourRecord(record, source.sourceType, source.id) 
   }
 
-  @for(media <- source.medias) {
-    @mediaComponent(media)
-  }
+  @mediasComponent(source.medias)
 
 }

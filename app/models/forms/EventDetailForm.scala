@@ -4,6 +4,8 @@ import java.time.Instant
 
 import anorm._
 import anorm.SqlParser._
+import models.queryData.EventDetailOnlyQueryData
+import models.queryData.EventDetailQueryData
 import models.EventDetail
 import models.EventType
 import models.EventType.EventType
@@ -30,7 +32,26 @@ final case class EventDetailForm(
     events_details_gedcom_date: String,
     events_details_age: String,
     events_details_cause: String
-)
+) {
+  def toEventDetailOnlyQueryData = {
+    EventDetailOnlyQueryData(
+      base,
+      0,
+      place,
+      addr_id,
+      events_details_descriptor,
+      events_details_gedcom_date,
+      events_details_age,
+      events_details_cause,
+      None,
+      None,
+      None,
+      None,
+      None,
+      Instant.now
+    )
+  }
+}
 
 object EventDetailForm {
 

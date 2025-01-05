@@ -9,6 +9,7 @@ import scala.concurrent.Future
 import cats.*
 import cats.implicits.*
 import models.AuthenticatedRequest
+import models.EventType.IndividualEvent
 import models.Events
 import models.GenealogyDatabase
 import models.Person
@@ -47,7 +48,7 @@ class GenealogyDatabaseService @Inject() (
     mariadbQueries.getFirstnamesList(id, name).flatMap { personList =>
       personList.traverse { person =>
         eventService.getIndividualEvents(person.id).map { events =>
-          Person(person, Events(events), List.empty, List.empty)
+          Person(person, Events(events, Some(person.id), IndividualEvent), List.empty, List.empty)
         }
       }
     }

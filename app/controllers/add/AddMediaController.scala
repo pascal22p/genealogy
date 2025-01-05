@@ -1,4 +1,4 @@
-package controllers.edit
+package controllers.add
 
 import java.nio.file.Paths
 import javax.inject.Inject
@@ -36,11 +36,11 @@ import services.EventService
 import services.PersonService
 import services.SessionService
 import services.SourCitationService
-import views.html.edit.AddMedia
+import views.html.add.AddMedia
 import views.html.ServiceUnavailable
 
 @Singleton
-class EditMediaController @Inject() (
+class AddMediaController @Inject() (
     authJourney: AuthJourney,
     eventService: EventService,
     personService: PersonService,
