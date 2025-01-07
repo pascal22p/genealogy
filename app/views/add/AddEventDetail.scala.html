@@ -1,36 +1,51 @@
 @import models.forms.EventDetailForm
-@import models.EventDetail
 @import views.html.helper
 @import views.html.components.Block
 @import helper._
 @import utils.Constants
 @import uk.gov.hmrc.govukfrontend.views.Implicits.*
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits.*
+@import uk.gov.hmrc.hmrcfrontend.views.Implicits.*
+@import models.EventType.EventType
+@import models.EventType.IndividualEvent
 
 @this(
         main: Main,
         block: Block,
         govukInput: GovukInput,
         govukSelect: GovukSelect,
-        govukButton: GovukButton
+        govukButton: GovukButton,
+        govukErrorSummary: GovukErrorSummary
 )
 
-@(eventDetailsForm: Form[EventDetailForm], allPlaces: List[Place], event: EventDetail)(implicit request: AuthenticatedRequest[?], messages: Messages)
+@(eventDetailForm: Form[EventDetailForm], ownerId: Int, allPlaces: List[Place], eventType: EventType)(implicit request: AuthenticatedRequest[?], messages: Messages)
+
+@postLink = @{
+    if(eventType == IndividualEvent) {
+        controllers.add.routes.AddIndividualEventDetailController.onSubmit(ownerId)
+    } else {
+        controllers.add.routes.AddFamilyEventDetailController.onSubmit(ownerId)
+    }
+}
 
 @main(1, None) {
 
-<div style="padding-left:10em;"><a class="govuk-link" href="@controllers.routes.EventController.showEvent(event.events_details_id)">Return to Event</a></div>
 
+  @block("Add a new event") {
 
-@block("Event") {
-    @if(eventDetailsForm.hasGlobalErrors) {
-        @for(error <- eventDetailsForm.globalErrors) {
+    @if(eventDetailForm.hasGlobalErrors) {
+        @for(error <- eventDetailForm.globalErrors) {
             <span class="error-message">@error.format(messages)</span>
         }
     }
 
-    @helper.form(action = controllers.edit.routes.EditEventDetailController.onSubmit(event.events_details_id) ) {
+    @if(eventDetailForm.errors.nonEmpty) {
+        @govukErrorSummary(ErrorSummary().withFormErrorsAsHtml(eventDetailForm))
+    }
+    
+    @helper.form(action = postLink ) {
         @helper.CSRF.formField
+        <input type="hidden" name="personId" value="@ownerId" />
         @govukInput(
             Input(
                 label = Label(content = Text("Database")),
@@ -38,18 +53,18 @@
                     content = HtmlContent("The database where the event is stored")
                 )),
                 classes = "govuk-!-width-one-half"
-            ).withFormField(eventDetailsForm("base"))
+            ).withFormField(eventDetailForm("base"))
         )
         @govukSelect(
             Select(
                 items =
-                    Seq(SelectItem(value = None, text = "Unknown")) ++ allPlaces.map(p => SelectItem(value = Some(p.id.toString), text = p.oneLinerString)).sortBy(_.text),
+                    Seq(SelectItem(value = Some(""), text = "Unknown")) ++ allPlaces.map(p => SelectItem(value = Some(p.id.toString), text = p.oneLinerString)).sortBy(_.text),
                 label = Label(
                     content = Text("Location")),
                 hint = Some(Hint(
                     content = HtmlContent("Location where the event happened")
                 ))    
-            ).withFormField(eventDetailsForm("place"))
+            ).withFormField(eventDetailForm("place"))
         )
         @govukInput(
             Input(
@@ -58,16 +73,19 @@
                     content = HtmlContent("id of an address. Use Location instead if possible")
                 )),
                 classes = "govuk-!-width-one-half"
-            ).withFormField(eventDetailsForm("addr_id"))
+            ).withFormField(eventDetailForm("addr_id"))
         )
         @govukSelect(
             Select(
-                items =
-                    Seq(SelectItem(value = None, text = "Unknown")) ++ Constants.individualsEvents.map(e => SelectItem(value = Some(e), text = messages(e))).sortBy(_.text),
+                items = if(eventType == IndividualEvent) {
+                        Seq(SelectItem(value = None, text = "Unknown")) ++ Constants.individualsEvents.map(e => SelectItem(value = Some(e), text = messages(e))).sortBy(_.text)
+                    } else {
+                        Seq(SelectItem(value = None, text = "Unknown")) ++ Constants.familyEvents.map(e => SelectItem(value = Some(e), text = messages(e))).sortBy(_.text)
+                    },
                 label = Label(
                     content = Text("Type of event")),
                 hint = None
-            ).withFormField(eventDetailsForm("events_tag"))
+            ).withFormField(eventDetailForm("events_tag"))
         )        
         @govukInput(
             Input(
@@ -76,7 +94,7 @@
                     content = HtmlContent("Text describing a particular event pertaining to the individual or family.")
                 )),
                 classes = "govuk-!-width-one-half"
-            ).withFormField(eventDetailsForm("events_details_descriptor"))
+            ).withFormField(eventDetailForm("events_details_descriptor"))
         )
         @govukInput(
             Input(
@@ -85,7 +103,7 @@
                     content = HtmlContent("Date of the event in the format Gedcom.")
                 )),
                 classes = "govuk-!-width-one-half"
-            ).withFormField(eventDetailsForm("events_details_gedcom_date"))
+            ).withFormField(eventDetailForm("events_details_gedcom_date"))
         )
         @govukInput(
             Input(
@@ -94,7 +112,7 @@
                     content = HtmlContent("Age of the individual on the day of the event.")
                 )),
                 classes = "govuk-!-width-one-half"
-            ).withFormField(eventDetailsForm("events_details_age"))
+            ).withFormField(eventDetailForm("events_details_age"))
         )
         @govukInput(
             Input(
@@ -103,15 +121,16 @@
                     content = HtmlContent("Used in special cases to record the reasons which precipitated an event.")
                 )),
                 classes = "govuk-!-width-one-half"
-            ).withFormField(eventDetailsForm("events_details_cause"))
+            ).withFormField(eventDetailForm("events_details_cause"))
         )
-        @govukButton(Button(
-            content = Text("Submit"),
-            name = Some("submit"),
-            href = None,
-            inputType = Some("submit")))
+        @govukButton(
+            Button(
+                element = Some("button"),
+                content = Text("Submit")
+            )
+        )
     }
 
-}
+  }
 
 }

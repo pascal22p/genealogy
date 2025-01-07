@@ -13,10 +13,10 @@
 
 @()(implicit request: AuthenticatedRequest[?], messages: Messages)
 
-@main("Famille Parois", 1, None) {
+@main(1, None) {
 
     @block("Add new media file") {
-        @helper.form(action = controllers.edit.routes.EditMediaController.upload(), Symbol("enctype") -> "multipart/form-data") {
+        @helper.form(action = controllers.add.routes.AddMediaController.upload(), Symbol("enctype") -> "multipart/form-data") {
             @helper.CSRF.formField
 
             @govukFileUpload(FileUpload(

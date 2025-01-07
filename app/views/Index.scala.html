@@ -8,11 +8,7 @@
 @(dbs: List[GenealogyDatabase], localSession: SessionData)(implicit request: AuthenticatedRequest[?], messages: Messages)
 
 
-@main("Famille Parois", localSession.dbId, None) {
-
-  @for(userData <- localSession.userData) {
-      <h1>@userData.username</h1>
-  }
+@main(localSession.dbId, None) {
 
     @govukSummaryList(
         SummaryList(
@@ -32,8 +28,15 @@
                 )
             },
             card = Some(Card(
-                title = Some(CardTitle(content = Text("Events"))),
-                actions = None,
+                title = Some(CardTitle(content = Text("List of databases"))),
+                actions = Some(Actions(
+                    items = Seq(
+                        ActionItem(
+                            href = "#",
+                            content = Text("Add")
+                        )
+                    )
+                )),
                 classes = "govuk-!-margin-4",
                 attributes = Map.empty
             )),
@@ -41,5 +44,4 @@
             attributes = Map.empty
         )
     )
-
 }

@@ -1,5 +1,5 @@
 @import models.Person
-@import views.html.components.{FamilyView, PersonDetails, IndividualEvents, Parents}
+@import views.html.components.{FamilyView, PersonDetails, EventsDetails, Parents}
 
 
 @this(
@@ -13,8 +13,12 @@
   s"""Generation $depth"""
 }
 
+@id(depth: Int) = @{
+  s"generation-$depth"
+}
 
-@main("todo", dbId, flatTree.headOption.flatMap(_._2.headOption)) {
+
+@main(dbId, flatTree.headOption.flatMap(_._2.headOption)) {
 
   @for(gen <- flatTree) {  
       @govukSummaryList(
@@ -41,7 +45,7 @@
               attributes = Map.empty
           )),
           classes = "",
-          attributes = Map.empty
+          attributes = Map("id" -> id(gen._1))
       )
       )
   }

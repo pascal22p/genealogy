@@ -1,0 +1,3 @@
+GET     /person-details/:id                controllers.delete.DeleteIndividualController.deletePersonConfirmation(id: Int)
+POST    /person-details/:id                controllers.delete.DeleteIndividualController.deletePersonAction(id: Int)
+

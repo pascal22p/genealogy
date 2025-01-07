@@ -12,7 +12,7 @@
     }
 }
 
-@main("Famille Parois", dbId, None) {
+@main(dbId, None) {
 
     @govukSummaryList(
         SummaryList(
@@ -33,7 +33,14 @@
             },
             card = Some(Card(
                 title = Some(CardTitle(content = Text(boxTitle(names)))),
-                actions = None,
+                actions = Some(Actions(
+                    items = Seq(
+                        ActionItem(
+                            href = controllers.add.routes.AddPersonDetailsController.showForm.url,
+                            content = Text("Add")
+                        )
+                    )
+                )),
                 classes = "govuk-!-margin-4",
                 attributes = Map.empty
             )),

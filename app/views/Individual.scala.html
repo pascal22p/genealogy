@@ -1,21 +1,28 @@
 @import models.Person
-@import views.html.components.{FamilyView, PersonDetails, IndividualEvents, Parents}
+@import views.html.components.{FamilyView, PersonDetails, EventsDetails, Parents}
 
 @this(
   main: Main,
   familyView: FamilyView,
   personDetails: PersonDetails,
-  individualEvents: IndividualEvents,
+  individualEvents: EventsDetails,
   parents: Parents)
 
 @(person: Person, dbId: Int)(implicit request: AuthenticatedRequest[?], messages: Messages)
 
 
-@main(person.details.shortName, dbId, Some(person)) {
+@main(dbId, Some(person)) {
+
+  <p class="govuk-body-l">
+    <ul class="govuk-list">
+      <li><a class="govuk-link" href="@controllers.routes.DescendanceController.showDescendant(person.details.id)">Descendants</a></li>
+      <li><a class="govuk-link" href="@controllers.routes.AscendanceController.showAscendant(person.details.id)">Ascendants</a></li>
+  </ul>
+  </p>
 
   @personDetails(person)
-
-  @individualEvents(person.events.eventsDetails)
+  
+  @individualEvents(person.events)
 
   @for(family <- person.families) {
     @familyView(family, person.findPartner(family.id))

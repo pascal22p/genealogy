@@ -1,21 +1,35 @@
+@import models.EventType.*
 @this(
     block: Block, 
     lastModified: LastModified,
     govukSummaryList: GovukSummaryList
 )
 
-@(events: List[EventDetail])(implicit authenticatedRequest: AuthenticatedRequest[?], messages: Messages)
+@(events: Events)(implicit authenticatedRequest: AuthenticatedRequest[?], messages: Messages)
 
 @eventDetailRow(event: EventDetail) = {
     @event.formatDate @for(place <- event.place) {
         at @place.oneLiner()
     }
-    <span style="color: blue; font-size: x-small;">@if(event.sourCount>0){-S-}</span>
+}
+
+@source(event: EventDetail) = @{
+    if(event.sourCount>0){"View (Source)"} else {"View"}
+}
+
+@addEventLink = @{
+    events.ownerId.fold("") { ownerId =>
+        if(events.ownerType == IndividualEvent) {
+            controllers.add.routes.AddIndividualEventDetailController.showForm(ownerId).url
+        } else {
+            controllers.add.routes.AddFamilyEventDetailController.showForm(ownerId).url
+        }
+    }
 }
 
 @govukSummaryList(
     SummaryList(
-        rows = events.map { event =>
+        rows = events.eventsDetails.sortBy(_.jd_count).map { event =>
             SummaryListRow(
                 key = Key(Text(messages(event.tag.get))),
                 value = Value(HtmlContent(eventDetailRow(event))),
@@ -24,7 +38,7 @@
                     items = Seq(
                         ActionItem(
                             href = controllers.routes.EventController.showEvent(event.events_details_id).url,
-                            content = Text("Details")
+                            content = Text(source(event))
                         )
                     )
                 ))
@@ -32,7 +46,15 @@
         },
         card = Some(Card(
             title = Some(CardTitle(content = Text("Events"))),
-            actions = None,
+            actions = events.ownerId.map { ownerId => 
+                Actions(
+                items = Seq(
+                    ActionItem(
+                        href = addEventLink,
+                        content = Text("Add")
+                    )
+                )
+            )},
             classes = "govuk-!-margin-4",
             attributes = Map.empty
           )),

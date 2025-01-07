@@ -7,6 +7,7 @@ import scala.jdk.CollectionConverters.*
 
 import models.AuthenticatedRequest
 import models.EventDetail
+import models.EventType.IndividualEvent
 import models.Events
 import models.FemaleSex
 import models.Person
@@ -55,8 +56,8 @@ class GenealogyDatabaseServiceSpec extends BaseSpec {
       val fakeEventDetails1                   = List(fakeEventDetail(events_details_id = 1))
       val fakeEventDetails2                   = List(fakeEventDetail(events_details_id = 2))
 
-      val person1 = Person(fakePersonDetail1, Events(fakeEventDetails1))
-      val person2 = Person(fakePersonDetail2, Events(fakeEventDetails2))
+      val person1 = Person(fakePersonDetail1, Events(fakeEventDetails1, Some(1), IndividualEvent))
+      val person2 = Person(fakePersonDetail2, Events(fakeEventDetails2, Some(2), IndividualEvent))
       when(mockMariadbQueries.getFirstnamesList(any(), any())(any())).thenReturn(
         Future.successful(List(fakePersonDetail1, fakePersonDetail2))
       )

@@ -32,12 +32,42 @@
                     actions = None
                 ),
                 SummaryListRow(
-                    key = Key(Text(messages("resn"))),
-                    value = Value(Text(person.details.privacyRestriction.getOrElse("Unknown"))),
+                    key = Key(Text("Firstname prefix")),
+                    value = Value(Text(messages(person.details.firstnamePrefix))),
                     classes = "govuk-summary-list__row--no-border govuk-summary-list__row--no-actions",
                     actions = None
                 ),
-            ),
+                SummaryListRow(
+                    key = Key(Text("Given name")),
+                    value = Value(Text(messages(person.details.nameGiven))),
+                    classes = "govuk-summary-list__row--no-border govuk-summary-list__row--no-actions",
+                    actions = None
+                ),
+                SummaryListRow(
+                    key = Key(Text("Nickname")),
+                    value = Value(Text(messages(person.details.nameNickname))),
+                    classes = "govuk-summary-list__row--no-border govuk-summary-list__row--no-actions",
+                    actions = None
+                ),
+                SummaryListRow(
+                    key = Key(Text("Surname prefix")),
+                    value = Value(Text(messages(person.details.surnamePrefix))),
+                    classes = "govuk-summary-list__row--no-border govuk-summary-list__row--no-actions",
+                    actions = None
+                ),
+                SummaryListRow(
+                    key = Key(Text("Name suffix")),
+                    value = Value(Text(messages(person.details.nameSuffix))),
+                    classes = "govuk-summary-list__row--no-border govuk-summary-list__row--no-actions",
+                    actions = None
+                ),
+                SummaryListRow(
+                    key = Key(Text(messages("resn"))),
+                    value = Value(Text(person.details.privacyRestriction.getOrElse("None (public)"))),
+                    classes = "govuk-summary-list__row--no-border govuk-summary-list__row--no-actions",
+                    actions = None
+                ),
+            ).filter(_.value.content != Text("")),
             card = Some(Card(
                 title = Some(CardTitle(content = Text("Person details"))),
                 actions = Some(Actions(
@@ -45,6 +75,10 @@
                         ActionItem(
                             href = controllers.edit.routes.EditPersonDetailsController.showForm(person.details.id).url,
                             content = Text("Edit")
+                        ),
+                        ActionItem(
+                            href = controllers.delete.routes.DeleteIndividualController.deletePersonConfirmation(person.details.id).url,
+                            content = Text("Delete")
                         )
                     )
                 )),

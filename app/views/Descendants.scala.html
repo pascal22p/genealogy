@@ -1,9 +1,10 @@
 @import models.Person
-@import views.html.components.{FamilyView, PersonDetails, IndividualEvents, Parents, NameLink}
+@import views.html.components.{Block, FamilyView, PersonDetails, EventsDetails, Parents, NameLink}
 
 
 @this(
   main: Main,
+  block: Block,
         nameLink: NameLink)
 
 @(person: Person, dbId: Int)(implicit request: AuthenticatedRequest[?], messages: Messages)
@@ -31,9 +32,11 @@
     Html(s"<span class=\"govuk-!-font-size-16\">[$depth]</span>" + nameLink(person) + children)
 }
 
-@main(person.name, dbId, Some(person)) {
+@main(dbId, Some(person)) {
 
+    @block("Descendants") {
   <ul class="govuk-list"><li style="margin:0;padding:0">
       @aDescendant(person)
   </li></ul>
+}
 }

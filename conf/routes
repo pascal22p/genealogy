@@ -5,6 +5,12 @@
 
 ->         /hmrc-frontend                      hmrcfrontend.Routes
 
+->      /add                                   add.Routes
+->      /delete                                delete.Routes
+->      /edit                                  edit.Routes
+->      /admin                                 admin.Routes
+
+
 GET     /                                         controllers.HomeController.onload()
 GET     /surnames/base/:id                        controllers.HomeController.showSurnames(id: Int)
 GET     /firstnames/base/:id/name/:name           controllers.HomeController.showFirstnames(id: Int, name: String)
@@ -14,26 +20,9 @@ GET     /descendant/:id                           controllers.DescendanceControl
 GET     /ascendant/:id                            controllers.AscendanceController.showAscendant(id: Int)
 GET     /switch-lang/:lang                        controllers.IndividualController.languageSwitch(lang: String)
 
-GET     /edit/person-details/:id                  controllers.edit.EditPersonDetailsController.showForm(id: Int)
-POST    /edit/person-details                      controllers.edit.EditPersonDetailsController.onSubmit
-
-GET     /edit/event-detail/:id                   controllers.edit.EditEventDetailController.showForm(id: Int)
-POST    /edit/event-detail/:id                   controllers.edit.EditEventDetailController.onSubmit(id: Int)
-
-GET     /edit/source-citation/:id                controllers.edit.EditSourCitationController.showForm(id: Int)
-POST    /edit/source-citation/:id                controllers.edit.EditSourCitationController.onSubmit(id: Int)
-
-GET     /edit/source-record/:sourRecordId/:sourCitationType/:sourCitationId                controllers.edit.EditSourRecordController.showForm(sourRecordId: Int, sourCitationType: SourCitationType, sourCitationId: Int)
-POST    /edit/source-record/:id                controllers.edit.EditSourRecordController.onSubmit(id: Int)
-
-GET     /add/media  controllers.edit.EditMediaController.showForm()
-POST    /add/media  controllers.edit.EditMediaController.upload()
-
 GET     /login                                    controllers.LoginController.onLoad()
 POST    /login                                    controllers.LoginController.onSubmit()
 GET     /logout                                   controllers.LogoutController.onLoad()
-
-GET     /admin/calculate-day-counts               controllers.admin.DatabaseFixes.calculateDaysForDates
 
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
 GET     /medias/:filename                         controllers.MediaController.serveMedia(filename: String)

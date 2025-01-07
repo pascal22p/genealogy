@@ -4,6 +4,7 @@ import scala.concurrent.Future
 
 import actions.AuthAction
 import actions.AuthActionImpl
+import models.EventType.IndividualEvent
 import models.Events
 import models.Person
 import models.Session
@@ -40,30 +41,46 @@ class individualControllerSpec extends BaseSpec {
     "display person details" when {
       "privacy is set and see_privacy is true" in {
         when(mockPersonService.getPerson(any(), any[Boolean], any[Boolean], any[Boolean])).thenReturn(
-          Future.successful(Some(Person(fakePersonDetails(privacyRestriction = Some("privacy")), Events(List.empty))))
+          Future.successful(
+            Some(
+              Person(
+                fakePersonDetails(privacyRestriction = Some("privacy")),
+                Events(List.empty, Some(1), IndividualEvent)
+              )
+            )
+          )
         )
 
         val result = sut.showPerson(1).apply(FakeRequest().withHeaders(("seePrivacy", "true")))
         status(result) mustBe OK
-        contentAsString(result) must include("Firstname Surname")
+        contentAsString(result) must include("Firstname")
       }
     }
 
     "privacy is not set and see_privacy is false" in {
       when(mockPersonService.getPerson(any(), any[Boolean], any[Boolean], any[Boolean])).thenReturn(
-        Future.successful(Some(Person(fakePersonDetails(privacyRestriction = None), Events(List.empty))))
+        Future.successful(
+          Some(Person(fakePersonDetails(privacyRestriction = None), Events(List.empty, Some(1), IndividualEvent)))
+        )
       )
 
       val result = sut.showPerson(1).apply(FakeRequest().withHeaders(("seePrivacy", "false")))
       status(result) mustBe OK
-      contentAsString(result) must include("Firstname Surname")
+      contentAsString(result) must include("Firstname")
     }
   }
 
   "not display person details" when {
     "privacy is set and see_privacy is false" in {
       when(mockPersonService.getPerson(any(), any[Boolean], any[Boolean], any[Boolean])).thenReturn(
-        Future.successful(Some(Person(fakePersonDetails(privacyRestriction = Some("privacy")), Events(List.empty))))
+        Future.successful(
+          Some(
+            Person(
+              fakePersonDetails(privacyRestriction = Some("privacy")),
+              Events(List.empty, Some(1), IndividualEvent)
+            )
+          )
+        )
       )
 
       val result = sut.showPerson(1).apply(FakeRequest().withHeaders(("seePrivacy", "false")))
@@ -72,7 +89,14 @@ class individualControllerSpec extends BaseSpec {
 
     "privacy is set and UserData is None" in {
       when(mockPersonService.getPerson(any(), any[Boolean], any[Boolean], any[Boolean])).thenReturn(
-        Future.successful(Some(Person(fakePersonDetails(privacyRestriction = Some("privacy")), Events(List.empty))))
+        Future.successful(
+          Some(
+            Person(
+              fakePersonDetails(privacyRestriction = Some("privacy")),
+              Events(List.empty, Some(1), IndividualEvent)
+            )
+          )
+        )
       )
 
       val result = sut.showPerson(1).apply(FakeRequest().withHeaders(("userData", "false")))

@@ -43,7 +43,7 @@ final case class PersonDetailsForm(
       nameSuffix,
       nameGiven,
       nameNickname,
-      if (privacyRestriction.isEmpty) None else privacyRestriction
+      privacyRestriction
     )
   }
 
@@ -53,10 +53,10 @@ object PersonDetailsForm {
 
   def unapply(
       u: PersonDetailsForm
-  ): Some[(Int, Int, String, String, String, String, String, String, String, String, Option[String])] = Some(
+  ): Some[(Int, Option[Int], String, String, String, String, String, String, String, String, Option[String])] = Some(
     (
       u.base,
-      u.id,
+      if (u.id == 0) None else Some(u.id),
       u.firstname,
       u.surname,
       u.sex,
@@ -69,13 +69,41 @@ object PersonDetailsForm {
     )
   )
 
+  def apply(
+      base: Int,
+      id: Option[Int],
+      firstname: String,
+      surname: String,
+      sex: String,
+      firstnamePrefix: String,
+      surnamePrefix: String,
+      nameSuffix: String,
+      nameGiven: String,
+      nameNickname: String,
+      privacyRestriction: Option[String]
+  ): PersonDetailsForm = {
+    PersonDetailsForm(
+      base,
+      id.getOrElse(0),
+      firstname,
+      surname,
+      sex,
+      firstnamePrefix,
+      surnamePrefix,
+      nameSuffix,
+      nameGiven,
+      nameNickname,
+      privacyRestriction
+    )
+  }
+
   val personDetailsForm: Form[PersonDetailsForm] = Form(
     mapping(
       "base"               -> number,
-      "id"                 -> number,
+      "id"                 -> optional(number),
       "firstname"          -> text,
       "surname"            -> text,
-      "sex"                -> text.verifying(s => List("", "M", "F").contains(s)),
+      "sex"                -> text.verifying("Value is not Unknown, Male or Female", s => List("", "M", "F").contains(s)),
       "firstnamePrefix"    -> text,
       "surnamePrefix"      -> text,
       "nameSuffix"         -> text,
