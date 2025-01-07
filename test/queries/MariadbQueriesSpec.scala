@@ -216,7 +216,8 @@ class MariadbQueriesSpec extends BaseSpec with BeforeAndAfterEach with Logging {
       val person1  = fakePersonDetails(id = 1)
       val person2  = fakePersonDetails(id = 2)
       val idFamily = 3
-      val child    = Child(Person(fakePersonDetails(id = 5), Events(List.empty)), "adopted", None)
+      val child =
+        Child(Person(fakePersonDetails(id = 5), Events(List.empty, Some(5), IndividualEvent)), "adopted", None)
       val result = (for {
         _      <- executeSql(sqlFamily(idFamily, person1, person2, List(child), List.empty))
         result <- sut.getFamiliesFromIndividualId(child.person.details.id)
@@ -305,7 +306,8 @@ class MariadbQueriesSpec extends BaseSpec with BeforeAndAfterEach with Logging {
       val person1  = fakePersonDetails(id = 1)
       val person2  = fakePersonDetails(id = 2)
       val idFamily = 3
-      val child    = Child(Person(fakePersonDetails(id = 4), Events(List.empty)), "adopted", None)
+      val child =
+        Child(Person(fakePersonDetails(id = 4), Events(List.empty, Some(4), IndividualEvent)), "adopted", None)
       val result = (for {
         _      <- executeSql(sqlFamily(idFamily, person1, person2, List(child), List.empty))
         result <- sut.getChildren(idFamily)

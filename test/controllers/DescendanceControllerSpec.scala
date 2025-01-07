@@ -6,6 +6,8 @@ import scala.concurrent.Future
 
 import actions.AuthAction
 import models.*
+import models.EventType.FamilyEvent
+import models.EventType.IndividualEvent
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar.mock
@@ -24,25 +26,42 @@ class DescendanceControllerSpec extends BaseSpec {
   val fakeAuthAction: FakeAuthAction             = new FakeAuthAction(Session("id", SessionData(1, Some(userData))))
   val mockDescendanceService: DescendanceService = mock[DescendanceService]
 
-  val personD: Person = Person(fakePersonDetails(firstname = "Firstname4", id = 4), Events(List.empty))
-  val personE: Person = Person(fakePersonDetails(firstname = "Firstname5", id = 5), Events(List.empty))
+  val personD: Person =
+    Person(fakePersonDetails(firstname = "Firstname4", id = 4), Events(List.empty, Some(4), IndividualEvent))
+  val personE: Person =
+    Person(fakePersonDetails(firstname = "Firstname5", id = 5), Events(List.empty, Some(5), IndividualEvent))
 
   val childD: Child = Child(personD, "relaType", None)
   val childE: Child = Child(personE, "relaType", None)
 
-  val familyC: Family = Family(1, None, None, Instant.now, None, "", List(childE))
+  val familyC: Family =
+    Family(3, None, None, Instant.now, None, "", List(childE), Events(List.empty, Some(3), FamilyEvent))
   val personC: Person =
-    Person(fakePersonDetails(firstname = "Firstname3", id = 3), Events(List.empty), families = List(familyC))
+    Person(
+      fakePersonDetails(firstname = "Firstname3", id = 3),
+      Events(List.empty, Some(3), IndividualEvent),
+      families = List(familyC)
+    )
 
-  val childC: Child   = Child(personC, "relaType", None)
-  val familyB: Family = Family(1, None, None, Instant.now, None, "", List(childC, childD))
+  val childC: Child = Child(personC, "relaType", None)
+  val familyB: Family =
+    Family(2, None, None, Instant.now, None, "", List(childC, childD), Events(List.empty, Some(2), FamilyEvent))
   val personB: Person =
-    Person(fakePersonDetails(firstname = "Firstname2", id = 2), Events(List.empty), families = List(familyB))
+    Person(
+      fakePersonDetails(firstname = "Firstname2", id = 2),
+      Events(List.empty, Some(2), IndividualEvent),
+      families = List(familyB)
+    )
 
-  val childB: Child   = Child(personB, "relaType", None)
-  val familyA: Family = Family(1, None, None, Instant.now, None, "", List(childB))
+  val childB: Child = Child(personB, "relaType", None)
+  val familyA: Family =
+    Family(1, None, None, Instant.now, None, "", List(childB), Events(List.empty, Some(1), FamilyEvent))
   val personA: Person =
-    Person(fakePersonDetails(firstname = "Firstname1", id = 1), Events(List.empty), families = List(familyA))
+    Person(
+      fakePersonDetails(firstname = "Firstname1", id = 1),
+      Events(List.empty, Some(1), IndividualEvent),
+      families = List(familyA)
+    )
 
   protected override def localGuiceApplicationBuilder(): GuiceApplicationBuilder =
     GuiceApplicationBuilder()

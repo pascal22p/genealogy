@@ -4,6 +4,8 @@ import java.time.Instant
 
 import scala.concurrent.Future
 
+import models.EventType.FamilyEvent
+import models.EventType.IndividualEvent
 import models.Events
 import models.Family
 import models.MaleSex
@@ -33,16 +35,31 @@ class AscendanceServiceSpec extends BaseSpec {
       val timeStamp = Instant.now
 
       val personD: Person =
-        Person(fakePersonDetails(firstname = "Firstname4", id = 4, timestamp = timeStamp), Events(List.empty))
+        Person(
+          fakePersonDetails(firstname = "Firstname4", id = 4, timestamp = timeStamp),
+          Events(List.empty, Some(4), IndividualEvent)
+        )
       val personE: Person =
-        Person(fakePersonDetails(firstname = "Firstname5", id = 5, timestamp = timeStamp), Events(List.empty))
+        Person(
+          fakePersonDetails(firstname = "Firstname5", id = 5, timestamp = timeStamp),
+          Events(List.empty, Some(5), IndividualEvent)
+        )
 
-      val familyC: Family   = Family(1, None, Some(personE.copy(parents = List.empty)), timeStamp, None, "")
+      val familyC: Family = Family(
+        1,
+        None,
+        Some(personE.copy(parents = List.empty)),
+        timeStamp,
+        None,
+        "",
+        List.empty,
+        Events(List.empty, Some(1), FamilyEvent)
+      )
       val parentsC: Parents = Parents(familyC, "", "", None)
       val personC: Person =
         Person(
           fakePersonDetails(firstname = "Firstname3", id = 3, timestamp = timeStamp),
-          Events(List.empty),
+          Events(List.empty, Some(3), IndividualEvent),
           parents = List(parentsC)
         )
 
@@ -52,22 +69,34 @@ class AscendanceServiceSpec extends BaseSpec {
         Some(personD.copy(parents = List.empty)),
         timeStamp,
         None,
-        ""
+        "",
+        List.empty,
+        Events(List.empty, Some(1), FamilyEvent)
       )
       val parentsB: Parents = Parents(familyB, "", "", None)
       val personB: Person =
         Person(
           fakePersonDetails(firstname = "Firstname2", id = 2, timestamp = timeStamp),
-          Events(List.empty),
+          Events(List.empty, Some(2), IndividualEvent),
           parents = List(parentsB)
         )
 
-      val familyA: Family   = Family(1, Some(personB.copy(parents = List.empty)), None, timeStamp, None, "")
+      val familyA: Family =
+        Family(
+          1,
+          Some(personB.copy(parents = List.empty)),
+          None,
+          timeStamp,
+          None,
+          "",
+          List.empty,
+          Events(List.empty, Some(1), FamilyEvent)
+        )
       val parentsA: Parents = Parents(familyA, "", "", None)
       val personA: Person =
         Person(
           fakePersonDetails(firstname = "Firstname1", id = 1, timestamp = timeStamp),
-          Events(List.empty),
+          Events(List.empty, Some(1), IndividualEvent),
           parents = List(parentsA)
         )
 
@@ -97,7 +126,7 @@ class AscendanceServiceSpec extends BaseSpec {
           "surnamePrefix",
           None
         ),
-        Events(List()),
+        Events(List.empty, Some(1), IndividualEvent),
         List(
           Parents(
             Family(
@@ -118,7 +147,7 @@ class AscendanceServiceSpec extends BaseSpec {
                     "surnamePrefix",
                     None
                   ),
-                  Events(List()),
+                  Events(List.empty, Some(2), IndividualEvent),
                   List(
                     Parents(
                       Family(
@@ -139,7 +168,7 @@ class AscendanceServiceSpec extends BaseSpec {
                               "surnamePrefix",
                               None
                             ),
-                            Events(List()),
+                            Events(List.empty, Some(3), IndividualEvent),
                             List(
                               Parents(
                                 Family(
@@ -161,7 +190,7 @@ class AscendanceServiceSpec extends BaseSpec {
                                         "surnamePrefix",
                                         None
                                       ),
-                                      Events(List()),
+                                      Events(List.empty, Some(5), IndividualEvent),
                                       List(),
                                       List()
                                     )
@@ -170,7 +199,7 @@ class AscendanceServiceSpec extends BaseSpec {
                                   None,
                                   "",
                                   List(),
-                                  Events(List())
+                                  Events(List.empty, Some(1), FamilyEvent),
                                 ),
                                 "",
                                 "",
@@ -196,7 +225,7 @@ class AscendanceServiceSpec extends BaseSpec {
                               "surnamePrefix",
                               None
                             ),
-                            Events(List()),
+                            Events(List.empty, Some(4), IndividualEvent),
                             List(),
                             List()
                           )
@@ -205,7 +234,7 @@ class AscendanceServiceSpec extends BaseSpec {
                         None,
                         "",
                         List(),
-                        Events(List())
+                        Events(List.empty, Some(1), FamilyEvent),
                       ),
                       "",
                       "",
@@ -220,7 +249,7 @@ class AscendanceServiceSpec extends BaseSpec {
               None,
               "",
               List(),
-              Events(List())
+              Events(List.empty, Some(1), FamilyEvent),
             ),
             "",
             "",

@@ -6,6 +6,8 @@ import scala.concurrent.Future
 import scala.jdk.CollectionConverters.*
 
 import models.*
+import models.EventType.FamilyEvent
+import models.EventType.IndividualEvent
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
@@ -40,36 +42,53 @@ class DescendanceServiceSpec extends BaseSpec {
       val timeStamp = Instant.now
 
       val personD: Person =
-        Person(fakePersonDetails(firstname = "Firstname4", id = 4, timestamp = timeStamp), Events(List.empty))
+        Person(
+          fakePersonDetails(firstname = "Firstname4", id = 4, timestamp = timeStamp),
+          Events(List.empty, Some(4), IndividualEvent)
+        )
       val personE: Person =
-        Person(fakePersonDetails(firstname = "Firstname5", id = 5, timestamp = timeStamp), Events(List.empty))
+        Person(
+          fakePersonDetails(firstname = "Firstname5", id = 5, timestamp = timeStamp),
+          Events(List.empty, Some(5), IndividualEvent)
+        )
 
       val childD: Child = Child(personD, "relaType", None)
       val childE: Child = Child(personE, "relaType", None)
 
-      val familyC: Family = Family(1, None, None, timeStamp, None, "", List(childE))
+      val familyC: Family =
+        Family(1, None, None, timeStamp, None, "", List(childE), Events(List.empty, Some(1), FamilyEvent))
       val personC: Person =
         Person(
           fakePersonDetails(firstname = "Firstname3", id = 3, timestamp = timeStamp),
-          Events(List.empty),
+          Events(List.empty, Some(3), IndividualEvent),
           families = List(familyC)
         )
 
-      val childC: Child   = Child(personC.copy(families = List.empty), "relaType", None)
-      val familyB: Family = Family(1, None, None, timeStamp, None, "", List(childC, childD))
+      val childC: Child = Child(personC.copy(families = List.empty), "relaType", None)
+      val familyB: Family = Family(
+        1,
+        None,
+        None,
+        timeStamp,
+        None,
+        "",
+        List(childC, childD),
+        Events(List.empty, Some(1), FamilyEvent)
+      )
       val personB: Person =
         Person(
           fakePersonDetails(firstname = "Firstname2", id = 2, timestamp = timeStamp),
-          Events(List.empty),
+          Events(List.empty, Some(2), IndividualEvent),
           families = List(familyB)
         )
 
-      val childB: Child   = Child(personB.copy(families = List.empty), "relaType", None)
-      val familyA: Family = Family(1, None, None, timeStamp, None, "", List(childB))
+      val childB: Child = Child(personB.copy(families = List.empty), "relaType", None)
+      val familyA: Family =
+        Family(1, None, None, timeStamp, None, "", List(childB), Events(List.empty, Some(1), FamilyEvent))
       val personA: Person =
         Person(
           fakePersonDetails(firstname = "Firstname1", id = 1, timestamp = timeStamp),
-          Events(List.empty),
+          Events(List.empty, Some(1), IndividualEvent),
           families = List(familyA)
         )
 
@@ -88,7 +107,7 @@ class DescendanceServiceSpec extends BaseSpec {
           "surnamePrefix",
           None
         ),
-        Events(List()),
+        Events(List.empty, Some(1), IndividualEvent),
         List(),
         List(
           Family(
@@ -115,7 +134,7 @@ class DescendanceServiceSpec extends BaseSpec {
                     "surnamePrefix",
                     None
                   ),
-                  Events(List()),
+                  Events(List.empty, Some(2), IndividualEvent),
                   List(),
                   List(
                     Family(
@@ -142,7 +161,7 @@ class DescendanceServiceSpec extends BaseSpec {
                               "surnamePrefix",
                               None
                             ),
-                            Events(List()),
+                            Events(List.empty, Some(3), IndividualEvent),
                             List(),
                             List(
                               Family(
@@ -169,7 +188,7 @@ class DescendanceServiceSpec extends BaseSpec {
                                         "surnamePrefix",
                                         None
                                       ),
-                                      Events(List()),
+                                      Events(List.empty, Some(5), IndividualEvent),
                                       List(),
                                       List()
                                     ),
@@ -177,7 +196,7 @@ class DescendanceServiceSpec extends BaseSpec {
                                     None
                                   )
                                 ),
-                                Events(List())
+                                Events(List.empty, Some(1), FamilyEvent)
                               )
                             )
                           ),
@@ -200,7 +219,7 @@ class DescendanceServiceSpec extends BaseSpec {
                               "surnamePrefix",
                               None
                             ),
-                            Events(List()),
+                            Events(List.empty, Some(4), IndividualEvent),
                             List(),
                             List()
                           ),
@@ -208,7 +227,7 @@ class DescendanceServiceSpec extends BaseSpec {
                           None
                         )
                       ),
-                      Events(List())
+                      Events(List.empty, Some(1), FamilyEvent)
                     )
                   )
                 ),
@@ -216,7 +235,7 @@ class DescendanceServiceSpec extends BaseSpec {
                 None
               )
             ),
-            Events(List())
+            Events(List.empty, Some(1), FamilyEvent)
           )
         )
       )

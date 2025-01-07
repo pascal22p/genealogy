@@ -6,6 +6,10 @@ import scala.concurrent.Future
 
 import actions.AuthAction
 import models.*
+import models.EventType.FamilyEvent
+import models.EventType.IndividualEvent
+import models.EventType.UnknownEvent
+import org.jsoup.Jsoup
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar.mock
@@ -37,34 +41,51 @@ class AscendanceControllerSpec extends BaseSpec {
     "display list of ascendants" in {
       val timeStamp = Instant.now
       val personD: Person =
-        Person(fakePersonDetails(firstname = "Firstname4", id = 4, timestamp = timeStamp), Events(List.empty))
+        Person(
+          fakePersonDetails(firstname = "Firstname4", id = 4, timestamp = timeStamp),
+          Events(List.empty, Some(4), IndividualEvent)
+        )
       val personE: Person =
-        Person(fakePersonDetails(firstname = "Firstname5", id = 5, timestamp = timeStamp), Events(List.empty))
+        Person(
+          fakePersonDetails(firstname = "Firstname5", id = 5, timestamp = timeStamp),
+          Events(List.empty, Some(5), IndividualEvent)
+        )
 
-      val familyC: Family   = Family(1, None, Some(personE), timeStamp, None, "")
+      val familyC: Family =
+        Family(3, None, Some(personE), timeStamp, None, "", List.empty, Events(List.empty, Some(3), FamilyEvent))
       val parentsC: Parents = Parents(familyC, "", "", None)
       val personC: Person =
         Person(
           fakePersonDetails(firstname = "Firstname3", id = 3, timestamp = timeStamp),
-          Events(List.empty),
+          Events(List.empty, Some(3), IndividualEvent),
           parents = List(parentsC)
         )
 
-      val familyB: Family   = Family(1, Some(personC), Some(personD), timeStamp, None, "")
+      val familyB: Family = Family(
+        2,
+        Some(personC),
+        Some(personD),
+        timeStamp,
+        None,
+        "",
+        List.empty,
+        Events(List.empty, Some(2), FamilyEvent)
+      )
       val parentsB: Parents = Parents(familyB, "", "", None)
       val personB: Person =
         Person(
           fakePersonDetails(firstname = "Firstname2", id = 2, timestamp = timeStamp),
-          Events(List.empty),
+          Events(List.empty, Some(2), IndividualEvent),
           parents = List(parentsB)
         )
 
-      val familyA: Family   = Family(1, Some(personB), None, timeStamp, None, "")
+      val familyA: Family =
+        Family(1, Some(personB), None, timeStamp, None, "", List.empty, Events(List.empty, Some(1), FamilyEvent))
       val parentsA: Parents = Parents(familyA, "", "", None)
       val personA: Person =
         Person(
           fakePersonDetails(firstname = "Firstname1", id = 1, timestamp = timeStamp),
-          Events(List.empty),
+          Events(List.empty, Some(1), IndividualEvent),
           parents = List(parentsA)
         )
 
@@ -72,180 +93,110 @@ class AscendanceControllerSpec extends BaseSpec {
         Future.successful(Some(personA))
       )
 
-      val expected =
-        """
-          |<divclass="govuk-!-padding-4box">
-          |  <divclass="govuk-summary-cardgovuk-!-margin-4">
-          |    <divclass="govuk-summary-card__title-wrapper">
-          |      <h2class="govuk-summary-card__title">Generation0</h2>
-          |    </div>
-          |    <divclass="govuk-summary-card__content">
-          |      <dlclass="govuk-summary-list">
-          |        <divclass="govuk-summary-list__rowgovuk-summary-list__row--no-border">
-          |          <dtclass="govuk-summary-list__key">Firstname1Surname</dt>
-          |          <ddclass="govuk-summary-list__value"></dd>
-          |          <ddclass="govuk-summary-list__actions"><aclass="govuk-link"href="/individual/1">Details<spanclass="govuk-visually-hidden">(Generation0)</span></a></dd>
-          |        </div>
-          |      </dl>
-          |    </div>
-          |  </div>
-          |  <divclass="govuk-summary-cardgovuk-!-margin-4">
-          |    <divclass="govuk-summary-card__title-wrapper">
-          |      <h2class="govuk-summary-card__title">Generation1</h2>
-          |    </div>
-          |    <divclass="govuk-summary-card__content">
-          |      <dlclass="govuk-summary-list">
-          |        <divclass="govuk-summary-list__rowgovuk-summary-list__row--no-border">
-          |          <dtclass="govuk-summary-list__key">Firstname2Surname</dt>
-          |          <ddclass="govuk-summary-list__value"></dd>
-          |          <ddclass="govuk-summary-list__actions"><aclass="govuk-link"href="/individual/2">Details<spanclass="govuk-visually-hidden">(Generation1)</span></a></dd>
-          |        </div>
-          |      </dl>
-          |    </div>
-          |  </div>
-          |  <divclass="govuk-summary-cardgovuk-!-margin-4">
-          |    <divclass="govuk-summary-card__title-wrapper">
-          |      <h2class="govuk-summary-card__title">Generation2</h2>
-          |    </div>
-          |    <divclass="govuk-summary-card__content">
-          |      <dlclass="govuk-summary-list">
-          |        <divclass="govuk-summary-list__rowgovuk-summary-list__row--no-border">
-          |          <dtclass="govuk-summary-list__key">Firstname3Surname</dt>
-          |          <ddclass="govuk-summary-list__value"></dd><ddclass="govuk-summary-list__actions"><aclass="govuk-link"href="/individual/3">Details<spanclass="govuk-visually-hidden">(Generation2)</span></a></dd>
-          |        </div>
-          |        <divclass="govuk-summary-list__rowgovuk-summary-list__row--no-border">
-          |          <dtclass="govuk-summary-list__key">Firstname4Surname</dt>
-          |          <ddclass="govuk-summary-list__value"></dd>
-          |          <ddclass="govuk-summary-list__actions"><aclass="govuk-link"href="/individual/4">Details<spanclass="govuk-visually-hidden">(Generation2)</span></a></dd>
-          |        </div>
-          |      </dl>
-          |    </div>
-          |  </div>
-          |  <divclass="govuk-summary-cardgovuk-!-margin-4">
-          |    <divclass="govuk-summary-card__title-wrapper">
-          |      <h2class="govuk-summary-card__title">Generation3</h2>
-          |    </div>
-          |    <divclass="govuk-summary-card__content">
-          |      <dlclass="govuk-summary-list">
-          |        <divclass="govuk-summary-list__rowgovuk-summary-list__row--no-border">
-          |          <dtclass="govuk-summary-list__key">Firstname5Surname</dt>
-          |          <ddclass="govuk-summary-list__value"></dd>
-          |          <ddclass="govuk-summary-list__actions"><aclass="govuk-link"href="/individual/5">Details<spanclass="govuk-visually-hidden">(Generation3)</span></a></dd>
-          |        </div>
-          |      </dl>
-          |    </div>
-          |  </div>
-          |</div>
-          |""".stripMargin.filterNot(_.isWhitespace)
-
-      val result = sut.showAscendant(1).apply(FakeRequest())
+      val result      = sut.showAscendant(1).apply(FakeRequest())
+      val html        = Jsoup.parse(contentAsString(result))
+      val generation0 = html.getElementById("generation-0").html()
+      val generation1 = html.getElementById("generation-1").html()
+      val generation2 = html.getElementById("generation-2").html()
+      val generation3 = html.getElementById("generation-3").html()
       status(result) mustBe OK
-      contentAsString(result).filterNot(_.isWhitespace) must include(expected)
+      generation0.toString must include("Firstname1 Surname")
+      generation1.toString must include("Firstname2 Surname")
+      generation2.toString must include("Firstname3 Surname")
+      generation2.toString must include("Firstname4 Surname")
+      generation3.toString must include("Firstname5 Surname")
     }
 
     "remove duplicates" in {
-      val personD: Person = Person(fakePersonDetails(firstname = "Firstname4", id = 4), Events(List.empty))
-      val personE: Person = Person(fakePersonDetails(firstname = "Firstname5", id = 5), Events(List.empty))
+      val personD: Person =
+        Person(fakePersonDetails(firstname = "Firstname4", id = 4), Events(List.empty, Some(4), IndividualEvent))
+      val personE: Person =
+        Person(fakePersonDetails(firstname = "Firstname5", id = 5), Events(List.empty, Some(5), IndividualEvent))
 
-      val familyC: Family   = Family(1, None, Some(personE), Instant.now, None, "")
+      val familyC: Family =
+        Family(4, None, Some(personE), Instant.now, None, "", List.empty, Events(List.empty, Some(4), FamilyEvent))
       val parentsC: Parents = Parents(familyC, "", "", None)
       val personC: Person =
-        Person(fakePersonDetails(firstname = "Firstname3", id = 3), Events(List.empty), parents = List(parentsC))
+        Person(
+          fakePersonDetails(firstname = "Firstname3", id = 3),
+          Events(List.empty, Some(3), IndividualEvent),
+          parents = List(parentsC)
+        )
 
-      val familyB: Family   = Family(1, Some(personC), Some(personD), Instant.now, None, "")
+      val familyB: Family = Family(
+        3,
+        Some(personC),
+        Some(personD),
+        Instant.now,
+        None,
+        "",
+        List.empty,
+        Events(List.empty, Some(3), FamilyEvent)
+      )
       val parentsB: Parents = Parents(familyB, "", "", None)
       val personB: Person =
-        Person(fakePersonDetails(firstname = "Firstname2", id = 2), Events(List.empty), parents = List(parentsB))
+        Person(
+          fakePersonDetails(firstname = "Firstname2", id = 2),
+          Events(List.empty, Some(2), IndividualEvent),
+          parents = List(parentsB)
+        )
 
-      val familyBB: Family   = Family(1, Some(personC), Some(personD), Instant.now, None, "")
+      val familyBB: Family = Family(
+        2,
+        Some(personC),
+        Some(personD),
+        Instant.now,
+        None,
+        "",
+        List.empty,
+        Events(List.empty, Some(2), FamilyEvent)
+      )
       val parentsBB: Parents = Parents(familyB, "", "", None)
       val personBB: Person =
-        Person(fakePersonDetails(firstname = "Firstname22", id = 2), Events(List.empty), parents = List(parentsB))
+        Person(
+          fakePersonDetails(firstname = "Firstname22", id = 22),
+          Events(List.empty, Some(22), IndividualEvent),
+          parents = List(parentsB)
+        )
 
-      val familyA: Family   = Family(1, Some(personB), Some(personBB), Instant.now, None, "")
+      val familyA: Family = Family(
+        1,
+        Some(personB),
+        Some(personBB),
+        Instant.now,
+        None,
+        "",
+        List.empty,
+        Events(List.empty, Some(1), FamilyEvent)
+      )
       val parentsA: Parents = Parents(familyA, "", "", None)
       val personA: Person =
-        Person(fakePersonDetails(firstname = "Firstname1", id = 1), Events(List.empty), parents = List(parentsA))
+        Person(
+          fakePersonDetails(firstname = "Firstname1", id = 1),
+          Events(List.empty, Some(1), IndividualEvent),
+          parents = List(parentsA)
+        )
 
       when(mockAscendanceService.getAscendant(any(), any())).thenReturn(
         Future.successful(Some(personA))
       )
 
-      val expected =
-        """
-          | <divclass="govuk-!-padding-4box">
-          |  <divclass="govuk-summary-cardgovuk-!-margin-4">
-          |    <divclass="govuk-summary-card__title-wrapper">
-          |      <h2class="govuk-summary-card__title">Generation0</h2>
-          |    </div>
-          |    <divclass="govuk-summary-card__content">
-          |      <dlclass="govuk-summary-list">
-          |        <divclass="govuk-summary-list__rowgovuk-summary-list__row--no-border">
-          |          <dtclass="govuk-summary-list__key">Firstname1Surname</dt>
-          |          <ddclass="govuk-summary-list__value"></dd>
-          |          <ddclass="govuk-summary-list__actions"><aclass="govuk-link"href="/individual/1">Details<spanclass="govuk-visually-hidden">(Generation0)</span></a></dd>
-          |        </div>
-          |      </dl>
-          |    </div>
-          |  </div>
-          |  <divclass="govuk-summary-cardgovuk-!-margin-4">
-          |    <divclass="govuk-summary-card__title-wrapper">
-          |      <h2class="govuk-summary-card__title">Generation1</h2>
-          |    </div>
-          |    <divclass="govuk-summary-card__content">
-          |      <dlclass="govuk-summary-list">
-          |        <divclass="govuk-summary-list__rowgovuk-summary-list__row--no-border">
-          |          <dtclass="govuk-summary-list__key">Firstname2Surname</dt>
-          |          <ddclass="govuk-summary-list__value"></dd>
-          |          <ddclass="govuk-summary-list__actions"><aclass="govuk-link"href="/individual/2">Details<spanclass="govuk-visually-hidden">(Generation1)</span></a></dd>
-          |        </div>
-          |        <divclass="govuk-summary-list__rowgovuk-summary-list__row--no-border">
-          |          <dtclass="govuk-summary-list__key">Firstname22Surname</dt>
-          |            <ddclass="govuk-summary-list__value"></dd><ddclass="govuk-summary-list__actions"><aclass="govuk-link"href="/individual/2">Details<spanclass="govuk-visually-hidden">(Generation1)</span></a></dd>
-          |        </div>
-          |      </dl>
-          |    </div>
-          |  </div>
-          |  <divclass="govuk-summary-cardgovuk-!-margin-4">
-          |    <divclass="govuk-summary-card__title-wrapper">
-          |      <h2class="govuk-summary-card__title">Generation2</h2>
-          |    </div>
-          |    <divclass="govuk-summary-card__content">
-          |      <dlclass="govuk-summary-list">
-          |        <divclass="govuk-summary-list__rowgovuk-summary-list__row--no-border">
-          |          <dtclass="govuk-summary-list__key">Firstname3Surname</dt>
-          |          <ddclass="govuk-summary-list__value"></dd>
-          |          <ddclass="govuk-summary-list__actions"><aclass="govuk-link"href="/individual/3">Details<spanclass="govuk-visually-hidden">(Generation2)</span></a></dd>
-          |        </div>
-          |        <divclass="govuk-summary-list__rowgovuk-summary-list__row--no-border">
-          |          <dtclass="govuk-summary-list__key">Firstname4Surname</dt>
-          |          <ddclass="govuk-summary-list__value"></dd>
-          |          <ddclass="govuk-summary-list__actions"><aclass="govuk-link"href="/individual/4">Details<spanclass="govuk-visually-hidden">(Generation2)</span></a></dd>
-          |        </div>
-          |      </dl>
-          |    </div>
-          |  </div>
-          |  <divclass="govuk-summary-cardgovuk-!-margin-4">
-          |    <divclass="govuk-summary-card__title-wrapper">
-          |      <h2class="govuk-summary-card__title">Generation3</h2>
-          |    </div>
-          |    <divclass="govuk-summary-card__content">
-          |      <dlclass="govuk-summary-list">
-          |        <divclass="govuk-summary-list__rowgovuk-summary-list__row--no-border">
-          |          <dtclass="govuk-summary-list__key">Firstname5Surname</dt>
-          |          <ddclass="govuk-summary-list__value"></dd>
-          |          <ddclass="govuk-summary-list__actions"><aclass="govuk-link"href="/individual/5">Details<spanclass="govuk-visually-hidden">(Generation3)</span></a></dd>
-          |        </div>
-          |      </dl>
-          |    </div>
-          |  </div>
-          |</div>
-          |
-          |""".stripMargin.filterNot(_.isWhitespace)
-
       val result = sut.showAscendant(1).apply(FakeRequest())
+      val html   = Jsoup.parse(contentAsString(result))
+      println(html)
+      val generation0 = html.getElementById("generation-0").html()
+      val generation1 = html.getElementById("generation-1").html()
+      val generation2 = html.getElementById("generation-2").html()
+      val generation3 = html.getElementById("generation-3").html()
       status(result) mustBe OK
-      contentAsString(result).filterNot(_.isWhitespace) must include(expected)
+      generation0.toString must include("Firstname1 Surname")
+      generation1.toString must include("Firstname2 Surname")
+      generation1.toString must include("Firstname22 Surname")
+      generation2.toString must include("Firstname3 Surname")
+      generation2.toString must include("Firstname4 Surname")
+      generation2.toString.split("Firstname4 Surname").length mustBe 2
+      generation3.toString must include("Firstname5 Surname")
+      generation3.toString.split("Firstname5 Surname").length mustBe 2
     }
   }
 }

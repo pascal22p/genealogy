@@ -13,6 +13,10 @@
   s"""Generation $depth"""
 }
 
+@id(depth: Int) = @{
+  s"generation-$depth"
+}
+
 
 @main(dbId, flatTree.headOption.flatMap(_._2.headOption)) {
 
@@ -41,7 +45,7 @@
               attributes = Map.empty
           )),
           classes = "",
-          attributes = Map.empty
+          attributes = Map("id" -> id(gen._1))
       )
       )
   }
