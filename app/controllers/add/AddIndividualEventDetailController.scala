@@ -9,19 +9,19 @@ import actions.AuthAction
 import actions.AuthJourney
 import models.forms.EventDetailForm
 import models.AuthenticatedRequest
+import models.EventType.IndividualEvent
 import models.Person
 import play.api.data.Form
 import play.api.i18n.*
 import play.api.mvc.*
 import play.api.Logging
+import queries.GetSqlQueries
 import queries.InsertSqlQueries
 import services.PersonService
 import services.SessionService
+import uk.gov.hmrc.hmrcfrontend.views.viewmodels.accountmenu.PersonalDetails
 import views.html.add.AddEventDetail
 import views.html.ServiceUnavailable
-import uk.gov.hmrc.hmrcfrontend.views.viewmodels.accountmenu.PersonalDetails
-import queries.GetSqlQueries
-import models.EventType.IndividualEvent
 
 @Singleton
 class AddIndividualEventDetailController @Inject() (
@@ -41,30 +41,33 @@ class AddIndividualEventDetailController @Inject() (
 
   def showForm(personId: Int): Action[AnyContent] = authJourney.authWithAdminRight.async {
     implicit authenticatedRequest: AuthenticatedRequest[AnyContent] =>
-    val filled = EventDetailForm(authenticatedRequest.localSession.sessionData.dbId, None, None, "", "", "", "", "")
-    val form = EventDetailForm.eventDetailForm.fill(filled)
-    getSqlQueries.getAllPlaces.map { allPlace =>
-      Ok(addEventDetailsView(form, personId, allPlace, IndividualEvent))
-    }
+      val filled = EventDetailForm(authenticatedRequest.localSession.sessionData.dbId, None, None, "", "", "", "", "")
+      val form   = EventDetailForm.eventDetailForm.fill(filled)
+      getSqlQueries.getAllPlaces.map { allPlace =>
+        Ok(addEventDetailsView(form, personId, allPlace, IndividualEvent))
+      }
   }
 
-  def onSubmit(personId: Int): Action[AnyContent] = authJourney.authWithAdminRight.async { implicit authenticatedRequest =>
-    val errorFunction: Form[EventDetailForm] => Future[Result] = { (formWithErrors: Form[EventDetailForm]) =>
-      getSqlQueries.getAllPlaces.map { allPlace =>
-        BadRequest(addEventDetailsView(formWithErrors, personId, allPlace, IndividualEvent))
+  def onSubmit(personId: Int): Action[AnyContent] = authJourney.authWithAdminRight.async {
+    implicit authenticatedRequest =>
+      val errorFunction: Form[EventDetailForm] => Future[Result] = { (formWithErrors: Form[EventDetailForm]) =>
+        getSqlQueries.getAllPlaces.map { allPlace =>
+          BadRequest(addEventDetailsView(formWithErrors, personId, allPlace, IndividualEvent))
+        }
       }
-    }
 
-    val successFunction: EventDetailForm => Future[Result] = { (dataForm: EventDetailForm) =>
-      insertSqlQueries.insertEventDetail(dataForm.toEventDetailOnlyQueryData, personId, IndividualEvent).fold(
-        InternalServerError(serviceUnavailableView("No record was inserted"))
-      ){ id =>
-        Redirect(controllers.routes.EventController.showEvent(id))
+      val successFunction: EventDetailForm => Future[Result] = { (dataForm: EventDetailForm) =>
+        insertSqlQueries
+          .insertEventDetail(dataForm.toEventDetailOnlyQueryData, personId, IndividualEvent)
+          .fold(
+            InternalServerError(serviceUnavailableView("No record was inserted"))
+          ) { id =>
+            Redirect(controllers.routes.EventController.showEvent(id))
+          }
       }
-    }
 
-    val formValidationResult = EventDetailForm.eventDetailForm.bindFromRequest()
-    formValidationResult.fold(errorFunction, successFunction)
+      val formValidationResult = EventDetailForm.eventDetailForm.bindFromRequest()
+      formValidationResult.fold(errorFunction, successFunction)
   }
 
 }
