@@ -24,7 +24,7 @@
                     actions = Some(Actions(
                         items = Seq(
                             ActionItem(
-                                href = controllers.routes.IndividualController.showPerson(name.details.id).url,
+                                href = controllers.routes.IndividualController.showPerson(dbId, name.details.id).url,
                                 content = Text("View")
                             )
                         )
@@ -36,7 +36,7 @@
                 actions = Some(Actions(
                     items = Seq(
                         ActionItem(
-                            href = controllers.add.routes.AddPersonDetailsController.showForm.url,
+                            href = controllers.add.routes.AddPersonDetailsController.showForm(dbId).url,
                             content = Text("Add")
                         )
                     )

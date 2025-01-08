@@ -8,6 +8,7 @@ import scala.concurrent.Future
 
 import anorm.*
 import anorm.SqlParser.*
+import cats.data.OptionT
 import models.*
 import models.forms.EventDetailForm
 import models.queryData.*
@@ -233,6 +234,16 @@ final class GetSqlQueries @Inject() (db: Database, databaseExecutionContext: Dat
         .as[List[Media]](Media.mysqlParser.*)
     }
   }(databaseExecutionContext)
+
+  def getGenealogyDatabase(id: Int): OptionT[Future, GenealogyDatabase] = OptionT(Future {
+    db.withConnection { implicit conn =>
+      SQL("""SELECT id, nom, descriptif
+            |FROM genea_infos
+            |WHERE id = {id}""".stripMargin)
+        .on("id" -> id)
+        .as[Option[GenealogyDatabase]](GenealogyDatabase.mysqlParser.singleOpt)
+    }
+  }(databaseExecutionContext))
 
   def getGenealogyDatabases: Future[List[GenealogyDatabase]] = Future {
     db.withConnection { implicit conn =>

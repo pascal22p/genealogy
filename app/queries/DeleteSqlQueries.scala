@@ -34,10 +34,6 @@ import play.api.libs.json.Json
 final class DeleteSqlQueries @Inject() (db: Database, databaseExecutionContext: DatabaseExecutionContext) {
 
   def deletePersonDetails(personDetailsId: Int): Future[Int] = Future {
-    val parser: ResultSetParser[Option[Int]] = {
-      int("insert_id").singleOpt
-    }
-
     db.withTransaction { implicit conn =>
       SQL("""DELETE genea_events_details FROM genea_events_details
             | LEFT JOIN rel_indi_events ON genea_events_details.events_details_id = rel_indi_events.events_details_id
@@ -53,6 +49,18 @@ final class DeleteSqlQueries @Inject() (db: Database, databaseExecutionContext: 
           """.stripMargin)
         .on(
           "id" -> personDetailsId
+        )
+        .executeUpdate()
+    }
+  }(databaseExecutionContext)
+
+  def deleteGenealogyDatabase(id: Int): Future[Int] = Future {
+    db.withConnection { implicit conn =>
+      SQL("""DELETE FROM genea_infos
+            | WHERE id = {id}
+        """.stripMargin)
+        .on(
+          "id" -> id
         )
         .executeUpdate()
     }

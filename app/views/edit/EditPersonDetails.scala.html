@@ -14,7 +14,7 @@
         govukButton: GovukButton
 )
 
-@(personDetailsForm: Form[PersonDetailsForm])(implicit request: AuthenticatedRequest[?], messages: Messages)
+@(dbId: Int, personDetailsForm: Form[PersonDetailsForm])(implicit request: AuthenticatedRequest[?], messages: Messages)
 
 @main(1, None) {
 
@@ -27,7 +27,7 @@
         }
     }
 
-    @helper.form(action = controllers.edit.routes.EditPersonDetailsController.onSubmit ) {
+    @helper.form(action = controllers.edit.routes.EditPersonDetailsController.onSubmit(dbId) ) {
         @helper.CSRF.formField
         <input type="hidden" value="@personDetailsForm("id").value" name="id" />
         @govukInput(

@@ -36,31 +36,32 @@ class AddPersonDetailsController @Inject() (
     with I18nSupport
     with Logging {
 
-  def showForm: Action[AnyContent] = authJourney.authWithAdminRight.async {
+  def showForm(baseId: Int): Action[AnyContent] = authJourney.authWithAdminRight.async {
     implicit authenticatedRequest: AuthenticatedRequest[AnyContent] =>
       val filled =
-        PersonDetailsForm(authenticatedRequest.localSession.sessionData.dbId, -1, "", "", "", "", "", "", "", "", None)
+        PersonDetailsForm(baseId, -1, "", "", "", "", "", "", "", "", None)
       val form = PersonDetailsForm.personDetailsForm.fill(filled)
-      Future.successful(Ok(addPersonDetails(form)))
+      Future.successful(Ok(addPersonDetails(baseId, form)))
   }
 
-  def onSubmit: Action[AnyContent] = authJourney.authWithAdminRight.async { implicit authenticatedRequest =>
-    val errorFunction: Form[PersonDetailsForm] => Future[Result] = { (formWithErrors: Form[PersonDetailsForm]) =>
-      Future.successful(BadRequest(addPersonDetails(formWithErrors)))
-    }
+  def onSubmit(baseId: Int): Action[AnyContent] = authJourney.authWithAdminRight.async {
+    implicit authenticatedRequest =>
+      val errorFunction: Form[PersonDetailsForm] => Future[Result] = { (formWithErrors: Form[PersonDetailsForm]) =>
+        Future.successful(BadRequest(addPersonDetails(baseId, formWithErrors)))
+      }
 
-    val successFunction: PersonDetailsForm => Future[Result] = { (dataForm: PersonDetailsForm) =>
-      insertSqlQueries
-        .insertPersonDetails(dataForm.toPersonalDetails)
-        .fold(
-          InternalServerError(serviceUnavailableView("No record was inserted"))
-        ) { id =>
-          Redirect(controllers.routes.IndividualController.showPerson(id))
-        }
-    }
+      val successFunction: PersonDetailsForm => Future[Result] = { (dataForm: PersonDetailsForm) =>
+        insertSqlQueries
+          .insertPersonDetails(dataForm.toPersonalDetails)
+          .fold(
+            InternalServerError(serviceUnavailableView("No record was inserted"))
+          ) { id =>
+            Redirect(controllers.routes.IndividualController.showPerson(baseId, id))
+          }
+      }
 
-    val formValidationResult = PersonDetailsForm.personDetailsForm.bindFromRequest()
-    formValidationResult.fold(errorFunction, successFunction)
+      val formValidationResult = PersonDetailsForm.personDetailsForm.bindFromRequest()
+      formValidationResult.fold(errorFunction, successFunction)
   }
 
 }

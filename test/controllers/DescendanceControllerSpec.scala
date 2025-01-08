@@ -1,6 +1,7 @@
 package controllers
 
 import java.time.Instant
+import java.time.LocalDateTime
 
 import scala.concurrent.Future
 
@@ -23,7 +24,7 @@ import testUtils.FakeAuthAction
 
 class DescendanceControllerSpec extends BaseSpec {
   val userData: UserData                         = UserData(1, "username", "hashedPassword", true, true)
-  val fakeAuthAction: FakeAuthAction             = new FakeAuthAction(Session("id", SessionData(1, Some(userData))))
+  val fakeAuthAction: FakeAuthAction             = new FakeAuthAction(Session("id", SessionData(Some(userData)), LocalDateTime.now))
   val mockDescendanceService: DescendanceService = mock[DescendanceService]
 
   val personD: Person =
@@ -82,16 +83,16 @@ class DescendanceControllerSpec extends BaseSpec {
         """
           |<divclass="govuk-!-padding-4box">
           |<ulclass="govuk-list">
-          |  <listyle="margin:0;padding:0"><spanclass="govuk-!-font-size-16">[1]</span><aclass="govuk-link"style="padding:0;margin:0"href="/individual/1">Firstname1Surname</a>
+          |  <listyle="margin:0;padding:0"><spanclass="govuk-!-font-size-16">[1]</span><aclass="govuk-link"style="padding:0;margin:0"href="/base/1/individual/1">Firstname1Surname</a>
           |    <ulclass="govuk-listgovuk-!-margin-top-0govuk-!-margin-bottom-0"style="padding-left:40px">
-          |      <listyle="margin:0;padding:0">└<spanclass="govuk-!-font-size-16">[2]</span><aclass="govuk-link"style="padding:0;margin:0"href="/individual/2">Firstname2Surname</a>
+          |      <listyle="margin:0;padding:0">└<spanclass="govuk-!-font-size-16">[2]</span><aclass="govuk-link"style="padding:0;margin:0"href="/base/1/individual/2">Firstname2Surname</a>
           |        <ulclass="govuk-listgovuk-!-margin-top-0govuk-!-margin-bottom-0"style="padding-left:40px">
-          |          <listyle="margin:0;padding:0">├<spanclass="govuk-!-font-size-16">[3]</span><aclass="govuk-link"style="padding:0;margin:0"href="/individual/3">Firstname3Surname</a>
+          |          <listyle="margin:0;padding:0">├<spanclass="govuk-!-font-size-16">[3]</span><aclass="govuk-link"style="padding:0;margin:0"href="/base/1/individual/3">Firstname3Surname</a>
           |            <ulclass="govuk-listgovuk-!-margin-top-0govuk-!-margin-bottom-0"style="padding-left:40px">
-          |              <listyle="margin:0;padding:0">└<spanclass="govuk-!-font-size-16">[4]</span><aclass="govuk-link"style="padding:0;margin:0"href="/individual/5">Firstname5Surname</a></li>
+          |              <listyle="margin:0;padding:0">└<spanclass="govuk-!-font-size-16">[4]</span><aclass="govuk-link"style="padding:0;margin:0"href="/base/1/individual/5">Firstname5Surname</a></li>
           |            </ul>
           |          </li>
-          |          <listyle="margin:0;padding:0">└<spanclass="govuk-!-font-size-16">[3]</span><aclass="govuk-link"style="padding:0;margin:0"href="/individual/4">Firstname4Surname</a></li>
+          |          <listyle="margin:0;padding:0">└<spanclass="govuk-!-font-size-16">[3]</span><aclass="govuk-link"style="padding:0;margin:0"href="/base/1/individual/4">Firstname4Surname</a></li>
           |        </ul>
           |      </li>
           |    </ul>
@@ -100,7 +101,7 @@ class DescendanceControllerSpec extends BaseSpec {
           |</div>
           |""".stripMargin.filterNot(_.isWhitespace)
 
-      val result = sut.showDescendant(1).apply(FakeRequest())
+      val result = sut.showDescendant(1, 1).apply(FakeRequest())
       status(result) mustBe OK
       contentAsString(result).filterNot(_.isWhitespace) must include(expected)
     }

@@ -1,5 +1,7 @@
 package actions
 
+import java.time.LocalDateTime
+
 import scala.concurrent.ExecutionContext
 import scala.concurrent.ExecutionContext.global
 import scala.concurrent.Future
@@ -64,7 +66,7 @@ class AuthActionSpec extends BaseSpec {
     val sessionId = "123456-123456"
     val userData  = UserData(1, "name", "hashedPassword", true, true)
     when(mockSqlQueries.getSessionData(any())).thenReturn(
-      Future.successful(Some(Session(sessionId, SessionData(1, Some(userData)))))
+      Future.successful(Some(Session(sessionId, SessionData(Some(userData)), LocalDateTime.now)))
     )
     when(mockSqlQueries.sessionKeepAlive(any())).thenReturn(
       Future.successful(1)

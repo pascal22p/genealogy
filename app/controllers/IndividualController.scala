@@ -26,7 +26,7 @@ class IndividualController @Inject() (
 ) extends BaseController
     with I18nSupport {
 
-  def showPerson(id: Int): Action[AnyContent] = authAction.async {
+  def showPerson(baseId: Int, id: Int): Action[AnyContent] = authAction.async {
     implicit authenticatedRequest: AuthenticatedRequest[AnyContent] =>
       personService.getPerson(id).map { (personOption: Option[Person]) =>
         personOption.fold(NotFound("Nothing here")) { person =>
@@ -34,7 +34,7 @@ class IndividualController @Inject() (
 
           if (!person.details.privacyRestriction.contains("privacy") || isAllowedToSee) {
             sessionService.insertPersonInHistory(person)
-            Ok(individualView(person, authenticatedRequest.localSession.sessionData.dbId))
+            Ok(individualView(person, baseId))
           } else {
             Forbidden("Not allowed")
           }
@@ -44,7 +44,7 @@ class IndividualController @Inject() (
 
   def languageSwitch(lang: String): Action[AnyContent] = authAction.async {
     implicit request: AuthenticatedRequest[AnyContent] =>
-      Future.successful(Redirect(routes.IndividualController.showPerson(300)).withLang(Lang(lang)))
+      Future.successful(Redirect(routes.IndividualController.showPerson(1, 300)).withLang(Lang(lang)))
 
   }
 }

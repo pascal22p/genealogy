@@ -39,14 +39,14 @@ class HomeController @Inject() (
   def showSurnames(id: Int): Action[AnyContent] = authAction.async {
     implicit request: AuthenticatedRequest[AnyContent] =>
       genealogyDatabaseService.getSurnamesList(id).map { names =>
-        Ok(surnamesView(names, request.localSession.sessionData.dbId))
+        Ok(surnamesView(names, id))
       }
   }
 
   def showFirstnames(id: Int, name: String): Action[AnyContent] = authAction.async {
     implicit request: AuthenticatedRequest[AnyContent] =>
       genealogyDatabaseService.getFirstnamesList(id, name).map { names =>
-        Ok(firstnamesView(names, request.localSession.sessionData.dbId))
+        Ok(firstnamesView(names, id))
       }
   }
 }

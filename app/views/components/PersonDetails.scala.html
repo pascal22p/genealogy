@@ -1,6 +1,6 @@
 @this(lastModified: LastModified, block: Block, govukSummaryList: GovukSummaryList)
 
-@(person: Person)(implicit authenticatedRequest: AuthenticatedRequest[?], messages: Messages)
+@(dbId: Int, person: Person)(implicit authenticatedRequest: AuthenticatedRequest[?], messages: Messages)
 
     @lastModified(person.details.timestamp)
 
@@ -73,11 +73,11 @@
                 actions = Some(Actions(
                     items = Seq(
                         ActionItem(
-                            href = controllers.edit.routes.EditPersonDetailsController.showForm(person.details.id).url,
+                            href = controllers.edit.routes.EditPersonDetailsController.showForm(dbId, person.details.id).url,
                             content = Text("Edit")
                         ),
                         ActionItem(
-                            href = controllers.delete.routes.DeleteIndividualController.deletePersonConfirmation(person.details.id).url,
+                            href = controllers.delete.routes.DeleteIndividualController.deletePersonConfirmation(dbId, person.details.id).url,
                             content = Text("Delete")
                         )
                     )

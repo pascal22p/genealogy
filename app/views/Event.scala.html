@@ -18,12 +18,12 @@
 
   @if(event.eventType == IndividualEvent) {
     @for(ownerId <- event.ownerId) {
-      <div style="padding-left:10em;"><a class="govuk-link" href="@controllers.routes.IndividualController.showPerson(ownerId)">Return to @event.description page</a></div>
+      <div style="padding-left:10em;"><a class="govuk-link" href="@controllers.routes.IndividualController.showPerson(dbId, ownerId)">Return to @event.description page</a></div>
     }
   }
   @* @if(event.eventType == FamilyEvent) {
    *   @for(ownerId <- event.ownerId) {
-   *     <div style="padding-left:10em;"><a class="govuk-link" href="@controllers.routes.FamilyController.showFamily(ownerId)">Return to @event.description page</a></div>
+   *     <div style="padding-left:10em;"><a class="govuk-link" href="@controllers.routes.FamilyController.showFamily(dbId, ownerId)">Return to @event.description page</a></div>
    *   }
    * }
    *@
@@ -82,7 +82,7 @@
             actions = Some(Actions(
               items = Seq(
                   ActionItem(
-                      href = controllers.edit.routes.EditEventDetailController.showForm(event.events_details_id).url,
+                      href = controllers.edit.routes.EditEventDetailController.showForm(dbId, event.events_details_id).url,
                       content = Text("Edit")
                   ),
                   ActionItem(
@@ -100,7 +100,7 @@
   )
 
   @for(source <- event.sourCitations) {
-    @sourCitation(source)
+    @sourCitation(dbId, source)
   }
 
 }

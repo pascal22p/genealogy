@@ -42,7 +42,7 @@ class DescendanceController @Inject() (
     with I18nSupport
     with Logging {
 
-  def showDescendant(id: Int): Action[AnyContent] = authAction.async {
+  def showDescendant(baseId: Int, id: Int): Action[AnyContent] = authAction.async {
     implicit authenticatedRequest: AuthenticatedRequest[AnyContent] =>
       descendanceService.getDescendant(id, 0).map {
         case Some(tree) =>

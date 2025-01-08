@@ -16,9 +16,9 @@
         govukErrorSummary: GovukErrorSummary
 )
 
-@(personDetailsForm: Form[PersonDetailsForm])(implicit request: AuthenticatedRequest[?], messages: Messages)
+@(dbId: Int, personDetailsForm: Form[PersonDetailsForm])(implicit request: AuthenticatedRequest[?], messages: Messages)
 
-@main(1, None) {
+@main(dbId, None) {
 
 
   @block("Add new person details") {
@@ -33,7 +33,7 @@
         @govukErrorSummary(ErrorSummary().withFormErrorsAsHtml(personDetailsForm))
     }
     
-    @helper.form(action = controllers.add.routes.AddPersonDetailsController.onSubmit ) {
+    @helper.form(action = controllers.add.routes.AddPersonDetailsController.onSubmit(dbId) ) {
         @helper.CSRF.formField
         @govukInput(
             Input(

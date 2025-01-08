@@ -15,19 +15,19 @@
 
   <p class="govuk-body-l">
     <ul class="govuk-list">
-      <li><a class="govuk-link" href="@controllers.routes.DescendanceController.showDescendant(person.details.id)">Descendants</a></li>
-      <li><a class="govuk-link" href="@controllers.routes.AscendanceController.showAscendant(person.details.id)">Ascendants</a></li>
+      <li><a class="govuk-link" href="@controllers.routes.DescendanceController.showDescendant(dbId, person.details.id)">Descendants</a></li>
+      <li><a class="govuk-link" href="@controllers.routes.AscendanceController.showAscendant(dbId, person.details.id)">Ascendants</a></li>
   </ul>
   </p>
 
-  @personDetails(person)
+  @personDetails(dbId, person)
   
-  @individualEvents(person.events)
+  @individualEvents(dbId, person.events)
 
   @for(family <- person.families) {
-    @familyView(family, person.findPartner(family.id))
+    @familyView(dbId, family, person.findPartner(family.id))
   }
 
-  @parents(person)
+  @parents(dbId, person)
 
 }

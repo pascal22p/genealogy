@@ -12,13 +12,13 @@
         govukButton: GovukButton
 )
 
-@(sourCitationForm: Form[SourCitationForm], sourCitation: SourCitation)(implicit request: AuthenticatedRequest[?], messages: Messages)
+@(dbId: Int, sourCitationForm: Form[SourCitationForm], sourCitation: SourCitation)(implicit request: AuthenticatedRequest[?], messages: Messages)
 
-@main(1, None) {
+@main(dbId, None) {
 
     @if(sourCitation.sourceType == SourCitationType.EventSourCitation) {
         @for(id <- sourCitation.ownerId) {
-            <div style="padding-left:10em;"><a href="@controllers.routes.EventController.showEvent(id)">Return to Event</a></div>
+            <div style="padding-left:10em;"><a href="@controllers.routes.EventController.showEvent(dbId, id)">Return to Event</a></div>
         }
     }
 
@@ -30,7 +30,7 @@
         }
     }
 
-    @helper.form(action = controllers.edit.routes.EditSourCitationController.onSubmit(sourCitation.id)) {
+    @helper.form(action = controllers.edit.routes.EditSourCitationController.onSubmit(dbId, sourCitation.id)) {
         @helper.CSRF.formField
 
         @govukInput(

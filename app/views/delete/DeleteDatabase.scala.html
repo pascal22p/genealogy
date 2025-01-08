@@ -1,0 +1,53 @@
+@import models.Person
+@import views.html.components.{FamilyView, PersonDetails, EventsDetails, Parents}
+
+@this(
+  main: Main,
+  familyView: FamilyView,
+  individualEvents: EventsDetails,
+  parents: Parents,
+  govukButton: GovukButton,
+  govukSummaryList: GovukSummaryList)
+
+@(database: GenealogyDatabase)(implicit request: AuthenticatedRequest[?], messages: Messages)
+
+
+@main(1, None) {
+
+  @govukSummaryList(
+    SummaryList(
+        rows = Seq(
+            SummaryListRow(
+                key = Key(Text(messages("id"))),
+                value = Value(Text(database.name)),
+                classes = "govuk-summary-list__row--no-border govuk-summary-list__row--no-actions",
+                actions = None
+            ),
+            SummaryListRow(
+                key = Key(Text("Description")),
+                value = Value(Text(database.description)),
+                classes = "govuk-summary-list__row--no-border govuk-summary-list__row--no-actions",
+                actions = None
+            )
+        ),
+        card = Some(Card(
+            title = Some(CardTitle(content = Text("Database to be deleted"))),
+            actions = None,
+            classes = "govuk-!-margin-4",
+            attributes = Map.empty
+          )),
+        classes = "",
+        attributes = Map.empty
+    )
+  )
+
+  @helper.form(action = controllers.delete.routes.DeleteDatabaseController.deleteDatabaseAction(database.id) ) {
+    @helper.CSRF.formField
+    @govukButton(Button(
+      inputType = Some("submit"),
+      content = Text("Delete this database"),
+      classes = "govuk-button--warning"
+    ))
+  }
+  
+}

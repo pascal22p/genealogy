@@ -1,5 +1,7 @@
 package testUtils
 
+import java.time.LocalDateTime
+
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
@@ -19,9 +21,13 @@ class FakeAuthAction(localSession: Session) extends AuthAction {
     val seePrivacy = request.headers.get("seePrivacy").exists(_.toBoolean)
     val userData   = request.headers.get("userData").forall(_.toBoolean)
     val newSession = (userData, seePrivacy) match {
-      case (false, _) => Session("1", localSession.sessionData.copy(userData = None))
+      case (false, _) => Session("1", localSession.sessionData.copy(userData = None), LocalDateTime.now)
       case (true, privacy) =>
-        Session("1", SessionData(1, localSession.sessionData.userData.map(_.copy(seePrivacy = privacy))))
+        Session(
+          "1",
+          SessionData(localSession.sessionData.userData.map(_.copy(seePrivacy = privacy))),
+          LocalDateTime.now
+        )
     }
     block(AuthenticatedRequest(request, newSession))
   }
