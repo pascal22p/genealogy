@@ -17,7 +17,7 @@
         """<ul class="govuk-list govuk-!-margin-top-0 govuk-!-margin-bottom-0" style="padding-left:40px">""" +
                 person.families.map { family =>
                     val first = person.findPartner(family.id).fold(""){ partner =>
-                        "<li style=\"margin:0;padding:0\">x " + nameLink(partner) + "</li>"
+                        "<li style=\"margin:0;padding:0\">x " + nameLink(dbId, partner) + "</li>"
                     }
                     val last = family.children.reverse.headOption
                     val allButLast = family.children.dropRight(1)
@@ -29,7 +29,7 @@
                 }.mkString("\n") + "</ul>"
     }
 
-    Html(s"<span class=\"govuk-!-font-size-16\">[$depth]</span>" + nameLink(person) + children)
+    Html(s"<span class=\"govuk-!-font-size-16\">[$depth]</span>" + nameLink(dbId, person) + children)
 }
 
 @main(dbId, Some(person)) {

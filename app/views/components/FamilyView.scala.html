@@ -8,7 +8,7 @@
     block: Block,
     govukSummaryList: GovukSummaryList)
 
-@(family: Family, partnerOption: Option[Person])(implicit authenticatedRequest: AuthenticatedRequest[?], messages: Messages)
+@(dbId: Int, family: Family, partnerOption: Option[Person])(implicit authenticatedRequest: AuthenticatedRequest[?], messages: Messages)
 
 @title = {
     Family 
@@ -39,7 +39,7 @@ Some(Actions(
                     actions = Some(Actions(
                         items = Seq(
                             ActionItem(
-                                href = controllers.routes.IndividualController.showPerson(partner.details.id).url,
+                                href = controllers.routes.IndividualController.showPerson(dbId, partner.details.id).url,
                                 content = Text("View")
                             ),
                                 ActionItem(
@@ -62,7 +62,7 @@ Some(Actions(
     )
 }
 
-@familyEvents(family.events)
+@familyEvents(dbId, family.events)
 
 @govukSummaryList(
     SummaryList(
@@ -74,7 +74,7 @@ Some(Actions(
                 actions = Some(Actions(
                     items = Seq(
                         ActionItem(
-                            href = controllers.routes.IndividualController.showPerson(child.person.details.id).url,
+                            href = controllers.routes.IndividualController.showPerson(dbId, child.person.details.id).url,
                             content = Text("View")
                         ),
                         ActionItem(
@@ -90,7 +90,7 @@ Some(Actions(
             actions = Some(Actions(
                 items = Seq(
                     ActionItem(
-                        href = controllers.edit.routes.EditPersonDetailsController.showForm(1).url,
+                        href = "#",
                         content = Text("Add")
                     )
                 )

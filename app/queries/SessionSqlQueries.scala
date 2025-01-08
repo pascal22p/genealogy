@@ -1,6 +1,7 @@
 package queries
 
 import java.time.Instant
+import java.time.LocalDateTime
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -36,7 +37,8 @@ final class SessionSqlQueries @Inject() (db: Database, databaseExecutionContext:
     db.withConnection { implicit conn =>
       SQL("""SELECT *
             |FROM genea_sessions
-            |WHERE sessionId = {id}""".stripMargin)
+            |WHERE sessionId = {id}
+            |AND timeStamp > CURRENT_TIMESTAMP - INTERVAL '15' MINUTE""".stripMargin)
         .on("id" -> sessionId)
         .as(Session.mysqlParser.singleOpt)
     }
@@ -44,10 +46,14 @@ final class SessionSqlQueries @Inject() (db: Database, databaseExecutionContext:
 
   def putSessionData(session: Session): Future[Option[String]] = Future {
     db.withConnection { implicit conn =>
-      SQL("""INSERT INTO genea_sessions (sessionId, sessionData)
-            |VALUES ({id}, {data})
+      SQL("""INSERT INTO genea_sessions (sessionId, sessionData, timeStamp)
+            |VALUES ({id}, {data}, {timeStamp})
             |""".stripMargin)
-        .on("id" -> session.sessionId, "data" -> Json.toJson(session.sessionData).toString)
+        .on(
+          "id"        -> session.sessionId,
+          "data"      -> Json.toJson(session.sessionData).toString,
+          "timeStamp" -> LocalDateTime.now
+        )
         .executeInsert(str(1).singleOpt)
     }
   }(databaseExecutionContext)

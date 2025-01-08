@@ -1,5 +1,6 @@
 package actions
 
+import java.time.LocalDateTime
 import java.util.UUID
 import javax.inject.Inject
 
@@ -44,8 +45,8 @@ class AuthActionImpl @Inject() (
           }
         }
       case None =>
-        val session = Session(sessionId, SessionData(1, None))
-        sqlQueries.putSessionData(session).map(_ => Redirect(request.uri).withSession("sessionId" -> sessionId))
+        val session = Session(uuid, SessionData(None), LocalDateTime.now())
+        sqlQueries.putSessionData(session).map(_ => Redirect(request.uri).withSession("sessionId" -> uuid))
     }
   }
 

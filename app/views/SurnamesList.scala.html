@@ -44,7 +44,7 @@
                 actions = Some(Actions(
                     items = Seq(
                         ActionItem(
-                            href = controllers.add.routes.AddPersonDetailsController.showForm.url,
+                            href = controllers.add.routes.AddPersonDetailsController.showForm(dbId).url,
                             content = Text("Add")
                         )
                     )

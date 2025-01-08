@@ -35,7 +35,7 @@ class EditPersonDetailsController @Inject() (
     with I18nSupport
     with Logging {
 
-  def showForm(id: Int): Action[AnyContent] = authJourney.authWithAdminRight.async {
+  def showForm(baseId: Int, id: Int): Action[AnyContent] = authJourney.authWithAdminRight.async {
     implicit authenticatedRequest: AuthenticatedRequest[AnyContent] =>
       personService.getPerson(id).map { (personOption: Option[Person]) =>
         personOption.fold(NotFound("Nothing here")) { person =>
@@ -44,7 +44,7 @@ class EditPersonDetailsController @Inject() (
           if (!person.details.privacyRestriction.contains("privacy") || isAllowedToSee) {
             sessionService.insertPersonInHistory(person)
             val form = PersonDetailsForm.personDetailsForm.fill(person.details.toForm)
-            Ok(editPersonDetails(form))
+            Ok(editPersonDetails(baseId, form))
           } else {
             Forbidden("Not allowed")
           }
@@ -52,23 +52,24 @@ class EditPersonDetailsController @Inject() (
       }
   }
 
-  def onSubmit: Action[AnyContent] = authJourney.authWithAdminRight.async { implicit authenticatedRequest =>
-    val errorFunction: Form[PersonDetailsForm] => Future[Result] = { (formWithErrors: Form[PersonDetailsForm]) =>
-      // This is the bad case, where the form had validation errors.
-      // Let's show the user the form again, with the errors highlighted.
-      // Note how we pass the form with errors to the template.
-      Future.successful(BadRequest(editPersonDetails(formWithErrors)))
-    }
-
-    val successFunction: PersonDetailsForm => Future[Result] = { (dataForm: PersonDetailsForm) =>
-      updateSqlQueries.updatePersonDetails(dataForm.toPersonalDetails).map {
-        case 1 => Redirect(controllers.routes.IndividualController.showPerson(dataForm.id))
-        case _ => InternalServerError(serviceUnavailableView("No record was updated"))
+  def onSubmit(baseId: Int): Action[AnyContent] = authJourney.authWithAdminRight.async {
+    implicit authenticatedRequest =>
+      val errorFunction: Form[PersonDetailsForm] => Future[Result] = { (formWithErrors: Form[PersonDetailsForm]) =>
+        // This is the bad case, where the form had validation errors.
+        // Let's show the user the form again, with the errors highlighted.
+        // Note how we pass the form with errors to the template.
+        Future.successful(BadRequest(editPersonDetails(baseId, formWithErrors)))
       }
-    }
 
-    val formValidationResult = PersonDetailsForm.personDetailsForm.bindFromRequest()
-    formValidationResult.fold(errorFunction, successFunction)
+      val successFunction: PersonDetailsForm => Future[Result] = { (dataForm: PersonDetailsForm) =>
+        updateSqlQueries.updatePersonDetails(dataForm.toPersonalDetails).map {
+          case 1 => Redirect(controllers.routes.IndividualController.showPerson(baseId, dataForm.id))
+          case _ => InternalServerError(serviceUnavailableView("No record was updated"))
+        }
+      }
+
+      val formValidationResult = PersonDetailsForm.personDetailsForm.bindFromRequest()
+      formValidationResult.fold(errorFunction, successFunction)
   }
 
 }

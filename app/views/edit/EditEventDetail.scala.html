@@ -15,11 +15,11 @@
         govukButton: GovukButton
 )
 
-@(eventDetailsForm: Form[EventDetailForm], allPlaces: List[Place], event: EventDetail)(implicit request: AuthenticatedRequest[?], messages: Messages)
+@(dbId: Int, eventDetailsForm: Form[EventDetailForm], allPlaces: List[Place], event: EventDetail)(implicit request: AuthenticatedRequest[?], messages: Messages)
 
 @main(1, None) {
 
-<div style="padding-left:10em;"><a class="govuk-link" href="@controllers.routes.EventController.showEvent(event.events_details_id)">Return to Event</a></div>
+<div style="padding-left:10em;"><a class="govuk-link" href="@controllers.routes.EventController.showEvent(dbId, event.events_details_id)">Return to Event</a></div>
 
 
 @block("Event") {
@@ -29,7 +29,7 @@
         }
     }
 
-    @helper.form(action = controllers.edit.routes.EditEventDetailController.onSubmit(event.events_details_id) ) {
+    @helper.form(action = controllers.edit.routes.EditEventDetailController.onSubmit(dbId, event.events_details_id) ) {
         @helper.CSRF.formField
         @govukInput(
             Input(

@@ -1,5 +1,7 @@
 package controllers
 
+import java.time.LocalDateTime
+
 import scala.concurrent.Future
 
 import actions.AuthAction
@@ -19,7 +21,7 @@ import testUtils.FakeAuthAction
 
 class EventControllerSpec extends BaseSpec {
   val userData: UserData             = UserData(1, "username", "hashedPassword", true, true)
-  val fakeAuthAction: FakeAuthAction = new FakeAuthAction(Session("id", SessionData(1, Some(userData))))
+  val fakeAuthAction: FakeAuthAction = new FakeAuthAction(Session("id", SessionData(Some(userData)), LocalDateTime.now))
   val mockEventService: EventService = mock[EventService]
 
   protected override def localGuiceApplicationBuilder(): GuiceApplicationBuilder =
@@ -38,7 +40,7 @@ class EventControllerSpec extends BaseSpec {
           Future.successful(Some(fakeEventDetail(privacyRestriction = Some("privacy"))))
         )
 
-        val result = sut.showEvent(1).apply(FakeRequest().withHeaders(("seePrivacy", "true")))
+        val result = sut.showEvent(1, 1).apply(FakeRequest().withHeaders(("seePrivacy", "true")))
         status(result) mustBe OK
         contentAsString(result) must include("Orphan event")
       }
@@ -49,7 +51,7 @@ class EventControllerSpec extends BaseSpec {
         Future.successful(Some(fakeEventDetail()))
       )
 
-      val result = sut.showEvent(1).apply(FakeRequest().withHeaders(("seePrivacy", "false")))
+      val result = sut.showEvent(1, 1).apply(FakeRequest().withHeaders(("seePrivacy", "false")))
       status(result) mustBe OK
       contentAsString(result) must include("Orphan event")
     }
@@ -61,7 +63,7 @@ class EventControllerSpec extends BaseSpec {
         Future.successful(Some(fakeEventDetail(privacyRestriction = Some("privacy"))))
       )
 
-      val result = sut.showEvent(1).apply(FakeRequest().withHeaders(("seePrivacy", "false")))
+      val result = sut.showEvent(1, 1).apply(FakeRequest().withHeaders(("seePrivacy", "false")))
       status(result) mustBe FORBIDDEN
     }
 
@@ -70,7 +72,7 @@ class EventControllerSpec extends BaseSpec {
         Future.successful(Some(fakeEventDetail(privacyRestriction = Some("privacy"))))
       )
 
-      val result = sut.showEvent(1).apply(FakeRequest().withHeaders(("userData", "false")))
+      val result = sut.showEvent(1, 1).apply(FakeRequest().withHeaders(("userData", "false")))
       status(result) mustBe FORBIDDEN
     }
   }
@@ -80,7 +82,7 @@ class EventControllerSpec extends BaseSpec {
       Future.successful(None)
     )
 
-    val result = sut.showEvent(1).apply(FakeRequest())
+    val result = sut.showEvent(1, 1).apply(FakeRequest())
     status(result) mustBe NOT_FOUND
   }
 }

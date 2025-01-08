@@ -45,24 +45,24 @@ class EditEventDetailController @Inject() (
     with I18nSupport
     with Logging {
 
-  def showForm(id: Int) = authJourney.authWithAdminRight.async { implicit request =>
+  def showForm(baseId: Int, id: Int) = authJourney.authWithAdminRight.async { implicit request =>
     handleEvent(id) { (event, person, allPlace) =>
       val form = EventDetailForm.eventDetailForm.fill(event.toForm)
-      Future.successful(Ok(editEventDetail(form, allPlace, event)))
+      Future.successful(Ok(editEventDetail(baseId, form, allPlace, event)))
     }
   }
 
-  def onSubmit(id: Int) = authJourney.authWithAdminRight.async { implicit request =>
+  def onSubmit(baseId: Int, id: Int) = authJourney.authWithAdminRight.async { implicit request =>
     def errorFunction: Form[EventDetailForm] => Future[Result] = { (formWithErrors: Form[EventDetailForm]) =>
       handleEvent(id) { (event, person, allPlace) =>
-        Future.successful(BadRequest(editEventDetail(formWithErrors, allPlace, event)))
+        Future.successful(BadRequest(editEventDetail(baseId, formWithErrors, allPlace, event)))
       }
     }
 
     val successFunction: EventDetailForm => Future[Result] = { (dataForm: EventDetailForm) =>
       handleEvent(id) { (event, person, allPlace) =>
         updateSqlQueries.updateEventDetails(event.fromForm(dataForm, allPlace)).map {
-          case 1 => Redirect(controllers.routes.EventController.showEvent(id))
+          case 1 => Redirect(controllers.routes.EventController.showEvent(baseId, id))
           case _ => InternalServerError(serviceUnavailableView("No record was updated"))
         }
       }

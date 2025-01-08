@@ -1,6 +1,7 @@
 package controllers
 
 import java.time.Instant
+import java.time.LocalDateTime
 
 import scala.concurrent.Future
 
@@ -25,7 +26,7 @@ import testUtils.FakeAuthAction
 
 class AscendanceControllerSpec extends BaseSpec {
   val userData: UserData                            = UserData(1, "username", "hashedPassword", true, true)
-  val fakeAuthAction: FakeAuthAction                = new FakeAuthAction(Session("id", SessionData(1, Some(userData))))
+  val fakeAuthAction: FakeAuthAction                = new FakeAuthAction(Session("id", SessionData(Some(userData)), LocalDateTime.now))
   lazy val mockAscendanceService: AscendanceService = mock[AscendanceService]
 
   protected override def localGuiceApplicationBuilder(): GuiceApplicationBuilder =
@@ -93,7 +94,7 @@ class AscendanceControllerSpec extends BaseSpec {
         Future.successful(Some(personA))
       )
 
-      val result      = sut.showAscendant(1).apply(FakeRequest())
+      val result      = sut.showAscendant(1, 1).apply(FakeRequest())
       val html        = Jsoup.parse(contentAsString(result))
       val generation0 = html.getElementById("generation-0").html()
       val generation1 = html.getElementById("generation-1").html()
@@ -181,9 +182,8 @@ class AscendanceControllerSpec extends BaseSpec {
         Future.successful(Some(personA))
       )
 
-      val result = sut.showAscendant(1).apply(FakeRequest())
-      val html   = Jsoup.parse(contentAsString(result))
-      println(html)
+      val result      = sut.showAscendant(1, 1).apply(FakeRequest())
+      val html        = Jsoup.parse(contentAsString(result))
       val generation0 = html.getElementById("generation-0").html()
       val generation1 = html.getElementById("generation-1").html()
       val generation2 = html.getElementById("generation-2").html()

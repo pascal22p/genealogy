@@ -5,7 +5,7 @@
     govukSummaryList: GovukSummaryList
 )
 
-@(events: Events)(implicit authenticatedRequest: AuthenticatedRequest[?], messages: Messages)
+@(dbId: Int, events: Events)(implicit authenticatedRequest: AuthenticatedRequest[?], messages: Messages)
 
 @eventDetailRow(event: EventDetail) = {
     @event.formatDate @for(place <- event.place) {
@@ -20,9 +20,9 @@
 @addEventLink = @{
     events.ownerId.fold("") { ownerId =>
         if(events.ownerType == IndividualEvent) {
-            controllers.add.routes.AddIndividualEventDetailController.showForm(ownerId).url
+            controllers.add.routes.AddIndividualEventDetailController.showForm(dbId, ownerId).url
         } else {
-            controllers.add.routes.AddFamilyEventDetailController.showForm(ownerId).url
+            controllers.add.routes.AddFamilyEventDetailController.showForm(dbId, ownerId).url
         }
     }
 }
@@ -37,7 +37,7 @@
                 actions = Some(Actions(
                     items = Seq(
                         ActionItem(
-                            href = controllers.routes.EventController.showEvent(event.events_details_id).url,
+                            href = controllers.routes.EventController.showEvent(dbId, event.events_details_id).url,
                             content = Text(source(event))
                         )
                     )

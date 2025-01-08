@@ -1,3 +1,5 @@
-GET     /person-details/:id                controllers.delete.DeleteIndividualController.deletePersonConfirmation(id: Int)
-POST    /person-details/:id                controllers.delete.DeleteIndividualController.deletePersonAction(id: Int)
+GET     /base/:baseId/person-details/:id                controllers.delete.DeleteIndividualController.deletePersonConfirmation(baseId: Int, id: Int)
+POST    /base/:baseId/person-details/:id                controllers.delete.DeleteIndividualController.deletePersonAction(baseId: Int, id: Int)
 
+GET     /base/:baseId                controllers.delete.DeleteDatabaseController.deleteDatabaseConfirmation(baseId: Int)
+POST    /base/:baseId                controllers.delete.DeleteDatabaseController.deleteDatabaseAction(baseId: Int)

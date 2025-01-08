@@ -57,11 +57,11 @@ class AddMediaController @Inject() (
     with I18nSupport
     with Logging {
 
-  def showForm() = authJourney.authWithAdminRight.async { implicit request =>
-    Future.successful(Ok(addMediaView()))
+  def showForm(baseId: Int) = authJourney.authWithAdminRight.async { implicit request =>
+    Future.successful(Ok(addMediaView(baseId)))
   }
 
-  def upload: Action[MultipartFormData[Files.TemporaryFile]] =
+  def upload(baseId: Int): Action[MultipartFormData[Files.TemporaryFile]] =
     authJourney.authWithAdminRight.async(parse.multipartFormData) { implicit request =>
       request.body
         .file("picture")
@@ -80,9 +80,9 @@ class AddMediaController @Inject() (
         }
     }
 
-  def onSubmit(id: Int) = authJourney.authWithAdminRight.async { implicit request =>
+  def onSubmit(baseId: Int, id: Int) = authJourney.authWithAdminRight.async { implicit request =>
     def errorFunction(formWithErrors: Form[SourCitationForm]): Future[Result] = {
-      Future.successful(BadRequest(addMediaView()))
+      Future.successful(BadRequest(addMediaView(baseId)))
     }
 
     val successFunction: SourCitationForm => Future[Result] = { dataForm =>

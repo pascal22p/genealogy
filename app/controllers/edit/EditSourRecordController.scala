@@ -60,18 +60,18 @@ class EditSourRecordController @Inject() (
     }
   }
 
-  def showForm(sourRecordId: Int, sourCitationType: SourCitationType, sourCitationId: Int) =
+  def showForm(baseId: Int, sourRecordId: Int, sourCitationType: SourCitationType, sourCitationId: Int) =
     authJourney.authWithAdminRight.async { implicit request =>
       handleSourRecord(sourRecordId) { sourRecord =>
         val form = SourRecordForm.sourRecordForm.fill(sourRecord.toForm(sourCitationId, sourCitationType))
-        Future.successful(Ok(sourRecordView(form, sourRecord)))
+        Future.successful(Ok(sourRecordView(baseId, form, sourRecord)))
       }
     }
 
-  def onSubmit(sourRecordId: Int) = authJourney.authWithAdminRight.async { implicit request =>
+  def onSubmit(baseId: Int, sourRecordId: Int) = authJourney.authWithAdminRight.async { implicit request =>
     def errorFunction(formWithErrors: Form[SourRecordForm]): Future[Result] = {
       handleSourRecord(sourRecordId) { sourRecord =>
-        Future.successful(BadRequest(sourRecordView(formWithErrors, sourRecord)))
+        Future.successful(BadRequest(sourRecordView(baseId, formWithErrors, sourRecord)))
       }
     }
 
@@ -83,13 +83,15 @@ class EditSourRecordController @Inject() (
               case EventSourCitation =>
                 sourCitationService.getSourCitations(dataForm.parentId, UnknownSourCitation).map { sourCitationList =>
                   sourCitationList.headOption.fold(NotFound("SourCitation could not be found")) { sourCitation =>
-                    Redirect(controllers.routes.EventController.showEvent(sourCitation.ownerId.getOrElse(0)))
+                    Redirect(controllers.routes.EventController.showEvent(baseId, sourCitation.ownerId.getOrElse(0)))
                   }
                 }
               case IndividualSourCitation =>
                 sourCitationService.getSourCitations(dataForm.parentId, UnknownSourCitation).map { sourCitationList =>
                   sourCitationList.headOption.fold(NotFound("SourCitation could not be found")) { sourCitation =>
-                    Redirect(controllers.routes.IndividualController.showPerson(sourCitation.ownerId.getOrElse(0)))
+                    Redirect(
+                      controllers.routes.IndividualController.showPerson(baseId, sourCitation.ownerId.getOrElse(0))
+                    )
                   }
                 }
               case FamilySourCitation =>

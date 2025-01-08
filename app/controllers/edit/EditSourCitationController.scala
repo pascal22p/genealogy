@@ -60,17 +60,17 @@ class EditSourCitationController @Inject() (
     }
   }
 
-  def showForm(id: Int) = authJourney.authWithAdminRight.async { implicit request =>
+  def showForm(baseId: Int, id: Int) = authJourney.authWithAdminRight.async { implicit request =>
     handleSourCitation(id) { sourCitation =>
       val form = SourCitationForm.sourCitationForm.fill(sourCitation.toForm)
-      Future.successful(Ok(sourCitationView(form, sourCitation)))
+      Future.successful(Ok(sourCitationView(baseId, form, sourCitation)))
     }
   }
 
-  def onSubmit(id: Int) = authJourney.authWithAdminRight.async { implicit request =>
+  def onSubmit(baseId: Int, id: Int) = authJourney.authWithAdminRight.async { implicit request =>
     def errorFunction(formWithErrors: Form[SourCitationForm]): Future[Result] = {
       handleSourCitation(id) { sourCitation =>
-        Future.successful(BadRequest(sourCitationView(formWithErrors, sourCitation)))
+        Future.successful(BadRequest(sourCitationView(baseId, formWithErrors, sourCitation)))
       }
     }
 
@@ -81,11 +81,11 @@ class EditSourCitationController @Inject() (
             sourCitation.sourceType match {
               case EventSourCitation =>
                 sourCitation.ownerId.fold(NotFound("Record updated but parent not found"))(eventId =>
-                  Redirect(controllers.routes.EventController.showEvent(eventId))
+                  Redirect(controllers.routes.EventController.showEvent(baseId, eventId))
                 )
               case IndividualSourCitation =>
                 sourCitation.ownerId.fold(NotFound("Record updated but parent not found"))(personId =>
-                  Redirect(controllers.routes.IndividualController.showPerson(personId))
+                  Redirect(controllers.routes.IndividualController.showPerson(baseId, personId))
                 )
               // case FamilySourCitation => Redirect(controllers.routes.FamilyController.showFamily(sourCitation.ownerId.get))
               case _ => NotImplemented(serviceUnavailableView("Record updated no view implemented yet"))

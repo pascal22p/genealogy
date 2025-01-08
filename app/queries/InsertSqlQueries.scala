@@ -72,14 +72,12 @@ final class InsertSqlQueries @Inject() (db: Database, databaseExecutionContext: 
         int("insert_id").singleOpt
       }
 
-      println(s"Owner id: $ownerId, event type: $eventType")
-
       db.withTransaction { implicit conn =>
         val eventId =
           SQL("""INSERT INTO genea_events_details 
                 | (place_id, addr_id, events_details_descriptor, events_details_gedcom_date, events_details_age, events_details_cause, jd_count, jd_precision, jd_calendar, events_details_famc, events_details_adop, base)
                 | VALUES ({place_id}, {addr_id}, {events_details_descriptor}, {events_details_gedcom_date}, {events_details_age}, {events_details_cause}, {jd_count}, {jd_precision}, {jd_calendar}, {events_details_famc}, {events_details_adop}, {base})
-          """.stripMargin)
+        """.stripMargin)
             .on(
               "place_id"                   -> eventDetailOnlyQueryData.place_id,
               "addr_id"                    -> eventDetailOnlyQueryData.addr_id,
@@ -100,7 +98,7 @@ final class InsertSqlQueries @Inject() (db: Database, databaseExecutionContext: 
           SQL("""INSERT INTO rel_indi_events
                 | (indi_id, events_details_id)
                 | VALUES ({indiId}, {eventId})
-          """.stripMargin)
+        """.stripMargin)
             .on(
               "indiId"  -> ownerId,
               "eventId" -> eventId
@@ -110,7 +108,7 @@ final class InsertSqlQueries @Inject() (db: Database, databaseExecutionContext: 
           SQL("""INSERT INTO rel_familles_events
                 | (familles_id, events_details_id)
                 | VALUES ({familyId}, {eventId})
-          """.stripMargin)
+        """.stripMargin)
             .on(
               "familyId" -> ownerId,
               "eventId"  -> eventId
@@ -125,5 +123,26 @@ final class InsertSqlQueries @Inject() (db: Database, databaseExecutionContext: 
         eventId
       }
     }(databaseExecutionContext))
+
+  def insertDatabase(genealogyDatabase: GenealogyDatabase): OptionT[Future, Int] = OptionT(Future {
+    val parser: ResultSetParser[Option[Int]] = {
+      int("insert_id").singleOpt
+    }
+
+    db.withConnection { implicit conn =>
+      SQL(
+        """INSERT INTO genea_infos 
+          | (nom, descriptif, entetes)
+          | VALUES ({name}, {description}, "{headers}")
+        """.stripMargin
+      )
+        .on(
+          "name"        -> genealogyDatabase.name,
+          "description" -> genealogyDatabase.description,
+          "headers"     -> ""
+        )
+        .executeInsert[Option[Int]](parser)
+    }
+  }(databaseExecutionContext))
 
 }

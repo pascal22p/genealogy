@@ -1,5 +1,7 @@
 package controllers
 
+import java.time.LocalDateTime
+
 import scala.concurrent.Future
 
 import actions.AuthAction
@@ -25,7 +27,7 @@ import testUtils.FakeAuthAction
 
 class individualControllerSpec extends BaseSpec {
   val userData: UserData               = UserData(1, "username", "hashedPassword", true, true)
-  val fakeAuthAction: FakeAuthAction   = new FakeAuthAction(Session("id", SessionData(1, Some(userData))))
+  val fakeAuthAction: FakeAuthAction   = new FakeAuthAction(Session("id", SessionData(Some(userData)), LocalDateTime.now))
   val mockPersonService: PersonService = mock[PersonService]
 
   protected override def localGuiceApplicationBuilder(): GuiceApplicationBuilder =
@@ -51,7 +53,7 @@ class individualControllerSpec extends BaseSpec {
           )
         )
 
-        val result = sut.showPerson(1).apply(FakeRequest().withHeaders(("seePrivacy", "true")))
+        val result = sut.showPerson(1, 1).apply(FakeRequest().withHeaders(("seePrivacy", "true")))
         status(result) mustBe OK
         contentAsString(result) must include("Firstname")
       }
@@ -64,7 +66,7 @@ class individualControllerSpec extends BaseSpec {
         )
       )
 
-      val result = sut.showPerson(1).apply(FakeRequest().withHeaders(("seePrivacy", "false")))
+      val result = sut.showPerson(1, 1).apply(FakeRequest().withHeaders(("seePrivacy", "false")))
       status(result) mustBe OK
       contentAsString(result) must include("Firstname")
     }
@@ -83,7 +85,7 @@ class individualControllerSpec extends BaseSpec {
         )
       )
 
-      val result = sut.showPerson(1).apply(FakeRequest().withHeaders(("seePrivacy", "false")))
+      val result = sut.showPerson(1, 1).apply(FakeRequest().withHeaders(("seePrivacy", "false")))
       status(result) mustBe FORBIDDEN
     }
 
@@ -99,7 +101,7 @@ class individualControllerSpec extends BaseSpec {
         )
       )
 
-      val result = sut.showPerson(1).apply(FakeRequest().withHeaders(("userData", "false")))
+      val result = sut.showPerson(1, 1).apply(FakeRequest().withHeaders(("userData", "false")))
       status(result) mustBe FORBIDDEN
     }
   }
@@ -109,7 +111,7 @@ class individualControllerSpec extends BaseSpec {
       Future.successful(None)
     )
 
-    val result = sut.showPerson(1).apply(FakeRequest())
+    val result = sut.showPerson(1, 1).apply(FakeRequest())
     status(result) mustBe NOT_FOUND
   }
 }

@@ -1,11 +1,15 @@
-GET     /media  controllers.add.AddMediaController.showForm()
-POST    /media  controllers.add.AddMediaController.upload()
+GET     /base/:baseId/media  controllers.add.AddMediaController.showForm(baseId: Int)
+POST    /base/:baseId/media  controllers.add.AddMediaController.upload(baseId: Int)
 
-GET     /person-details                       controllers.add.AddPersonDetailsController.showForm
-POST    /person-details                       controllers.add.AddPersonDetailsController.onSubmit
+GET     /base/:baseId/person-details                       controllers.add.AddPersonDetailsController.showForm(baseId: Int)
+POST    /base/:baseId/person-details                       controllers.add.AddPersonDetailsController.onSubmit(baseId: Int)
 
-GET     /event/person/:id                       controllers.add.AddIndividualEventDetailController.showForm(id: Int)
-POST    /event/person/:id                       controllers.add.AddIndividualEventDetailController.onSubmit(id: Int)
+GET     /base/:baseId/person/:id/event                       controllers.add.AddIndividualEventDetailController.showForm(baseId: Int, id: Int)
+POST    /base/:baseId/person/:id/event                       controllers.add.AddIndividualEventDetailController.onSubmit(baseId: Int, id: Int)
 
-GET     /event/family/:id                       controllers.add.AddFamilyEventDetailController.showForm(id: Int)
-POST    /event/family/:id                       controllers.add.AddFamilyEventDetailController.onSubmit(id: Int)
+GET     /base/:baseId/family/:id/event                       controllers.add.AddFamilyEventDetailController.showForm(baseId: Int, id: Int)
+POST    /base/:baseId/family/:id/event                       controllers.add.AddFamilyEventDetailController.onSubmit(baseId: Int, id: Int)
+
+GET     /database                       controllers.add.AddDatabaseController.showForm
+POST    /database                       controllers.add.AddDatabaseController.onSubmit
+

@@ -39,20 +39,20 @@ class AddIndividualEventDetailController @Inject() (
     with I18nSupport
     with Logging {
 
-  def showForm(personId: Int): Action[AnyContent] = authJourney.authWithAdminRight.async {
+  def showForm(baseId: Int, personId: Int): Action[AnyContent] = authJourney.authWithAdminRight.async {
     implicit authenticatedRequest: AuthenticatedRequest[AnyContent] =>
-      val filled = EventDetailForm(authenticatedRequest.localSession.sessionData.dbId, None, None, "", "", "", "", "")
+      val filled = EventDetailForm(baseId, None, None, "", "", "", "", "")
       val form   = EventDetailForm.eventDetailForm.fill(filled)
       getSqlQueries.getAllPlaces.map { allPlace =>
-        Ok(addEventDetailsView(form, personId, allPlace, IndividualEvent))
+        Ok(addEventDetailsView(baseId, form, personId, allPlace, IndividualEvent))
       }
   }
 
-  def onSubmit(personId: Int): Action[AnyContent] = authJourney.authWithAdminRight.async {
+  def onSubmit(baseId: Int, personId: Int): Action[AnyContent] = authJourney.authWithAdminRight.async {
     implicit authenticatedRequest =>
       val errorFunction: Form[EventDetailForm] => Future[Result] = { (formWithErrors: Form[EventDetailForm]) =>
         getSqlQueries.getAllPlaces.map { allPlace =>
-          BadRequest(addEventDetailsView(formWithErrors, personId, allPlace, IndividualEvent))
+          BadRequest(addEventDetailsView(baseId, formWithErrors, personId, allPlace, IndividualEvent))
         }
       }
 
@@ -62,7 +62,7 @@ class AddIndividualEventDetailController @Inject() (
           .fold(
             InternalServerError(serviceUnavailableView("No record was inserted"))
           ) { id =>
-            Redirect(controllers.routes.EventController.showEvent(id))
+            Redirect(controllers.routes.EventController.showEvent(baseId, id))
           }
       }
 

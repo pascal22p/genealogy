@@ -12,7 +12,7 @@
         block: Block
 )
 
-@(sourRecordForm: Form[SourRecordForm], sourRecord: SourRecord)(implicit request: AuthenticatedRequest[?], messages: Messages)
+@(dbId: Int, sourRecordForm: Form[SourRecordForm], sourRecord: SourRecord)(implicit request: AuthenticatedRequest[?], messages: Messages)
 
 @main(1, None) {
 
@@ -24,7 +24,7 @@
         }
     }
 
-    @helper.form(action = controllers.edit.routes.EditSourRecordController.onSubmit(sourRecord.id)) {
+    @helper.form(action = controllers.edit.routes.EditSourRecordController.onSubmit(dbId, sourRecord.id)) {
         @helper.CSRF.formField
 
         <input type="hidden" name="parentType" value="@sourRecordForm("parentType").value.getOrElse("Unknown")">

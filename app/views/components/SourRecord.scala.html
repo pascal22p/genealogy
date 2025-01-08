@@ -7,7 +7,7 @@
   block: Block,
   govukSummaryList: GovukSummaryList)
 
-@(record: SourRecordModel, sourceType: SourCitationType, sourceId: Int)(implicit request: AuthenticatedRequest[?], messages: Messages)
+@(dbId: Int, record: SourRecordModel, sourceType: SourCitationType, sourceId: Int)(implicit request: AuthenticatedRequest[?], messages: Messages)
 
 
 @govukSummaryList(
@@ -73,7 +73,7 @@
           actions = Some(Actions(
             items = Seq(
                 ActionItem(
-                    href = controllers.edit.routes.EditSourRecordController.showForm(record.id, sourceType, sourceId).url,
+                    href = controllers.edit.routes.EditSourRecordController.showForm(dbId, record.id, sourceType, sourceId).url,
                     content = Text("Edit")
                 )
             )

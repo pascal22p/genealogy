@@ -29,14 +29,14 @@ class DeleteIndividualController @Inject() (
 ) extends BaseController
     with I18nSupport {
 
-  def deletePersonConfirmation(id: Int): Action[AnyContent] = authJourney.authWithAdminRight.async {
+  def deletePersonConfirmation(baseId: Int, id: Int): Action[AnyContent] = authJourney.authWithAdminRight.async {
     implicit authenticatedRequest: AuthenticatedRequest[AnyContent] =>
       personService.getPerson(id).map { (personOption: Option[Person]) =>
         personOption.fold(NotFound("Nothing here")) { person =>
           val isAllowedToSee = authenticatedRequest.localSession.sessionData.userData.fold(false)(_.seePrivacy)
 
           if (!person.details.privacyRestriction.contains("privacy") || isAllowedToSee) {
-            Ok(deleteIndividualView(person, authenticatedRequest.localSession.sessionData.dbId))
+            Ok(deleteIndividualView(person, baseId))
           } else {
             Forbidden("Not allowed")
           }
@@ -44,16 +44,15 @@ class DeleteIndividualController @Inject() (
       }
   }
 
-  def deletePersonAction(id: Int): Action[AnyContent] = authJourney.authWithAdminRight.async {
+  def deletePersonAction(baseId: Int, id: Int): Action[AnyContent] = authJourney.authWithAdminRight.async {
     implicit authenticatedRequest: AuthenticatedRequest[AnyContent] =>
-      val dbId = authenticatedRequest.localSession.sessionData.dbId
       personService.getPerson(id).map { (personOption: Option[Person]) =>
         personOption.fold(NotFound("Nothing here")) { person =>
           val isAllowedToSee = authenticatedRequest.localSession.sessionData.userData.fold(false)(_.seePrivacy)
 
           if (!person.details.privacyRestriction.contains("privacy") || isAllowedToSee) {
             deleteSqlQueries.deletePersonDetails(person.details.id)
-            Redirect(controllers.routes.HomeController.showSurnames(dbId))
+            Redirect(controllers.routes.HomeController.showSurnames(baseId))
           } else {
             Forbidden("Not allowed")
           }

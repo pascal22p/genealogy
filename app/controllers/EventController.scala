@@ -31,7 +31,7 @@ class EventController @Inject() (
 ) extends BaseController
     with I18nSupport {
 
-  def showEvent(id: Int): Action[AnyContent] = authAction.async {
+  def showEvent(baseId: Int, id: Int): Action[AnyContent] = authAction.async {
     implicit authenticatedRequest: AuthenticatedRequest[AnyContent] =>
       eventService.getEvent(id).flatMap { eventOption =>
         eventOption.fold(Future.successful(NotFound("Event could not be found"))) { event =>
@@ -40,7 +40,7 @@ class EventController @Inject() (
 
             if (!event.privacyRestriction.contains("privacy") || isAllowedToSee) {
               person.flatten.map(sessionService.insertPersonInHistory)
-              Ok(eventView(event, authenticatedRequest.localSession.sessionData.dbId, person.flatten))
+              Ok(eventView(event, baseId, person.flatten))
             } else {
               Forbidden("Not allowed")
             }

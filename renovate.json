@@ -7,7 +7,7 @@
         {
             "matchDatasources": ["maven"],
             "registryUrls": [
-                "https://open.artefacts.tax.service.gov.uk/maven2/"
+                "https://open.artefacts.tax.service.gov.uk/"
             ]
         }
     ]

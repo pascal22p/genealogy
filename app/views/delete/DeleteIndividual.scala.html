@@ -97,7 +97,7 @@
     )
   )
 
-  @helper.form(action = controllers.delete.routes.DeleteIndividualController.deletePersonAction(person.details.id) ) {
+  @helper.form(action = controllers.delete.routes.DeleteIndividualController.deletePersonAction(dbId, person.details.id) ) {
     @helper.CSRF.formField
     @govukButton(Button(
       inputType = Some("submit"),
