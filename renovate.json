@@ -6,7 +6,7 @@
   "packageRules": [
         {
             "matchDatasources": ["maven"],
-            "matchPackageNames": ["play-frontend-hmrc-play-30_3"],
+            "matchPackageNames": ["uk.gov.hmrc:play-frontend-hmrc-play-30_3"],
             "registryUrls": [
                 "https://open.artefacts.tax.service.gov.uk/maven2/"
             ]
