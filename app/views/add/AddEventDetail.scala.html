@@ -21,10 +21,11 @@
 @(dbId: Int, eventDetailForm: Form[EventDetailForm], ownerId: Int, allPlaces: List[Place], eventType: EventType)(implicit request: AuthenticatedRequest[?], messages: Messages)
 
 @postLink = @{
-    if(eventType == IndividualEvent) {
-        controllers.add.routes.AddIndividualEventDetailController.onSubmit(dbId, ownerId)
-    } else {
-        controllers.add.routes.AddFamilyEventDetailController.onSubmit(dbId, ownerId)
+    eventType match {
+        case _: IndividualEvent.type => {
+            controllers.add.routes.AddIndividualEventDetailController.onSubmit(dbId, ownerId)
+        }
+        case _ => { controllers.add.routes.AddFamilyEventDetailController.onSubmit(dbId, ownerId) }
     }
 }
 
@@ -77,11 +78,12 @@
         )
         @govukSelect(
             Select(
-                items = if(eventType == IndividualEvent) {
+                items = eventType match {
+                    case _: IndividualEvent.type => {
                         Seq(SelectItem(value = None, text = "Unknown")) ++ Constants.individualsEvents.map(e => SelectItem(value = Some(e), text = messages(e))).sortBy(_.text)
-                    } else {
-                        Seq(SelectItem(value = None, text = "Unknown")) ++ Constants.familyEvents.map(e => SelectItem(value = Some(e), text = messages(e))).sortBy(_.text)
-                    },
+                    }
+                    case _ => { Seq(SelectItem(value = None, text = "Unknown")) ++ Constants.familyEvents.map(e => SelectItem(value = Some(e), text = messages(e))).sortBy(_.text) }
+                  },
                 label = Label(
                     content = Text("Type of event")),
                 hint = None

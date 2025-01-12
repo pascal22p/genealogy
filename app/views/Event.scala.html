@@ -1,12 +1,12 @@
 @import models.Person
 @import play.twirl.api.HtmlFormat
-@import views.html.components.{Block, FamilyView, PersonDetails, EventsDetails, Parents, LastModified, SourCitation}
+@import views.html.components.{Block, SourCitation, LastModified}
 @import models.EventType.{IndividualEvent, FamilyEvent, UnknownEvent}
+@import models.SourCitationType.EventSourCitation
 @import controllers.routes.Assets
 
 @this(
   main: Main,
-  block: Block,
   sourCitation: SourCitation,
   lastModified: LastModified,
   govukSummaryList: GovukSummaryList)
@@ -16,19 +16,13 @@
 
 @main(dbId, person) {
 
-  @if(event.eventType == IndividualEvent) {
-    @for(ownerId <- event.ownerId) {
-      <div style="padding-left:10em;"><a class="govuk-link" href="@controllers.routes.IndividualController.showPerson(dbId, ownerId)">Return to @event.description page</a></div>
+  @event.eventType match {
+    case _: IndividualEvent.type => {
+      @for(ownerId <- event.ownerId) {
+        <div style="padding-left:10em;"><a class="govuk-link" href="@controllers.routes.IndividualController.showPerson(dbId, ownerId)">Return to @event.description page</a></div>
+      }
     }
-  }
-  @* @if(event.eventType == FamilyEvent) {
-   *   @for(ownerId <- event.ownerId) {
-   *     <div style="padding-left:10em;"><a class="govuk-link" href="@controllers.routes.FamilyController.showFamily(dbId, ownerId)">Return to @event.description page</a></div>
-   *   }
-   * }
-   *@
-  @if(event.eventType == UnknownEvent) {
-    <div style="padding-left:10em;">Orphan event</div>
+    case _ => { <div style="padding-left:10em;">Orphan event</div> }
   }
 
   @lastModified(event.events_details_timestamp)
@@ -99,8 +93,6 @@
     )
   )
 
-  @for(source <- event.sourCitations) {
-    @sourCitation(dbId, source)
-  }
-
+  @sourCitation(dbId, event.sourCitations, event.events_details_id, EventSourCitation)
+  
 }

@@ -13,3 +13,6 @@ POST    /base/:baseId/family/:id/event                       controllers.add.Add
 GET     /database                       controllers.add.AddDatabaseController.showForm
 POST    /database                       controllers.add.AddDatabaseController.onSubmit
 
+GET     /base/:baseId/:sourCitationType/:id/sour-citation      controllers.add.AddSourCitationController.showForm(baseId: Int, id: Int, sourCitationType: SourCitationType)
+POST    /base/:baseId/:sourCitationType/:id/sour-citation      controllers.add.AddSourCitationController.onSubmit(baseId: Int, id: Int, sourCitationType: SourCitationType)
+

@@ -1,6 +1,5 @@
 package queries
 
-import java.time.Instant
 import java.time.LocalDateTime
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -10,23 +9,6 @@ import scala.concurrent.Future
 import anorm.*
 import anorm.SqlParser.*
 import models.*
-import models.forms.EventDetailForm
-import models.queryData.*
-import models.EventType.EventType
-import models.EventType.FamilyEvent
-import models.EventType.IndividualEvent
-import models.EventType.UnknownEvent
-import models.MediaType.EventMedia
-import models.MediaType.FamilyMedia
-import models.MediaType.IndividualMedia
-import models.MediaType.MediaType
-import models.MediaType.SourCitationMedia
-import models.MediaType.UnknownMedia
-import models.SourCitationType.EventSourCitation
-import models.SourCitationType.FamilySourCitation
-import models.SourCitationType.IndividualSourCitation
-import models.SourCitationType.SourCitationType
-import models.SourCitationType.UnknownSourCitation
 import play.api.db.Database
 import play.api.libs.json.Json
 

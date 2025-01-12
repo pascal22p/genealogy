@@ -9,7 +9,6 @@ import scala.concurrent.Future
 import cats.*
 import cats.implicits.*
 import models.*
-import models.EventType.FamilyEvent
 import models.EventType.IndividualEvent
 import queries.GetSqlQueries
 

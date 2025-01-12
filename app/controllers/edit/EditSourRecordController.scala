@@ -6,11 +6,8 @@ import javax.inject.Singleton
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
-import actions.AuthAction
 import actions.AuthJourney
-import cats.implicits.*
 import models.forms.SourRecordForm
-import models.AuthenticatedRequest
 import models.SourCitationType.EventSourCitation
 import models.SourCitationType.FamilySourCitation
 import models.SourCitationType.IndividualSourCitation
@@ -18,17 +15,12 @@ import models.SourCitationType.SourCitationType
 import models.SourCitationType.UnknownSourCitation
 import models.SourRecord
 import play.api.data.Form
-import play.api.data.FormError
 import play.api.i18n.I18nSupport
-import play.api.mvc.AnyContent
 import play.api.mvc.BaseController
 import play.api.mvc.ControllerComponents
 import play.api.mvc.Result
 import play.api.Logging
-import queries.GetSqlQueries
 import queries.UpdateSqlQueries
-import services.PersonService
-import services.SessionService
 import services.SourCitationService
 import services.SourRecordService
 import views.html.edit.EditSourRecord
@@ -37,11 +29,8 @@ import views.html.ServiceUnavailable
 @Singleton
 class EditSourRecordController @Inject() (
     authJourney: AuthJourney,
-    personService: PersonService,
     sourRecordService: SourRecordService,
     sourCitationService: SourCitationService,
-    sessionService: SessionService,
-    getSqlQueries: GetSqlQueries,
     updateSqlQueries: UpdateSqlQueries,
     sourRecordView: EditSourRecord,
     serviceUnavailableView: ServiceUnavailable,
@@ -54,7 +43,7 @@ class EditSourRecordController @Inject() (
 
   private def handleSourRecord(id: Int)(
       block: SourRecord => Future[Result]
-  )(implicit request: AuthenticatedRequest[AnyContent]): Future[Result] = {
+  ): Future[Result] = {
     sourRecordService.getSourRecord(id).flatMap { sourRecord =>
       sourRecord.fold(Future.successful(NotFound("SourCitation could not be found")))(block)
     }
@@ -80,13 +69,13 @@ class EditSourRecordController @Inject() (
         updateSqlQueries.updateSourRecord(sourRecord.fromForm(dataForm)).flatMap {
           case 1 =>
             dataForm.parentType match {
-              case EventSourCitation =>
+              case _: EventSourCitation.type =>
                 sourCitationService.getSourCitations(dataForm.parentId, UnknownSourCitation).map { sourCitationList =>
                   sourCitationList.headOption.fold(NotFound("SourCitation could not be found")) { sourCitation =>
                     Redirect(controllers.routes.EventController.showEvent(baseId, sourCitation.ownerId.getOrElse(0)))
                   }
                 }
-              case IndividualSourCitation =>
+              case _: IndividualSourCitation.type =>
                 sourCitationService.getSourCitations(dataForm.parentId, UnknownSourCitation).map { sourCitationList =>
                   sourCitationList.headOption.fold(NotFound("SourCitation could not be found")) { sourCitation =>
                     Redirect(
@@ -94,9 +83,9 @@ class EditSourRecordController @Inject() (
                     )
                   }
                 }
-              case FamilySourCitation =>
+              case _: FamilySourCitation.type =>
                 Future.successful(NotImplemented(serviceUnavailableView("Family edit Not implemented")))
-              case UnknownSourCitation =>
+              case _: UnknownSourCitation.type =>
                 Future.successful(InternalServerError(serviceUnavailableView("Unknown sour citation type")))
             }
           case _ => Future.successful(InternalServerError(serviceUnavailableView("No record was updated")))

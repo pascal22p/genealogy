@@ -6,30 +6,20 @@ import javax.inject.Singleton
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
-import actions.AuthAction
 import actions.AuthJourney
-import cats.implicits.*
 import models.forms.SourCitationForm
-import models.AuthenticatedRequest
 import models.SourCitation
 import models.SourCitationType
 import models.SourCitationType.EventSourCitation
-import models.SourCitationType.FamilySourCitation
 import models.SourCitationType.IndividualSourCitation
 import models.SourCitationType.UnknownSourCitation
-import org.apache.pekko.http.scaladsl.model.HttpCharsetRange.*
 import play.api.data.Form
 import play.api.i18n.I18nSupport
-import play.api.mvc.AnyContent
 import play.api.mvc.BaseController
 import play.api.mvc.ControllerComponents
 import play.api.mvc.Result
 import play.api.Logging
-import queries.GetSqlQueries
 import queries.UpdateSqlQueries
-import services.EventService
-import services.PersonService
-import services.SessionService
 import services.SourCitationService
 import views.html.edit.EditSourCitation
 import views.html.ServiceUnavailable
@@ -37,11 +27,7 @@ import views.html.ServiceUnavailable
 @Singleton
 class EditSourCitationController @Inject() (
     authJourney: AuthJourney,
-    eventService: EventService,
-    personService: PersonService,
     sourCitationService: SourCitationService,
-    sessionService: SessionService,
-    getSqlQueries: GetSqlQueries,
     updateSqlQueries: UpdateSqlQueries,
     sourCitationView: EditSourCitation,
     serviceUnavailableView: ServiceUnavailable,
@@ -54,7 +40,7 @@ class EditSourCitationController @Inject() (
 
   private def handleSourCitation(id: Int)(
       block: SourCitation => Future[Result]
-  )(implicit request: AuthenticatedRequest[AnyContent]): Future[Result] = {
+  ): Future[Result] = {
     sourCitationService.getSourCitations(id, UnknownSourCitation).flatMap { sourCitationList =>
       sourCitationList.headOption.fold(Future.successful(NotFound("SourCitation could not be found")))(block)
     }
@@ -79,11 +65,11 @@ class EditSourCitationController @Inject() (
         updateSqlQueries.updateSourCitation(sourCitation.fromForm(dataForm)).map {
           case 1 =>
             sourCitation.sourceType match {
-              case EventSourCitation =>
+              case _: EventSourCitation.type =>
                 sourCitation.ownerId.fold(NotFound("Record updated but parent not found"))(eventId =>
                   Redirect(controllers.routes.EventController.showEvent(baseId, eventId))
                 )
-              case IndividualSourCitation =>
+              case _: IndividualSourCitation.type =>
                 sourCitation.ownerId.fold(NotFound("Record updated but parent not found"))(personId =>
                   Redirect(controllers.routes.IndividualController.showPerson(baseId, personId))
                 )

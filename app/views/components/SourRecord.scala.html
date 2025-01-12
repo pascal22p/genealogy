@@ -1,11 +1,9 @@
 @import models.{SourRecord => SourRecordModel}
 @import models.SourCitationType.SourCitationType
-@import views.html.components.{LastModified, Block}
 
 @this(
-  lastModified: LastModified, 
-  block: Block,
-  govukSummaryList: GovukSummaryList)
+  govukSummaryList: GovukSummaryList
+)
 
 @(dbId: Int, record: SourRecordModel, sourceType: SourCitationType, sourceId: Int)(implicit request: AuthenticatedRequest[?], messages: Messages)
 

@@ -2,8 +2,10 @@ package models.forms
 
 import java.time.Instant
 
-import models.SourCitationType.IndividualSourCitation
-import play.api.data.FieldMapping
+import models.SourCitationQueryData
+import models.SourCitationType
+import models.SourCitationType.SourCitationType
+import models.SourRecord
 import play.api.data.Form
 import play.api.data.Forms.mapping
 import play.api.data.Forms.number
@@ -17,13 +19,32 @@ final case class SourCitationForm(
     submitter: String,
     text: String,
     page: String,
-    quay: Option[Int]
-)
+    quay: Option[Int],
+    recordId: Option[Int]
+) {
+  def toSourCitationQueryData(ownerId: Int, ownerType: SourCitationType) =
+    SourCitationQueryData(
+      id = 0,
+      record = recordId.map(id => SourRecord(id, "", "", "", "", "", "", None, "", "", Instant.now())),
+      page = page,
+      even = even,
+      role = role,
+      dates = date,
+      text = text,
+      quay = quay,
+      subm = submitter,
+      timestamp = Instant.now(),
+      ownerId = Some(ownerId),
+      sourceType = ownerType
+    )
+}
 
 object SourCitationForm {
 
-  def unapply(u: SourCitationForm): Option[(String, String, String, String, String, String, Option[Int])] = Some(
-    (u.date, u.even, u.role, u.submitter, u.text, u.page, u.quay)
+  def unapply(
+      u: SourCitationForm
+  ): Option[(String, String, String, String, String, String, Option[Int], Option[Int])] = Some(
+    (u.date, u.even, u.role, u.submitter, u.text, u.page, u.quay, u.recordId)
   )
 
   val sourCitationForm: Form[SourCitationForm] = Form(
@@ -34,7 +55,8 @@ object SourCitationForm {
       "submitter" -> text,
       "text"      -> text,
       "page"      -> text,
-      "quay"      -> optional(number)
+      "quay"      -> optional(number),
+      "recordId"  -> optional(number)
     )(SourCitationForm.apply)(SourCitationForm.unapply)
   )
 }

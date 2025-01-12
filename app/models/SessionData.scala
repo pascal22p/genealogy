@@ -1,6 +1,5 @@
 package models
 
-import anorm.*
 import anorm.SqlParser.*
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat

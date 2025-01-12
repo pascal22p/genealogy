@@ -1,14 +1,13 @@
 @import models.forms.SourRecordForm
 @import models.SourRecord
-@import views.html.helper
 @import views.html.components.Block
-@import helper._
 @import uk.gov.hmrc.govukfrontend.views.Implicits.*
 
 @this(
         main: Main,
         govukButton: GovukButton,
         govukInput: GovukInput,
+        formWithCSRF: FormWithCSRF,
         block: Block
 )
 
@@ -24,9 +23,7 @@
         }
     }
 
-    @helper.form(action = controllers.edit.routes.EditSourRecordController.onSubmit(dbId, sourRecord.id)) {
-        @helper.CSRF.formField
-
+    @formWithCSRF(controllers.edit.routes.EditSourRecordController.onSubmit(dbId, sourRecord.id)) {
         <input type="hidden" name="parentType" value="@sourRecordForm("parentType").value.getOrElse("Unknown")">
         <input type="hidden" name="parentId" value="@sourRecordForm("parentId").value.getOrElse("Unknown")">
         

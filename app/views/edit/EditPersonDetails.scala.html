@@ -1,7 +1,5 @@
 @import models.forms.PersonDetailsForm
-@import views.html.helper
 @import views.html.components.Block
-@import helper._
 @import uk.gov.hmrc.govukfrontend.views.Implicits.*
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits.*
 
@@ -11,7 +9,8 @@
         block: Block,
         govukInput: GovukInput,
         govukSelect: GovukSelect,
-        govukButton: GovukButton
+        govukButton: GovukButton,
+        formWithCSRF: FormWithCSRF
 )
 
 @(dbId: Int, personDetailsForm: Form[PersonDetailsForm])(implicit request: AuthenticatedRequest[?], messages: Messages)
@@ -27,8 +26,7 @@
         }
     }
 
-    @helper.form(action = controllers.edit.routes.EditPersonDetailsController.onSubmit(dbId) ) {
-        @helper.CSRF.formField
+    @formWithCSRF(controllers.edit.routes.EditPersonDetailsController.onSubmit(dbId)) {
         <input type="hidden" value="@personDetailsForm("id").value" name="id" />
         @govukInput(
             Input(

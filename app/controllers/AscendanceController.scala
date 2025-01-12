@@ -4,7 +4,6 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 import scala.concurrent.ExecutionContext
-import scala.concurrent.Future
 
 import actions.AuthAction
 import cats.*
@@ -14,20 +13,16 @@ import play.api.i18n.*
 import play.api.mvc.*
 import play.api.Logging
 import services.AscendanceService
-import services.PersonService
 import services.SessionService
 import utils.TreeUtils
 import views.html.Ascendants
-import views.html.Individual
 
 @Singleton
 class AscendanceController @Inject() (
     authAction: AuthAction,
-    personService: PersonService,
     ascendanceService: AscendanceService,
     sessionService: SessionService,
     treeUtils: TreeUtils,
-    individualView: Individual,
     ascendants: Ascendants,
     val controllerComponents: ControllerComponents
 )(

@@ -10,25 +10,10 @@ import anorm.*
 import anorm.SqlParser.*
 import cats.data.OptionT
 import models.*
-import models.forms.EventDetailForm
 import models.queryData.*
-import models.EventType.EventType
 import models.EventType.FamilyEvent
 import models.EventType.IndividualEvent
-import models.EventType.UnknownEvent
-import models.MediaType.EventMedia
-import models.MediaType.FamilyMedia
-import models.MediaType.IndividualMedia
-import models.MediaType.MediaType
-import models.MediaType.SourCitationMedia
-import models.MediaType.UnknownMedia
-import models.SourCitationType.EventSourCitation
-import models.SourCitationType.FamilySourCitation
-import models.SourCitationType.IndividualSourCitation
-import models.SourCitationType.SourCitationType
-import models.SourCitationType.UnknownSourCitation
 import play.api.db.Database
-import play.api.libs.json.Json
 import play.api.Logging
 
 @Singleton
@@ -63,9 +48,7 @@ final class InsertSqlQueries @Inject() (db: Database, databaseExecutionContext: 
   }(databaseExecutionContext))
 
   def insertEventDetail(
-      eventDetailOnlyQueryData: EventDetailOnlyQueryData,
-      ownerId: Int,
-      eventType: EventType
+      eventDetailQueryData: EventDetailQueryData,
   ): OptionT[Future, Int] =
     OptionT(Future {
       val parser: ResultSetParser[Option[Int]] = {
@@ -79,47 +62,51 @@ final class InsertSqlQueries @Inject() (db: Database, databaseExecutionContext: 
                 | VALUES ({place_id}, {addr_id}, {events_details_descriptor}, {events_details_gedcom_date}, {events_details_age}, {events_details_cause}, {jd_count}, {jd_precision}, {jd_calendar}, {events_details_famc}, {events_details_adop}, {base})
         """.stripMargin)
             .on(
-              "place_id"                   -> eventDetailOnlyQueryData.place_id,
-              "addr_id"                    -> eventDetailOnlyQueryData.addr_id,
-              "events_details_descriptor"  -> eventDetailOnlyQueryData.events_details_descriptor,
-              "events_details_gedcom_date" -> eventDetailOnlyQueryData.events_details_gedcom_date,
-              "events_details_age"         -> eventDetailOnlyQueryData.events_details_age,
-              "events_details_cause"       -> eventDetailOnlyQueryData.events_details_cause,
-              "jd_count"                   -> eventDetailOnlyQueryData.jd_count,
-              "jd_precision"               -> eventDetailOnlyQueryData.jd_precision,
-              "jd_calendar"                -> eventDetailOnlyQueryData.jd_calendar,
-              "events_details_famc"        -> eventDetailOnlyQueryData.events_details_famc,
-              "events_details_adop"        -> eventDetailOnlyQueryData.events_details_adop,
-              "base"                       -> eventDetailOnlyQueryData.base
+              "place_id"                   -> eventDetailQueryData.place_id,
+              "addr_id"                    -> eventDetailQueryData.addr_id,
+              "events_details_descriptor"  -> eventDetailQueryData.events_details_descriptor,
+              "events_details_gedcom_date" -> eventDetailQueryData.events_details_gedcom_date,
+              "events_details_age"         -> eventDetailQueryData.events_details_age,
+              "events_details_cause"       -> eventDetailQueryData.events_details_cause,
+              "jd_count"                   -> eventDetailQueryData.jd_count,
+              "jd_precision"               -> eventDetailQueryData.jd_precision,
+              "jd_calendar"                -> eventDetailQueryData.jd_calendar,
+              "events_details_famc"        -> eventDetailQueryData.events_details_famc,
+              "events_details_adop"        -> eventDetailQueryData.events_details_adop,
+              "base"                       -> eventDetailQueryData.base
             )
             .executeInsert[Option[Int]](parser)
 
-        if (eventType == IndividualEvent) {
-          SQL("""INSERT INTO rel_indi_events
-                | (indi_id, events_details_id)
-                | VALUES ({indiId}, {eventId})
-        """.stripMargin)
-            .on(
-              "indiId"  -> ownerId,
-              "eventId" -> eventId
-            )
-            .execute()
-        } else if (eventType == FamilyEvent) {
-          SQL("""INSERT INTO rel_familles_events
-                | (familles_id, events_details_id)
-                | VALUES ({familyId}, {eventId})
-        """.stripMargin)
-            .on(
-              "familyId" -> ownerId,
-              "eventId"  -> eventId
-            )
-            .execute()
-        } else {
-          val ex = new RuntimeException(s"The type `$eventType` is not supported")
-          logger.error(ex.getMessage(), ex)
-          None
-        }
+        eventDetailQueryData.eventType match {
+          case _: IndividualEvent.type =>
+            SQL("""INSERT INTO rel_indi_events
+                  | (indi_id, events_details_id, events_tag)
+                  | VALUES ({indiId}, {eventId}, {eventTag})
+            """.stripMargin)
+              .on(
+                "indiId"   -> eventDetailQueryData.ownerId.getOrElse(0),
+                "eventId"  -> eventId,
+                "eventTag" -> eventDetailQueryData.tag
+              )
+              .execute()
 
+          case _: FamilyEvent.type =>
+            SQL("""INSERT INTO rel_familles_events
+                  | (familles_id, events_details_id, events_tag)
+                  | VALUES ({familyId}, {eventId}, {eventTag})
+            """.stripMargin)
+              .on(
+                "familyId" -> eventDetailQueryData.ownerId,
+                "eventId"  -> eventId,
+                "eventTag" -> eventDetailQueryData.tag
+              )
+              .execute()
+
+          case _ =>
+            val ex = new RuntimeException(s"The type `${eventDetailQueryData.eventType}` is not supported")
+            logger.error(ex.getMessage(), ex)
+            None
+        }
         eventId
       }
     }(databaseExecutionContext))
@@ -139,6 +126,27 @@ final class InsertSqlQueries @Inject() (db: Database, databaseExecutionContext: 
         .on(
           "name"        -> genealogyDatabase.name,
           "description" -> genealogyDatabase.description,
+          "headers"     -> ""
+        )
+        .executeInsert[Option[Int]](parser)
+    }
+  }(databaseExecutionContext))
+
+  def insertSourCitation(sourCitation: SourCitationQueryData): OptionT[Future, Int] = OptionT(Future {
+    val parser: ResultSetParser[Option[Int]] = {
+      int("insert_id").singleOpt
+    }
+
+    db.withConnection { implicit conn =>
+      SQL(
+        """INSERT INTO genea_sour_citations 
+          | (nom, descriptif, entetes)
+          | VALUES ({name}, {description}, "{headers}")
+        """.stripMargin
+      )
+        .on(
+          "name"        -> sourCitation.id,
+          "description" -> sourCitation.dates,
           "headers"     -> ""
         )
         .executeInsert[Option[Int]](parser)

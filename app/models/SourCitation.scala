@@ -28,7 +28,8 @@ final case class SourCitation(
       subm,
       text,
       page,
-      quay
+      quay,
+      record.map(_.id)
     )
 
   def fromForm(sourCitationForm: SourCitationForm): SourCitation = SourCitation(

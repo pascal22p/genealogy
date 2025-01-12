@@ -3,7 +3,6 @@ package models
 import anorm._
 import anorm.SqlParser._
 import play.twirl.api.Html
-import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 
 final case class Place(
     id: Int,
