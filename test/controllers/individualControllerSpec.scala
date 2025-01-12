@@ -5,7 +5,6 @@ import java.time.LocalDateTime
 import scala.concurrent.Future
 
 import actions.AuthAction
-import actions.AuthActionImpl
 import models.EventType.IndividualEvent
 import models.Events
 import models.Person

@@ -1,9 +1,5 @@
 package models
 
-import java.time.Instant
-
-import models.EventType.EventType
-import models.EventType.UnknownEvent
 import org.scalatest.matchers.should.Matchers.should
 import org.scalatest.matchers.should.Matchers.shouldBe
 import org.scalatestplus.play.*

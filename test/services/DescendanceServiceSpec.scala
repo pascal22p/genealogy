@@ -3,27 +3,18 @@ package services
 import java.time.Instant
 
 import scala.concurrent.Future
-import scala.jdk.CollectionConverters.*
 
 import models.*
 import models.EventType.FamilyEvent
 import models.EventType.IndividualEvent
-import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito
-import org.mockito.Mockito.times
-import org.mockito.Mockito.verify
 import org.mockito.Mockito.when
-import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.mvc.AnyContentAsEmpty
-import play.api.test.FakeRequest
-import play.api.Application
-import queries.GetSqlQueries
 import testUtils.BaseSpec
 
 class DescendanceServiceSpec extends BaseSpec {

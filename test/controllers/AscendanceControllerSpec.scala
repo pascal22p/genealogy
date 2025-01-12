@@ -9,7 +9,6 @@ import actions.AuthAction
 import models.*
 import models.EventType.FamilyEvent
 import models.EventType.IndividualEvent
-import models.EventType.UnknownEvent
 import org.jsoup.Jsoup
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -142,17 +141,6 @@ class AscendanceControllerSpec extends BaseSpec {
           parents = List(parentsB)
         )
 
-      val familyBB: Family = Family(
-        2,
-        Some(personC),
-        Some(personD),
-        Instant.now,
-        None,
-        "",
-        List.empty,
-        Events(List.empty, Some(2), FamilyEvent)
-      )
-      val parentsBB: Parents = Parents(familyB, "", "", None)
       val personBB: Person =
         Person(
           fakePersonDetails(firstname = "Firstname22", id = 22),

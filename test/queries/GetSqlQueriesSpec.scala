@@ -69,7 +69,7 @@ class GetSqlQueriesSpec extends BaseSpec with BeforeAndAfterEach with Logging {
 
   override def beforeEach(): Unit = {
     super.beforeEach()
-    createTables().futureValue
+    createTables().map(_ => ()).futureValue
   }
 
   def sqlPersonDetails(person: PersonDetails): String =
