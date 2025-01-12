@@ -1,6 +1,5 @@
 package controllers
 import java.io.File
-import java.nio.file.NoSuchFileException
 import javax.inject._
 
 import scala.concurrent.ExecutionContext

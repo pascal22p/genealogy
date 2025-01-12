@@ -1,15 +1,10 @@
 package models.forms
 
-import java.time.Instant
-
 import models.SourCitationType
-import play.api.data.FieldMapping
 import play.api.data.Form
 import play.api.data.Forms.mapping
-import play.api.data.Forms.nonEmptyText
 import play.api.data.Forms.number
 import play.api.data.Forms.of
-import play.api.data.Forms.optional
 import play.api.data.Forms.text
 
 final case class SourRecordForm(

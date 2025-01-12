@@ -1,6 +1,5 @@
 package queries
 
-import java.time.Instant
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -10,7 +9,6 @@ import anorm.*
 import anorm.SqlParser.*
 import cats.data.OptionT
 import models.*
-import models.forms.EventDetailForm
 import models.queryData.*
 import models.EventType.EventType
 import models.EventType.FamilyEvent
@@ -28,7 +26,6 @@ import models.SourCitationType.IndividualSourCitation
 import models.SourCitationType.SourCitationType
 import models.SourCitationType.UnknownSourCitation
 import play.api.db.Database
-import play.api.libs.json.Json
 
 @Singleton
 final class GetSqlQueries @Inject() (db: Database, databaseExecutionContext: DatabaseExecutionContext) {
@@ -46,9 +43,9 @@ final class GetSqlQueries @Inject() (db: Database, databaseExecutionContext: Dat
   def getEvents(id: Int, eventType: EventType): Future[List[EventDetailQueryData]] = Future {
     db.withConnection { implicit conn =>
       val where = eventType match {
-        case IndividualEvent => "WHERE rel_indi_events.indi_id = {id}"
-        case FamilyEvent     => "WHERE rel_familles_events.familles_id = {id}"
-        case _               => "WHERE genea_events_details.events_details_id = {id}"
+        case _: IndividualEvent.type => "WHERE rel_indi_events.indi_id = {id}"
+        case _: FamilyEvent.type     => "WHERE rel_familles_events.familles_id = {id}"
+        case _                       => "WHERE genea_events_details.events_details_id = {id}"
       }
       SQL(s"""SELECT genea_events_details.*, rel_indi_events.*, rel_familles_events.*, r.sourCount,
              |       CASE
@@ -165,10 +162,10 @@ final class GetSqlQueries @Inject() (db: Database, databaseExecutionContext: Dat
   def getSourCitations(id: Int, typeCitation: SourCitationType): Future[List[SourCitationQueryData]] = Future {
     db.withConnection { implicit conn =>
       val where = typeCitation match {
-        case EventSourCitation      => "WHERE rel_events_sources.events_details_id = {id}"
-        case IndividualSourCitation => "WHERE rel_indi_sources.indi_id = {id}"
-        case FamilySourCitation     => "WHERE rel_familles_sources.familles_id = {id}"
-        case UnknownSourCitation    => "WHERE genea_sour_citations.sour_citations_id = {id}"
+        case _: EventSourCitation.type      => "WHERE rel_events_sources.events_details_id = {id}"
+        case _: IndividualSourCitation.type => "WHERE rel_indi_sources.indi_id = {id}"
+        case _: FamilySourCitation.type     => "WHERE rel_familles_sources.familles_id = {id}"
+        case _: UnknownSourCitation.type    => "WHERE genea_sour_citations.sour_citations_id = {id}"
       }
 
       SQL(s"""SELECT *,
@@ -199,11 +196,11 @@ final class GetSqlQueries @Inject() (db: Database, databaseExecutionContext: Dat
   def getMedias(id: Int, typeMedia: MediaType): Future[List[Media]] = Future {
     db.withConnection { implicit conn =>
       val where = typeMedia match {
-        case EventMedia        => "WHERE rel_events_multimedia.events_details_id = {id}"
-        case IndividualMedia   => "WHERE rel_indi_multimedia.indi_id = {id}"
-        case FamilyMedia       => "WHERE rel_familles_multimedia.familles_id = {id}"
-        case SourCitationMedia => "WHERE rel_sour_citations_multimedia.sour_citations_id = {id}"
-        case UnknownMedia      => "WHERE genea_multimedia.media_id = {id}"
+        case _: EventMedia.type        => "WHERE rel_events_multimedia.events_details_id = {id}"
+        case _: IndividualMedia.type   => "WHERE rel_indi_multimedia.indi_id = {id}"
+        case _: FamilyMedia.type       => "WHERE rel_familles_multimedia.familles_id = {id}"
+        case _: SourCitationMedia.type => "WHERE rel_sour_citations_multimedia.sour_citations_id = {id}"
+        case _: UnknownMedia.type      => "WHERE genea_multimedia.media_id = {id}"
       }
 
       SQL(

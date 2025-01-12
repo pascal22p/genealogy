@@ -1,11 +1,12 @@
 @import models.Person
-@import views.html.components.{Block, FamilyView, PersonDetails, EventsDetails, Parents, NameLink}
+@import views.html.components.{Block, NameLink}
 
 
 @this(
-  main: Main,
-  block: Block,
-        nameLink: NameLink)
+    main: Main,
+    block: Block,
+    nameLink: NameLink
+)
 
 @(person: Person, dbId: Int)(implicit request: AuthenticatedRequest[?], messages: Messages)
 

@@ -26,7 +26,6 @@ import play.api.test.Helpers.contentAsString
 import play.api.test.Helpers.defaultAwaitTimeout
 import play.api.test.Helpers.session
 import play.api.test.Helpers.status
-import queries.GetSqlQueries
 import queries.SessionSqlQueries
 import testUtils.BaseSpec
 

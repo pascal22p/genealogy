@@ -5,7 +5,6 @@ import javax.inject.*
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
-import actions.AuthAction
 import actions.AuthJourney
 import models.forms.PersonDetailsForm
 import models.AuthenticatedRequest

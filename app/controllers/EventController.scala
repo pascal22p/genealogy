@@ -8,8 +8,6 @@ import scala.concurrent.Future
 import actions.AuthAction
 import cats.implicits.*
 import models.AuthenticatedRequest
-import models.EventDetail
-import models.EventType.IndividualEvent
 import models.Person
 import play.api.i18n.*
 import play.api.mvc.*

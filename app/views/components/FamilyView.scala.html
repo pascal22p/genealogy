@@ -4,7 +4,6 @@
 
 @this(
     familyEvents: EventsDetails,
-    lastModified: LastModified,
     block: Block,
     govukSummaryList: GovukSummaryList)
 
@@ -14,10 +13,6 @@
     Family 
     @family.parent1.map(_.details.surname).getOrElse("Unknown") —
     @family.parent2.map(_.details.surname).getOrElse("Unknown")
-}
-
-@nameWithDate(person: Person) = {
-    @person.details.shortName @person.events.birthAndDeathDate
 }
 
 @block(title.toString, 

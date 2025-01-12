@@ -3,9 +3,7 @@ package controllers.delete
 import javax.inject.*
 
 import scala.concurrent.ExecutionContext
-import scala.concurrent.Future
 
-import actions.AuthAction
 import actions.AuthJourney
 import models.AuthenticatedRequest
 import models.Person
@@ -13,14 +11,12 @@ import play.api.i18n.*
 import play.api.mvc.*
 import queries.DeleteSqlQueries
 import services.PersonService
-import services.SessionService
 import views.html.delete.DeleteIndividual
 
 @Singleton
 class DeleteIndividualController @Inject() (
     authJourney: AuthJourney,
     personService: PersonService,
-    sessionService: SessionService,
     deleteIndividualView: DeleteIndividual,
     deleteSqlQueries: DeleteSqlQueries,
     val controllerComponents: ControllerComponents

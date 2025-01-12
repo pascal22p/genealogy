@@ -5,29 +5,22 @@ import javax.inject.*
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
-import actions.AuthAction
 import actions.AuthJourney
 import models.forms.EventDetailForm
 import models.AuthenticatedRequest
 import models.EventType.IndividualEvent
-import models.Person
 import play.api.data.Form
 import play.api.i18n.*
 import play.api.mvc.*
 import play.api.Logging
 import queries.GetSqlQueries
 import queries.InsertSqlQueries
-import services.PersonService
-import services.SessionService
-import uk.gov.hmrc.hmrcfrontend.views.viewmodels.accountmenu.PersonalDetails
 import views.html.add.AddEventDetail
 import views.html.ServiceUnavailable
 
 @Singleton
 class AddIndividualEventDetailController @Inject() (
     authJourney: AuthJourney,
-    personService: PersonService,
-    sessionService: SessionService,
     insertSqlQueries: InsertSqlQueries,
     addEventDetailsView: AddEventDetail,
     serviceUnavailableView: ServiceUnavailable,
@@ -58,7 +51,7 @@ class AddIndividualEventDetailController @Inject() (
 
       val successFunction: EventDetailForm => Future[Result] = { (dataForm: EventDetailForm) =>
         insertSqlQueries
-          .insertEventDetail(dataForm.toEventDetailOnlyQueryData, personId, IndividualEvent)
+          .insertEventDetail(dataForm.toEventDetailQueryData(IndividualEvent, personId))
           .fold(
             InternalServerError(serviceUnavailableView("No record was inserted"))
           ) { id =>

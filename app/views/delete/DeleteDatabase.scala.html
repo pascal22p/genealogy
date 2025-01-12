@@ -1,13 +1,10 @@
-@import models.Person
-@import views.html.components.{FamilyView, PersonDetails, EventsDetails, Parents}
 
 @this(
   main: Main,
-  familyView: FamilyView,
-  individualEvents: EventsDetails,
-  parents: Parents,
   govukButton: GovukButton,
-  govukSummaryList: GovukSummaryList)
+  govukSummaryList: GovukSummaryList,
+  formWithCSRF: FormWithCSRF
+)
 
 @(database: GenealogyDatabase)(implicit request: AuthenticatedRequest[?], messages: Messages)
 
@@ -41,8 +38,7 @@
     )
   )
 
-  @helper.form(action = controllers.delete.routes.DeleteDatabaseController.deleteDatabaseAction(database.id) ) {
-    @helper.CSRF.formField
+  @formWithCSRF(controllers.delete.routes.DeleteDatabaseController.deleteDatabaseAction(database.id)) {
     @govukButton(Button(
       inputType = Some("submit"),
       content = Text("Delete this database"),

@@ -1,16 +1,10 @@
 @import models.{Media => ModelMedia}
-@import views.html.components.LastModified
 
 @this(
-  lastModified: LastModified, 
   block: Block,
-  govukSummaryList: GovukSummaryList)
+)
 
 @(medias: List[ModelMedia])(implicit authenticatedRequest: AuthenticatedRequest[?], messages: Messages)
-
-@displayMedia(filename: String) = @{
-  s"""<div style="width:90%;margin-left:auto;margin-right:auto;padding:1em;"><img src="${routes.Assets.versioned(s"Medias/Parois/$filename")}" /></div>"""
-}
 
   @block(
     title = "Medias", 

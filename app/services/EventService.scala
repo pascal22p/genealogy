@@ -14,10 +14,7 @@ import models.EventType.IndividualEvent
 import models.EventType.UnknownEvent
 import models.Place
 import models.SourCitation
-import models.SourCitationQueryData
 import models.SourCitationType.EventSourCitation
-import models.UserData
-import org.mindrot.jbcrypt.BCrypt
 import queries.GetSqlQueries
 
 @Singleton

@@ -1,6 +1,5 @@
 package models
 
-import anorm._
 import anorm.SqlParser._
 import queryData.FamilyAsChildQueryData
 

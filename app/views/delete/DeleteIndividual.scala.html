@@ -1,13 +1,10 @@
-@import models.Person
-@import views.html.components.{FamilyView, PersonDetails, EventsDetails, Parents}
 
 @this(
   main: Main,
-  familyView: FamilyView,
-  individualEvents: EventsDetails,
-  parents: Parents,
   govukButton: GovukButton,
-  govukSummaryList: GovukSummaryList)
+  govukSummaryList: GovukSummaryList,
+  formWithCSRF: FormWithCSRF
+)
 
 @(person: Person, dbId: Int)(implicit request: AuthenticatedRequest[?], messages: Messages)
 
@@ -85,7 +82,7 @@
               classes = "govuk-summary-list__row--no-border",
               actions = None
             )
-        }).filter(_.value.content != Text("")),
+        }).filter(_.value.content.nonEmpty),
         card = Some(Card(
             title = Some(CardTitle(content = Text("Person to be deleted"))),
             actions = None,
@@ -97,8 +94,7 @@
     )
   )
 
-  @helper.form(action = controllers.delete.routes.DeleteIndividualController.deletePersonAction(dbId, person.details.id) ) {
-    @helper.CSRF.formField
+  @formWithCSRF(controllers.delete.routes.DeleteIndividualController.deletePersonAction(dbId, person.details.id)) {
     @govukButton(Button(
       inputType = Some("submit"),
       content = Text("Delete this person"),

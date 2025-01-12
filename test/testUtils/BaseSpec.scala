@@ -9,7 +9,6 @@ import models.MaleSex
 import models.PersonDetails
 import models.Place
 import models.Sex
-import org.mockito.Mockito
 import org.scalatest.concurrent.IntegrationPatience
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar

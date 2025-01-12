@@ -7,27 +7,11 @@ import javax.inject.Singleton
 import scala.concurrent.Future
 
 import anorm.*
-import anorm.SqlParser.*
 import models.*
-import models.forms.EventDetailForm
-import models.queryData.*
-import models.EventType.EventType
 import models.EventType.FamilyEvent
 import models.EventType.IndividualEvent
 import models.EventType.UnknownEvent
-import models.MediaType.EventMedia
-import models.MediaType.FamilyMedia
-import models.MediaType.IndividualMedia
-import models.MediaType.MediaType
-import models.MediaType.SourCitationMedia
-import models.MediaType.UnknownMedia
-import models.SourCitationType.EventSourCitation
-import models.SourCitationType.FamilySourCitation
-import models.SourCitationType.IndividualSourCitation
-import models.SourCitationType.SourCitationType
-import models.SourCitationType.UnknownSourCitation
 import play.api.db.Database
-import play.api.libs.json.Json
 
 @Singleton
 final class UpdateSqlQueries @Inject() (db: Database, databaseExecutionContext: DatabaseExecutionContext) {
@@ -92,7 +76,7 @@ final class UpdateSqlQueries @Inject() (db: Database, databaseExecutionContext: 
         .executeUpdate()
 
       event.eventType match {
-        case FamilyEvent =>
+        case _: FamilyEvent.type =>
           SQL("""UPDATE rel_familles_events
                 |SET events_tag = {tag},
                 |timestamp = {timestamp}
@@ -104,7 +88,7 @@ final class UpdateSqlQueries @Inject() (db: Database, databaseExecutionContext: 
               "timestamp" -> Instant.now
             )
             .executeUpdate()
-        case IndividualEvent =>
+        case _: IndividualEvent.type =>
           SQL("""UPDATE rel_indi_events
                 |SET events_tag = {tag},
                 |timestamp = {timestamp}
@@ -117,7 +101,7 @@ final class UpdateSqlQueries @Inject() (db: Database, databaseExecutionContext: 
             )
             .executeUpdate()
 
-        case UnknownEvent => 0
+        case _: UnknownEvent.type => 0
       }
 
     }

@@ -1,8 +1,6 @@
 @import models.forms.EventDetailForm
 @import models.EventDetail
-@import views.html.helper
 @import views.html.components.Block
-@import helper._
 @import utils.Constants
 @import uk.gov.hmrc.govukfrontend.views.Implicits.*
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits.*
@@ -12,7 +10,8 @@
         block: Block,
         govukInput: GovukInput,
         govukSelect: GovukSelect,
-        govukButton: GovukButton
+        govukButton: GovukButton,
+        formWithCSRF: FormWithCSRF
 )
 
 @(dbId: Int, eventDetailsForm: Form[EventDetailForm], allPlaces: List[Place], event: EventDetail)(implicit request: AuthenticatedRequest[?], messages: Messages)
@@ -29,8 +28,7 @@
         }
     }
 
-    @helper.form(action = controllers.edit.routes.EditEventDetailController.onSubmit(dbId, event.events_details_id) ) {
-        @helper.CSRF.formField
+    @formWithCSRF(controllers.edit.routes.EditEventDetailController.onSubmit(dbId, event.events_details_id)) {
         @govukInput(
             Input(
                 label = Label(content = Text("Database")),

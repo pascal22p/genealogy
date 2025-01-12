@@ -1,18 +1,14 @@
 package services
 
-import java.time.Instant
 import java.time.LocalDateTime
 
 import scala.concurrent.Future
 import scala.jdk.CollectionConverters.*
 
 import models.AuthenticatedRequest
-import models.EventDetail
 import models.EventType.IndividualEvent
 import models.Events
-import models.FemaleSex
 import models.Person
-import models.PersonDetails
 import models.Session
 import models.SessionData
 import org.mockito.ArgumentCaptor
@@ -21,14 +17,12 @@ import org.mockito.Mockito
 import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.when
-import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
-import play.api.Application
 import queries.GetSqlQueries
 import testUtils.BaseSpec
 

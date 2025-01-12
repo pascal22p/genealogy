@@ -1,9 +1,6 @@
 @import controllers.routes
-@import views.html.components.{LastModified, Block}
 
 @this(
-    lastModified: LastModified, 
-    block: Block,
     govukSummaryList: GovukSummaryList)
 
 @(dbId: Int, person: Person)(implicit authenticatedRequest: AuthenticatedRequest[?], messages: Messages)

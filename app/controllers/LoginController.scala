@@ -1,6 +1,5 @@
 package controllers
 
-import java.nio.file.Paths
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -9,9 +8,7 @@ import scala.concurrent.Future
 
 import actions.AuthAction
 import models.forms.UserDataForm
-import models.AuthenticatedRequest
 import play.api.data.Form
-import play.api.http.HeaderNames
 import play.api.i18n.I18nSupport
 import play.api.mvc.Action
 import play.api.mvc.AnyContent

@@ -79,7 +79,25 @@ lazy val genealogy = (project in file("."))
     ),
     TwirlKeys.templateImports ++= Seq(
       "uk.gov.hmrc.govukfrontend.views.html.components._"
-      )
+    ),
+    semanticdbEnabled := true,
+    scalacOptions ++= Seq(
+      "-deprecation",
+      "-feature",
+      "-unchecked",
+      "-language:noAutoTupling",
+      "-language:strictEquality",
+      "-Xkind-projector",
+      "-Wvalue-discard",
+      "-Wunused:all",
+      "-Xfatal-warnings",
+      //"-Yexplicit-nulls",
+      "-Wsafe-init",
+      "-Wconf:msg=unused import&src=html/.*:s",
+      "-Wconf:src=routes/.*:s"
+    )
   )
+
+  Test / scalacOptions --= Seq("-language:strictEquality")
 
   

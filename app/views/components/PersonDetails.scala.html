@@ -1,4 +1,4 @@
-@this(lastModified: LastModified, block: Block, govukSummaryList: GovukSummaryList)
+@this(lastModified: LastModified, govukSummaryList: GovukSummaryList)
 
 @(dbId: Int, person: Person)(implicit authenticatedRequest: AuthenticatedRequest[?], messages: Messages)
 
@@ -67,7 +67,7 @@
                     classes = "govuk-summary-list__row--no-border govuk-summary-list__row--no-actions",
                     actions = None
                 ),
-            ).filter(_.value.content != Text("")),
+            ).filter(_.value.content.nonEmpty),
             card = Some(Card(
                 title = Some(CardTitle(content = Text("Person details"))),
                 actions = Some(Actions(

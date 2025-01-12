@@ -4,10 +4,8 @@
 @import uk.gov.hmrc.hmrcfrontend.views.html.components._
 
 @this(
-    block: Block, 
     assetConfig: AssetsConfig,
     govukServiceNavigation: GovukServiceNavigation,
-    govukSelect: GovukSelect,
     hmrcTimeoutDialog: HmrcTimeoutDialog
 )
 
@@ -46,18 +44,6 @@
     }
 }
 
-@lastSeen = @{
-    """<div class="govuk-service-navigation__item govuk-!-padding-top-2">
-        <form action="#">
-        Last seen: <select class="govuk-select" id="sort" name="sort">""" +
-        request.localSession.sessionData.history.map { el => 
-            s"""<option value="${el.personId}">${el.name}</option>""""
-        }.mkString("") +
-    """</select>
-        <input type="submit" value="Go" />
-    </form></div>"""
-}
-
 <html lang="fr" >
 <head>
     <title>Genealogie</title>
@@ -77,6 +63,7 @@
 
 </head>
 <body class="govuk-frontend-supported">
+    <a href="#main-content" class="govuk-skip-link" data-module="govuk-skip-link">Skip to main content</a>
     <header>
         <div class="govuk-grid-row box_title govuk-!-margin-left-2 govuk-!-margin-right-2 govuk-!-margin-bottom-0">
             <div class="govuk-grid-column-full">

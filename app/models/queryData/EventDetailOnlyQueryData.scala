@@ -4,8 +4,6 @@ import java.time.Instant
 
 import anorm.*
 import anorm.SqlParser.*
-import models.EventType
-import models.EventType.EventType
 
 final case class EventDetailOnlyQueryData(
     base: Int,

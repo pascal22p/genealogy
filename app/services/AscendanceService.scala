@@ -6,7 +6,6 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
 import cats.implicits.*
-import models.EventType.EventType
 import models.EventType.FamilyEvent
 import models.Events
 import models.Family

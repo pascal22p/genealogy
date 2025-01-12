@@ -2,22 +2,11 @@ package models.forms
 
 import java.time.Instant
 
-import anorm._
-import anorm.SqlParser._
-import models.queryData.EventDetailOnlyQueryData
 import models.queryData.EventDetailQueryData
-import models.EventDetail
 import models.EventType
 import models.EventType.EventType
-import models.MaleSex
-import models.PersonDetails
-import models.Place
-import models.Sex
-import models.SourCitation
 import play.api.data.format.Formats._
-import play.api.data.FieldMapping
 import play.api.data.Form
-import play.api.data.Forms.ignored
 import play.api.data.Forms.mapping
 import play.api.data.Forms.number
 import play.api.data.Forms.optional
@@ -33,8 +22,8 @@ final case class EventDetailForm(
     events_details_age: String,
     events_details_cause: String
 ) {
-  def toEventDetailOnlyQueryData = {
-    EventDetailOnlyQueryData(
+  def toEventDetailQueryData(eventType: EventType, ownerId: Int) = {
+    EventDetailQueryData(
       base,
       0,
       place,
@@ -48,7 +37,13 @@ final case class EventDetailForm(
       None,
       None,
       None,
-      Instant.now
+      Instant.now,
+      Some(events_tag),
+      None,
+      eventType,
+      0,
+      Some(ownerId),
+      None
     )
   }
 }
