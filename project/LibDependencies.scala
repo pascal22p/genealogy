@@ -9,7 +9,7 @@ object LibDependencies {
     "org.playframework.anorm" %% "anorm"               % "2.8.1",
     "org.typelevel"           %% "cats-core"           % "2.12.0",
     "org.mindrot"             %  "jbcrypt"             % "0.4",
-    "uk.gov.hmrc" %% "play-frontend-hmrc-play-30" % "11.9.0"
+    "uk.gov.hmrc" %% "play-frontend-hmrc-play-30" % "11.10.0"
   )
 
   val libraryDependenciesTest: Seq[ModuleID] = Seq(
