@@ -41,7 +41,8 @@ object Child {
               nameNickname,
               None
             ),
-            Events(List.empty, Some(id), EventType.IndividualEvent)
+            Events(List.empty, Some(id), EventType.IndividualEvent),
+            Attributes(List.empty, Some(id), EventType.IndividualEvent)
           ),
           relaType,
           relaStat

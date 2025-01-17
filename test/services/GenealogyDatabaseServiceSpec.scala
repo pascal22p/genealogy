@@ -5,6 +5,7 @@ import java.time.LocalDateTime
 import scala.concurrent.Future
 import scala.jdk.CollectionConverters.*
 
+import models.Attributes
 import models.AuthenticatedRequest
 import models.EventType.IndividualEvent
 import models.Events
@@ -51,8 +52,16 @@ class GenealogyDatabaseServiceSpec extends BaseSpec {
       val fakeEventDetails1                   = List(fakeEventDetail(events_details_id = 1))
       val fakeEventDetails2                   = List(fakeEventDetail(events_details_id = 2))
 
-      val person1 = Person(fakePersonDetail1, Events(fakeEventDetails1, Some(1), IndividualEvent))
-      val person2 = Person(fakePersonDetail2, Events(fakeEventDetails2, Some(2), IndividualEvent))
+      val person1 = Person(
+        fakePersonDetail1,
+        Events(fakeEventDetails1, Some(1), IndividualEvent),
+        Attributes(List.empty, Some(1), IndividualEvent)
+      )
+      val person2 = Person(
+        fakePersonDetail2,
+        Events(fakeEventDetails2, Some(2), IndividualEvent),
+        Attributes(List.empty, Some(2), IndividualEvent)
+      )
       when(mockMariadbQueries.getFirstnamesList(any(), any())(any())).thenReturn(
         Future.successful(List(fakePersonDetail1, fakePersonDetail2))
       )

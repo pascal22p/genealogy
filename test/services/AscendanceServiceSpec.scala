@@ -4,6 +4,7 @@ import java.time.Instant
 
 import scala.concurrent.Future
 
+import models.Attributes
 import models.EventType.FamilyEvent
 import models.EventType.IndividualEvent
 import models.Events
@@ -37,12 +38,14 @@ class AscendanceServiceSpec extends BaseSpec {
       val personD: Person =
         Person(
           fakePersonDetails(firstname = "Firstname4", id = 4, timestamp = timeStamp),
-          Events(List.empty, Some(4), IndividualEvent)
+          Events(List.empty, Some(4), IndividualEvent),
+          Attributes(List.empty, Some(1), IndividualEvent)
         )
       val personE: Person =
         Person(
           fakePersonDetails(firstname = "Firstname5", id = 5, timestamp = timeStamp),
-          Events(List.empty, Some(5), IndividualEvent)
+          Events(List.empty, Some(5), IndividualEvent),
+          Attributes(List.empty, Some(1), IndividualEvent)
         )
 
       val familyC: Family = Family(
@@ -60,6 +63,7 @@ class AscendanceServiceSpec extends BaseSpec {
         Person(
           fakePersonDetails(firstname = "Firstname3", id = 3, timestamp = timeStamp),
           Events(List.empty, Some(3), IndividualEvent),
+          Attributes(List.empty, Some(1), IndividualEvent),
           parents = List(parentsC)
         )
 
@@ -78,6 +82,7 @@ class AscendanceServiceSpec extends BaseSpec {
         Person(
           fakePersonDetails(firstname = "Firstname2", id = 2, timestamp = timeStamp),
           Events(List.empty, Some(2), IndividualEvent),
+          Attributes(List.empty, Some(1), IndividualEvent),
           parents = List(parentsB)
         )
 
@@ -97,6 +102,7 @@ class AscendanceServiceSpec extends BaseSpec {
         Person(
           fakePersonDetails(firstname = "Firstname1", id = 1, timestamp = timeStamp),
           Events(List.empty, Some(1), IndividualEvent),
+          Attributes(List.empty, Some(1), IndividualEvent),
           parents = List(parentsA)
         )
 
@@ -127,6 +133,7 @@ class AscendanceServiceSpec extends BaseSpec {
           None
         ),
         Events(List.empty, Some(1), IndividualEvent),
+        Attributes(List.empty, Some(1), IndividualEvent),
         List(
           Parents(
             Family(
@@ -148,6 +155,7 @@ class AscendanceServiceSpec extends BaseSpec {
                     None
                   ),
                   Events(List.empty, Some(2), IndividualEvent),
+                  Attributes(List.empty, Some(1), IndividualEvent),
                   List(
                     Parents(
                       Family(
@@ -169,6 +177,7 @@ class AscendanceServiceSpec extends BaseSpec {
                               None
                             ),
                             Events(List.empty, Some(3), IndividualEvent),
+                            Attributes(List.empty, Some(1), IndividualEvent),
                             List(
                               Parents(
                                 Family(
@@ -191,6 +200,7 @@ class AscendanceServiceSpec extends BaseSpec {
                                         None
                                       ),
                                       Events(List.empty, Some(5), IndividualEvent),
+                                      Attributes(List.empty, Some(1), IndividualEvent),
                                       List(),
                                       List()
                                     )
@@ -199,7 +209,7 @@ class AscendanceServiceSpec extends BaseSpec {
                                   None,
                                   "",
                                   List(),
-                                  Events(List.empty, Some(1), FamilyEvent),
+                                  Events(List.empty, Some(1), FamilyEvent)
                                 ),
                                 "",
                                 "",
@@ -226,6 +236,7 @@ class AscendanceServiceSpec extends BaseSpec {
                               None
                             ),
                             Events(List.empty, Some(4), IndividualEvent),
+                            Attributes(List.empty, Some(1), IndividualEvent),
                             List(),
                             List()
                           )
@@ -234,7 +245,7 @@ class AscendanceServiceSpec extends BaseSpec {
                         None,
                         "",
                         List(),
-                        Events(List.empty, Some(1), FamilyEvent),
+                        Events(List.empty, Some(1), FamilyEvent)
                       ),
                       "",
                       "",
@@ -249,7 +260,7 @@ class AscendanceServiceSpec extends BaseSpec {
               None,
               "",
               List(),
-              Events(List.empty, Some(1), FamilyEvent),
+              Events(List.empty, Some(1), FamilyEvent)
             ),
             "",
             "",

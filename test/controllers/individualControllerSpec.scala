@@ -5,6 +5,7 @@ import java.time.LocalDateTime
 import scala.concurrent.Future
 
 import actions.AuthAction
+import models.Attributes
 import models.EventType.IndividualEvent
 import models.Events
 import models.Person
@@ -46,7 +47,8 @@ class individualControllerSpec extends BaseSpec {
             Some(
               Person(
                 fakePersonDetails(privacyRestriction = Some("privacy")),
-                Events(List.empty, Some(1), IndividualEvent)
+                Events(List.empty, Some(1), IndividualEvent),
+                Attributes(List.empty, Some(1), IndividualEvent)
               )
             )
           )
@@ -61,7 +63,13 @@ class individualControllerSpec extends BaseSpec {
     "privacy is not set and see_privacy is false" in {
       when(mockPersonService.getPerson(any(), any[Boolean], any[Boolean], any[Boolean])).thenReturn(
         Future.successful(
-          Some(Person(fakePersonDetails(privacyRestriction = None), Events(List.empty, Some(1), IndividualEvent)))
+          Some(
+            Person(
+              fakePersonDetails(privacyRestriction = None),
+              Events(List.empty, Some(1), IndividualEvent),
+              Attributes(List.empty, Some(1), IndividualEvent)
+            )
+          )
         )
       )
 
@@ -78,7 +86,8 @@ class individualControllerSpec extends BaseSpec {
           Some(
             Person(
               fakePersonDetails(privacyRestriction = Some("privacy")),
-              Events(List.empty, Some(1), IndividualEvent)
+              Events(List.empty, Some(1), IndividualEvent),
+              Attributes(List.empty, Some(1), IndividualEvent)
             )
           )
         )
@@ -94,7 +103,8 @@ class individualControllerSpec extends BaseSpec {
           Some(
             Person(
               fakePersonDetails(privacyRestriction = Some("privacy")),
-              Events(List.empty, Some(1), IndividualEvent)
+              Events(List.empty, Some(1), IndividualEvent),
+              Attributes(List.empty, Some(1), IndividualEvent)
             )
           )
         )

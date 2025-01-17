@@ -28,9 +28,17 @@ class DescendanceControllerSpec extends BaseSpec {
   val mockDescendanceService: DescendanceService = mock[DescendanceService]
 
   val personD: Person =
-    Person(fakePersonDetails(firstname = "Firstname4", id = 4), Events(List.empty, Some(4), IndividualEvent))
+    Person(
+      fakePersonDetails(firstname = "Firstname4", id = 4),
+      Events(List.empty, Some(4), IndividualEvent),
+      Attributes(List.empty, Some(1), IndividualEvent)
+    )
   val personE: Person =
-    Person(fakePersonDetails(firstname = "Firstname5", id = 5), Events(List.empty, Some(5), IndividualEvent))
+    Person(
+      fakePersonDetails(firstname = "Firstname5", id = 5),
+      Events(List.empty, Some(5), IndividualEvent),
+      Attributes(List.empty, Some(1), IndividualEvent)
+    )
 
   val childD: Child = Child(personD, "relaType", None)
   val childE: Child = Child(personE, "relaType", None)
@@ -41,6 +49,7 @@ class DescendanceControllerSpec extends BaseSpec {
     Person(
       fakePersonDetails(firstname = "Firstname3", id = 3),
       Events(List.empty, Some(3), IndividualEvent),
+      Attributes(List.empty, Some(1), IndividualEvent),
       families = List(familyC)
     )
 
@@ -51,6 +60,7 @@ class DescendanceControllerSpec extends BaseSpec {
     Person(
       fakePersonDetails(firstname = "Firstname2", id = 2),
       Events(List.empty, Some(2), IndividualEvent),
+      Attributes(List.empty, Some(1), IndividualEvent),
       families = List(familyB)
     )
 
@@ -61,6 +71,7 @@ class DescendanceControllerSpec extends BaseSpec {
     Person(
       fakePersonDetails(firstname = "Firstname1", id = 1),
       Events(List.empty, Some(1), IndividualEvent),
+      Attributes(List.empty, Some(1), IndividualEvent),
       families = List(familyA)
     )
 

@@ -219,7 +219,15 @@ class GetSqlQueriesSpec extends BaseSpec with BeforeAndAfterEach with Logging {
       val person2  = fakePersonDetails(id = 2)
       val idFamily = 3
       val child =
-        Child(Person(fakePersonDetails(id = 5), Events(List.empty, Some(5), IndividualEvent)), "adopted", None)
+        Child(
+          Person(
+            fakePersonDetails(id = 5),
+            Events(List.empty, Some(5), IndividualEvent),
+            Attributes(List.empty, Some(1), IndividualEvent)
+          ),
+          "adopted",
+          None
+        )
       val result = (for {
         _      <- executeSql(sqlFamily(idFamily, person1, person2, List(child), List.empty))
         result <- sut.getFamiliesFromIndividualId(child.person.details.id)
@@ -309,7 +317,15 @@ class GetSqlQueriesSpec extends BaseSpec with BeforeAndAfterEach with Logging {
       val person2  = fakePersonDetails(id = 2)
       val idFamily = 3
       val child =
-        Child(Person(fakePersonDetails(id = 4), Events(List.empty, Some(4), IndividualEvent)), "adopted", None)
+        Child(
+          Person(
+            fakePersonDetails(id = 4),
+            Events(List.empty, Some(4), IndividualEvent),
+            Attributes(List.empty, Some(1), IndividualEvent)
+          ),
+          "adopted",
+          None
+        )
       val result = (for {
         _      <- executeSql(sqlFamily(idFamily, person1, person2, List(child), List.empty))
         result <- sut.getChildren(idFamily)

@@ -43,12 +43,14 @@ class AscendanceControllerSpec extends BaseSpec {
       val personD: Person =
         Person(
           fakePersonDetails(firstname = "Firstname4", id = 4, timestamp = timeStamp),
-          Events(List.empty, Some(4), IndividualEvent)
+          Events(List.empty, Some(4), IndividualEvent),
+          Attributes(List.empty, Some(1), IndividualEvent)
         )
       val personE: Person =
         Person(
           fakePersonDetails(firstname = "Firstname5", id = 5, timestamp = timeStamp),
-          Events(List.empty, Some(5), IndividualEvent)
+          Events(List.empty, Some(5), IndividualEvent),
+          Attributes(List.empty, Some(1), IndividualEvent)
         )
 
       val familyC: Family =
@@ -58,6 +60,7 @@ class AscendanceControllerSpec extends BaseSpec {
         Person(
           fakePersonDetails(firstname = "Firstname3", id = 3, timestamp = timeStamp),
           Events(List.empty, Some(3), IndividualEvent),
+          Attributes(List.empty, Some(1), IndividualEvent),
           parents = List(parentsC)
         )
 
@@ -76,6 +79,7 @@ class AscendanceControllerSpec extends BaseSpec {
         Person(
           fakePersonDetails(firstname = "Firstname2", id = 2, timestamp = timeStamp),
           Events(List.empty, Some(2), IndividualEvent),
+          Attributes(List.empty, Some(1), IndividualEvent),
           parents = List(parentsB)
         )
 
@@ -86,6 +90,7 @@ class AscendanceControllerSpec extends BaseSpec {
         Person(
           fakePersonDetails(firstname = "Firstname1", id = 1, timestamp = timeStamp),
           Events(List.empty, Some(1), IndividualEvent),
+          Attributes(List.empty, Some(1), IndividualEvent),
           parents = List(parentsA)
         )
 
@@ -109,9 +114,17 @@ class AscendanceControllerSpec extends BaseSpec {
 
     "remove duplicates" in {
       val personD: Person =
-        Person(fakePersonDetails(firstname = "Firstname4", id = 4), Events(List.empty, Some(4), IndividualEvent))
+        Person(
+          fakePersonDetails(firstname = "Firstname4", id = 4),
+          Events(List.empty, Some(4), IndividualEvent),
+          Attributes(List.empty, Some(1), IndividualEvent)
+        )
       val personE: Person =
-        Person(fakePersonDetails(firstname = "Firstname5", id = 5), Events(List.empty, Some(5), IndividualEvent))
+        Person(
+          fakePersonDetails(firstname = "Firstname5", id = 5),
+          Events(List.empty, Some(5), IndividualEvent),
+          Attributes(List.empty, Some(1), IndividualEvent)
+        )
 
       val familyC: Family =
         Family(4, None, Some(personE), Instant.now, None, "", List.empty, Events(List.empty, Some(4), FamilyEvent))
@@ -120,6 +133,7 @@ class AscendanceControllerSpec extends BaseSpec {
         Person(
           fakePersonDetails(firstname = "Firstname3", id = 3),
           Events(List.empty, Some(3), IndividualEvent),
+          Attributes(List.empty, Some(1), IndividualEvent),
           parents = List(parentsC)
         )
 
@@ -138,6 +152,7 @@ class AscendanceControllerSpec extends BaseSpec {
         Person(
           fakePersonDetails(firstname = "Firstname2", id = 2),
           Events(List.empty, Some(2), IndividualEvent),
+          Attributes(List.empty, Some(1), IndividualEvent),
           parents = List(parentsB)
         )
 
@@ -145,6 +160,7 @@ class AscendanceControllerSpec extends BaseSpec {
         Person(
           fakePersonDetails(firstname = "Firstname22", id = 22),
           Events(List.empty, Some(22), IndividualEvent),
+          Attributes(List.empty, Some(1), IndividualEvent),
           parents = List(parentsB)
         )
 
@@ -163,6 +179,7 @@ class AscendanceControllerSpec extends BaseSpec {
         Person(
           fakePersonDetails(firstname = "Firstname1", id = 1),
           Events(List.empty, Some(1), IndividualEvent),
+          Attributes(List.empty, Some(1), IndividualEvent),
           parents = List(parentsA)
         )
 

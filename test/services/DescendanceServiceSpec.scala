@@ -5,6 +5,7 @@ import java.time.Instant
 import scala.concurrent.Future
 
 import models.*
+import models.Attributes
 import models.EventType.FamilyEvent
 import models.EventType.IndividualEvent
 import org.mockito.ArgumentMatchers
@@ -35,12 +36,14 @@ class DescendanceServiceSpec extends BaseSpec {
       val personD: Person =
         Person(
           fakePersonDetails(firstname = "Firstname4", id = 4, timestamp = timeStamp),
-          Events(List.empty, Some(4), IndividualEvent)
+          Events(List.empty, Some(4), IndividualEvent),
+          Attributes(List.empty, Some(1), IndividualEvent)
         )
       val personE: Person =
         Person(
           fakePersonDetails(firstname = "Firstname5", id = 5, timestamp = timeStamp),
-          Events(List.empty, Some(5), IndividualEvent)
+          Events(List.empty, Some(5), IndividualEvent),
+          Attributes(List.empty, Some(1), IndividualEvent)
         )
 
       val childD: Child = Child(personD, "relaType", None)
@@ -52,6 +55,7 @@ class DescendanceServiceSpec extends BaseSpec {
         Person(
           fakePersonDetails(firstname = "Firstname3", id = 3, timestamp = timeStamp),
           Events(List.empty, Some(3), IndividualEvent),
+          Attributes(List.empty, Some(1), IndividualEvent),
           families = List(familyC)
         )
 
@@ -70,6 +74,7 @@ class DescendanceServiceSpec extends BaseSpec {
         Person(
           fakePersonDetails(firstname = "Firstname2", id = 2, timestamp = timeStamp),
           Events(List.empty, Some(2), IndividualEvent),
+          Attributes(List.empty, Some(1), IndividualEvent),
           families = List(familyB)
         )
 
@@ -80,6 +85,7 @@ class DescendanceServiceSpec extends BaseSpec {
         Person(
           fakePersonDetails(firstname = "Firstname1", id = 1, timestamp = timeStamp),
           Events(List.empty, Some(1), IndividualEvent),
+          Attributes(List.empty, Some(1), IndividualEvent),
           families = List(familyA)
         )
 
@@ -99,6 +105,7 @@ class DescendanceServiceSpec extends BaseSpec {
           None
         ),
         Events(List.empty, Some(1), IndividualEvent),
+        Attributes(List.empty, Some(1), IndividualEvent),
         List(),
         List(
           Family(
@@ -126,6 +133,7 @@ class DescendanceServiceSpec extends BaseSpec {
                     None
                   ),
                   Events(List.empty, Some(2), IndividualEvent),
+                  Attributes(List.empty, Some(1), IndividualEvent),
                   List(),
                   List(
                     Family(
@@ -153,6 +161,7 @@ class DescendanceServiceSpec extends BaseSpec {
                               None
                             ),
                             Events(List.empty, Some(3), IndividualEvent),
+                            Attributes(List.empty, Some(1), IndividualEvent),
                             List(),
                             List(
                               Family(
@@ -180,6 +189,7 @@ class DescendanceServiceSpec extends BaseSpec {
                                         None
                                       ),
                                       Events(List.empty, Some(5), IndividualEvent),
+                                      Attributes(List.empty, Some(1), IndividualEvent),
                                       List(),
                                       List()
                                     ),
@@ -211,6 +221,7 @@ class DescendanceServiceSpec extends BaseSpec {
                               None
                             ),
                             Events(List.empty, Some(4), IndividualEvent),
+                            Attributes(List.empty, Some(1), IndividualEvent),
                             List(),
                             List()
                           ),
