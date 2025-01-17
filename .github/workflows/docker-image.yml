@@ -55,3 +55,4 @@ jobs:
         docker-login-username: "${{ secrets.DOCKER_HUB_LOGIN }}"
         docker-login-password: "${{ secrets.DOCKER_HUB_PASSWORD }}"
         docker-registry: "registry-1.docker.io"
+        docker-repository: "genealogy"
