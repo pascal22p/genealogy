@@ -16,6 +16,7 @@ import models.queryData.FamilyQueryData
 import models.AuthenticatedRequest
 import models.EventType.FamilyEvent
 import models.EventType.IndividualEvent
+import models.ResnType.PrivacyResn
 import org.scalatest.BeforeAndAfterEach
 import play.api.db.Database
 import play.api.test.FakeRequest
@@ -389,7 +390,7 @@ class GetSqlQueriesSpec extends BaseSpec with BeforeAndAfterEach with Logging {
           sqlPersonDetails(fakePersonDetails(id = 1, surname = "D")) +
             sqlPersonDetails(fakePersonDetails(id = 2, surname = "B")) +
             sqlPersonDetails(fakePersonDetails(id = 3, surname = "C")) +
-            sqlPersonDetails(fakePersonDetails(id = 4, surname = "A", privacyRestriction = Some("privacy")))
+            sqlPersonDetails(fakePersonDetails(id = 4, surname = "A", privacyRestriction = Some(PrivacyResn)))
         )
         result <- sut.getSurnamesList(1)(
           AuthenticatedRequest(FakeRequest(), Session("sessionId", SessionData(None), LocalDateTime.now))
@@ -436,7 +437,7 @@ class GetSqlQueriesSpec extends BaseSpec with BeforeAndAfterEach with Logging {
           sqlPersonDetails(fakePersonDetails(id = 1, surname = "D")) +
             sqlPersonDetails(fakePersonDetails(id = 2, surname = "B")) +
             sqlPersonDetails(fakePersonDetails(id = 3, surname = "C")) +
-            sqlPersonDetails(fakePersonDetails(id = 4, surname = "A", privacyRestriction = Some("privacy")))
+            sqlPersonDetails(fakePersonDetails(id = 4, surname = "A", privacyRestriction = Some(PrivacyResn)))
         )
         result <- sut.getSurnamesList(1)(
           AuthenticatedRequest(
@@ -471,7 +472,7 @@ class GetSqlQueriesSpec extends BaseSpec with BeforeAndAfterEach with Logging {
             sqlPersonDetails(fakePersonDetails(id = 2, surname = "Z", firstname = "B")) +
             sqlPersonDetails(fakePersonDetails(id = 3, surname = "X", firstname = "C")) +
             sqlPersonDetails(
-              fakePersonDetails(id = 4, surname = "Z", firstname = "A", privacyRestriction = Some("privacy"))
+              fakePersonDetails(id = 4, surname = "Z", firstname = "A", privacyRestriction = Some(PrivacyResn))
             )
         )
         result <- sut.getFirstnamesList(1, "Z")(
@@ -489,7 +490,7 @@ class GetSqlQueriesSpec extends BaseSpec with BeforeAndAfterEach with Logging {
             sqlPersonDetails(fakePersonDetails(id = 2, surname = "Z", firstname = "B")) +
             sqlPersonDetails(fakePersonDetails(id = 3, surname = "X", firstname = "C")) +
             sqlPersonDetails(
-              fakePersonDetails(id = 4, surname = "Z", firstname = "A", privacyRestriction = Some("privacy"))
+              fakePersonDetails(id = 4, surname = "Z", firstname = "A", privacyRestriction = Some(PrivacyResn))
             )
         )
         result <- sut.getFirstnamesList(1, "Z")(

@@ -1,8 +1,9 @@
 package services.gedcom
 
+import anorm.SQL
+
 import javax.inject.Inject
 import javax.inject.Singleton
-
 import cats.data.Ior
 import models.gedcom.GedcomIndiBlock
 import models.gedcom.GedcomNode
@@ -33,6 +34,15 @@ class GedcomImportService @Inject() (
       println(warning)
     }
 
+    val startTransaction =
+      """
+        |START TRANSACTION;
+        |select * from genea_individuals LOCK IN SHARE MODE;
+        |SELECT `AUTO_INCREMENT` INTO @startIndi FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'genealogie' AND TABLE_NAME = 'genea_individuals';
+        |""".stripMargin
+
+    val commitTransaction = "COMMIT;"
+
     val sqlHead =
       s"INSERT INTO genea_individuals (indi_id, base, indi_nom, indi_prenom, indi_sexe, indi_npfx, indi_givn, indi_nick, indi_spfx, indi_nsfx, indi_resn) VALUES\n"
     val indiSqls = indis.right
@@ -43,11 +53,17 @@ class GedcomImportService @Inject() (
           case nameRegex(firstname, surname, other) => (firstname, surname + " " + other)
           case _                                    => ("", "")
         }
-        s"""(${gedcomCommonParser.getIndiId(indi.id)}, $base, "$surname", "$firstname", "${indi.sex}", "${indi.nameStructure.npfx}", "${indi.nameStructure.givn}", "${indi.nameStructure.nick}", "${indi.nameStructure.spfx}", "${indi.nameStructure.nsfx}", ${indi.resn})"""
-      }
-      .mkString(sqlHead, ",\n", "")
+        SQL("""$sqlHead ({indi_id} + @startIndi, {base}, {surname}, {firstname}, {indi_sex}, "${indi.nameStructure.npfx}", "${indi.nameStructure.givn}", "${indi.nameStructure.nick}", "${indi.nameStructure.spfx}", "${indi.nameStructure.nsfx}", ${indi.resn.getOrElse("NULL")});""")
+          .on("indi_id" -> indi.id,
+            "base" -> base,
+            "surname" -> surname,
+            "firstname" -> firstname,
 
-    println(indiSqls)
+
+          )
+      }
+
+    println(startTransaction + indiSqls + commitTransaction)
   }
 
 }

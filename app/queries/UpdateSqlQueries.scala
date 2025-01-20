@@ -42,7 +42,7 @@ final class UpdateSqlQueries @Inject() (db: Database, databaseExecutionContext: 
           "nickname"  -> personDetails.nameNickname,
           "spfx"      -> personDetails.surnamePrefix,
           "nsfx"      -> personDetails.nameSuffix,
-          "resn"      -> personDetails.privacyRestriction,
+          "resn"      -> personDetails.privacyRestriction.map(resn => s"$resn"),
           "id"        -> personDetails.id
         )
         .executeUpdate()

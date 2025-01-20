@@ -14,22 +14,6 @@ class GedcomCommonParser @Inject() () {
   private val tagAndXrefRegexp: Regex       = "^\\s*[0-9]+\\s+([A-Za-z]+)\\s*(@([^@]+)@|)\\s*(.+|)".r
   private val level0TagAndXrefRegexp: Regex = "^\\s*0\\s+(@([^@]+)@|)\\s*([A-Za-z]+).*".r
 
-  var indiHashMap: scala.collection.mutable.Map[String, Int] = scala.collection.mutable.Map.empty[String, Int]
-
-  def getIndiId(hashId: String): Int = {
-    if (indiHashMap.contains(hashId)) {
-      indiHashMap(hashId)
-    } else {
-      val newId = if (indiHashMap.isEmpty) {
-        1000
-      } else {
-        indiHashMap.values.max + 1
-      }
-      indiHashMap.addOne(hashId -> newId)
-      newId
-    }
-  }
-
   def getBlocks(gedcomString: String, level: Int = 0): List[(Int, String)] = {
     scala.io.Source
       .fromString(gedcomString)

@@ -1,3 +1,10 @@
 package models.gedcom
 
-final case class GedcomIndiBlock(nameStructure: GedComPersonalNameStructure, resn: String, sex: String, id: String)
+import models.ResnType.ResnType
+
+final case class GedcomIndiBlock(
+    nameStructure: GedComPersonalNameStructure,
+    resn: Option[ResnType],
+    sex: String,
+    id: Int
+)

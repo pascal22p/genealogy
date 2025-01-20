@@ -13,31 +13,30 @@ final case class PersonDetails(
     surname: String, // SURN
     sex: Sex,        // SEX
     timestamp: Instant,
-    firstnamePrefix: String,           // NPFX
-    surnamePrefix: String,             // SPFX
-    nameSuffix: String,                // NSFX
-    nameGiven: String,                 // GIVN
-    nameNickname: String,              // NICK
-    privacyRestriction: Option[String] // RESN
+    firstnamePrefix: String,                      // NPFX
+    surnamePrefix: String,                        // SPFX
+    nameSuffix: String,                           // NSFX
+    nameGiven: String,                            // GIVN
+    nameNickname: String,                         // NICK
+    privacyRestriction: Option[ResnType.ResnType] // RESN
 
 ) {
   def shortName: String = (firstname + " " + surname).trim
 
-  def toForm = {
+  def toForm: PersonDetailsForm =
     PersonDetailsForm(
       base: Int,
       id: Int,
       firstname: String,
-      surname: String,                   // SURN
-      sex.gedcom: String,                // SEX
-      firstnamePrefix: String,           // NPFX
-      surnamePrefix: String,             // SPFX
-      nameSuffix: String,                // NSFX
-      nameGiven: String,                 // GIVN
-      nameNickname: String,              // NICK
-      privacyRestriction: Option[String] // RESN
+      surname: String,                              // SURN
+      sex.gedcom: String,                           // SEX
+      firstnamePrefix: String,                      // NPFX
+      surnamePrefix: String,                        // SPFX
+      nameSuffix: String,                           // NSFX
+      nameGiven: String,                            // GIVN
+      nameNickname: String,                         // NICK
+      privacyRestriction: Option[ResnType.ResnType] // RESN
     )
-  }
 }
 
 object PersonDetails {
@@ -68,7 +67,7 @@ object PersonDetails {
           nameSuffix,
           nameGiven,
           nameNickname,
-          resn
+          resn.flatMap(ResnType.fromString)
         )
     }
 }

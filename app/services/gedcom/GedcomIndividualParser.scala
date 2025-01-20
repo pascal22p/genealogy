@@ -7,9 +7,11 @@ import com.google.inject.Singleton
 import models.gedcom.GedComPersonalNameStructure
 import models.gedcom.GedcomIndiBlock
 import models.gedcom.GedcomNode
+import models.ResnType
+import models.ResnType.ResnType
 
 @Singleton
-class GedcomIndividualParser @Inject() (gedcomCommonParser: GedcomCommonParser) {
+class GedcomIndividualParser @Inject() (gedcomCommonParser: GedcomCommonParser, gedcomHashIdTable: GedcomHashIdTable) {
 
   def readIndiBlock(node: GedcomNode): Ior[List[String], GedcomIndiBlock] = {
     /*
@@ -56,18 +58,14 @@ class GedcomIndividualParser @Inject() (gedcomCommonParser: GedcomCommonParser) 
           readPersonalNameStructure(node)
       }
 
-    val resnIor: Ior[List[String], Map[String, String]] =
+    val resnIor: Ior[List[String], Map[String, Option[ResnType]]] =
       node.children
         .find(_.name == "RESN")
         .fold(Ior.Right(Map.empty)) { node =>
           gedcomCommonParser.readTagContent(node).map { mapTags =>
             mapTags.map {
               case (key: String, resn: String) =>
-                if (List("locked", "privacy", "confidential").contains(resn)) {
-                  key -> s"\"$resn\""
-                } else {
-                  key -> "NULL"
-                }
+                key -> ResnType.fromString(resn)
             }
           }
         }
@@ -93,7 +91,12 @@ class GedcomIndividualParser @Inject() (gedcomCommonParser: GedcomCommonParser) 
       sex     <- sexIor
       ignored <- ignoredContent
     } yield {
-      GedcomIndiBlock(name, resn.getOrElse("RESN", "NULL"), sex.getOrElse("SEX", ""), xref)
+      GedcomIndiBlock(
+        name,
+        resn.getOrElse("RESN", None),
+        sex.getOrElse("SEX", ""),
+        gedcomHashIdTable.getIndividualIdFromString(xref)
+      )
     }
 
   }

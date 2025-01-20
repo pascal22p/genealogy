@@ -5,7 +5,11 @@ import testUtils.BaseSpec
 class GedcomImportServiceSpec extends BaseSpec {
 
   val gedcomCommonParser = new GedcomCommonParser
-  val sut                = new GedcomImportService(gedcomCommonParser, new GedcomIndividualParser(gedcomCommonParser))
+  val gedcomHashIdTable  = new GedcomHashIdTable
+  val sut = new GedcomImportService(
+    gedcomCommonParser,
+    new GedcomIndividualParser(gedcomCommonParser, gedcomHashIdTable)
+  )
 
   val gedcomString = """
                        |0 HEAD

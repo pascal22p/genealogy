@@ -3,6 +3,7 @@ package models.forms
 import java.time.Instant
 
 import models.PersonDetails
+import models.ResnType
 import models.Sex
 import play.api.data.format.Formats._
 import play.api.data.Form
@@ -15,14 +16,14 @@ final case class PersonDetailsForm(
     base: Int,
     id: Int,
     firstname: String,
-    surname: String,                   // SURN
-    sex: String,                       // SEX
-    firstnamePrefix: String,           // NPFX
-    surnamePrefix: String,             // SPFX
-    nameSuffix: String,                // NSFX
-    nameGiven: String,                 // GIVN
-    nameNickname: String,              // NICK
-    privacyRestriction: Option[String] // RESN
+    surname: String,                              // SURN
+    sex: String,                                  // SEX
+    firstnamePrefix: String,                      // NPFX
+    surnamePrefix: String,                        // SPFX
+    nameSuffix: String,                           // NSFX
+    nameGiven: String,                            // GIVN
+    nameNickname: String,                         // NICK
+    privacyRestriction: Option[ResnType.ResnType] // RESN
 
 ) {
   def toPersonalDetails: PersonDetails = {
@@ -60,7 +61,7 @@ object PersonDetailsForm {
       u.nameSuffix,
       u.nameGiven,
       u.nameNickname,
-      u.privacyRestriction
+      u.privacyRestriction.map(resn => s"$resn")
     )
   )
 
@@ -88,7 +89,7 @@ object PersonDetailsForm {
       nameSuffix,
       nameGiven,
       nameNickname,
-      privacyRestriction
+      privacyRestriction.flatMap(ResnType.fromString)
     )
   }
 

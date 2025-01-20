@@ -9,6 +9,7 @@ import models.Attributes
 import models.EventType.IndividualEvent
 import models.Events
 import models.Person
+import models.ResnType.PrivacyResn
 import models.Session
 import models.SessionData
 import models.UserData
@@ -46,7 +47,7 @@ class individualControllerSpec extends BaseSpec {
           Future.successful(
             Some(
               Person(
-                fakePersonDetails(privacyRestriction = Some("privacy")),
+                fakePersonDetails(privacyRestriction = Some(PrivacyResn)),
                 Events(List.empty, Some(1), IndividualEvent),
                 Attributes(List.empty, Some(1), IndividualEvent)
               )
@@ -85,7 +86,7 @@ class individualControllerSpec extends BaseSpec {
         Future.successful(
           Some(
             Person(
-              fakePersonDetails(privacyRestriction = Some("privacy")),
+              fakePersonDetails(privacyRestriction = Some(PrivacyResn)),
               Events(List.empty, Some(1), IndividualEvent),
               Attributes(List.empty, Some(1), IndividualEvent)
             )
@@ -102,7 +103,7 @@ class individualControllerSpec extends BaseSpec {
         Future.successful(
           Some(
             Person(
-              fakePersonDetails(privacyRestriction = Some("privacy")),
+              fakePersonDetails(privacyRestriction = Some(PrivacyResn)),
               Events(List.empty, Some(1), IndividualEvent),
               Attributes(List.empty, Some(1), IndividualEvent)
             )
