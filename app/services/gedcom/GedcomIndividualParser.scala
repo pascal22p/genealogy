@@ -5,13 +5,19 @@ import javax.inject.Inject
 import cats.data.Ior
 import com.google.inject.Singleton
 import models.gedcom.GedComPersonalNameStructure
+import models.gedcom.GedcomEventBlock
 import models.gedcom.GedcomIndiBlock
 import models.gedcom.GedcomNode
 import models.ResnType
 import models.ResnType.ResnType
+import utils.Constants
 
 @Singleton
-class GedcomIndividualParser @Inject() (gedcomCommonParser: GedcomCommonParser, gedcomHashIdTable: GedcomHashIdTable) {
+class GedcomIndividualParser @Inject() (
+    gedcomCommonParser: GedcomCommonParser,
+    gedcomHashIdTable: GedcomHashIdTable,
+    gedcomEventParser: GedcomEventParser
+) {
 
   def readIndiBlock(node: GedcomNode): Ior[List[String], GedcomIndiBlock] = {
     /*
@@ -39,7 +45,6 @@ class GedcomIndividualParser @Inject() (gedcomCommonParser: GedcomCommonParser, 
         +1 <<SOURCE_CITATION>> {0:M} p.39
         +1 <<MULTIMEDIA_LINK>> {0:M} p.37, 26
      */
-    val allTagList = List("RESN", "SEX", "NAME")
 
     val (xref, name) = (node.xref, node.name) match {
       case (Some(xref), name) if name == "INDI" => (xref, name)
@@ -75,6 +80,17 @@ class GedcomIndividualParser @Inject() (gedcomCommonParser: GedcomCommonParser, 
         gedcomCommonParser.readTagContent(node)
       }
 
+    val eventsIor: Ior[List[String], List[GedcomEventBlock]] = node.children
+      .filter { child =>
+        Constants.individualsEvents.contains(child.name)
+      }
+      .foldLeft(Ior.Right(List.empty): Ior[List[String], List[GedcomEventBlock]]) {
+        case (result, node) =>
+          result.combine(gedcomEventParser.readEventBlock(node).map(List(_)))
+      }
+
+    val allTagList = List("RESN", "SEX", "NAME") ++ eventsIor.right.fold(List.empty[String])(_.map(_.tag))
+
     val ignoredContent: Ior[List[String], Map[String, String]] = node.children
       .filterNot(child => allTagList.contains(child.name))
       .map { node =>
@@ -89,13 +105,15 @@ class GedcomIndividualParser @Inject() (gedcomCommonParser: GedcomCommonParser, 
       name    <- nameStructure
       resn    <- resnIor
       sex     <- sexIor
+      events  <- eventsIor
       ignored <- ignoredContent
     } yield {
       GedcomIndiBlock(
         name,
         resn.getOrElse("RESN", None),
         sex.getOrElse("SEX", ""),
-        gedcomHashIdTable.getIndividualIdFromString(xref)
+        gedcomHashIdTable.getIndividualIdFromString(xref),
+        events
       )
     }
 

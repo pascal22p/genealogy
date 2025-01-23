@@ -2,13 +2,6 @@ package queries
 
 import java.time.LocalDateTime
 
-import scala.concurrent.ExecutionContext
-import scala.concurrent.Future
-import scala.util.Failure
-import scala.util.Success
-import scala.util.Try
-
-import anorm.SQL
 import models.*
 import models.queryData.EventDetailQueryData
 import models.queryData.FamilyAsChildQueryData
@@ -17,61 +10,12 @@ import models.AuthenticatedRequest
 import models.EventType.FamilyEvent
 import models.EventType.IndividualEvent
 import models.ResnType.PrivacyResn
-import org.scalatest.BeforeAndAfterEach
-import play.api.db.Database
 import play.api.test.FakeRequest
-import play.api.Application
 import play.api.Logging
-import testUtils.BaseSpec
+import testUtils.MariadbHelper
 
-class GetSqlQueriesSpec extends BaseSpec with BeforeAndAfterEach with Logging {
-
-  lazy val db: Database                  = app.injector.instanceOf[Database]
-  implicit lazy val ec: ExecutionContext = app.injector.instanceOf[ExecutionContext]
-  lazy val sut: GetSqlQueries            = app.injector.instanceOf[GetSqlQueries]
-
-  val testDataBase: String = "genealogie-test"
-
-  implicit override lazy val app: Application = localGuiceApplicationBuilder()
-    .configure(
-      "db.default.url" -> "jdbc:mariadb://localhost:3306"
-    )
-    .build()
-
-  def executeSql(queries: String, logMe: Boolean = false): Future[Boolean] = Future {
-    db.withConnection { implicit conn =>
-      queries.trim
-        .split(";")
-        .map { query =>
-          if (logMe) logger.error("Query: " + query)
-          Try(SQL(query).execute()) match {
-            case Success(bool) => bool
-            case Failure(error) =>
-              logger.error("Error with query: " + query)
-              throw error
-          }
-        }
-        .reduce(_ && _)
-    }
-  }
-
-  def createTables(): Future[Boolean] = {
-    val source = scala.io.Source.fromFile("doc/tables.sql")
-    val lines =
-      try source.mkString
-      finally source.close()
-    val queries =
-      s"""DROP DATABASE IF EXISTS `$testDataBase`;
-         |CREATE DATABASE `$testDataBase`;
-         |USE `$testDataBase`;
-         |""".stripMargin + lines
-    executeSql(queries)
-  }
-
-  override def beforeEach(): Unit = {
-    super.beforeEach()
-    createTables().map(_ => ()).futureValue
-  }
+class GetSqlQueriesSpec extends MariadbHelper with Logging {
+  lazy val sut: GetSqlQueries = app.injector.instanceOf[GetSqlQueries]
 
   def sqlPersonDetails(person: PersonDetails): String =
     s"""INSERT INTO `genea_individuals` (`indi_id`, `base`, `indi_nom`, `indi_prenom`, `indi_sexe`, `indi_npfx`, `indi_givn`, `indi_nick`, `indi_spfx`, `indi_nsfx`, `indi_resn`) VALUES

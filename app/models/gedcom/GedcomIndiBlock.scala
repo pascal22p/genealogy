@@ -6,5 +6,6 @@ final case class GedcomIndiBlock(
     nameStructure: GedComPersonalNameStructure,
     resn: Option[ResnType],
     sex: String,
-    id: Int
+    id: Int,
+    events: List[GedcomEventBlock]
 )

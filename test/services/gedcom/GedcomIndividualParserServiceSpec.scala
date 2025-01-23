@@ -2,6 +2,7 @@ package services.gedcom
 
 import cats.data.Ior
 import models.gedcom.GedComPersonalNameStructure
+import models.gedcom.GedcomEventBlock
 import models.gedcom.GedcomIndiBlock
 import models.gedcom.GedcomNode
 import testUtils.BaseSpec
@@ -9,9 +10,11 @@ import testUtils.BaseSpec
 class GedcomIndividualParserServiceSpec extends BaseSpec {
 
   val gedcomHashIdTable = new GedcomHashIdTable
+  val gedcomEventParser = new GedcomEventParser
   val sut = new GedcomIndividualParser(
     new GedcomCommonParser,
-    gedcomHashIdTable
+    gedcomHashIdTable,
+    gedcomEventParser
   )
 
   val gedcomString: String = """
@@ -351,9 +354,6 @@ class GedcomIndividualParserServiceSpec extends BaseSpec {
 
       val expected = Ior.Both(
         List(
-          "Line 3: `1 BIRT` is not supported",
-          "Line 6: `1 DEAT` is not supported",
-          "Line 9: `1 BURI` is not supported",
           "Line 11: `1 FAMS @F232@` is not supported",
           "Line 12: `1 FAMC @F226@` is not supported"
         ),
@@ -361,7 +361,12 @@ class GedcomIndividualParserServiceSpec extends BaseSpec {
           GedComPersonalNameStructure("Caroline of_Baden //", "", "given", "nickname", "", "", "surn"),
           None,
           "F",
-          0
+          0,
+          List(
+            GedcomEventBlock("BIRT", "13 JUL 1776"),
+            GedcomEventBlock("DEAT", "13 NOV 1841"),
+            GedcomEventBlock("BURI", "")
+          )
         )
       )
 
