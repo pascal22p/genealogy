@@ -2,6 +2,9 @@ package services.gedcom
 
 import javax.inject.Inject
 
+import anorm.Row
+import anorm.SQL
+import anorm.SimpleSql
 import cats.data.Ior
 import com.google.inject.Singleton
 import models.gedcom.GedComPersonalNameStructure
@@ -173,5 +176,31 @@ class GedcomIndividualParser @Inject() (
         )
       }
     }
+  }
+
+  def gedcomIndiBlock2Sql(node: GedcomIndiBlock, base: Int): SimpleSql[Row] = {
+    val nameRegex = "([^/]*)/([^/]*)/(.*)".r
+    val (firstname, surname) = node.nameStructure.name match {
+      case nameRegex(firstname, surname, other) => (firstname, surname + " " + other)
+      case _                                    => ("", "")
+    }
+
+    SQL(
+      s"""INSERT INTO genea_individuals (indi_id, base, indi_nom, indi_prenom, indi_sexe, indi_npfx, indi_givn, indi_nick, indi_spfx, indi_nsfx, indi_resn) VALUES
+         | ({indi_id} + @startIndi, {base}, {surname}, {firstname}, {indi_sex}, {indi_npfx}, {indi_givn}, {indi_nick}, {indi_spfx}, {indi_nsfx}, {indi_resn})""".stripMargin
+    )
+      .on(
+        "indi_id"   -> node.id,
+        "base"      -> base,
+        "surname"   -> surname,
+        "firstname" -> firstname,
+        "indi_sex"  -> node.sex,
+        "indi_npfx" -> node.nameStructure.npfx,
+        "indi_givn" -> node.nameStructure.givn,
+        "indi_nick" -> node.nameStructure.nick,
+        "indi_spfx" -> node.nameStructure.spfx,
+        "indi_nsfx" -> node.nameStructure.nsfx,
+        "indi_resn" -> node.resn.map(resn => s"$resn")
+      )
   }
 }

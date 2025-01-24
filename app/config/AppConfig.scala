@@ -8,5 +8,7 @@ import play.api.Configuration
 @Singleton
 class AppConfig @Inject() (configuration: Configuration) {
 
-  val mediaPath = configuration.get[String](s"media-path")
+  val mediaPath: String = configuration.get[String]("media-path")
+
+  val databaseName: String = configuration.get[String]("database.name")
 }

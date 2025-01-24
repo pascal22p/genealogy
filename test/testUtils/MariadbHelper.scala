@@ -20,6 +20,7 @@ trait MariadbHelper extends BaseSpec with BeforeAndAfterEach with Logging {
 
   implicit override lazy val app: Application = localGuiceApplicationBuilder()
     .configure(
+      "database.name"  -> testDataBase,
       "db.default.url" -> "jdbc:mariadb://localhost:3306"
     )
     .build()
