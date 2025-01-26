@@ -8,6 +8,7 @@ import models.EventType.UnknownEvent
 import models.MaleSex
 import models.PersonDetails
 import models.Place
+import models.ResnType
 import models.Sex
 import org.scalatest.concurrent.IntegrationPatience
 import org.scalatest.concurrent.ScalaFutures
@@ -37,12 +38,12 @@ trait BaseSpec
       surname: String = "Surname", // SURN
       sex: Sex = MaleSex,          // SEX
       timestamp: Instant = Instant.now(),
-      firstnamePrefix: String = "firstnamePrefix", // NPFX
-      surnamePrefix: String = "surnamePrefix",     // SPFX
-      nameSuffix: String = "nameSuffix",           // NSFX
-      nameGiven: String = "nameGiven",             // GIVN
-      nameNickname: String = "nameNickname",       // NICK
-      privacyRestriction: Option[String] = None    // RESN
+      firstnamePrefix: String = "firstnamePrefix",         // NPFX
+      surnamePrefix: String = "surnamePrefix",             // SPFX
+      nameSuffix: String = "nameSuffix",                   // NSFX
+      nameGiven: String = "nameGiven",                     // GIVN
+      nameNickname: String = "nameNickname",               // NICK
+      privacyRestriction: Option[ResnType.ResnType] = None // RESN
 
   ): PersonDetails = PersonDetails(
     base,

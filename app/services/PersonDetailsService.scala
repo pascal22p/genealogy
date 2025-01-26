@@ -38,6 +38,7 @@ class PersonDetailsService @Inject() (
               Person(
                 parent,
                 Events(events1.getOrElse(List.empty[EventDetail]), Some(parent.id), IndividualEvent),
+                Attributes(List.empty, Some(parent.id), IndividualEvent),
                 List.empty
               )
             ),
@@ -45,6 +46,7 @@ class PersonDetailsService @Inject() (
               Person(
                 parent,
                 Events(events2.getOrElse(List.empty[EventDetail]), Some(parent.id), IndividualEvent),
+                Attributes(List.empty, Some(parent.id), IndividualEvent),
                 List.empty
               )
             )

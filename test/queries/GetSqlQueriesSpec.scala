@@ -2,13 +2,6 @@ package queries
 
 import java.time.LocalDateTime
 
-import scala.concurrent.ExecutionContext
-import scala.concurrent.Future
-import scala.util.Failure
-import scala.util.Success
-import scala.util.Try
-
-import anorm.SQL
 import models.*
 import models.queryData.EventDetailQueryData
 import models.queryData.FamilyAsChildQueryData
@@ -16,61 +9,13 @@ import models.queryData.FamilyQueryData
 import models.AuthenticatedRequest
 import models.EventType.FamilyEvent
 import models.EventType.IndividualEvent
-import org.scalatest.BeforeAndAfterEach
-import play.api.db.Database
+import models.ResnType.PrivacyResn
 import play.api.test.FakeRequest
-import play.api.Application
 import play.api.Logging
-import testUtils.BaseSpec
+import testUtils.MariadbHelper
 
-class GetSqlQueriesSpec extends BaseSpec with BeforeAndAfterEach with Logging {
-
-  lazy val db: Database                  = app.injector.instanceOf[Database]
-  implicit lazy val ec: ExecutionContext = app.injector.instanceOf[ExecutionContext]
-  lazy val sut: GetSqlQueries            = app.injector.instanceOf[GetSqlQueries]
-
-  val testDataBase: String = "genealogie-test"
-
-  implicit override lazy val app: Application = localGuiceApplicationBuilder()
-    .configure(
-      "db.default.url" -> "jdbc:mariadb://localhost:3306"
-    )
-    .build()
-
-  def executeSql(queries: String, logMe: Boolean = false): Future[Boolean] = Future {
-    db.withConnection { implicit conn =>
-      queries.trim
-        .split(";")
-        .map { query =>
-          if (logMe) logger.error("Query: " + query)
-          Try(SQL(query).execute()) match {
-            case Success(bool) => bool
-            case Failure(error) =>
-              logger.error("Error with query: " + query)
-              throw error
-          }
-        }
-        .reduce(_ && _)
-    }
-  }
-
-  def createTables(): Future[Boolean] = {
-    val source = scala.io.Source.fromFile("doc/tables.sql")
-    val lines =
-      try source.mkString
-      finally source.close()
-    val queries =
-      s"""DROP DATABASE IF EXISTS `$testDataBase`;
-         |CREATE DATABASE `$testDataBase`;
-         |USE `$testDataBase`;
-         |""".stripMargin + lines
-    executeSql(queries)
-  }
-
-  override def beforeEach(): Unit = {
-    super.beforeEach()
-    createTables().map(_ => ()).futureValue
-  }
+class GetSqlQueriesSpec extends MariadbHelper with Logging {
+  lazy val sut: GetSqlQueries = app.injector.instanceOf[GetSqlQueries]
 
   def sqlPersonDetails(person: PersonDetails): String =
     s"""INSERT INTO `genea_individuals` (`indi_id`, `base`, `indi_nom`, `indi_prenom`, `indi_sexe`, `indi_npfx`, `indi_givn`, `indi_nick`, `indi_spfx`, `indi_nsfx`, `indi_resn`) VALUES
@@ -219,7 +164,15 @@ class GetSqlQueriesSpec extends BaseSpec with BeforeAndAfterEach with Logging {
       val person2  = fakePersonDetails(id = 2)
       val idFamily = 3
       val child =
-        Child(Person(fakePersonDetails(id = 5), Events(List.empty, Some(5), IndividualEvent)), "adopted", None)
+        Child(
+          Person(
+            fakePersonDetails(id = 5),
+            Events(List.empty, Some(5), IndividualEvent),
+            Attributes(List.empty, Some(1), IndividualEvent)
+          ),
+          "adopted",
+          None
+        )
       val result = (for {
         _      <- executeSql(sqlFamily(idFamily, person1, person2, List(child), List.empty))
         result <- sut.getFamiliesFromIndividualId(child.person.details.id)
@@ -309,7 +262,15 @@ class GetSqlQueriesSpec extends BaseSpec with BeforeAndAfterEach with Logging {
       val person2  = fakePersonDetails(id = 2)
       val idFamily = 3
       val child =
-        Child(Person(fakePersonDetails(id = 4), Events(List.empty, Some(4), IndividualEvent)), "adopted", None)
+        Child(
+          Person(
+            fakePersonDetails(id = 4),
+            Events(List.empty, Some(4), IndividualEvent),
+            Attributes(List.empty, Some(1), IndividualEvent)
+          ),
+          "adopted",
+          None
+        )
       val result = (for {
         _      <- executeSql(sqlFamily(idFamily, person1, person2, List(child), List.empty))
         result <- sut.getChildren(idFamily)
@@ -373,7 +334,7 @@ class GetSqlQueriesSpec extends BaseSpec with BeforeAndAfterEach with Logging {
           sqlPersonDetails(fakePersonDetails(id = 1, surname = "D")) +
             sqlPersonDetails(fakePersonDetails(id = 2, surname = "B")) +
             sqlPersonDetails(fakePersonDetails(id = 3, surname = "C")) +
-            sqlPersonDetails(fakePersonDetails(id = 4, surname = "A", privacyRestriction = Some("privacy")))
+            sqlPersonDetails(fakePersonDetails(id = 4, surname = "A", privacyRestriction = Some(PrivacyResn)))
         )
         result <- sut.getSurnamesList(1)(
           AuthenticatedRequest(FakeRequest(), Session("sessionId", SessionData(None), LocalDateTime.now))
@@ -420,7 +381,7 @@ class GetSqlQueriesSpec extends BaseSpec with BeforeAndAfterEach with Logging {
           sqlPersonDetails(fakePersonDetails(id = 1, surname = "D")) +
             sqlPersonDetails(fakePersonDetails(id = 2, surname = "B")) +
             sqlPersonDetails(fakePersonDetails(id = 3, surname = "C")) +
-            sqlPersonDetails(fakePersonDetails(id = 4, surname = "A", privacyRestriction = Some("privacy")))
+            sqlPersonDetails(fakePersonDetails(id = 4, surname = "A", privacyRestriction = Some(PrivacyResn)))
         )
         result <- sut.getSurnamesList(1)(
           AuthenticatedRequest(
@@ -455,7 +416,7 @@ class GetSqlQueriesSpec extends BaseSpec with BeforeAndAfterEach with Logging {
             sqlPersonDetails(fakePersonDetails(id = 2, surname = "Z", firstname = "B")) +
             sqlPersonDetails(fakePersonDetails(id = 3, surname = "X", firstname = "C")) +
             sqlPersonDetails(
-              fakePersonDetails(id = 4, surname = "Z", firstname = "A", privacyRestriction = Some("privacy"))
+              fakePersonDetails(id = 4, surname = "Z", firstname = "A", privacyRestriction = Some(PrivacyResn))
             )
         )
         result <- sut.getFirstnamesList(1, "Z")(
@@ -473,7 +434,7 @@ class GetSqlQueriesSpec extends BaseSpec with BeforeAndAfterEach with Logging {
             sqlPersonDetails(fakePersonDetails(id = 2, surname = "Z", firstname = "B")) +
             sqlPersonDetails(fakePersonDetails(id = 3, surname = "X", firstname = "C")) +
             sqlPersonDetails(
-              fakePersonDetails(id = 4, surname = "Z", firstname = "A", privacyRestriction = Some("privacy"))
+              fakePersonDetails(id = 4, surname = "Z", firstname = "A", privacyRestriction = Some(PrivacyResn))
             )
         )
         result <- sut.getFirstnamesList(1, "Z")(

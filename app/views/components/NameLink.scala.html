@@ -6,7 +6,7 @@
 @(dbId:Int, person: Person)(implicit authenticatedRequest: AuthenticatedRequest[?], messages: Messages)
 
 @if(!person.details.privacyRestriction.contains("privacy") || authenticatedRequest.localSession.sessionData.userData.fold(false)(_.seePrivacy)) {
-    <a class="govuk-link" style="padding:0;margin:0" href="@controllers.routes.IndividualController.showPerson(dbId, person.details.id)">@person.details.shortName</a> @person.events.birthAndDeathDate    
+    <a class="govuk-link" style="padding:0;margin:0" href="@controllers.routes.IndividualController.showPerson(dbId, person.details.id)">@person.details.shortName</a> @person.events.birthAndDeathDate
 } else {
     (Access Restricted)
 }

@@ -44,7 +44,15 @@ class PersonService @Inject() (
       parents                <- getParents(id, omitParents)
       families: List[Family] <- getFamilies(id, omitSources, omitFamilies)
     } yield {
-      personDetails.map(person => Person(person, Events(events, Some(person.id), IndividualEvent), parents, families))
+      personDetails.map(person =>
+        Person(
+          person,
+          Events(events, Some(person.id), IndividualEvent),
+          Attributes(List.empty, Some(person.id), IndividualEvent),
+          parents,
+          families
+        )
+      )
     }
   }
 

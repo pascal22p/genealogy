@@ -5,6 +5,7 @@ import play.api.i18n.Messages
 final case class Person(
     details: PersonDetails,
     events: Events,
+    attributes: Attributes,
     parents: List[Parents] = List.empty,
     families: List[Family] = List.empty
 ) {

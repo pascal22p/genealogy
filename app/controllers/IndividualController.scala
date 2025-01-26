@@ -32,7 +32,7 @@ class IndividualController @Inject() (
         personOption.fold(NotFound("Nothing here")) { person =>
           val isAllowedToSee = authenticatedRequest.localSession.sessionData.userData.fold(false)(_.seePrivacy)
 
-          if (!person.details.privacyRestriction.contains("privacy") || isAllowedToSee) {
+          if (person.details.privacyRestriction.isEmpty || isAllowedToSee) {
             sessionService.insertPersonInHistory(person)
             Ok(individualView(person, baseId))
           } else {

@@ -7,6 +7,7 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
 import cats.implicits.*
+import models.Attributes
 import models.Child
 import models.EventDetail
 import models.EventType.FamilyEvent
@@ -69,10 +70,20 @@ class FamilyService @Inject() (
             Family(
               family,
               parent1.map(
-                Person(_, Events(events1.getOrElse(List.empty[EventDetail]), Some(family.id), FamilyEvent), List.empty)
+                Person(
+                  _,
+                  Events(events1.getOrElse(List.empty[EventDetail]), Some(family.id), FamilyEvent),
+                  Attributes(List.empty, Some(family.id), FamilyEvent),
+                  List.empty
+                )
               ),
               parent2.map(
-                Person(_, Events(events2.getOrElse(List.empty[EventDetail]), Some(family.id), FamilyEvent), List.empty)
+                Person(
+                  _,
+                  Events(events2.getOrElse(List.empty[EventDetail]), Some(family.id), FamilyEvent),
+                  Attributes(List.empty, Some(family.id), FamilyEvent),
+                  List.empty
+                )
               )
             )
           }
