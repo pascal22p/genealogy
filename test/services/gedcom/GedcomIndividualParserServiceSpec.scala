@@ -354,6 +354,9 @@ class GedcomIndividualParserServiceSpec extends BaseSpec {
 
       val expected = Ior.Both(
         List(
+          "Line 4: `2 PLAC Karlsruhe` is not supported",
+          "Line 7: `2 PLAC Munich,Germany` is not supported",
+          "Line 9: `2 PLAC Theatinerkirche,Munich,Germany` is not supported",
           "Line 11: `1 FAMS @F232@` is not supported",
           "Line 12: `1 FAMC @F226@` is not supported"
         ),

@@ -3,6 +3,8 @@ package services.gedcom
 import javax.inject.Inject
 import javax.inject.Singleton
 
+import scala.concurrent.Future
+
 import anorm.Row
 import anorm.SQL
 import anorm.SimpleSql
@@ -11,6 +13,7 @@ import config.AppConfig
 import models.gedcom.GedcomFamilyBlock
 import models.gedcom.GedcomIndiBlock
 import models.gedcom.GedcomNode
+import models.DatabaseExecutionContext
 import play.api.db.Database
 
 @Singleton
@@ -20,19 +23,22 @@ class GedcomImportService @Inject() (
     gedcomFamilyParser: GedcomFamilyParser,
     gedcomEventParser: GedcomEventParser,
     config: AppConfig,
-    db: Database
+    db: Database,
+    databaseExecutionContext: DatabaseExecutionContext
 ) {
 
-  def gedcom2sql(gedcomString: String, dbId: Int) = {
+  def gedcom2sql(gedcomString: String, dbId: Int): Future[Boolean] = Future {
     val nodes = gedcomCommonParser.getTree(gedcomString)
     val sqls  = convertTree2SQL(nodes, dbId)
 
     db.withTransaction { implicit conn =>
-      sqls.map { sql =>
-        sql.execute()
-      }
-    }.reduce(_ && _)
-  }
+      sqls
+        .map { sql =>
+          sql.execute()
+        }
+        .reduce(_ && _)
+    }
+  }(databaseExecutionContext)
 
   val startTransaction: List[SimpleSql[Row]] = List(
     SQL("SET FOREIGN_KEY_CHECKS=1").on(),

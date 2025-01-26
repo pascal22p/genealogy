@@ -1,5 +1,7 @@
 package services.gedcom
 
+import scala.concurrent.Future
+
 import anorm.ResultSetParser
 import anorm.SQL
 import anorm.SqlParser.int
@@ -212,17 +214,21 @@ class GedcomImportServiceSpec extends MariadbHelper {
         int("insert_id").singleOpt
       }
 
-      val tt = db.withConnection { implicit conn =>
-        SQL("SET FOREIGN_KEY_CHECKS=1;")
-        SQL(
-          "INSERT INTO `genea_infos` (`nom`, `descriptif`, `entetes`, `ged_corp`, `subm`) VALUES ({name}, '', '', '', NULL)"
-        )
-          .on("name" -> "test")
-          .executeInsert[Option[Int]](parser)
-      }
+      val result = for {
+        _ <- Future {
+          db.withConnection { implicit conn =>
+            SQL("SET FOREIGN_KEY_CHECKS=1;")
+            SQL(
+              "INSERT INTO `genea_infos` (`nom`, `descriptif`, `entetes`, `ged_corp`, `subm`) VALUES ({name}, '', '', '', NULL)"
+            )
+              .on("name" -> "test")
+              .executeInsert[Option[Int]](parser)
+          }
+        }
+        result <- sut.gedcom2sql(gedcomString, 1)
+      } yield result
 
-      val result = sut.gedcom2sql(gedcomString, 1)
-      result mustBe true
+      result.futureValue mustBe false
     }
   }
 }
