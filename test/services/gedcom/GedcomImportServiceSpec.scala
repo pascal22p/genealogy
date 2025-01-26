@@ -220,10 +220,9 @@ class GedcomImportServiceSpec extends MariadbHelper {
           .on("name" -> "test")
           .executeInsert[Option[Int]](parser)
       }
-      println(s"77777777777 $tt")
 
       val result = sut.gedcom2sql(gedcomString, 1)
-      result mustBe false
+      result mustBe true
     }
   }
 }

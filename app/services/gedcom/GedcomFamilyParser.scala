@@ -90,15 +90,14 @@ class GedcomFamilyParser @Inject() (
 
     val allTagList = List("RESN", "HUSB", "WIFE", "CHIL") ++ eventsIor.right.fold(List.empty[String])(_.map(_.tag))
 
-    val ignoredContent: Ior[List[String], Map[String, String]] = node.children
-      .filterNot(child => allTagList.contains(child.name))
-      .map { node =>
-        Ior.Left(List(s"Line ${node.lineNumber}: `${node.line}` is not supported"))
-      }
-      .foldLeft(Ior.Right(Map.empty): Ior[List[String], Map[String, String]]) {
-        case (result, element) =>
-          result.combine(element)
-      }
+    val ignoredContent: Ior[List[String], Map[String, String]] = Ior.Left(
+      node.children
+        .filterNot(child => allTagList.contains(child.name))
+        .foldLeft(List.empty[String]) {
+          case (result, node) =>
+            result ++ List(s"Line ${node.lineNumber}: `${node.line}` is not supported")
+        }
+    )
 
     for {
       resn     <- resnIor

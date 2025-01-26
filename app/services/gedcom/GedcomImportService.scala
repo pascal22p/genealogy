@@ -28,12 +28,28 @@ class GedcomImportService @Inject() (
     val sqls  = convertTree2SQL(nodes, dbId)
 
     db.withTransaction { implicit conn =>
-      sqls.foreach { sql =>
+      sqls.map { sql =>
         sql.execute()
       }
-    }
-    true
+    }.reduce(_ && _)
   }
+
+  val startTransaction: List[SimpleSql[Row]] = List(
+    SQL("SET FOREIGN_KEY_CHECKS=1").on(),
+    SQL("START TRANSACTION").on(),
+    SQL("select * from genea_individuals WHERE indi_id > 0 LOCK IN SHARE MODE").on(),
+    SQL(
+      s"SELECT `AUTO_INCREMENT` INTO @startIndi FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '${config.databaseName}' AND TABLE_NAME = 'genea_individuals'"
+    ).on(),
+    SQL(
+      s"SELECT `AUTO_INCREMENT` INTO @startEvent FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '${config.databaseName}' AND TABLE_NAME = 'genea_events_details'"
+    ).on(),
+    SQL(
+      s"SELECT `AUTO_INCREMENT` INTO @startFamily FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '${config.databaseName}' AND TABLE_NAME = 'genea_familles'"
+    ).on()
+  )
+
+  val commitTransaction: List[SimpleSql[Row]] = List(SQL("COMMIT;").on())
 
   def convertTree2SQL(nodes: List[GedcomNode], base: Int): List[SimpleSql[Row]] = {
     val indis: Ior[List[String], List[GedcomIndiBlock]] = nodes
@@ -51,23 +67,6 @@ class GedcomImportService @Inject() (
         case (listFamily, family) =>
           listFamily.combine(family.map(i => List(i)))
       }
-
-    val startTransaction: List[SimpleSql[Row]] = List(
-      SQL("SET FOREIGN_KEY_CHECKS=1").on(),
-      SQL("START TRANSACTION").on(),
-      SQL("select * from genea_individuals WHERE indi_id > 0 LOCK IN SHARE MODE").on(),
-      SQL(
-        s"SELECT `AUTO_INCREMENT` INTO @startIndi FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '${config.databaseName}' AND TABLE_NAME = 'genea_individuals'"
-      ).on(),
-      SQL(
-        s"SELECT `AUTO_INCREMENT` INTO @startEvent FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '${config.databaseName}' AND TABLE_NAME = 'genea_events_details'"
-      ).on(),
-      SQL(
-        s"SELECT `AUTO_INCREMENT` INTO @startFamily FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '${config.databaseName}' AND TABLE_NAME = 'genea_familles'"
-      ).on()
-    )
-
-    val commitTransaction: List[SimpleSql[Row]] = List(SQL("COMMIT;").on())
 
     val indiSqls: List[SimpleSql[Row]] = indis.right
       .getOrElse(List.empty)
@@ -91,15 +90,14 @@ class GedcomImportService @Inject() (
         .getOrElse(List.empty)
         .flatMap(family => gedcomEventParser.gedcomFamilyEventBlock2Sql(family.events, base, family.id))
 
-    val ignoredContent: Ior[List[String], Map[String, String]] = nodes
-      .filterNot(node => List("INDI", "FAM").contains(node.name))
-      .map { node =>
-        Ior.Left(List(s"Line ${node.lineNumber}: `${node.line}` is not supported"))
-      }
-      .foldLeft(Ior.Right(Map.empty): Ior[List[String], Map[String, String]]) {
-        case (result, element) =>
-          result.combine(element)
-      }
+    val ignoredContent: Ior[List[String], Map[String, String]] = Ior.Left(
+      nodes
+        .filterNot(node => List("INDI", "FAM").contains(node.name))
+        .foldLeft(List.empty[String]) {
+          case (result, node) =>
+            result ++ List(s"Line ${node.lineNumber}: `${node.line}` is not supported")
+        }
+    )
 
     val warnings =
       indis.left.getOrElse(List.empty) ++ families.left.getOrElse(List.empty) ++ ignoredContent.left.getOrElse(

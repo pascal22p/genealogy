@@ -51,7 +51,8 @@ trait MariadbHelper extends BaseSpec with BeforeAndAfterEach with Logging {
       s"""DROP DATABASE IF EXISTS `$testDataBase`;
          |CREATE DATABASE `$testDataBase`;
          |USE `$testDataBase`;
-         |""".stripMargin + lines
+         |""".stripMargin
+        + lines
     executeSql(queries)
   }
 
