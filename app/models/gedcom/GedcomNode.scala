@@ -9,5 +9,3 @@ final case class GedcomNode(
     content: Option[String],
     children: List[GedcomNode]
 )
-
-final case class GedcomTree(root: List[GedcomNode])

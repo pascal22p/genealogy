@@ -4,21 +4,11 @@
 
 @this(
   mediasComponent: Medias, 
-  block: Block, 
   sourRecord: SourRecord,
   govukSummaryList: GovukSummaryList)
 
-@(dbId: Int, sources: List[ModelSourCitation], ownerId: Int, ownerType: SourCitationType)(implicit request: AuthenticatedRequest[?], messages: Messages)
+@(dbId: Int, source: ModelSourCitation)(implicit request: AuthenticatedRequest[?], messages: Messages)
 
-@block("Sources", Some(Actions(
-  items = Seq(
-      ActionItem(
-          href = controllers.add.routes.AddSourCitationController.showForm(dbId, ownerId, ownerType).url,
-          content = Text("Add")
-      )
-  )
-))) {
-  @for(source <- sources) {
   @govukSummaryList(
     SummaryList(
         rows = Seq(
@@ -88,5 +78,4 @@
   }
 
   @mediasComponent(source.medias)
-  }
-}
+

@@ -22,7 +22,7 @@ final case class SourCitationForm(
     quay: Option[Int],
     recordId: Option[Int]
 ) {
-  def toSourCitationQueryData(ownerId: Int, ownerType: SourCitationType) =
+  def toSourCitationQueryData(ownerId: Int, dbId: Int, ownerType: SourCitationType) =
     SourCitationQueryData(
       id = 0,
       record = recordId.map(id => SourRecord(id, "", "", "", "", "", "", None, "", "", Instant.now())),
@@ -35,7 +35,8 @@ final case class SourCitationForm(
       subm = submitter,
       timestamp = Instant.now(),
       ownerId = Some(ownerId),
-      sourceType = ownerType
+      sourceType = ownerType,
+      dbId = dbId
     )
 }
 

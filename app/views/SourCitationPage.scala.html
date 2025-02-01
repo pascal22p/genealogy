@@ -1,0 +1,28 @@
+@import models.Person
+@import play.twirl.api.HtmlFormat
+@import views.html.components.{Block, OneSourCitation, LastModified}
+@import models.EventType.{IndividualEvent, FamilyEvent, UnknownEvent}
+@import models.{SourCitation => ModelSourCitation}
+@import models.SourCitationType.{EventSourCitation, IndividualSourCitation, FamilySourCitation}
+@import controllers.routes.Assets
+
+@this(
+  main: Main,
+  oneSourCitation: OneSourCitation
+)
+
+@(dbId: Int, modelSourCitation: ModelSourCitation)(implicit request: AuthenticatedRequest[?], messages: Messages)
+
+
+@main(dbId, None) {
+
+  @(modelSourCitation.sourceType, modelSourCitation.ownerId)  match {
+    case (_: EventSourCitation.type, Some(id)) => { <a href="@routes.EventController.showEvent(dbId, id)">See Event</a> }
+    case (_: IndividualSourCitation.type, Some(id)) => { <a href="@routes.IndividualController.showPerson(dbId, id)">See Individual</a> }
+    case (_: FamilySourCitation.type, Some(id)) => { <a href="@routes.FamilyController.showFamily(dbId, id)">See Family</a> }
+    case _ => { Source not attached to anything }
+  }
+
+  @oneSourCitation(dbId, modelSourCitation)
+  
+}

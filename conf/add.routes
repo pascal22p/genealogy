@@ -1,8 +1,8 @@
-GET     /base/:baseId/media  controllers.add.AddMediaController.showForm(baseId: Int)
-POST    /base/:baseId/media  controllers.add.AddMediaController.upload(baseId: Int)
+GET     /base/:baseId/media                                  controllers.add.AddMediaController.showForm(baseId: Int)
+POST    /base/:baseId/media                                  controllers.add.AddMediaController.upload(baseId: Int)
 
-GET     /base/:baseId/person-details                       controllers.add.AddPersonDetailsController.showForm(baseId: Int)
-POST    /base/:baseId/person-details                       controllers.add.AddPersonDetailsController.onSubmit(baseId: Int)
+GET     /base/:baseId/person-details                         controllers.add.AddPersonDetailsController.showForm(baseId: Int)
+POST    /base/:baseId/person-details                         controllers.add.AddPersonDetailsController.onSubmit(baseId: Int)
 
 GET     /base/:baseId/person/:id/event                       controllers.add.AddIndividualEventDetailController.showForm(baseId: Int, id: Int)
 POST    /base/:baseId/person/:id/event                       controllers.add.AddIndividualEventDetailController.onSubmit(baseId: Int, id: Int)
@@ -10,9 +10,9 @@ POST    /base/:baseId/person/:id/event                       controllers.add.Add
 GET     /base/:baseId/family/:id/event                       controllers.add.AddFamilyEventDetailController.showForm(baseId: Int, id: Int)
 POST    /base/:baseId/family/:id/event                       controllers.add.AddFamilyEventDetailController.onSubmit(baseId: Int, id: Int)
 
-GET     /database                       controllers.add.AddDatabaseController.showForm
-POST    /database                       controllers.add.AddDatabaseController.onSubmit
+GET     /database                                            controllers.add.AddDatabaseController.showForm
+POST    /database                                            controllers.add.AddDatabaseController.onSubmit
 
-GET     /base/:baseId/:sourCitationType/:id/sour-citation      controllers.add.AddSourCitationController.showForm(baseId: Int, id: Int, sourCitationType: SourCitationType)
-POST    /base/:baseId/:sourCitationType/:id/sour-citation      controllers.add.AddSourCitationController.onSubmit(baseId: Int, id: Int, sourCitationType: SourCitationType)
+GET     /base/:baseId/:sourCitationType/:id/sour-citation    controllers.add.AddSourCitationController.showForm(baseId: Int, id: Int, sourCitationType: SourCitationType)
+POST    /base/:baseId/:sourCitationType/:id/sour-citation    controllers.add.AddSourCitationController.onSubmit(baseId: Int, id: Int, sourCitationType: SourCitationType)
 

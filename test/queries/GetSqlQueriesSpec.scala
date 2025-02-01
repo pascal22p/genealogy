@@ -107,7 +107,7 @@ class GetSqlQueriesSpec extends MariadbHelper with Logging {
       val idPerson = 1
       val result   = sut.getPersonDetails(idPerson).futureValue
 
-      result mustBe List.empty
+      result mustBe List.empty[PersonDetails]
     }
   }
 
@@ -130,7 +130,7 @@ class GetSqlQueriesSpec extends MariadbHelper with Logging {
     "returns nothing" in {
       val result = sut.getEvents(1, IndividualEvent).futureValue
 
-      result mustBe List.empty
+      result mustBe List.empty[EventDetailQueryData]
     }
   }
 
@@ -154,7 +154,7 @@ class GetSqlQueriesSpec extends MariadbHelper with Logging {
     "returns nothing" in {
       val result = sut.getEvents(1, FamilyEvent).futureValue
 
-      result mustBe List.empty
+      result mustBe List.empty[EventDetailQueryData]
     }
   }
 
@@ -189,7 +189,7 @@ class GetSqlQueriesSpec extends MariadbHelper with Logging {
       val idPerson = 1
       val result   = sut.getFamiliesFromIndividualId(idPerson).futureValue
 
-      result mustBe List.empty
+      result mustBe List.empty[FamilyAsChildQueryData]
     }
   }
 
@@ -458,7 +458,7 @@ class GetSqlQueriesSpec extends MariadbHelper with Logging {
         )
         .futureValue
 
-      result mustBe List.empty
+      result mustBe List.empty[PersonDetails]
     }
   }
 }

@@ -73,7 +73,7 @@ final class InsertSqlQueries @Inject() (db: Database, databaseExecutionContext: 
               "jd_calendar"                -> eventDetailQueryData.jd_calendar,
               "events_details_famc"        -> eventDetailQueryData.events_details_famc,
               "events_details_adop"        -> eventDetailQueryData.events_details_adop,
-              "base"                       -> eventDetailQueryData.base
+              "base"                       -> eventDetailQueryData.dbId
             )
             .executeInsert[Option[Int]](parser)
 

@@ -112,7 +112,7 @@ class DescendanceControllerSpec extends BaseSpec {
           |</div>
           |""".stripMargin.filterNot(_.isWhitespace)
 
-      val result = sut.showDescendant(1, 1).apply(FakeRequest())
+      val result = sut.showDescendant(1).apply(FakeRequest())
       status(result) mustBe OK
       contentAsString(result).filterNot(_.isWhitespace) must include(expected)
     }

@@ -42,7 +42,7 @@ class DeleteDatabaseController @Inject() (
     implicit authenticatedRequest: AuthenticatedRequest[AnyContent] =>
       getSqlQueries
         .getGenealogyDatabase(id)
-        .fold(Future.successful(NotFound("database not found"))) { database =>
+        .fold(Future.successful(NotFound("database not found"))) { _ =>
           val isAllowedToEdit = authenticatedRequest.localSession.sessionData.userData.fold(false)(_.seePrivacy)
 
           if (isAllowedToEdit) {

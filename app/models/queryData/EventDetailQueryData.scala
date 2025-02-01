@@ -8,7 +8,7 @@ import models.EventType
 import models.EventType.EventType
 
 final case class EventDetailQueryData(
-    base: Int,
+    dbId: Int,
     events_details_id: Int,
     place_id: Option[Int],
     addr_id: Option[Int],

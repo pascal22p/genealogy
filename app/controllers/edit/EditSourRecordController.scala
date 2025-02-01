@@ -70,18 +70,20 @@ class EditSourRecordController @Inject() (
           case 1 =>
             dataForm.parentType match {
               case _: EventSourCitation.type =>
-                sourCitationService.getSourCitations(dataForm.parentId, UnknownSourCitation).map { sourCitationList =>
-                  sourCitationList.headOption.fold(NotFound("SourCitation could not be found")) { sourCitation =>
-                    Redirect(controllers.routes.EventController.showEvent(baseId, sourCitation.ownerId.getOrElse(0)))
-                  }
+                sourCitationService.getSourCitations(dataForm.parentId, UnknownSourCitation, baseId).map {
+                  sourCitationList =>
+                    sourCitationList.headOption.fold(NotFound("SourCitation could not be found")) { sourCitation =>
+                      Redirect(controllers.routes.EventController.showEvent(baseId, sourCitation.ownerId.getOrElse(0)))
+                    }
                 }
               case _: IndividualSourCitation.type =>
-                sourCitationService.getSourCitations(dataForm.parentId, UnknownSourCitation).map { sourCitationList =>
-                  sourCitationList.headOption.fold(NotFound("SourCitation could not be found")) { sourCitation =>
-                    Redirect(
-                      controllers.routes.IndividualController.showPerson(baseId, sourCitation.ownerId.getOrElse(0))
-                    )
-                  }
+                sourCitationService.getSourCitations(dataForm.parentId, UnknownSourCitation, baseId).map {
+                  sourCitationList =>
+                    sourCitationList.headOption.fold(NotFound("SourCitation could not be found")) { sourCitation =>
+                      Redirect(
+                        controllers.routes.IndividualController.showPerson(baseId, sourCitation.ownerId.getOrElse(0))
+                      )
+                    }
                 }
               case _: FamilySourCitation.type =>
                 Future.successful(NotImplemented(serviceUnavailableView("Family edit Not implemented")))

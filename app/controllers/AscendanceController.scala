@@ -31,7 +31,7 @@ class AscendanceController @Inject() (
     with I18nSupport
     with Logging {
 
-  def showAscendant(baseId: Int, id: Int): Action[AnyContent] = authAction.async {
+  def showAscendant(id: Int): Action[AnyContent] = authAction.async {
     implicit authenticatedRequest: AuthenticatedRequest[AnyContent] =>
       ascendanceService.getAscendant(id, 0).map {
         case None => NotFound("Nothing here")
