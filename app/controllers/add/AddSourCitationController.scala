@@ -44,10 +44,10 @@ class AddSourCitationController @Inject() (
 
       val successFunction: SourCitationForm => Future[Result] = { (dataForm: SourCitationForm) =>
         insertSqlQueries
-          .insertSourCitation(dataForm.toSourCitationQueryData(ownerId, sourCitationType))
+          .insertSourCitation(dataForm.toSourCitationQueryData(ownerId, baseId, sourCitationType))
           .fold(
             InternalServerError(serviceUnavailableView("No record was inserted"))
-          ) { id =>
+          ) { _ =>
             Redirect(controllers.routes.EventController.showEvent(baseId, ownerId))
           }
       }

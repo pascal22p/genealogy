@@ -96,6 +96,14 @@
                     classes = "",
                     attributes = Map.empty
                 )),
+                Some(ServiceNavigationItem(
+                    content = Text("Medias"),
+                    href = controllers.routes.MediaListController.showMedias(dbId).url,
+                    active = false,
+                    current = false,
+                    classes = "",
+                    attributes = Map.empty
+                )),
                 personOption.map { person =>
                     ServiceNavigationItem(
                         content = Text("Person details"),

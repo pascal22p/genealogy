@@ -1,0 +1,64 @@
+@import models.SessionData
+@import models.MediaType.MediaType
+@import models.MediaType.{EventMedia, IndividualMedia, FamilyMedia, SourCitationMedia}
+
+@this(
+        main: Main,
+        govukSummaryList: GovukSummaryList
+)
+
+@(medias: List[Media])(implicit request: AuthenticatedRequest[?], messages: Messages)
+
+@link(id: Int, dbId: Int, mediaType: MediaType): String = @{
+  mediaType match {
+    case _: EventMedia.type        => routes.EventController.showEvent(dbId, id).url
+    case _: IndividualMedia.type   => routes.IndividualController.showPerson(dbId, id).url
+    case _: FamilyMedia.type       => "#"
+    case _: SourCitationMedia.type => routes.SourCitationController.showSourCitation(dbId, id).url
+    case _                 => "#"
+  }
+}
+
+@main(1, None) {
+
+  @govukSummaryList(
+    SummaryList(
+      rows = medias.map { media =>
+        SummaryListRow(
+          key = Key(Text(media.title)),
+          value = Value(HtmlContent(s"""<img src="${routes.MediaController.serveMedia(media.filename)}" style="width:90%;"/>""")),
+          classes = "",
+          actions = Some(Actions(
+            items = Seq(
+              ActionItem(
+                href = link(media.ownerId.getOrElse(-1), media.dbId, media.mediaType),
+                content = Text("View")
+              ),
+              ActionItem(
+                href = "#",
+                content = Text("Delete")
+              )
+            )
+          ))
+        )
+      },
+      card = Some(Card(
+        title = Some(CardTitle(content = Text("Medias"))),
+        actions = Some(
+          Actions(
+            items = Seq(
+              ActionItem(
+                href = "#",
+                content = Text("Add")
+              )
+            )
+          )),
+        classes = "govuk-!-margin-4",
+        attributes = Map.empty
+      )),
+      classes = "",
+      attributes = Map.empty
+    )
+  )
+
+}

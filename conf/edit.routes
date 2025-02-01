@@ -1,5 +1,5 @@
-GET     /base/:baseId/person-details/:id                  controllers.edit.EditPersonDetailsController.showForm(baseId: Int, id: Int)
-POST    /base/:baseId/person-details                      controllers.edit.EditPersonDetailsController.onSubmit(baseId: Int)
+GET     /base/:baseId/person-details/:id                 controllers.edit.EditPersonDetailsController.showForm(baseId: Int, id: Int)
+POST    /base/:baseId/person-details                     controllers.edit.EditPersonDetailsController.onSubmit(baseId: Int)
 
 GET     /base/:baseId/event-detail/:id                   controllers.edit.EditEventDetailController.showForm(baseId: Int, id: Int)
 POST    /base/:baseId/event-detail/:id                   controllers.edit.EditEventDetailController.onSubmit(baseId: Int, id: Int)
@@ -8,4 +8,4 @@ GET     /base/:baseId/source-citation/:id                controllers.edit.EditSo
 POST    /base/:baseId/source-citation/:id                controllers.edit.EditSourCitationController.onSubmit(baseId: Int, id: Int)
 
 GET     /base/:baseId/source-record/:sourRecordId/:sourCitationType/:sourCitationId                controllers.edit.EditSourRecordController.showForm(baseId: Int, sourRecordId: Int, sourCitationType: SourCitationType, sourCitationId: Int)
-POST    /base/:baseId/source-record/:id                controllers.edit.EditSourRecordController.onSubmit(baseId: Int, id: Int)
+POST    /base/:baseId/source-record/:id                  controllers.edit.EditSourRecordController.onSubmit(baseId: Int, id: Int)

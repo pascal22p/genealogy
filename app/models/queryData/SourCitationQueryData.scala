@@ -19,7 +19,8 @@ final case class SourCitationQueryData(
     subm: String,
     timestamp: Instant,
     ownerId: Option[Int],
-    sourceType: SourCitationType
+    sourceType: SourCitationType,
+    dbId: Int
 )
 
 object SourCitationQueryData {
@@ -46,10 +47,11 @@ object SourCitationQueryData {
       get[String]("repo_caln") ~
       get[String]("repo_medi") ~
       get[Option[Int]]("owner_id") ~
-      get[String]("source_type")).map {
+      get[String]("source_type") ~
+      get[Int]("base")).map {
       case id ~ recordId ~ page ~ even ~ role ~ dates ~ text ~ quay ~ subm ~ timeStamp ~
           sourRecordId ~ auth ~ title ~ abbr ~ publ ~ agnc ~ rin ~ sourRecordTimestamp ~ repoId ~ repoCaln ~ repoMedi ~
-          ownerId ~ sourceType =>
+          ownerId ~ sourceType ~ base =>
         SourCitationQueryData(
           id,
           sourRecordId.map(id =>
@@ -76,7 +78,8 @@ object SourCitationQueryData {
           subm,
           timeStamp.getOrElse(Instant.now),
           ownerId,
-          SourCitationType.fromString(sourceType)
+          SourCitationType.fromString(sourceType),
+          base
         )
     }
 }

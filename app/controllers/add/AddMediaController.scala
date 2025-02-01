@@ -12,6 +12,7 @@ import play.api.data.Form
 import play.api.i18n.I18nSupport
 import play.api.libs.Files
 import play.api.mvc.Action
+import play.api.mvc.AnyContent
 import play.api.mvc.BaseController
 import play.api.mvc.ControllerComponents
 import play.api.mvc.MultipartFormData
@@ -30,7 +31,7 @@ class AddMediaController @Inject() (
     with I18nSupport
     with Logging {
 
-  def showForm(baseId: Int) = authJourney.authWithAdminRight.async { implicit request =>
+  def showForm(baseId: Int): Action[AnyContent] = authJourney.authWithAdminRight.async { implicit request =>
     Future.successful(Ok(addMediaView(baseId)))
   }
 
@@ -53,7 +54,7 @@ class AddMediaController @Inject() (
         }
     }
 
-  def onSubmit(baseId: Int, id: Int) = authJourney.authWithAdminRight.async { implicit request =>
+  def onSubmit(baseId: Int, id: Int): Action[AnyContent] = authJourney.authWithAdminRight.async { implicit request =>
     def errorFunction(formWithErrors: Form[SourCitationForm]): Future[Result] = {
       Future.successful(BadRequest(addMediaView(baseId)))
     }

@@ -45,6 +45,5 @@ class IndividualController @Inject() (
   def languageSwitch(lang: String): Action[AnyContent] = authAction.async {
     implicit request: AuthenticatedRequest[AnyContent] =>
       Future.successful(Redirect(routes.IndividualController.showPerson(1, 300)).withLang(Lang(lang)))
-
   }
 }

@@ -18,8 +18,12 @@ import queries.GetSqlQueries
 class SourCitationService @Inject() (mariadbQueries: GetSqlQueries)(
     implicit ec: ExecutionContext
 ) {
-  def getSourCitations(sourCitationId: Int, sourCitationType: SourCitationType): Future[List[SourCitation]] = {
-    mariadbQueries.getSourCitations(sourCitationId, sourCitationType).flatMap { sources =>
+  def getSourCitations(
+      sourCitationId: Int,
+      sourCitationType: SourCitationType,
+      dbId: Int
+  ): Future[List[SourCitation]] = {
+    mariadbQueries.getSourCitations(sourCitationId, sourCitationType, dbId).flatMap { sources =>
       sources.traverse { source =>
         fillExtraData(source)
       }
@@ -28,7 +32,11 @@ class SourCitationService @Inject() (mariadbQueries: GetSqlQueries)(
 
   private def fillExtraData(sourCitationQueryData: SourCitationQueryData): Future[SourCitation] = {
     for {
-      medias: List[Media] <- mariadbQueries.getMedias(sourCitationQueryData.id, SourCitationMedia)
+      medias: List[Media] <- mariadbQueries.getMedias(
+        Some(sourCitationQueryData.id),
+        SourCitationMedia,
+        sourCitationQueryData.dbId
+      )
     } yield {
       SourCitation(sourCitationQueryData, medias)
     }

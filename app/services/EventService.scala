@@ -52,7 +52,8 @@ class EventService @Inject() (mariadbQueries: GetSqlQueries, sourCitationService
       } else {
         sourCitationService.getSourCitations(
           event.events_details_id,
-          EventSourCitation
+          EventSourCitation,
+          event.dbId
         )
       }
     }

@@ -22,7 +22,7 @@ final case class EventDetailForm(
     events_details_age: String,
     events_details_cause: String
 ) {
-  def toEventDetailQueryData(eventType: EventType, ownerId: Int) = {
+  def toEventDetailQueryData(eventType: EventType, ownerId: Int): EventDetailQueryData = {
     EventDetailQueryData(
       base,
       0,

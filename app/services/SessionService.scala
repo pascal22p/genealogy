@@ -3,6 +3,8 @@ package services
 import javax.inject.Inject
 import javax.inject.Singleton
 
+import scala.concurrent.Future
+
 import models.AuthenticatedRequest
 import models.HistoryElement
 import models.Person
@@ -10,7 +12,7 @@ import queries.SessionSqlQueries
 
 @Singleton
 class SessionService @Inject() (sqlQueries: SessionSqlQueries) {
-  def insertPersonInHistory(person: Person)(implicit request: AuthenticatedRequest[?]) = {
+  def insertPersonInHistory(person: Person)(implicit request: AuthenticatedRequest[?]): Future[Int] = {
     val currentHistory = request.localSession.sessionData.history
     val newHistory =
       List(HistoryElement(person.details.id, person.name)) ++ currentHistory.filterNot(_.personId == person.details.id)

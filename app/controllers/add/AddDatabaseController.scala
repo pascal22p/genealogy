@@ -45,7 +45,7 @@ class AddDatabaseController @Inject() (
         .insertDatabase(dataForm.toGenealogyDatabase)
         .fold(
           InternalServerError(serviceUnavailableView("No record was inserted"))
-        ) { id =>
+        ) { _ =>
           Redirect(controllers.routes.HomeController.onload())
         }
     }

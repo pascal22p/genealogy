@@ -9,8 +9,10 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
 import actions.AuthJourney
-import cats.implicits._
+import cats.implicits.*
 import play.api.i18n.I18nSupport
+import play.api.mvc.Action
+import play.api.mvc.AnyContent
 import play.api.mvc.BaseController
 import play.api.mvc.ControllerComponents
 import play.api.Logging
@@ -32,7 +34,7 @@ class DatabaseFixes @Inject() (
     with I18nSupport
     with Logging {
 
-  def calculateDaysForDates = authJourney.authWithAdminRight.async { implicit request =>
+  def calculateDaysForDates: Action[AnyContent] = authJourney.authWithAdminRight.async { implicit request =>
     val result: Future[List[Option[Int]]] = getSqlQueries.getAllEvents.flatMap { events =>
       events.traverse { event =>
 
@@ -50,8 +52,8 @@ class DatabaseFixes @Inject() (
 
     result.map { changes =>
       val nones   = changes.filter(_.isEmpty)
-      val changed = changes.filter(_ == Some(1))
-      val failed  = changes.filter(_ == Some(0))
+      val changed = changes.filter(_.contains(1))
+      val failed  = changes.filter(_.contains(0))
       Ok(s"Changed: ${changed.size}, Failed: ${failed.size}, No change: ${nones.size}")
     }
   }

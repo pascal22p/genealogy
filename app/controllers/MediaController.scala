@@ -20,7 +20,7 @@ class MediaController @Inject() (
 ) extends BaseController
     with I18nSupport {
 
-  def serveMedia(filename: String) = Action {
+  def serveMedia(filename: String): Action[AnyContent] = Action {
     Try(new File(filename)) match {
       case Success(file) =>
         val path = new File(s"${appConfig.mediaPath}Parois/$file")

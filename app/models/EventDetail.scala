@@ -89,7 +89,7 @@ object EventDetail {
       sourCitations: List[SourCitation]
   ): EventDetail = {
     new EventDetail(
-      eventDetailQueryData.base,
+      eventDetailQueryData.dbId,
       eventDetailQueryData.events_details_id,
       place,
       eventDetailQueryData.addr_id,
