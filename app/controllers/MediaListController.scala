@@ -5,7 +5,7 @@ import javax.inject.Singleton
 
 import scala.concurrent.ExecutionContext
 
-import actions.AuthAction
+import actions.AuthJourney
 import models.AuthenticatedRequest
 import models.MediaType.UnknownMedia
 import play.api.i18n.I18nSupport
@@ -18,7 +18,7 @@ import views.html.MediaList
 
 @Singleton
 class MediaListController @Inject() (
-    authAction: AuthAction,
+    authJourney: AuthJourney,
     getSqlQueries: GetSqlQueries,
     mediaListView: MediaList,
     val controllerComponents: ControllerComponents
@@ -27,7 +27,7 @@ class MediaListController @Inject() (
 ) extends BaseController
     with I18nSupport {
 
-  def showMedias(dbId: Int): Action[AnyContent] = authAction.async {
+  def showMedias(dbId: Int): Action[AnyContent] = authJourney.authWithAdminRight.async {
     implicit request: AuthenticatedRequest[AnyContent] =>
       getSqlQueries.getMedias(None, UnknownMedia, dbId).map { medias =>
         Ok(mediaListView(medias))
