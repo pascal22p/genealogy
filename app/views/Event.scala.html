@@ -1,13 +1,13 @@
 @import models.Person
 @import play.twirl.api.HtmlFormat
-@import views.html.components.{Block, SourCitation, LastModified}
+@import views.html.components.{Block, SourCitations, LastModified}
 @import models.EventType.{IndividualEvent, FamilyEvent, UnknownEvent}
 @import models.SourCitationType.EventSourCitation
 @import controllers.routes.Assets
 
 @this(
   main: Main,
-  sourCitation: SourCitation,
+  sourCitations: SourCitations,
   lastModified: LastModified,
   govukSummaryList: GovukSummaryList)
 
@@ -93,6 +93,6 @@
     )
   )
 
-  @sourCitation(dbId, event.sourCitations, event.events_details_id, EventSourCitation)
+  @sourCitations(dbId, event.sourCitations, event.events_details_id, EventSourCitation)
   
 }
