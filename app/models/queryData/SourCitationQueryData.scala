@@ -36,19 +36,19 @@ object SourCitationQueryData {
       get[String]("sour_citations_subm") ~
       get[Option[Instant]]("sour_citations_timestamp") ~
       get[Option[Int]]("sour_records_id") ~
-      get[String]("sour_records_auth") ~
-      get[String]("sour_records_title") ~
-      get[String]("sour_records_abbr") ~
-      get[String]("sour_records_publ") ~
-      get[String]("sour_records_agnc") ~
-      get[String]("sour_records_rin") ~
+      get[Option[String]]("sour_records_auth") ~
+      get[Option[String]]("sour_records_title") ~
+      get[Option[String]]("sour_records_abbr") ~
+      get[Option[String]]("sour_records_publ") ~
+      get[Option[String]]("sour_records_agnc") ~
+      get[Option[String]]("sour_records_rin") ~
       get[Option[Instant]]("sour_records_timestamp") ~
       get[Option[Int]]("genea_sour_records.repo_id") ~
-      get[String]("repo_caln") ~
-      get[String]("repo_medi") ~
+      get[Option[String]]("repo_caln") ~
+      get[Option[String]]("repo_medi") ~
       get[Option[Int]]("owner_id") ~
       get[String]("source_type") ~
-      get[Int]("base")).map {
+      get[Int]("genea_sour_citations.base")).map {
       case id ~ recordId ~ page ~ even ~ role ~ dates ~ text ~ quay ~ subm ~ timeStamp ~
           sourRecordId ~ auth ~ title ~ abbr ~ publ ~ agnc ~ rin ~ sourRecordTimestamp ~ repoId ~ repoCaln ~ repoMedi ~
           ownerId ~ sourceType ~ base =>
@@ -57,15 +57,15 @@ object SourCitationQueryData {
           sourRecordId.map(id =>
             SourRecord(
               id,
-              auth,
-              title,
-              abbr,
-              publ,
-              agnc,
-              rin,
+              auth.getOrElse(""),
+              title.getOrElse(""),
+              abbr.getOrElse(""),
+              publ.getOrElse(""),
+              agnc.getOrElse(""),
+              rin.getOrElse(""),
               repoId,
-              repoCaln,
-              repoMedi,
+              repoCaln.getOrElse(""),
+              repoMedi.getOrElse(""),
               sourRecordTimestamp.getOrElse(Instant.now)
             )
           ),

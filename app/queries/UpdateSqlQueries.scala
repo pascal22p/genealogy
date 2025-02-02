@@ -117,6 +117,7 @@ final class UpdateSqlQueries @Inject() (db: Database, databaseExecutionContext: 
             |sour_citations_data_text = {sour_citations_data_text},
             |sour_citations_quay = {sour_citations_quay},
             |sour_citations_subm = {sour_citations_subm},
+            |sour_records_id = {sour_records_id},
             |sour_citations_timestamp = {sour_citations_timestamp}
             |WHERE sour_citations_id = {id}
             |""".stripMargin)
@@ -128,6 +129,7 @@ final class UpdateSqlQueries @Inject() (db: Database, databaseExecutionContext: 
           "sour_citations_data_text"  -> sourCitation.text,
           "sour_citations_quay"       -> sourCitation.quay,
           "sour_citations_subm"       -> sourCitation.subm,
+          "sour_records_id"           -> sourCitation.record.map(_.id),
           "sour_citations_timestamp"  -> Instant.now,
           "id"                        -> sourCitation.id
         )
