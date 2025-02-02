@@ -20,7 +20,7 @@ final case class SourCitation(
     sourceType: SourCitationType,
     medias: List[Media] = List.empty
 ) {
-  def toForm =
+  def toForm: SourCitationForm =
     SourCitationForm(
       dates,
       even,
@@ -34,7 +34,7 @@ final case class SourCitation(
 
   def fromForm(sourCitationForm: SourCitationForm): SourCitation = SourCitation(
     id,
-    record,
+    sourCitationForm.recordId.map(id => SourRecord(id, "", "", "", "", "", "", None, "", "", Instant.now())),
     sourCitationForm.page,
     sourCitationForm.even,
     sourCitationForm.role,

@@ -13,10 +13,12 @@
         block: Block,
         govukInput: GovukInput,
         govukButton: GovukButton,
+        govukTextarea: GovukTextarea,
+        govukSelect: GovukSelect,
         govukErrorSummary: GovukErrorSummary
 )
 
-@(sourCitationForm: Form[SourCitationForm], baseId: Int, ownerId: Int, ownerType: SourCitationType)(implicit request: AuthenticatedRequest[?], messages: Messages)
+@(sourCitationForm: Form[SourCitationForm], baseId: Int, ownerId: Int, ownerType: SourCitationType, sourRecords: List[SourRecord])(implicit request: AuthenticatedRequest[?], messages: Messages)
 
 @main(1, None) {
 
@@ -71,8 +73,8 @@
                 classes = "govuk-!-width-one-half"
             ).withFormField(sourCitationForm("submitter"))
         )
-        @govukInput(
-            Input(
+        @govukTextarea(
+            Textarea(
                 label = Label(content = Text("Text")),
                 hint = Some(Hint(
                     content = Text("A verbatim copy of any description contained within the source.")
@@ -98,13 +100,15 @@
                 classes = "govuk-!-width-one-half"
             ).withFormField(sourCitationForm("quay"))
         )
-        @govukInput(
-            Input(
-                label = Label(content = Text("Record id")),
+        @govukSelect(
+            Select(
+                items =
+                    Seq(SelectItem(value = Some(""), text = "Unknown")) ++ sourRecords.map(p => SelectItem(value = Some(p.id.toString), text = p.title + "/ " + p.repoCaln)).sortBy(_.text),
+                label = Label(
+                    content = Text("Sour Record")),
                 hint = Some(Hint(
-                    content = Text("id of the source record where the citation is made")
-                )),
-                classes = "govuk-!-width-one-half"
+                    content = HtmlContent("Source record where the citation is from")
+                ))
             ).withFormField(sourCitationForm("recordId"))
         )
         @govukButton(

@@ -9,10 +9,11 @@
         govukTextarea: GovukTextarea,
         govukInput: GovukInput,
         govukButton: GovukButton,
+        govukSelect: GovukSelect,
         formWithCSRF: FormWithCSRF
 )
 
-@(dbId: Int, sourCitationForm: Form[SourCitationForm], sourCitation: SourCitation)(implicit request: AuthenticatedRequest[?], messages: Messages)
+@(dbId: Int, sourCitationForm: Form[SourCitationForm], sourCitation: SourCitation, sourRecords: List[SourRecord])(implicit request: AuthenticatedRequest[?], messages: Messages)
 
 @main(dbId, None) {
 
@@ -93,7 +94,6 @@
                 classes = "govuk-!-width-one-half"
             ).withFormField(sourCitationForm("page"))
         )
-
         @govukInput(
             Input(
                 label = Label(content = Text("Quay")),
@@ -102,6 +102,17 @@
                 )),
                 classes = "govuk-!-width-one-half"
             ).withFormField(sourCitationForm("quay"))
+        )
+        @govukSelect(
+            Select(
+                items =
+                    Seq(SelectItem(value = Some(""), text = "Unknown")) ++ sourRecords.map(p => SelectItem(value = Some(p.id.toString), text = p.title + "/ " + p.repoCaln)).sortBy(_.text),
+                label = Label(
+                    content = Text("Sour Record")),
+                hint = Some(Hint(
+                    content = HtmlContent("Source record where the citation is from")
+                ))
+            ).withFormField(sourCitationForm("recordId"))
         )
 
         @govukButton(

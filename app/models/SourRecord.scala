@@ -51,9 +51,9 @@ object SourRecord {
       get[Option[Int]]("repo_id") ~
       get[String]("repo_caln") ~
       get[String]("repo_medi") ~
-      get[Instant]("sour_records_timestamp")).map {
+      get[Option[Instant]]("sour_records_timestamp")).map {
       case id ~ auth ~ title ~ abbr ~ publ ~ agnc ~ rin ~ repoId ~ repoCaln ~ repoMedi ~ timestamp =>
-        SourRecord(id, auth, title, abbr, publ, agnc, rin, repoId, repoCaln, repoMedi, timestamp)
+        SourRecord(id, auth, title, abbr, publ, agnc, rin, repoId, repoCaln, repoMedi, timestamp.getOrElse(Instant.now))
     }
   }
 }

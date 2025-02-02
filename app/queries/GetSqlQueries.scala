@@ -342,4 +342,12 @@ final class GetSqlQueries @Inject() (db: Database, databaseExecutionContext: Dat
     }
   }(databaseExecutionContext)
 
+  def getAllSourRecords: Future[List[SourRecord]] = Future {
+    db.withConnection { implicit conn =>
+      SQL("""SELECT *
+            |FROM genea_sour_records""".stripMargin)
+        .as[List[SourRecord]](SourRecord.mysqlParser.*)
+    }
+  }(databaseExecutionContext)
+
 }

@@ -13,6 +13,7 @@ import play.api.data.Form
 import play.api.i18n.*
 import play.api.mvc.*
 import play.api.Logging
+import queries.GetSqlQueries
 import queries.InsertSqlQueries
 import views.html.add.AddSourCitation
 import views.html.ServiceUnavailable
@@ -21,6 +22,7 @@ import views.html.ServiceUnavailable
 class AddSourCitationController @Inject() (
     authJourney: AuthJourney,
     insertSqlQueries: InsertSqlQueries,
+    getSqlQueries: GetSqlQueries,
     addSourCitationView: AddSourCitation,
     serviceUnavailableView: ServiceUnavailable,
     val controllerComponents: ControllerComponents
@@ -32,14 +34,18 @@ class AddSourCitationController @Inject() (
 
   def showForm(baseId: Int, ownerId: Int, sourCitationType: SourCitationType): Action[AnyContent] =
     authJourney.authWithAdminRight.async { implicit authenticatedRequest: AuthenticatedRequest[AnyContent] =>
-      val form = SourCitationForm.sourCitationForm
-      Future.successful(Ok(addSourCitationView(form, baseId, ownerId, sourCitationType)))
+      getSqlQueries.getAllSourRecords.map { records =>
+        val form = SourCitationForm.sourCitationForm
+        Ok(addSourCitationView(form, baseId, ownerId, sourCitationType, records))
+      }
     }
 
   def onSubmit(baseId: Int, ownerId: Int, sourCitationType: SourCitationType): Action[AnyContent] =
     authJourney.authWithAdminRight.async { implicit authenticatedRequest =>
       val errorFunction: Form[SourCitationForm] => Future[Result] = { (formWithErrors: Form[SourCitationForm]) =>
-        Future.successful(BadRequest(addSourCitationView(formWithErrors, baseId, ownerId, sourCitationType)))
+        getSqlQueries.getAllSourRecords.map { records =>
+          BadRequest(addSourCitationView(formWithErrors, baseId, ownerId, sourCitationType, records))
+        }
       }
 
       val successFunction: SourCitationForm => Future[Result] = { (dataForm: SourCitationForm) =>
