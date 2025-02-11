@@ -201,4 +201,21 @@ final class InsertSqlQueries @Inject() (db: Database, databaseExecutionContext: 
     }
   }(databaseExecutionContext))
 
+  def linkTable(table: String, values: Map[String, Int]): Future[Boolean] = Future {
+    db.withConnection { implicit conn =>
+      SQL(
+        s"""INSERT INTO $table
+           | (${values.keys.mkString(", ")})
+           | VALUES (${values.keys.map(v => s"{$v}").mkString(", ")})
+        """.stripMargin
+      )
+        .on(
+          values.map {
+            case (key, value) => NamedParameter(key, value)
+          }.toList*
+        )
+        .execute()
+    }
+  }(databaseExecutionContext)
+
 }
