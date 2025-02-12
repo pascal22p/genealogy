@@ -55,4 +55,4 @@ jobs:
         password: ${{ secrets.DOCKER_HUB_PASSWORD }}
 
     - name: Build and publish Docker image
-      run: sbt Docker/publish -d -v
+      run: sbt Docker/publish
