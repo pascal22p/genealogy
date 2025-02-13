@@ -11,8 +11,8 @@
     actions = Some(Actions(
       items = Seq(
           ActionItem(
-              href = "add",
-              content = Text("Add")
+              href = controllers.link.routes.LinkSourCitationToMediaController.showForm(1, 1).url,
+              content = Text("Link")
           )
       )
     ))

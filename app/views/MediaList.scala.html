@@ -1,21 +1,31 @@
 @import models.SessionData
 @import models.MediaType.MediaType
 @import models.MediaType.{EventMedia, IndividualMedia, FamilyMedia, SourCitationMedia}
+@import views.html.components.LastModified
 
 @this(
         main: Main,
+        lastModified: LastModified,
         govukSummaryList: GovukSummaryList
 )
 
-@(medias: List[Media])(implicit request: AuthenticatedRequest[?], messages: Messages)
+@(dbId: Int, medias: List[Media])(implicit request: AuthenticatedRequest[?], messages: Messages)
 
-@link(id: Int, dbId: Int, mediaType: MediaType): String = @{
+@link(id: Int, dbId: Int, mediaType: MediaType): Option[String] = @{
   mediaType match {
-    case _: EventMedia.type        => routes.EventController.showEvent(dbId, id).url
-    case _: IndividualMedia.type   => routes.IndividualController.showPerson(dbId, id).url
-    case _: FamilyMedia.type       => "#"
-    case _: SourCitationMedia.type => routes.SourCitationController.showSourCitation(dbId, id).url
-    case _                 => "#"
+    case _: EventMedia.type        => Some(routes.EventController.showEvent(dbId, id).url)
+    case _: IndividualMedia.type   => Some(routes.IndividualController.showPerson(dbId, id).url)
+    case _: FamilyMedia.type       => None
+    case _: SourCitationMedia.type => Some(routes.SourCitationController.showSourCitation(dbId, id).url)
+    case _                 => None
+  }
+}
+
+@keyContent(media: Media): String = @{
+  if(media.title.isEmpty) {
+    media.filename
+  } else {
+    media.title
   }
 }
 
@@ -23,22 +33,62 @@
 
   @govukSummaryList(
     SummaryList(
-      rows = medias.map { media =>
+      rows = medias.filter(_.ownerId.isEmpty).map { media =>
         SummaryListRow(
-          key = Key(Text(media.title)),
-          value = Value(HtmlContent(s"""<img src="${routes.MediaController.serveMedia(media.filename)}" style="width:90%;"/>""")),
+          key = Key(HtmlContent(keyContent(media))),
+          value = Value(HtmlContent(s"""${lastModified(media.timestamp)}<br /><img src="${routes.MediaController.serveMedia(media.filename)}" style="width:90%;"/>""")),
           classes = "",
           actions = Some(Actions(
             items = Seq(
-              ActionItem(
-                href = link(media.ownerId.getOrElse(-1), media.dbId, media.mediaType),
+              link(media.ownerId.getOrElse(-1), media.dbId, media.mediaType).map { aLink => ActionItem(
+                href = aLink,
                 content = Text("View")
-              ),
-              ActionItem(
+              )},
+              Some(ActionItem(
                 href = "#",
                 content = Text("Delete")
+              ))
+            ).flatten
+          ))
+        )
+      },
+      card = Some(Card(
+        title = Some(CardTitle(content = Text("Orphaned medias"))),
+        actions = Some(
+          Actions(
+            items = Seq(
+              ActionItem(
+                href = controllers.add.routes.AddMediaController.showForm(dbId).url,
+                content = Text("Add")
               )
             )
+          )),
+        classes = "govuk-!-margin-4",
+        attributes = Map.empty
+      )),
+      classes = "",
+      attributes = Map.empty
+    )
+  )
+
+  @govukSummaryList(
+    SummaryList(
+      rows = medias.filter(_.ownerId.isDefined).map { media =>
+        SummaryListRow(
+          key = Key(HtmlContent(keyContent(media))),
+          value = Value(HtmlContent(s"""${lastModified(media.timestamp)}<br /><img src="${routes.MediaController.serveMedia(media.filename)}" style="width:90%;"/>""")),
+          classes = "",
+          actions = Some(Actions(
+            items = Seq(
+              link(media.ownerId.getOrElse(-1), media.dbId, media.mediaType).map { aLink => ActionItem(
+                href = aLink,
+                content = Text("View")
+              )},
+              Some(ActionItem(
+                href = "#",
+                content = Text("Delete")
+              ))
+            ).flatten
           ))
         )
       },
@@ -48,7 +98,7 @@
           Actions(
             items = Seq(
               ActionItem(
-                href = "#",
+                href = controllers.add.routes.AddMediaController.showForm(dbId).url,
                 content = Text("Add")
               )
             )

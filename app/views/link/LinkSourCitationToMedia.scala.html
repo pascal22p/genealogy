@@ -1,0 +1,64 @@
+@import models.forms.LinkForm
+@import play.twirl.api.HtmlFormat
+@import views.html.components.{Block, OneSourCitation, LastModified}
+@import models.EventType.{IndividualEvent, FamilyEvent, UnknownEvent}
+@import models.{SourCitation => ModelSourCitation}
+@import models.SourCitationType.{EventSourCitation, IndividualSourCitation, FamilySourCitation}
+@import controllers.routes.Assets
+@import uk.gov.hmrc.govukfrontend.views.Implicits.*
+
+@this(
+  main: Main,
+  block: Block,
+        govukSelect: GovukSelect,
+        govukButton: GovukButton,
+        formWithCSRF: FormWithCSRF
+)
+
+@(dbId: Int, sourCitationId: Int, linkForm: Form[LinkForm], allMedias: List[Media])(implicit request: AuthenticatedRequest[?], messages: Messages)
+
+@keyContent(media: Media): String = @{
+  if(media.title.isEmpty) {
+    media.filename
+  } else {
+    media.title
+  }
+}
+
+@main(dbId, None) {
+
+  @block("Link media to source citation") {
+    @if(linkForm.hasGlobalErrors) {
+      @for(error <- linkForm.globalErrors) {
+        <span class="error-message">@error.format(messages)</span>
+      }
+    }
+
+    @if(linkForm.hasErrors) {
+      @for(error <- linkForm.errors) {
+        <span class="error-message">@error.format(messages)</span>
+      }
+    }
+
+    @formWithCSRF(controllers.link.routes.LinkSourCitationToMediaController.onSubmit(dbId, sourCitationId)) {
+      @govukSelect(
+        Select(
+          items =
+            allMedias.map(p => SelectItem(value = Some(p.id.toString), text = keyContent(p))),
+          label = Label(
+            content = Text("Media")),
+          hint = Some(Hint(
+            content = HtmlContent("Media to link to the source citation")
+          ))
+        ).withFormField(linkForm("linkId"))
+      )
+      @govukButton(Button(
+        content = Text("Submit"),
+        name = Some("submit"),
+        href = None,
+        inputType = Some("submit")))
+    }
+
+  }
+  
+}

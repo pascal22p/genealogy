@@ -8,6 +8,7 @@
 ->      /add                                   add.Routes
 ->      /delete                                delete.Routes
 ->      /edit                                  edit.Routes
+->      /link                                  link.Routes
 ->      /admin                                 admin.Routes
 
 
@@ -16,7 +17,7 @@ GET     /base/:baseId/surnames                    controllers.HomeController.sho
 GET     /base/:baseId/surname/:name/firstnames    controllers.HomeController.showFirstnames(baseId: Int, name: String)
 GET     /base/:baseId/individual/:id              controllers.IndividualController.showPerson(baseId: Int, id: Int)
 GET     /base/:baseId/event/:id                   controllers.EventController.showEvent(baseId: Int, id: Int)
-GET     /base/:baseId/sour-citation/:id           controllers.SourCitationController.showSourCitation(baseId: Int, id: Int)
+GET     /base/:baseId/source-citation/:id           controllers.SourCitationController.showSourCitation(baseId: Int, id: Int)
 GET     /base/:baseId/family/:id                  controllers.FamilyController.showFamily(baseId: Int, id: Int)
 GET     /descendant/:id                           controllers.DescendanceController.showDescendant(id: Int)
 GET     /ascendant/:id                            controllers.AscendanceController.showAscendant(id: Int)
