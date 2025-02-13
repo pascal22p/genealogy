@@ -23,19 +23,6 @@ jobs:
           VERSION=$(grep -m 1 'version :=' build.sbt | cut -d'"' -f2)
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
-      - name: Generate release notes
-        id: release_notes
-        run: |
-          PREVIOUS_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
-          echo "NOTES<<EOF" >> $GITHUB_ENV
-          echo "## What's Changed" >> $GITHUB_ENV
-          if [ -z "$PREVIOUS_TAG" ]; then
-            git log --pretty=format:"* %s" >> $GITHUB_ENV
-          else
-            git log --pretty=format:"* %s" ${PREVIOUS_TAG}..HEAD >> $GITHUB_ENV
-          fi
-          echo "EOF" >> $GITHUB_ENV
-
       - name: Build universal package
         run: sbt Universal/packageBin Universal/packageZipTarball
 
@@ -55,8 +42,8 @@ jobs:
         with:
           tag_name: v${{ env.VERSION }}
           name: Release v${{ env.VERSION }}
-          body: ${{ env.NOTES }}
-          draft: false
+          body: " env.NOTES "
+          draft: true
           prerelease: false
           files: |
             target/universal/your-app-${{ env.VERSION }}.zip
