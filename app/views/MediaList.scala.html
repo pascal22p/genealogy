@@ -9,7 +9,7 @@
         govukSummaryList: GovukSummaryList
 )
 
-@(medias: List[Media])(implicit request: AuthenticatedRequest[?], messages: Messages)
+@(dbId: Int, medias: List[Media])(implicit request: AuthenticatedRequest[?], messages: Messages)
 
 @link(id: Int, dbId: Int, mediaType: MediaType): Option[String] = @{
   mediaType match {
@@ -33,7 +33,47 @@
 
   @govukSummaryList(
     SummaryList(
-      rows = medias.map { media =>
+      rows = medias.filter(_.ownerId.isEmpty).map { media =>
+        SummaryListRow(
+          key = Key(HtmlContent(keyContent(media))),
+          value = Value(HtmlContent(s"""${lastModified(media.timestamp)}<br /><img src="${routes.MediaController.serveMedia(media.filename)}" style="width:90%;"/>""")),
+          classes = "",
+          actions = Some(Actions(
+            items = Seq(
+              link(media.ownerId.getOrElse(-1), media.dbId, media.mediaType).map { aLink => ActionItem(
+                href = aLink,
+                content = Text("View")
+              )},
+              Some(ActionItem(
+                href = "#",
+                content = Text("Delete")
+              ))
+            ).flatten
+          ))
+        )
+      },
+      card = Some(Card(
+        title = Some(CardTitle(content = Text("Orphaned medias"))),
+        actions = Some(
+          Actions(
+            items = Seq(
+              ActionItem(
+                href = controllers.add.routes.AddMediaController.showForm(dbId).url,
+                content = Text("Add")
+              )
+            )
+          )),
+        classes = "govuk-!-margin-4",
+        attributes = Map.empty
+      )),
+      classes = "",
+      attributes = Map.empty
+    )
+  )
+
+  @govukSummaryList(
+    SummaryList(
+      rows = medias.filter(_.ownerId.isDefined).map { media =>
         SummaryListRow(
           key = Key(HtmlContent(keyContent(media))),
           value = Value(HtmlContent(s"""${lastModified(media.timestamp)}<br /><img src="${routes.MediaController.serveMedia(media.filename)}" style="width:90%;"/>""")),
@@ -58,7 +98,7 @@
           Actions(
             items = Seq(
               ActionItem(
-                href = "#",
+                href = controllers.add.routes.AddMediaController.showForm(dbId).url,
                 content = Text("Add")
               )
             )

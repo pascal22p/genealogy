@@ -123,13 +123,35 @@ final class InsertSqlQueries @Inject() (db: Database, databaseExecutionContext: 
       SQL(
         """INSERT INTO genea_infos 
           | (nom, descriptif, entetes)
-          | VALUES ({name}, {description}, "{headers}")
+          | VALUES ({name}, {description}, {headers})
         """.stripMargin
       )
         .on(
           "name"        -> genealogyDatabase.name,
           "description" -> genealogyDatabase.description,
           "headers"     -> ""
+        )
+        .executeInsert[Option[Int]](parser)
+    }
+  }(databaseExecutionContext))
+
+  def insertMedia(media: Media): OptionT[Future, Int] = OptionT(Future {
+    val parser: ResultSetParser[Option[Int]] = {
+      int("insert_id").singleOpt
+    }
+
+    db.withConnection { implicit conn =>
+      SQL(
+        """INSERT INTO genea_multimedia
+          | (base, media_title, media_format, media_file)
+          | VALUES ({base}, {media_title}, {media_format}, {media_file})
+        """.stripMargin
+      )
+        .on(
+          "base"         -> media.dbId,
+          "media_title"  -> media.title,
+          "media_format" -> media.format,
+          "media_file"   -> media.filename
         )
         .executeInsert[Option[Int]](parser)
     }
