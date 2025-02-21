@@ -16,7 +16,6 @@ import play.api.Logging
 import queries.GetSqlQueries
 import queries.InsertSqlQueries
 import views.html.link.LinkSourCitationToMedia
-import views.html.ServiceUnavailable
 
 @Singleton
 class LinkSourCitationToMediaController @Inject() (
@@ -24,7 +23,6 @@ class LinkSourCitationToMediaController @Inject() (
     insertSqlQueries: InsertSqlQueries,
     getSqlQueries: GetSqlQueries,
     linkSourCitationToMediaView: LinkSourCitationToMedia,
-    serviceUnavailableView: ServiceUnavailable,
     val controllerComponents: ControllerComponents
 )(
     implicit ec: ExecutionContext
@@ -54,9 +52,8 @@ class LinkSourCitationToMediaController @Inject() (
             "rel_sour_citations_multimedia",
             Map("sour_citations_id" -> sourCitationId, "media_id" -> dataForm.linkId)
           )
-          .map {
-            case false => InternalServerError(serviceUnavailableView("No link was inserted"))
-            case true  => Redirect(controllers.routes.SourCitationController.showSourCitation(dbId, sourCitationId))
+          .map { _ =>
+            Redirect(controllers.routes.SourCitationController.showSourCitation(dbId, sourCitationId))
           }
       }
 

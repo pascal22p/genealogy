@@ -21,8 +21,14 @@
   if(media.title.isEmpty) {
     media.filename
   } else {
-    media.title
+    s"${media.title} – ${media.filename}"
   }
+}
+
+@unlinkMedias(medias: List[Media]): List[SelectItem] = @{
+  medias
+  .filter(_.ownerId.isEmpty).sortBy(_.timestamp).reverse
+  .map(p => SelectItem(value = Some(p.id.toString), text = keyContent(p)))
 }
 
 @main(dbId, None) {
@@ -43,8 +49,9 @@
     @formWithCSRF(controllers.link.routes.LinkSourCitationToMediaController.onSubmit(dbId, sourCitationId)) {
       @govukSelect(
         Select(
-          items =
-            allMedias.map(p => SelectItem(value = Some(p.id.toString), text = keyContent(p))),
+          items = unlinkMedias(allMedias) ++
+                  List(SelectItem(value = None, text = "------------")) ++
+                  allMedias.map(p => SelectItem(value = Some(p.id.toString), text = keyContent(p))),
           label = Label(
             content = Text("Media")),
           hint = Some(Hint(

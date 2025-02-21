@@ -4,14 +4,14 @@
   block: Block,
 )
 
-@(medias: List[ModelMedia])(implicit authenticatedRequest: AuthenticatedRequest[?], messages: Messages)
+@(dbId: Int, sourCitationId: Int, medias: List[ModelMedia])(implicit authenticatedRequest: AuthenticatedRequest[?], messages: Messages)
 
   @block(
     title = "Medias", 
     actions = Some(Actions(
       items = Seq(
           ActionItem(
-              href = controllers.link.routes.LinkSourCitationToMediaController.showForm(1, 1).url,
+              href = controllers.link.routes.LinkSourCitationToMediaController.showForm(dbId, sourCitationId).url,
               content = Text("Link")
           )
       )
