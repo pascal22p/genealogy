@@ -30,7 +30,7 @@ class MediaListController @Inject() (
   def showMedias(dbId: Int): Action[AnyContent] = authJourney.authWithAdminRight.async {
     implicit request: AuthenticatedRequest[AnyContent] =>
       getSqlQueries.getMedias(None, UnknownMedia, dbId).map { medias =>
-        Ok(mediaListView(medias))
+        Ok(mediaListView(dbId, medias.sortBy(_.timestamp).reverse))
       }
   }
 }

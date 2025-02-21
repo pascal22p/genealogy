@@ -213,7 +213,7 @@ final class GetSqlQueries @Inject() (db: Database, databaseExecutionContext: Dat
       } else {
         "WHERE genea_multimedia.base = {dbId}"
       }
-
+      
       SQL(
         s"""SELECT *,
            |       CASE

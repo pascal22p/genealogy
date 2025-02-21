@@ -1,6 +1,7 @@
 package controllers.add
 
 import java.nio.file.Paths
+import java.time.Instant
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -8,6 +9,8 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
 import actions.AuthJourney
+import models.Media
+import models.MediaType
 import play.api.i18n.I18nSupport
 import play.api.libs.Files
 import play.api.mvc.Action
@@ -17,6 +20,7 @@ import play.api.mvc.ControllerComponents
 import play.api.mvc.MultipartFormData
 import play.api.Logging
 import queries.GetSqlQueries
+import queries.InsertSqlQueries
 import views.html.add.AddMedia
 import views.html.ServiceUnavailable
 
@@ -24,6 +28,7 @@ import views.html.ServiceUnavailable
 class AddMediaController @Inject() (
     authJourney: AuthJourney,
     getSqlQueries: GetSqlQueries,
+    insertSqlQueries: InsertSqlQueries,
     addMediaView: AddMedia,
     serviceUnavailableView: ServiceUnavailable,
     val controllerComponents: ControllerComponents
@@ -44,12 +49,16 @@ class AddMediaController @Inject() (
           // only get the last part of the filename
           // otherwise someone can send a path like ../../home/foo/bar.txt to write to other files on the system
           val filename = Paths.get(picture.filename).getFileName
+          val ext      = s"$filename".split("\\.").reverse.headOption.getOrElse("")
 
           getSqlQueries
             .getGenealogyDatabase(baseId)
-            .fold(NotFound("Genealogy database not found")) { genealogyDb =>
+            .foldF(Future.successful(NotFound("Genealogy database not found"))) { genealogyDb =>
               picture.ref.copyTo(Paths.get(s"Medias/${genealogyDb.name}/$filename"), replace = false)
-              Ok(s"File uploaded Medias/${genealogyDb.name}/$filename")
+              val media = Media(0, baseId, "", ext, s"$filename", Instant.now, None, MediaType.UnknownMedia)
+              insertSqlQueries.insertMedia(media).value.map { _ =>
+                Ok(s"File uploaded Medias/${genealogyDb.name}/$filename")
+              }
             }
         }
         .getOrElse {

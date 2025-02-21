@@ -1,0 +1,2 @@
+GET     /base/:baseId/source-citation/:sourCitationId/media                                  controllers.link.LinkSourCitationToMediaController.showForm(baseId: Int, sourCitationId: Int)
+POST    /base/:baseId/source-citation/:sourCitationId/media                                  controllers.link.LinkSourCitationToMediaController.onSubmit(baseId: Int, sourCitationId: Int)
