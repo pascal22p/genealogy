@@ -1,11 +1,15 @@
 import com.typesafe.sbt.packager.docker.DockerChmodType
 import wartremover.Wart.{DefaultArguments, Equals, ImplicitParameter, Overloading, Recursion, Any, Throw, SeqApply, Nothing, IterableOps, MutableDataStructures, Var}
 import play.twirl.sbt.Import.TwirlKeys
+import com.typesafe.sbt.packager.docker.DockerAlias
+import com.github.sbt.git.SbtGit.git
 
 import scala.sys.process.Process
 
+enablePlugins(DockerPlugin)
+enablePlugins(GitPlugin)
 
-ThisBuild / version := "latest"
+ThisBuild / version := "0.2.0"
 ThisBuild / organization := "parois.net"
 ThisBuild / scalaVersion := "3.6.3"
 ThisBuild / scalafmtOnCompile := true
@@ -23,6 +27,59 @@ dockerExposedPorts ++= Seq(9123)
 dockerChmodType := DockerChmodType.UserGroupWriteExecute
 dockerUsername := Some("pascal22p")
 
+// Helper to get the short Git commit hash
+def shortCommitHash: String = {
+  sys.process.Process("git rev-parse --short HEAD").!!.trim
+}
+
+// Check if this is a manual release (e.g., via environment variable or Git tag)
+def isRelease = Def.setting {
+  // Option 1: Check for a RELEASE_BUILD environment variable set in CI
+  sys.env.get("RELEASE_BUILD").contains("true") ||
+    // Option 2: Check if the current commit is tagged with a version (requires sbt-git)
+  (ThisBuild / git.gitCurrentTags).value.exists(_.startsWith("v"))
+}
+
+// Define the Docker version dynamically (snapshot by default)
+Docker / version := {
+  val baseVersion = version.value
+  if (isRelease.value) baseVersion else s"$baseVersion-snapshot-${shortCommitHash}"
+}
+
+// Define Docker aliases (tags)
+Docker / dockerAliases := {
+  val baseVersion = version.value
+  val snapshotTag = s"v$baseVersion-snapshot-${shortCommitHash}"
+  val releaseTag = s"v$baseVersion"
+
+  if (isRelease.value) {
+    Seq(DockerAlias(
+      registryHost = (Docker / dockerRepository).value,
+      username = Some((Docker / packageName).value),
+      name = (Docker / packageName).value,
+      tag = Some(releaseTag)
+    ))
+  } else {
+    Seq(DockerAlias(
+      registryHost = (Docker / dockerRepository).value,
+      username = Some((Docker / packageName).value),
+      name = (Docker / packageName).value,
+      tag = Some(snapshotTag)
+    ))
+  }
+}
+
+Docker / dockerAliases ++= {
+  if (!isRelease.value) {
+    Seq(DockerAlias(
+      registryHost = (Docker / dockerRepository).value,
+      username = Some((Docker / packageName).value),
+      name = (Docker / packageName).value,
+      tag = Some("latest-snapshot")
+    ))
+  } else Nil
+}
+
 lazy val ensureDockerBuildx = taskKey[Unit]("Ensure that docker buildx configuration exists")
 lazy val dockerBuildWithBuildx = taskKey[Unit]("Build docker images using buildx")
 lazy val dockerBuildxSettings = Seq(
@@ -38,6 +95,7 @@ lazy val dockerBuildxSettings = Seq(
         alias + " .", baseDirectory.value / "target" / "docker"/ "stage").!
     )
   },
+  Docker / maintainer := "genealogie@parois.net",
   Docker / publish := Def.sequential(
   Docker / publishLocal,
     ensureDockerBuildx,
@@ -60,7 +118,6 @@ lazy val scoverageSettings = {
 lazy val genealogy = (project in file("."))
   .enablePlugins(PlayScala)
   .enablePlugins(JavaAppPackaging)
-  .enablePlugins(DockerPlugin)
   .settings(
     PlayKeys.playDefaultPort := 9123,
     libraryDependencies ++= LibDependencies.all,
