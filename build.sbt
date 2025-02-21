@@ -53,31 +53,36 @@ Docker / dockerAliases := {
   val releaseTag = s"v$baseVersion"
 
   if (isRelease.value) {
-    Seq(DockerAlias(
-      registryHost = (Docker / dockerRepository).value,
-      username = Some((Docker / packageName).value),
-      name = (Docker / packageName).value,
-      tag = Some(releaseTag)
-    ))
+    Seq(
+      DockerAlias(
+        registryHost = (Docker / dockerRepository).value,
+        username = Some((Docker / packageName).value),
+        name = (Docker / packageName).value,
+        tag = Some(releaseTag)
+      ),
+      DockerAlias(
+        registryHost = (Docker / dockerRepository).value,
+        username = Some((Docker / packageName).value),
+        name = (Docker / packageName).value,
+        tag = Some("latest")
+      )
+    )
   } else {
-    Seq(DockerAlias(
-      registryHost = (Docker / dockerRepository).value,
-      username = Some((Docker / packageName).value),
-      name = (Docker / packageName).value,
-      tag = Some(snapshotTag)
-    ))
+    Seq(
+      DockerAlias(
+        registryHost = (Docker / dockerRepository).value,
+        username = Some((Docker / packageName).value),
+        name = (Docker / packageName).value,
+        tag = Some(snapshotTag)
+      ),
+      DockerAlias(
+        registryHost = (Docker / dockerRepository).value,
+        username = Some((Docker / packageName).value),
+        name = (Docker / packageName).value,
+        tag = Some("latest-snapshot")
+      )
+    )
   }
-}
-
-Docker / dockerAliases ++= {
-  if (!isRelease.value) {
-    Seq(DockerAlias(
-      registryHost = (Docker / dockerRepository).value,
-      username = Some((Docker / packageName).value),
-      name = (Docker / packageName).value,
-      tag = Some("latest-snapshot")
-    ))
-  } else Nil
 }
 
 lazy val ensureDockerBuildx = taskKey[Unit]("Ensure that docker buildx configuration exists")
