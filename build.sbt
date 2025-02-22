@@ -46,45 +46,6 @@ Docker / version := {
   if (isRelease.value) baseVersion else s"$baseVersion-snapshot-${shortCommitHash}"
 }
 
-// Define Docker aliases (tags)
-Docker / dockerAliases := {
-  val baseVersion = version.value
-  val snapshotTag = s"v$baseVersion-snapshot-${shortCommitHash}"
-  val releaseTag = s"v$baseVersion"
-
-  if (isRelease.value) {
-    Seq(
-      DockerAlias(
-        registryHost = (Docker / dockerRepository).value,
-        username = Some((Docker / packageName).value),
-        name = (Docker / packageName).value,
-        tag = Some(releaseTag)
-      ),
-      DockerAlias(
-        registryHost = (Docker / dockerRepository).value,
-        username = Some((Docker / packageName).value),
-        name = (Docker / packageName).value,
-        tag = Some("latest")
-      )
-    )
-  } else {
-    Seq(
-      DockerAlias(
-        registryHost = (Docker / dockerRepository).value,
-        username = Some((Docker / packageName).value),
-        name = (Docker / packageName).value,
-        tag = Some(snapshotTag)
-      ),
-      DockerAlias(
-        registryHost = (Docker / dockerRepository).value,
-        username = Some((Docker / packageName).value),
-        name = (Docker / packageName).value,
-        tag = Some("latest-snapshot")
-      )
-    )
-  }
-}
-
 lazy val ensureDockerBuildx = taskKey[Unit]("Ensure that docker buildx configuration exists")
 lazy val dockerBuildWithBuildx = taskKey[Unit]("Build docker images using buildx")
 lazy val dockerBuildxSettings = Seq(
@@ -95,11 +56,13 @@ lazy val dockerBuildxSettings = Seq(
   },
   dockerBuildWithBuildx := {
     streams.value.log("Building and pushing image with Buildx")
-    dockerAliases.value.foreach(
-      alias => Process("docker buildx build --platform=linux/arm64,linux/amd64 --push -t " +
-        alias + " .", baseDirectory.value / "target" / "docker"/ "stage").!
+    (Docker / dockerAliases).value.foreach(
+      alias =>
+        Process("docker buildx build --platform=linux/arm64,linux/amd64 --push -t " +
+          alias + " .", baseDirectory.value / "target" / "docker" / "stage").!
     )
   },
+  Docker / dockerUsername := dockerUsername.value,
   Docker / maintainer := "genealogie@parois.net",
   Docker / publish := Def.sequential(
   Docker / publishLocal,
@@ -157,7 +120,47 @@ lazy val genealogy = (project in file("."))
       "-Wsafe-init",
       "-Wconf:msg=unused import&src=html/.*:s",
       "-Wconf:src=routes/.*:s"
-    )
+    ),
+
+    // Define Docker aliases (tags)
+    Docker / dockerAliases := {
+      val baseVersion = version.value
+      val snapshotTag = s"v$baseVersion-snapshot-${shortCommitHash}"
+      val releaseTag = s"v$baseVersion"
+
+      if (isRelease.value) {
+        Seq(
+          DockerAlias(
+            registryHost = (Docker / dockerRepository).value,
+            username = dockerUsername.value,
+            name = (Docker / packageName).value,
+            tag = Some(releaseTag)
+          ),
+          DockerAlias(
+            registryHost = (Docker / dockerRepository).value,
+            username = dockerUsername.value,
+            name = (Docker / packageName).value,
+            tag = Some("latest")
+          )
+        )
+      } else {
+        Seq(
+          DockerAlias(
+            registryHost = (Docker / dockerRepository).value,
+            username = dockerUsername.value,
+            name = (Docker / packageName).value,
+            tag = Some(snapshotTag)
+          ),
+          DockerAlias(
+            registryHost = (Docker / dockerRepository).value,
+            username = dockerUsername.value,
+            name = (Docker / packageName).value,
+            tag = Some("latest-snapshot")
+          )
+        )
+      }
+    }
+
   )
 
   Test / scalacOptions --= Seq("-language:strictEquality")
