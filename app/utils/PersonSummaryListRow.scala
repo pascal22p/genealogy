@@ -23,7 +23,6 @@ class PersonSummaryListRow @Inject() ()(implicit val appConfig: AppConfig) {
   )(implicit messages: Messages, authenticatedRequest: AuthenticatedRequest[?]): SummaryListRow = {
     val isAllowedToSee = authenticatedRequest.localSession.sessionData.userData.fold(false)(_.seePrivacy)
 
-    println(s"RRRRR ${person.details.shortName} ${person.details.privacyRestriction}    $isAllowedToSee")
     if (!person.details.privacyRestriction.contains(PrivacyResn) || isAllowedToSee) {
       SummaryListRow(
         key = Key(Text(person.details.shortName)),
@@ -47,7 +46,6 @@ class PersonSummaryListRow @Inject() ()(implicit val appConfig: AppConfig) {
         )
       )
     } else {
-      println("LLLLL")
       SummaryListRow(
         key = Key(Text(appConfig.redactedMask)),
         value = Value(HtmlContent(appConfig.redactedMask)),
