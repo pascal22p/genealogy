@@ -40,8 +40,9 @@ final case class EventDetail(
     val dateRegex               = ".*([0-9]{4}).*".r
     val isAllowedToSee: Boolean = authenticatedRequest.localSession.sessionData.userData.fold(false)(_.seePrivacy)
 
-    events_details_gedcom_date match {
-      case dateRegex(year) if year.toInt > 1900 && !isAllowedToSee => appConfig.redactedMask
+    val maxYear = dateRegex.findAllMatchIn(events_details_gedcom_date).toList.map(_.group(1).toInt).maxOption
+    maxYear match {
+      case Some(year) if year > 1900 && !isAllowedToSee => appConfig.redactedMask
       case _ =>
         CalendarConstants.allKeywords
           .foldLeft(events_details_gedcom_date) {

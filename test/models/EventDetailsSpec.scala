@@ -74,6 +74,37 @@ class EventDetailsSpec extends BaseSpec {
 
       sut.formatDate(messages) shouldBe expected
     }
+
+    "redact date" when {
+      "a simple year is entered" in {
+        implicit val request: AuthenticatedRequest[AnyContentAsEmpty.type] =
+          AuthenticatedRequest(
+            FakeRequest(),
+            Session("", SessionData(Some(UserData(0, "", "", false, false))), LocalDateTime.now)
+          )
+
+        val input    = "1 JAN 1928"
+        val expected = appConfig.redactedMask
+        val sut      = fakeEventDetail(events_details_gedcom_date = input)
+
+        sut.formatDate(messages, request) shouldBe expected
+
+      }
+      "a date range is entered" in {
+        implicit val request: AuthenticatedRequest[AnyContentAsEmpty.type] =
+          AuthenticatedRequest(
+            FakeRequest(),
+            Session("", SessionData(Some(UserData(0, "", "", false, false))), LocalDateTime.now)
+          )
+
+        val input    = "BET 1 JAN 1728 AND 2 FEB 2005"
+        val expected = appConfig.redactedMask
+        val sut      = fakeEventDetail(events_details_gedcom_date = input)
+
+        sut.formatDate(messages, request) shouldBe expected
+
+      }
+    }
   }
 
 }
