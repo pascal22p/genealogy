@@ -6,6 +6,7 @@ import scala.concurrent.Future
 
 import actions.AuthAction
 import models.*
+import models.ResnType.PrivacyResn
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar.mock
@@ -37,7 +38,7 @@ class EventControllerSpec extends BaseSpec {
     "display event details" when {
       "privacy is set and see_privacy is true" in {
         when(mockEventService.getEvent(any())).thenReturn(
-          Future.successful(Some(fakeEventDetail(privacyRestriction = Some("privacy"))))
+          Future.successful(Some(fakeEventDetail(privacyRestriction = Some(PrivacyResn))))
         )
 
         val result = sut.showEvent(1, 1).apply(FakeRequest().withHeaders(("seePrivacy", "true")))
@@ -60,7 +61,7 @@ class EventControllerSpec extends BaseSpec {
   "not display event details" when {
     "privacy is set and see_privacy is false" in {
       when(mockEventService.getEvent(any())).thenReturn(
-        Future.successful(Some(fakeEventDetail(privacyRestriction = Some("privacy"))))
+        Future.successful(Some(fakeEventDetail(privacyRestriction = Some(PrivacyResn))))
       )
 
       val result = sut.showEvent(1, 1).apply(FakeRequest().withHeaders(("seePrivacy", "false")))
@@ -69,7 +70,7 @@ class EventControllerSpec extends BaseSpec {
 
     "privacy is set and UserData is None" in {
       when(mockEventService.getEvent(any())).thenReturn(
-        Future.successful(Some(fakeEventDetail(privacyRestriction = Some("privacy"))))
+        Future.successful(Some(fakeEventDetail(privacyRestriction = Some(PrivacyResn))))
       )
 
       val result = sut.showEvent(1, 1).apply(FakeRequest().withHeaders(("userData", "false")))

@@ -1,7 +1,10 @@
 @import controllers.routes
+@import utils.PersonSummaryListRow
 
 @this(
-    govukSummaryList: GovukSummaryList)
+    personSummaryListRow: PersonSummaryListRow,
+    govukSummaryList: GovukSummaryList
+)
 
 @(dbId: Int, person: Person)(implicit authenticatedRequest: AuthenticatedRequest[?], messages: Messages)
 
@@ -13,36 +16,8 @@
     @govukSummaryList(
         SummaryList(
             rows = Seq(
-                parents.family.parent1.map { parent =>
-                    SummaryListRow(
-                        key = Key(Text(parent.details.shortName)),
-                        value = Value(HtmlContent(parent.events.birthAndDeathDate)),
-                        classes = "govuk-summary-list__row--no-border",
-                        actions = Some(Actions(
-                            items = Seq(
-                                ActionItem(
-                                    href = controllers.routes.IndividualController.showPerson(dbId, parent.details.id).url,
-                                    content = Text("View")
-                                )
-                            )
-                        ))
-                    )
-                },
-                parents.family.parent2.map { parent =>
-                    SummaryListRow(
-                        key = Key(Text(parent.details.shortName)),
-                        value = Value(HtmlContent(parent.events.birthAndDeathDate)),
-                        classes = "govuk-summary-list__row--no-border",
-                        actions = Some(Actions(
-                            items = Seq(
-                                ActionItem(
-                                    href = controllers.routes.IndividualController.showPerson(dbId, parent.details.id).url,
-                                    content = Text("View")
-                                )
-                            )
-                        ))
-                    )
-                }
+                parents.family.parent1.map( parent => personSummaryListRow.personSummaryListRow(dbId, parent)),
+                parents.family.parent2.map( parent => personSummaryListRow.personSummaryListRow(dbId, parent)),
             ).flatten,
             card = Some(Card(
                 title = Some(CardTitle(content = Text(parentTitle(parents.relaType).toString))),

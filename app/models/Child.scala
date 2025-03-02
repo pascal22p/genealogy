@@ -20,11 +20,11 @@ object Child {
       get[String]("indi_nick") ~
       get[String]("indi_spfx") ~
       get[String]("indi_nsfx") ~
+      get[Option[String]]("indi_resn") ~
       get[String]("rela_type") ~
       get[Option[String]]("rela_stat")).map {
-      // get[String]("indi_resn") map {
       case id ~ base ~ surname ~ firstname ~ sex ~ timestamp ~ firstnamePrefix ~
-          nameGiven ~ nameNickname ~ surnamePrefix ~ nameSuffix ~ relaType ~ relaStat =>
+          nameGiven ~ nameNickname ~ surnamePrefix ~ nameSuffix ~ resn ~ relaType ~ relaStat =>
         Child(
           Person(
             PersonDetails(
@@ -39,7 +39,7 @@ object Child {
               nameSuffix,
               nameGiven,
               nameNickname,
-              None
+              resn.flatMap(ResnType.fromString)
             ),
             Events(List.empty, Some(id), EventType.IndividualEvent),
             Attributes(List.empty, Some(id), EventType.IndividualEvent)

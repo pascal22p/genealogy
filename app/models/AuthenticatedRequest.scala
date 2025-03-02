@@ -5,5 +5,5 @@ import play.api.mvc.WrappedRequest
 
 final case class AuthenticatedRequest[A](request: Request[A], localSession: Session)
     extends WrappedRequest[A](request) {
-  def isAdmin: Boolean = localSession.sessionData.userData.map(_.isAdmin).getOrElse(false)
+  def isAdmin: Boolean = localSession.sessionData.userData.exists(_.isAdmin)
 }

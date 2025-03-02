@@ -6,6 +6,7 @@ import javax.inject.Singleton
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
+import cats.implicits.*
 import models.*
 import models.EventType.IndividualEvent
 
@@ -28,7 +29,14 @@ class PersonService @Inject() (
     if (omitFamilies) {
       Future.successful(List.empty[Family])
     } else {
-      familyService.getFamiliesAsPartner(id, omitSources)
+      familyService.getFamilyIdsFromPartnerId(id).flatMap { families =>
+        families
+          .map { id =>
+            familyService.getFamilyDetails(id, omitSources)
+          }
+          .sequence
+          .map(_.flatten)
+      }
     }
   }
 

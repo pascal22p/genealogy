@@ -43,9 +43,9 @@ class DatabaseFixes @Inject() (
         localDate match {
           case Some(date) =>
             val days = ChronoUnit.DAYS.between(CalendarConstants.startOfAllTime, date)
-            updateSqlQueries.updateEventNumberofDays(event.events_details_id, Some(days)).map(Some(_))
+            updateSqlQueries.updateEventNumberOfDays(event.events_details_id, Some(days)).map(Some(_))
           case None =>
-            updateSqlQueries.updateEventNumberofDays(event.events_details_id, None).map(_ => None)
+            updateSqlQueries.updateEventNumberOfDays(event.events_details_id, None).map(_ => None)
         }
       }
     }

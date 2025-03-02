@@ -1,5 +1,8 @@
 package models
 
+import java.time.LocalDateTime
+
+import config.AppConfig
 import org.scalatest.matchers.should.Matchers.should
 import org.scalatest.matchers.should.Matchers.shouldBe
 import org.scalatestplus.play.*
@@ -7,6 +10,8 @@ import play.api.i18n.Lang
 import play.api.i18n.Messages
 import play.api.i18n.MessagesApi
 import play.api.i18n.MessagesImpl
+import play.api.mvc.AnyContentAsEmpty
+import play.api.test.FakeRequest
 import testUtils.BaseSpec
 
 class EventDetailsSpec extends BaseSpec {
@@ -14,6 +19,12 @@ class EventDetailsSpec extends BaseSpec {
   implicit def messagesApi: MessagesApi = app.injector.instanceOf[MessagesApi]
 
   implicit lazy val messages: Messages = MessagesImpl(Lang("en"), messagesApi)
+  implicit val request: AuthenticatedRequest[AnyContentAsEmpty.type] =
+    AuthenticatedRequest(
+      FakeRequest(),
+      Session("", SessionData(Some(UserData(0, "", "", true, true))), LocalDateTime.now)
+    )
+  implicit val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
 
   "formatDate" must {
     "format 5 APR 1204" in {

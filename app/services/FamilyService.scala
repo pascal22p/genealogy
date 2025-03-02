@@ -36,24 +36,8 @@ class FamilyService @Inject() (
     }
   }
 
-  def getFamiliesAsPartner(
-      id: Int,
-      omitSources: Boolean = false
-  ): Future[List[Family]] = {
-    mariadbQueries.getFamiliesAsPartner(id).flatMap { families =>
-      families
-        .traverse(family => getFamilyDetails(family.id, omitSources))
-        .flatMap { families =>
-          families.flatten.traverse { family =>
-            for {
-              events   <- eventService.getFamilyEvents(family.id, omitSources)
-              children <- getChildren(family.id, omitSources)
-            } yield {
-              family.copy(children = children, events = Events(events, Some(family.id), FamilyEvent))
-            }
-          }
-        }
-    }
+  def getFamilyIdsFromPartnerId(id: Int): Future[List[Int]] = {
+    mariadbQueries.getFamilyIdsFromPartnerId(id)
   }
 
   def getFamilyDetails(id: Int, omitSources: Boolean = false): Future[Option[Family]] = {
@@ -62,10 +46,12 @@ class FamilyService @Inject() (
       .flatMap(families =>
         families.traverse { family =>
           for {
-            parent1 <- family.parent1.traverse(personDetailsService.getPersonDetails).map(_.flatten)
-            events1 <- parent1.traverse(i => eventService.getIndividualEvents(i.id, omitSources))
-            parent2 <- family.parent2.traverse(personDetailsService.getPersonDetails).map(_.flatten)
-            events2 <- parent2.traverse(i => eventService.getIndividualEvents(i.id, omitSources))
+            parent1      <- family.parent1.traverse(personDetailsService.getPersonDetails).map(_.flatten)
+            events1      <- parent1.traverse(i => eventService.getIndividualEvents(i.id, omitSources))
+            parent2      <- family.parent2.traverse(personDetailsService.getPersonDetails).map(_.flatten)
+            events2      <- parent2.traverse(i => eventService.getIndividualEvents(i.id, omitSources))
+            familyEvents <- eventService.getFamilyEvents(id)
+            children     <- getChildren(family.id, omitSources)
           } yield {
             Family(
               family,
@@ -84,7 +70,9 @@ class FamilyService @Inject() (
                   Attributes(List.empty, Some(family.id), FamilyEvent),
                   List.empty
                 )
-              )
+              ),
+              children,
+              familyEvents
             )
           }
         }

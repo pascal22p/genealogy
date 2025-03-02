@@ -2,6 +2,7 @@ package models
 
 import java.time.Instant
 
+import config.AppConfig
 import models.forms.EventDetailForm
 import models.queryData.EventDetailQueryData
 import models.EventType.EventType
@@ -28,24 +29,30 @@ final case class EventDetail(
     eventType: EventType,
     sourCount: Int,
     ownerId: Option[Int],
-    privacyRestriction: Option[String],
+    privacyRestriction: Option[ResnType.ResnType],
     sourCitations: List[SourCitation] = List.empty
 ) {
-  def formatDate(implicit messages: Messages): String = {
-    val dateRegex = ".*([0-9]{1,2} [a-zA-Z]{3,4} [0-9]{1,4}).*".r
+  def formatDate(
+      implicit messages: Messages,
+      authenticatedRequest: AuthenticatedRequest[?],
+      appConfig: AppConfig
+  ): String = {
+    val dateRegex               = ".*([0-9]{4}).*".r
+    val isAllowedToSee: Boolean = authenticatedRequest.localSession.sessionData.userData.fold(false)(_.seePrivacy)
+
     events_details_gedcom_date match {
-      case dateRegex(exactDate) =>
-      case _                    => events_details_gedcom_date
+      case dateRegex(year) if year.toInt > 1900 && !isAllowedToSee => appConfig.redactedMask
+      case _ =>
+        CalendarConstants.allKeywords
+          .foldLeft(events_details_gedcom_date) {
+            case (formattedDate, replace) =>
+              replace._1.replaceAllIn(formattedDate, messages(replace._2))
+          }
+          .trim
     }
-    CalendarConstants.allKeywords
-      .foldLeft(events_details_gedcom_date) {
-        case (formattedDate, replace) =>
-          replace._1.replaceAllIn(formattedDate, messages(replace._2))
-      }
-      .trim
   }
 
-  def toForm =
+  def toForm: EventDetailForm =
     EventDetailForm(
       base,
       place.map(_.id),

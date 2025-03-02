@@ -16,7 +16,13 @@ final case class Family(
 )
 
 object Family {
-  def apply(familyQueryData: FamilyQueryData, parent1: Option[Person], parent2: Option[Person]): Family = {
+  def apply(
+      familyQueryData: FamilyQueryData,
+      parent1: Option[Person],
+      parent2: Option[Person],
+      children: List[Child],
+      events: List[EventDetail]
+  ): Family = {
     new Family(
       familyQueryData.id,
       parent1,
@@ -24,8 +30,8 @@ object Family {
       familyQueryData.timestamp,
       familyQueryData.privacyRestriction,
       familyQueryData.refn,
-      List.empty,
-      Events(List.empty, Some(familyQueryData.id), EventType.FamilyEvent)
+      children,
+      Events(events, Some(familyQueryData.id), EventType.FamilyEvent)
     )
   }
 }
