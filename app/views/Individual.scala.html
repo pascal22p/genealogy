@@ -13,13 +13,6 @@
 
 @main(dbId, Some(person)) {
 
-  <p class="govuk-body-l">
-    <ul class="govuk-list">
-      <li><a class="govuk-link" href="@controllers.routes.DescendanceController.showDescendant(person.details.id)">Descendants</a></li>
-      <li><a class="govuk-link" href="@controllers.routes.AscendanceController.showAscendant(person.details.id)">Ascendants</a></li>
-  </ul>
-  </p>
-
   @personDetails(dbId, person)
   
   @individualEvents(dbId, person.events)

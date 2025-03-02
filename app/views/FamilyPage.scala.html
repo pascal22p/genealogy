@@ -1,0 +1,21 @@
+@import models.Person
+@import play.twirl.api.HtmlFormat
+@import views.html.components.{Block, FamilyView, LastModified}
+@import models.EventType.{IndividualEvent, FamilyEvent, UnknownEvent}
+@import models.{SourCitation => ModelSourCitation}
+@import models.SourCitationType.{EventSourCitation, IndividualSourCitation, FamilySourCitation}
+@import controllers.routes.Assets
+
+@this(
+  main: Main,
+  familyView: FamilyView
+)
+
+@(dbId: Int, family: Family)(implicit request: AuthenticatedRequest[?], messages: Messages)
+
+
+@main(dbId, None) {
+
+  @familyView(dbId, family, None)
+  
+}

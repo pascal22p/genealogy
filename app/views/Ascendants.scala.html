@@ -1,9 +1,12 @@
 @import models.Person
+@import config.AppConfig
 
 
 @this(
   main: Main,
   govukSummaryList: GovukSummaryList
+)(
+  implicit val appConfig: AppConfig
 )
 
 @(flatTree: List[(Int, List[Person])], dbId: Int)(implicit request: AuthenticatedRequest[?], messages: Messages)

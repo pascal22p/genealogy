@@ -6,6 +6,8 @@ import anorm.*
 import anorm.SqlParser.*
 import models.EventType
 import models.EventType.EventType
+import models.ResnType
+import models.ResnType.ResnType
 
 final case class EventDetailQueryData(
     dbId: Int,
@@ -27,7 +29,7 @@ final case class EventDetailQueryData(
     eventType: EventType,
     sourCount: Int,
     ownerId: Option[Int],
-    resn: Option[String]
+    resn: Option[ResnType.ResnType]
 )
 
 object EventDetailQueryData {
@@ -77,7 +79,7 @@ object EventDetailQueryData {
           EventType.fromString(eventType),
           sourCount.getOrElse(0),
           ownerId,
-          resn
+          resn.flatMap(ResnType.fromString)
         )
     }
 }
