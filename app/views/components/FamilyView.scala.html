@@ -1,10 +1,12 @@
 @import models.Family
 @import controllers.routes
 @import views.html.components.EventsDetails
+@import utils.PersonSummaryListRow
 
 @this(
     familyEvents: EventsDetails,
     block: Block,
+    personSummaryListRow: PersonSummaryListRow,
     govukSummaryList: GovukSummaryList)
 
 @(dbId: Int, family: Family, partnerOption: Option[Person])(implicit authenticatedRequest: AuthenticatedRequest[?], messages: Messages)
@@ -27,23 +29,7 @@ Some(Actions(
     @govukSummaryList(
         SummaryList(
             rows = Seq(
-                SummaryListRow(
-                    key = Key(Text(partner.details.shortName)),
-                    value = Value(HtmlContent(partner.events.birthAndDeathDate)),
-                    classes = "govuk-summary-list__row--no-border",
-                    actions = Some(Actions(
-                        items = Seq(
-                            ActionItem(
-                                href = controllers.routes.IndividualController.showPerson(dbId, partner.details.id).url,
-                                content = Text("View")
-                            ),
-                                ActionItem(
-                                href = "#",
-                                content = Text("Delete")
-                            )
-                        )
-                    ))
-                )
+              personSummaryListRow.personSummaryListRow(dbId, partner)
             ),
             card = Some(Card(
                 title = Some(CardTitle(content = Text("Partner"))),
@@ -57,29 +43,31 @@ Some(Actions(
     )
 }
 
+@if(partnerOption.isEmpty && (family.parent1.nonEmpty || family.parent2.nonEmpty)) {
+  @govukSummaryList(
+    SummaryList(
+      rows = Seq(
+        family.parent1.map( partner => personSummaryListRow.personSummaryListRow(dbId, partner)),
+        family.parent2.map( partner => personSummaryListRow.personSummaryListRow(dbId, partner))
+      ).flatten,
+      card = Some(Card(
+        title = Some(CardTitle(content = Text("Partners"))),
+        actions = None,
+        classes = "govuk-!-margin-4",
+        attributes = Map.empty
+      )),
+      classes = "",
+      attributes = Map.empty
+    )
+  )
+}
+
+
 @familyEvents(dbId, family.events)
 
 @govukSummaryList(
     SummaryList(
-        rows =  family.children.map { child =>
-            SummaryListRow(
-                key = Key(Text(child.person.details.shortName)),
-                value = Value(HtmlContent(child.person.events.birthAndDeathDate)),
-                classes = "govuk-summary-list__row--no-border",
-                actions = Some(Actions(
-                    items = Seq(
-                        ActionItem(
-                            href = controllers.routes.IndividualController.showPerson(dbId, child.person.details.id).url,
-                            content = Text("View")
-                        ),
-                        ActionItem(
-                            href = "#",
-                            content = Text("Delete")
-                        )
-                    )
-                ))
-            )
-        },
+        rows =  family.children.map(child => personSummaryListRow.personSummaryListRow(dbId, child.person)),
         card = Some(Card(
             title = Some(CardTitle(content = Text("Children"))),
             actions = Some(Actions(

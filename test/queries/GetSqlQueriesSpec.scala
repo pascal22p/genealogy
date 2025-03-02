@@ -200,13 +200,10 @@ class GetSqlQueriesSpec extends MariadbHelper with Logging {
       val idFamily = 3
       val result = (for {
         _      <- executeSql(sqlFamily(idFamily, person1, person2, List.empty, List.empty))
-        result <- sut.getFamiliesAsPartner(person1.id)
+        result <- sut.getFamilyIdsFromPartnerId(person1.id)
       } yield result).futureValue
 
-      result mustBe a[List[FamilyQueryData]]
-      result.size mustBe 1
-      result.head.parent1 mustBe Some(person1.id)
-      result.head.parent2 mustBe Some(person2.id)
+      result mustBe List(3)
     }
 
     "returns family when person is wife" in {
@@ -215,18 +212,15 @@ class GetSqlQueriesSpec extends MariadbHelper with Logging {
       val idFamily = 3
       val result = (for {
         _      <- executeSql(sqlFamily(idFamily, person1, person2, List.empty, List.empty))
-        result <- sut.getFamiliesAsPartner(person2.id)
+        result <- sut.getFamilyIdsFromPartnerId(person2.id)
       } yield result).futureValue
 
-      result mustBe a[List[FamilyQueryData]]
-      result.size mustBe 1
-      result.head.parent1 mustBe Some(person1.id)
-      result.head.parent2 mustBe Some(person2.id)
+      result mustBe List(3)
     }
 
     "returns nothing" in {
       val idPerson = 1
-      val result   = sut.getFamiliesAsPartner(idPerson).futureValue
+      val result   = sut.getFamilyIdsFromPartnerId(idPerson).futureValue
 
       result mustBe List.empty
     }

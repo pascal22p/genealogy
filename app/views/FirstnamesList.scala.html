@@ -1,7 +1,10 @@
+@import config.AppConfig
 
 @this(
         main: Main,
         govukSummaryList: GovukSummaryList
+)(
+  implicit val appConfig: AppConfig
 )
 
 @(names: List[Person], dbId: Int)(implicit request: AuthenticatedRequest[?], messages: Messages)

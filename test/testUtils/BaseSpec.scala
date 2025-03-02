@@ -80,7 +80,7 @@ trait BaseSpec
       eventType: EventType = UnknownEvent,
       sourCount: Int = 0,
       ownerId: Option[Int] = None,
-      privacyRestriction: Option[String] = None
+      privacyRestriction: Option[ResnType.ResnType] = None
   ): EventDetail = EventDetail(
     base,
     events_details_id,

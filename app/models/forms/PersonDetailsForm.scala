@@ -4,6 +4,7 @@ import java.time.Instant
 
 import models.PersonDetails
 import models.ResnType
+import models.ResnType._
 import models.Sex
 import play.api.data.format.Formats._
 import play.api.data.Form
@@ -61,7 +62,7 @@ object PersonDetailsForm {
       u.nameSuffix,
       u.nameGiven,
       u.nameNickname,
-      u.privacyRestriction.map(resn => s"$resn")
+      u.privacyRestriction.map(_.toString)
     )
   )
 

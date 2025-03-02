@@ -1,11 +1,16 @@
 package models
 
+import config.AppConfig
 import play.api.i18n.Messages
 import play.twirl.api.Html
 
 final case class Events(eventsDetails: List[EventDetail], ownerId: Option[Int], ownerType: EventType.EventType)
     extends EventsOrAttributes {
-  def birthAndDeathDate(implicit messages: Messages): Html = {
+  def birthAndDeathDate(
+      implicit messages: Messages,
+      authenticatedRequest: AuthenticatedRequest[?],
+      appConfig: AppConfig
+  ): Html = {
     val birthTags = List("BIRT", "BAPM")
     val birthDate = eventsDetails.find(event => birthTags.contains(event.tag.getOrElse(""))).map(_.formatDate)
     val deathTags = List("DEAT", "BURI")

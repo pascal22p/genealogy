@@ -13,6 +13,7 @@ import models.AuthenticatedRequest
 import models.EventDetail
 import models.Person
 import models.Place
+import models.ResnType.PrivacyResn
 import play.api.data.Form
 import play.api.i18n.I18nSupport
 import play.api.mvc.AnyContent
@@ -81,7 +82,7 @@ class EditEventDetailController @Inject() (
           event.ownerId.traverse(personId => personService.getPerson(personId)).flatMap { person =>
             val isAllowedToSee = request.localSession.sessionData.userData.fold(false)(_.seePrivacy)
 
-            if (!event.privacyRestriction.contains("privacy") || isAllowedToSee) {
+            if (!event.privacyRestriction.contains(PrivacyResn) || isAllowedToSee) {
               person.flatten.map(sessionService.insertPersonInHistory)
               result(event, person.flatten, allPlace)
             } else {

@@ -4,12 +4,16 @@
 @import models.EventType.{IndividualEvent, FamilyEvent, UnknownEvent}
 @import models.SourCitationType.EventSourCitation
 @import controllers.routes.Assets
+@import config.AppConfig
 
 @this(
   main: Main,
   sourCitations: SourCitations,
   lastModified: LastModified,
-  govukSummaryList: GovukSummaryList)
+  govukSummaryList: GovukSummaryList
+)(
+  implicit val appConfig: AppConfig
+)
 
 @(event: EventDetail, dbId: Int, person: Option[Person])(implicit request: AuthenticatedRequest[?], messages: Messages)
 
@@ -20,6 +24,11 @@
     case _: IndividualEvent.type => {
       @for(ownerId <- event.ownerId) {
         <div style="padding-left:10em;"><a class="govuk-link" href="@controllers.routes.IndividualController.showPerson(dbId, ownerId)">Return to @event.description page</a></div>
+      }
+    }
+    case _: FamilyEvent.type => {
+      @for(ownerId <- event.ownerId) {
+        <div style="padding-left:10em;"><a class="govuk-link" href="@controllers.routes.FamilyController.showFamily(dbId, ownerId)">Return to @event.description page</a></div>
       }
     }
     case _ => { <div style="padding-left:10em;">Orphan event</div> }

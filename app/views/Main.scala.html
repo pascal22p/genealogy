@@ -114,6 +114,26 @@
                         attributes = Map.empty
                     )
                 },
+                personOption.map { person =>
+                  ServiceNavigationItem(
+                    content = Text("Descendants"),
+                    href = controllers.routes.DescendanceController.showDescendant(person.details.id).url,
+                    active = false,
+                    current = false,
+                    classes = "",
+                    attributes = Map.empty
+                  )
+                },
+                personOption.map { person =>
+                  ServiceNavigationItem(
+                    content = Text("Ascendants"),
+                    href = controllers.routes.AscendanceController.showAscendant(person.details.id).url,
+                    active = false,
+                    current = false,
+                    classes = "",
+                    attributes = Map.empty
+                  )
+                },
                 loginOrlogout
             ).flatten,
             navigationClasses = "",

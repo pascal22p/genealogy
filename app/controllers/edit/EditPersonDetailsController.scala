@@ -9,6 +9,7 @@ import actions.AuthJourney
 import models.forms.PersonDetailsForm
 import models.AuthenticatedRequest
 import models.Person
+import models.ResnType.PrivacyResn
 import play.api.data.Form
 import play.api.i18n.*
 import play.api.mvc.*
@@ -40,7 +41,7 @@ class EditPersonDetailsController @Inject() (
         personOption.fold(NotFound("Nothing here")) { person =>
           val isAllowedToSee = authenticatedRequest.localSession.sessionData.userData.fold(false)(_.seePrivacy)
 
-          if (!person.details.privacyRestriction.contains("privacy") || isAllowedToSee) {
+          if (!person.details.privacyRestriction.contains(PrivacyResn) || isAllowedToSee) {
             sessionService.insertPersonInHistory(person)
             val form = PersonDetailsForm.personDetailsForm.fill(person.details.toForm)
             Ok(editPersonDetails(baseId, form))

@@ -2,6 +2,8 @@
 @import views.html.components.Block
 @import uk.gov.hmrc.govukfrontend.views.Implicits.*
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits.*
+@import models.ResnType
+@import models.ResnType._
 
 
 @this(
@@ -92,7 +94,7 @@
         @govukSelect(
             Select(
                 items =
-                    Seq(SelectItem(value = Some(""), text = "None (Public)")) ++ Seq(SelectItem(value = Some("locked"), text = "locked"), SelectItem(value = Some("privacy"), text = "privacy"), SelectItem(value = Some("confidential"), text = "confidential")),
+                    Seq(SelectItem(value = Some(""), text = "None (Public)")) ++ Seq(SelectItem(value = Some(PrivacyResn.toString), text = PrivacyResn.toString), SelectItem(value = Some(LockedResn.toString), text = LockedResn.toString), SelectItem(value = Some(ConfidentialResn.toString), text = ConfidentialResn.toString)),
                 label = Label(
                     content = Text("Privacy restriction")
                 ),

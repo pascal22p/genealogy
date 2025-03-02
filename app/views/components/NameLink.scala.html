@@ -1,7 +1,10 @@
 @import controllers.routes
 @import models.AuthenticatedRequest
+@import config.AppConfig
 
-@this()
+@this()(
+  implicit val appConfig: AppConfig
+)
 
 @(dbId:Int, person: Person)(implicit authenticatedRequest: AuthenticatedRequest[?], messages: Messages)
 

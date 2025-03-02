@@ -42,14 +42,15 @@ final class UpdateSqlQueries @Inject() (db: Database, databaseExecutionContext: 
           "nickname"  -> personDetails.nameNickname,
           "spfx"      -> personDetails.surnamePrefix,
           "nsfx"      -> personDetails.nameSuffix,
-          "resn"      -> personDetails.privacyRestriction.map(resn => s"$resn"),
-          "id"        -> personDetails.id
+          "resn" -> personDetails.privacyRestriction
+            .map(_.toString),
+          "id" -> personDetails.id
         )
         .executeUpdate()
     }
   }(databaseExecutionContext)
 
-  def updateEventDetails(event: EventDetail) = Future {
+  def updateEventDetails(event: EventDetail): Future[Int] = Future {
     db.withTransaction { implicit conn =>
       SQL("""UPDATE genea_events_details
             |SET place_id = {place_id},
@@ -169,7 +170,7 @@ final class UpdateSqlQueries @Inject() (db: Database, databaseExecutionContext: 
     }
   }(databaseExecutionContext)
 
-  def updateEventNumberofDays(eventId: Int, days: Option[Long]): Future[Int] = Future {
+  def updateEventNumberOfDays(eventId: Int, days: Option[Long]): Future[Int] = Future {
     db.withConnection { implicit conn =>
       SQL("""UPDATE genea_events_details
             |SET jd_count = {days}

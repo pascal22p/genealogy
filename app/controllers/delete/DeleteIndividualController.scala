@@ -7,6 +7,7 @@ import scala.concurrent.ExecutionContext
 import actions.AuthJourney
 import models.AuthenticatedRequest
 import models.Person
+import models.ResnType.PrivacyResn
 import play.api.i18n.*
 import play.api.mvc.*
 import queries.DeleteSqlQueries
@@ -31,7 +32,7 @@ class DeleteIndividualController @Inject() (
         personOption.fold(NotFound("Nothing here")) { person =>
           val isAllowedToSee = authenticatedRequest.localSession.sessionData.userData.fold(false)(_.seePrivacy)
 
-          if (!person.details.privacyRestriction.contains("privacy") || isAllowedToSee) {
+          if (!person.details.privacyRestriction.contains(PrivacyResn) || isAllowedToSee) {
             Ok(deleteIndividualView(person, baseId))
           } else {
             Forbidden("Not allowed")
@@ -46,7 +47,7 @@ class DeleteIndividualController @Inject() (
         personOption.fold(NotFound("Nothing here")) { person =>
           val isAllowedToSee = authenticatedRequest.localSession.sessionData.userData.fold(false)(_.seePrivacy)
 
-          if (!person.details.privacyRestriction.contains("privacy") || isAllowedToSee) {
+          if (!person.details.privacyRestriction.contains(PrivacyResn) || isAllowedToSee) {
             deleteSqlQueries.deletePersonDetails(person.details.id)
             Redirect(controllers.routes.HomeController.showSurnames(baseId))
           } else {

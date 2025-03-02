@@ -1,9 +1,12 @@
+@import config.AppConfig
 
 @this(
   main: Main,
   govukButton: GovukButton,
   govukSummaryList: GovukSummaryList,
   formWithCSRF: FormWithCSRF
+)(
+  implicit val appConfig: AppConfig
 )
 
 @(person: Person, dbId: Int)(implicit request: AuthenticatedRequest[?], messages: Messages)

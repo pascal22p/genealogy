@@ -9,6 +9,7 @@ import actions.AuthAction
 import cats.implicits.*
 import models.AuthenticatedRequest
 import models.Person
+import models.ResnType.PrivacyResn
 import play.api.i18n.*
 import play.api.mvc.*
 import services.EventService
@@ -36,7 +37,7 @@ class EventController @Inject() (
           event.ownerId.traverse(personId => personService.getPerson(personId)).map { person =>
             val isAllowedToSee = authenticatedRequest.localSession.sessionData.userData.fold(false)(_.seePrivacy)
 
-            if (!event.privacyRestriction.contains("privacy") || isAllowedToSee) {
+            if (!event.privacyRestriction.contains(PrivacyResn) || isAllowedToSee) {
               person.flatten.map(sessionService.insertPersonInHistory)
               Ok(eventView(event, baseId, person.flatten))
             } else {

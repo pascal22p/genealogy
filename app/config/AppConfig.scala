@@ -11,4 +11,6 @@ class AppConfig @Inject() (configuration: Configuration) {
   val mediaPath: String = configuration.get[String]("media-path")
 
   val databaseName: String = configuration.get[String]("database.name")
+
+  val redactedMask: String = "*******"
 }

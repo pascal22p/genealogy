@@ -1,6 +1,10 @@
 @import models.EventType.*
+@import config.AppConfig
+
 @this(
     govukSummaryList: GovukSummaryList
+)(
+  implicit val appConfig: AppConfig
 )
 
 @(dbId: Int, events: Events)(implicit authenticatedRequest: AuthenticatedRequest[?], messages: Messages)

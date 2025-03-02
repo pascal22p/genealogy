@@ -109,13 +109,13 @@ final class GetSqlQueries @Inject() (db: Database, databaseExecutionContext: Dat
     }
   }(databaseExecutionContext)
 
-  def getFamiliesAsPartner(individualId: Int): Future[List[FamilyQueryData]] = Future {
+  def getFamilyIdsFromPartnerId(individualId: Int): Future[List[Int]] = Future {
     db.withConnection { implicit conn =>
-      SQL("""SELECT *
+      SQL("""SELECT familles_id
             |FROM genea_familles
             |WHERE familles_husb = {id} OR familles_wife = {id}""".stripMargin)
         .on("id" -> individualId)
-        .as[List[FamilyQueryData]](FamilyQueryData.mysqlParser.*)
+        .as[List[Int]](int("familles_id").*)
     }
   }(databaseExecutionContext)
 
