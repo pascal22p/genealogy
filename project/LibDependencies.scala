@@ -15,7 +15,7 @@ object LibDependencies {
   val libraryDependenciesTest: Seq[ModuleID] = Seq(
     "org.scalatestplus.play"  %% "scalatestplus-play" % "7.0.1" % Test,
     "org.scalatestplus"       %%  "mockito-5-10"      % "3.2.18.0" % Test,
-    "org.jsoup"                % "jsoup"              % "1.18.3"
+    "org.jsoup"                % "jsoup"              % "1.19.1"
   )
 
   val all: Seq[ModuleID]  = libraryDependenciesCompile ++ libraryDependenciesTest
