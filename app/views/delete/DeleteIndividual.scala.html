@@ -9,7 +9,7 @@
   implicit val appConfig: AppConfig
 )
 
-@(person: Person, dbId: Int)(implicit request: AuthenticatedRequest[?], messages: Messages)
+@(person: Person, families: List[Family], parents: List[Parent], dbId: Int)(implicit request: AuthenticatedRequest[?], messages: Messages)
 
 
 @main(dbId, Some(person)) {
