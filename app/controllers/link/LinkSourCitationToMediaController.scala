@@ -6,6 +6,7 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
 import actions.AuthJourney
+import anorm.NamedParameter
 import models.forms.LinkForm
 import models.AuthenticatedRequest
 import models.MediaType.UnknownMedia
@@ -50,7 +51,7 @@ class LinkSourCitationToMediaController @Inject() (
         insertSqlQueries
           .linkTable(
             "rel_sour_citations_multimedia",
-            Map("sour_citations_id" -> sourCitationId, "media_id" -> dataForm.linkId)
+            List(NamedParameter("sour_citations_id", sourCitationId), NamedParameter("media_id", dataForm.linkId))
           )
           .map { _ =>
             Redirect(controllers.routes.SourCitationController.showSourCitation(dbId, sourCitationId))

@@ -297,7 +297,7 @@ final class GetSqlQueries @Inject() (db: Database, databaseExecutionContext: Dat
       }
     }(databaseExecutionContext)
 
-  def getFirstnamesList(id: Int, name: String)(
+  def getAllPersonDetails(id: Int, name: Option[String] = None)(
       implicit authenticatedRequest: AuthenticatedRequest[?]
   ): Future[List[PersonDetails]] = Future {
     db.withConnection { implicit conn =>
@@ -305,11 +305,15 @@ final class GetSqlQueries @Inject() (db: Database, databaseExecutionContext: Dat
       val isExcluded = authenticatedRequest.localSession.sessionData.userData.fold(excludePrivate) { userData =>
         if (userData.seePrivacy) "" else excludePrivate
       }
+      val filter = name.fold("") { _ =>
+        "AND indi_nom = {name}"
+      }
+
       SQL(s"""SELECT *
              |FROM genea_individuals
-             |WHERE base = {id} AND indi_nom = {name} $isExcluded
+             |WHERE base = {id} $filter $isExcluded
              |ORDER BY indi_prenom""".stripMargin)
-        .on("id" -> id, "name" -> name)
+        .on("id" -> id, "name" -> name.getOrElse(""))
         .as(PersonDetails.mysqlParser.*)
     }
   }(databaseExecutionContext)
@@ -346,6 +350,16 @@ final class GetSqlQueries @Inject() (db: Database, databaseExecutionContext: Dat
     db.withConnection { implicit conn =>
       SQL("""SELECT *
             |FROM genea_sour_records""".stripMargin)
+        .as[List[SourRecord]](SourRecord.mysqlParser.*)
+    }
+  }(databaseExecutionContext)
+
+  def getSourRecords(dbId: Int): Future[List[SourRecord]] = Future {
+    db.withConnection { implicit conn =>
+      SQL("""SELECT *
+            |FROM genea_sour_records
+            |WHERE base = {dbId}""".stripMargin)
+        .on("dbId" -> dbId)
         .as[List[SourRecord]](SourRecord.mysqlParser.*)
     }
   }(databaseExecutionContext)

@@ -46,7 +46,7 @@ class GenealogyDatabaseService @Inject() (
   def getFirstnamesList(id: Int, name: String)(
       implicit authenticatedRequest: AuthenticatedRequest[?]
   ): Future[List[Person]] = {
-    mariadbQueries.getFirstnamesList(id, name).flatMap { personList =>
+    mariadbQueries.getAllPersonDetails(id, Some(name)).flatMap { personList =>
       personList.traverse { person =>
         eventService.getIndividualEvents(person.id).map { events =>
           Person(

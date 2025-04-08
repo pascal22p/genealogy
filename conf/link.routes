@@ -1,2 +1,5 @@
 GET     /base/:baseId/source-citation/:sourCitationId/media                                  controllers.link.LinkSourCitationToMediaController.showForm(baseId: Int, sourCitationId: Int)
 POST    /base/:baseId/source-citation/:sourCitationId/media                                  controllers.link.LinkSourCitationToMediaController.onSubmit(baseId: Int, sourCitationId: Int)
+
+GET     /base/:baseId/family/:familyId/add-child                                             controllers.link.LinkChildToFamilyController.showForm(baseId: Int, familyId: Int)
+POST    /base/:baseId/family/:familyId/add-child                                             controllers.link.LinkChildToFamilyController.onSubmit(baseId: Int, familyId: Int)

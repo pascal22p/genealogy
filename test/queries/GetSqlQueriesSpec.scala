@@ -413,7 +413,7 @@ class GetSqlQueriesSpec extends MariadbHelper with Logging {
               fakePersonDetails(id = 4, surname = "Z", firstname = "A", privacyRestriction = Some(PrivacyResn))
             )
         )
-        result <- sut.getFirstnamesList(1, "Z")(
+        result <- sut.getAllPersonDetails(1, Some("Z"))(
           AuthenticatedRequest(FakeRequest(), Session("sessionId", SessionData(None), LocalDateTime.now))
         )
       } yield result).futureValue
@@ -431,7 +431,7 @@ class GetSqlQueriesSpec extends MariadbHelper with Logging {
               fakePersonDetails(id = 4, surname = "Z", firstname = "A", privacyRestriction = Some(PrivacyResn))
             )
         )
-        result <- sut.getFirstnamesList(1, "Z")(
+        result <- sut.getAllPersonDetails(1, Some("Z"))(
           AuthenticatedRequest(
             FakeRequest(),
             Session("sessionId", SessionData(Some(UserData(0, "username", "hashed", true, false))), LocalDateTime.now)
@@ -444,7 +444,7 @@ class GetSqlQueriesSpec extends MariadbHelper with Logging {
 
     "returns nothing" in {
       val result = sut
-        .getFirstnamesList(1, "Z")(
+        .getAllPersonDetails(1, Some("Z"))(
           AuthenticatedRequest(
             FakeRequest(),
             Session("sessionId", SessionData(Some(UserData(0, "username", "hashed", true, false))), LocalDateTime.now)

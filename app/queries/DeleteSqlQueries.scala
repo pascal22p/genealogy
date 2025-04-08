@@ -45,4 +45,17 @@ final class DeleteSqlQueries @Inject() (db: Database, databaseExecutionContext: 
     }
   }(databaseExecutionContext)
 
+  def deleteChildFromFamily(childId: Int, familyId: Int): Future[Int] = Future {
+    db.withConnection { implicit conn =>
+      SQL("""DELETE FROM rel_familles_indi
+            | WHERE indi_id = {childId} AND familles_id = {familyId}
+          """.stripMargin)
+        .on(
+          "childId"  -> childId,
+          "familyId" -> familyId
+        )
+        .executeUpdate()
+    }
+  }(databaseExecutionContext)
+
 }

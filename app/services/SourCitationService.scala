@@ -12,6 +12,7 @@ import models.MediaType.SourCitationMedia
 import models.SourCitation
 import models.SourCitationQueryData
 import models.SourCitationType.SourCitationType
+import models.SourRecord
 import queries.GetSqlQueries
 
 @Singleton
@@ -40,6 +41,10 @@ class SourCitationService @Inject() (mariadbQueries: GetSqlQueries)(
     } yield {
       SourCitation(sourCitationQueryData, medias)
     }
+  }
+
+  def getSourRecords(dbId: Int): Future[List[SourRecord]] = {
+    mariadbQueries.getSourRecords(dbId)
   }
 
 }

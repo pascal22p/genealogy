@@ -9,6 +9,8 @@
 ->      /delete                                delete.Routes
 ->      /edit                                  edit.Routes
 ->      /admin                                 admin.Routes
+->      /unlink                                unlink.Routes
+->      /link                                  link.Routes
 
 
 GET     /                                         controllers.HomeController.onload()
@@ -16,8 +18,11 @@ GET     /base/:baseId/surnames                    controllers.HomeController.sho
 GET     /base/:baseId/surname/:name/firstnames           controllers.HomeController.showFirstnames(baseId: Int, name: String)
 GET     /base/:baseId/individual/:id                           controllers.IndividualController.showPerson(baseId: Int, id: Int)
 GET     /base/:baseId/event/:id                                controllers.EventController.showEvent(baseId: Int, id: Int)
+GET     /base/:baseId/source-citation/:id           controllers.SourCitationController.showSourCitation(baseId: Int, id: Int)
+GET     /base/:baseId/family/:id                  controllers.FamilyController.showFamily(baseId: Int, id: Int)
 GET     /base/:baseId/descendant/:id                           controllers.DescendanceController.showDescendant(baseId: Int, id: Int)
 GET     /base/:baseId/ascendant/:id                            controllers.AscendanceController.showAscendant(baseId: Int, id: Int)
+GET     /base/:baseId/medias/show                 controllers.MediaListController.showMedias(baseId: Int)
 GET     /switch-lang/:lang                        controllers.IndividualController.languageSwitch(lang: String)
 
 GET     /login                                    controllers.LoginController.onLoad()

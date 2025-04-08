@@ -38,30 +38,34 @@ class EditSourCitationController @Inject() (
     with I18nSupport
     with Logging {
 
-  private def handleSourCitation(id: Int)(
+  private def handleSourCitation(baseId: Int, id: Int)(
       block: SourCitation => Future[Result]
   ): Future[Result] = {
-    sourCitationService.getSourCitations(id, UnknownSourCitation).flatMap { sourCitationList =>
+    sourCitationService.getSourCitations(id, UnknownSourCitation, baseId).flatMap { sourCitationList =>
       sourCitationList.headOption.fold(Future.successful(NotFound("SourCitation could not be found")))(block)
     }
   }
 
   def showForm(baseId: Int, id: Int) = authJourney.authWithAdminRight.async { implicit request =>
-    handleSourCitation(id) { sourCitation =>
+    handleSourCitation(baseId, id) { sourCitation =>
       val form = SourCitationForm.sourCitationForm.fill(sourCitation.toForm)
-      Future.successful(Ok(sourCitationView(baseId, form, sourCitation)))
+      sourCitationService.getSourRecords(baseId).map { sourRecords =>
+        Ok(sourCitationView(baseId, form, sourCitation, sourRecords))
+      }
     }
   }
 
   def onSubmit(baseId: Int, id: Int) = authJourney.authWithAdminRight.async { implicit request =>
     def errorFunction(formWithErrors: Form[SourCitationForm]): Future[Result] = {
-      handleSourCitation(id) { sourCitation =>
-        Future.successful(BadRequest(sourCitationView(baseId, formWithErrors, sourCitation)))
+      handleSourCitation(baseId, id) { sourCitation =>
+        sourCitationService.getSourRecords(baseId).map { sourRecords =>
+          BadRequest(sourCitationView(baseId, formWithErrors, sourCitation, sourRecords))
+        }
       }
     }
 
     val successFunction: SourCitationForm => Future[Result] = { dataForm =>
-      handleSourCitation(id) { sourCitation =>
+      handleSourCitation(baseId, id) { sourCitation =>
         updateSqlQueries.updateSourCitation(sourCitation.fromForm(dataForm)).map {
           case 1 =>
             sourCitation.sourceType match {
