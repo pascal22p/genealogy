@@ -5,7 +5,6 @@ import java.time.Instant
 import scala.concurrent.Future
 
 import models.*
-import models.Attributes
 import models.EventType.FamilyEvent
 import models.EventType.IndividualEvent
 import org.mockito.ArgumentMatchers

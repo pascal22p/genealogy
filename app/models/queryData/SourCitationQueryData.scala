@@ -4,7 +4,6 @@ import java.time.Instant
 
 import anorm.*
 import anorm.SqlParser.*
-import anorm.SqlParser.get
 import models.SourCitationType.SourCitationType
 
 final case class SourCitationQueryData(
