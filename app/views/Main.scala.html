@@ -117,7 +117,7 @@
                 personOption.map { person =>
                   ServiceNavigationItem(
                     content = Text("Descendants"),
-                    href = controllers.routes.DescendanceController.showDescendant(person.details.id).url,
+                    href = controllers.routes.DescendanceController.showDescendant(dbId, person.details.id).url,
                     active = false,
                     current = false,
                     classes = "",
@@ -127,7 +127,7 @@
                 personOption.map { person =>
                   ServiceNavigationItem(
                     content = Text("Ascendants"),
-                    href = controllers.routes.AscendanceController.showAscendant(person.details.id).url,
+                    href = controllers.routes.AscendanceController.showAscendant(dbId, person.details.id).url,
                     active = false,
                     current = false,
                     classes = "",

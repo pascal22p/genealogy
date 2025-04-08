@@ -19,9 +19,20 @@ class PersonSummaryListRow @Inject() ()(implicit val appConfig: AppConfig) {
 
   def personSummaryListRow(
       dbId: Int,
-      person: Person
+      person: Person,
+      unlinkLink: String
   )(implicit messages: Messages, authenticatedRequest: AuthenticatedRequest[?]): SummaryListRow = {
     val isAllowedToSee = authenticatedRequest.localSession.sessionData.userData.fold(false)(_.seePrivacy)
+    val isAdmin        = authenticatedRequest.localSession.sessionData.userData.fold(false)(_.isAdmin)
+
+    val deleteLink = if (isAdmin) {
+      Some(
+        ActionItem(
+          href = unlinkLink,
+          content = Text("Unlink")
+        )
+      )
+    } else { None }
 
     if (!person.details.privacyRestriction.contains(PrivacyResn) || isAllowedToSee) {
       SummaryListRow(
@@ -31,17 +42,14 @@ class PersonSummaryListRow @Inject() ()(implicit val appConfig: AppConfig) {
         actions = Some(
           Actions(
             items = Seq(
-              ActionItem(
-                href = controllers.routes.IndividualController.showPerson(dbId, person.details.id).url,
-                content = Text("View")
+              Some(
+                ActionItem(
+                  href = controllers.routes.IndividualController.showPerson(dbId, person.details.id).url,
+                  content = Text("View")
+                )
               ),
-              ActionItem(
-                href = controllers.delete.routes.DeleteIndividualController
-                  .deletePersonConfirmation(dbId, person.details.id)
-                  .url,
-                content = Text("Delete")
-              )
-            )
+              deleteLink
+            ).flatten
           )
         )
       )

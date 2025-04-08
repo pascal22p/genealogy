@@ -1,0 +1,37 @@
+@import config.AppConfig
+@import models.forms.LinkForm
+@import play.twirl.api.HtmlFormat
+@import views.html.components.{Block, OneSourCitation, LastModified}
+@import models.EventType.{IndividualEvent, FamilyEvent, UnknownEvent}
+@import models.{SourCitation => ModelSourCitation}
+@import models.SourCitationType.{EventSourCitation, IndividualSourCitation, FamilySourCitation}
+@import controllers.routes.Assets
+@import uk.gov.hmrc.govukfrontend.views.Implicits.*
+
+@this(
+  main: Main,
+  block: Block,
+  govukButton: GovukButton,
+  formWithCSRF: FormWithCSRF
+)(implicit appConfig: AppConfig)
+
+@(child: Person, family: Family, dbId: Int)(implicit request: AuthenticatedRequest[?], messages: Messages)
+
+
+
+@main(dbId, None) {
+
+  @block("Unlink child from family") {
+    <p class="govuk-body">Unlink @child.details.shortName (@child.events.birthAndDeathDate) from the family
+      @family.parent1.map(person => s"${person.details.shortName} (${person.events.birthAndDeathDate})") and
+      @family.parent2.map(person => s"${person.details.shortName} (${person.events.birthAndDeathDate})")</p>
+
+  @formWithCSRF(controllers.unlink.routes.UnlinkChildController.unlinkChildAction(dbId, child.details.id, family.id)) {
+    @govukButton(Button(
+      inputType = Some("submit"),
+      content = Text("Unlink from family"),
+      classes = "govuk-button--warning"
+    ))
+  }
+  }
+}

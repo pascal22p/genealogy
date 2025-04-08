@@ -62,7 +62,7 @@ class GenealogyDatabaseServiceSpec extends BaseSpec {
         Events(fakeEventDetails2, Some(2), IndividualEvent),
         Attributes(List.empty, Some(2), IndividualEvent)
       )
-      when(mockMariadbQueries.getFirstnamesList(any(), any())(any())).thenReturn(
+      when(mockMariadbQueries.getAllPersonDetails(any(), any())(any())).thenReturn(
         Future.successful(List(fakePersonDetail1, fakePersonDetail2))
       )
       when(mockEventService.getIndividualEvents(any(), any[Boolean]))

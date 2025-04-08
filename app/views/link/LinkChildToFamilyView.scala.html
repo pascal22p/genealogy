@@ -1,0 +1,70 @@
+@import config.AppConfig
+@import models.forms.LinkForm
+@import models.{PersonDetails, Family}
+@import views.html.helper
+@import views.html.components.Block
+@import helper._
+@import utils.Constants
+@import uk.gov.hmrc.govukfrontend.views.Implicits.*
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits.*
+@import uk.gov.hmrc.hmrcfrontend.views.Implicits.*
+
+@this(
+        main: Main,
+        block: Block,
+        govukSelect: GovukSelect,
+        govukButton: GovukButton,
+        govukErrorSummary: GovukErrorSummary
+)(implicit appConfig: AppConfig)
+
+@(dbId: Int, allPersons: List[Person], family: Family, linkForm: Form[LinkForm])(implicit request: AuthenticatedRequest[?], messages: Messages)
+
+@main(dbId, None) {
+
+
+  @block("Add new child to family") {
+
+    <p class="govuk-body">Add a new child the family
+        @family.parent1.map(person => s"${person.details.shortName} (${person.events.birthAndDeathDate})") and
+        @family.parent2.map(person => s"${person.details.shortName} (${person.events.birthAndDeathDate})")</p>
+
+    @if(linkForm.hasGlobalErrors) {
+        @for(error <- linkForm.globalErrors) {
+            <span class="error-message">@error.format(messages)</span>
+        }
+    }
+
+    @if(linkForm.errors.nonEmpty) {
+        @govukErrorSummary(ErrorSummary().withFormErrorsAsHtml(linkForm))
+    }
+    
+    @helper.form(action = controllers.link.routes.LinkChildToFamilyController.onSubmit(dbId, family.id) ) {
+        @helper.CSRF.formField
+        @govukSelect(
+            Select(
+                items =
+                    Seq(SelectItem(
+                        value = Some(""),
+                        text = "Unknown")) ++
+                            allPersons.map(person => SelectItem(
+                                value = Some(person.details.id.toString),
+                                text = s"${person.details.shortName} (${person.events.birthAndDeathDate})"
+                            )).sortBy(_.text),
+                label = Label(
+                    content = Text("Child")),
+                hint = Some(Hint(
+                    content = HtmlContent("Child to link the family")
+                ))    
+            ).withFormField(linkForm("linkId"))
+        )
+        @govukButton(
+            Button(
+                element = Some("button"),
+                content = Text("Add to family")
+            )
+        )
+    }
+
+  }
+
+}

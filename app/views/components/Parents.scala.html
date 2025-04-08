@@ -16,8 +16,12 @@
     @govukSummaryList(
         SummaryList(
             rows = Seq(
-                parents.family.parent1.map( parent => personSummaryListRow.personSummaryListRow(dbId, parent)),
-                parents.family.parent2.map( parent => personSummaryListRow.personSummaryListRow(dbId, parent)),
+                parents.family.parent1.map( parent => personSummaryListRow.personSummaryListRow(
+                    dbId,
+                    parent,
+                    controllers.unlink.routes.UnlinkChildController.unlinkChildConfirmation(dbId, person.details.id, parents.family.id).url
+                )),
+                parents.family.parent2.map( parent => personSummaryListRow.personSummaryListRow(dbId, parent, "qwert")),
             ).flatten,
             card = Some(Card(
                 title = Some(CardTitle(content = Text(parentTitle(parents.relaType).toString))),

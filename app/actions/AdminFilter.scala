@@ -28,7 +28,7 @@ class AdminFilter @Inject() (
   override def filter[A](request: AuthenticatedRequest[A]): Future[Option[Result]] = {
     implicit val implicitRequest: AuthenticatedRequest[A] = request
 
-    val isAdmin: Boolean = request.localSession.sessionData.userData.map(_.isAdmin).getOrElse(false)
+    val isAdmin: Boolean = request.localSession.sessionData.userData.exists(_.isAdmin)
 
     if (isAdmin) {
       Future.successful(None)

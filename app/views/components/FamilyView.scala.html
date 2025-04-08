@@ -29,7 +29,7 @@ Some(Actions(
     @govukSummaryList(
         SummaryList(
             rows = Seq(
-              personSummaryListRow.personSummaryListRow(dbId, partner)
+              personSummaryListRow.personSummaryListRow(dbId, partner, "wertyu")
             ),
             card = Some(Card(
                 title = Some(CardTitle(content = Text("Partner"))),
@@ -47,8 +47,16 @@ Some(Actions(
   @govukSummaryList(
     SummaryList(
       rows = Seq(
-        family.parent1.map( partner => personSummaryListRow.personSummaryListRow(dbId, partner)),
-        family.parent2.map( partner => personSummaryListRow.personSummaryListRow(dbId, partner))
+        family.parent1.map( partner => personSummaryListRow.personSummaryListRow(
+            dbId,
+            partner,
+            controllers.unlink.routes.UnlinkChildController.unlinkChildConfirmation(dbId, partner.details.id, family.id).url)
+        ),
+        family.parent2.map( partner => personSummaryListRow.personSummaryListRow(
+            dbId,
+            partner,
+            controllers.unlink.routes.UnlinkChildController.unlinkChildConfirmation(dbId, partner.details.id, family.id).url)
+        )
       ).flatten,
       card = Some(Card(
         title = Some(CardTitle(content = Text("Partners"))),
@@ -67,7 +75,11 @@ Some(Actions(
 
 @govukSummaryList(
     SummaryList(
-        rows =  family.children.map(child => personSummaryListRow.personSummaryListRow(dbId, child.person)),
+        rows =  family.children.map(child => personSummaryListRow.personSummaryListRow(
+            dbId,
+            child.person,
+            controllers.unlink.routes.UnlinkChildController.unlinkChildConfirmation(dbId, child.person.details.id, family.id).url
+        )),
         card = Some(Card(
             title = Some(CardTitle(content = Text("Children"))),
             actions = Some(Actions(
