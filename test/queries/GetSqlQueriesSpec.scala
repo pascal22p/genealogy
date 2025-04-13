@@ -6,7 +6,6 @@ import models.*
 import models.queryData.EventDetailQueryData
 import models.queryData.FamilyAsChildQueryData
 import models.queryData.FamilyQueryData
-import models.AuthenticatedRequest
 import models.EventType.FamilyEvent
 import models.EventType.IndividualEvent
 import models.ResnType.PrivacyResn
