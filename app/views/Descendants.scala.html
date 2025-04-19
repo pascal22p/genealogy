@@ -1,36 +1,46 @@
 @import models.Person
 @import views.html.components.{Block, NameLink}
-
+@import config.AppConfig
+@import models.ResnType.PrivacyResn
 
 @this(
     main: Main,
     block: Block,
-    nameLink: NameLink
+    nameLink: NameLink,
+    appConfig: AppConfig
 )
 
 @(person: Person, dbId: Int)(implicit request: AuthenticatedRequest[?], messages: Messages)
 
 @aDescendant(person: Person, depth: Int = 1): Html = @{
-
+    val isAllowedToSee = request.localSession.sessionData.userData.fold(false)(_.seePrivacy)
     val children = if(person.families.isEmpty) {
         ""
     } else {
         """<ul class="govuk-list govuk-!-margin-top-0 govuk-!-margin-bottom-0" style="padding-left:40px">""" +
                 person.families.map { family =>
-                    val first = person.findPartner(family.id).fold(""){ partner =>
-                        "<li style=\"margin:0;padding:0\">x " + nameLink(dbId, partner) + "</li>"
-                    }
-                    val last = family.children.reverse.headOption
-                    val allButLast = family.children.dropRight(1)
-                    first + allButLast.map { child =>
-                        s"<li style=\"margin:0;padding:0\">├${aDescendant(child.person, depth + 1)}</li>"
-                    }.mkString("\n") + last.fold("") { child =>
-                        s"<li style=\"margin:0;padding:0\">└${aDescendant(child.person, depth + 1)}</li>"
+                    if (!person.details.privacyRestriction.contains(PrivacyResn) || isAllowedToSee) {
+                        val first = person.findPartner(family.id).fold(""){ partner =>
+                            "<li style=\"margin:0;padding:0\">x " + nameLink(dbId, partner) + "</li>"
+                        }
+                        val last = family.children.reverse.headOption
+                        val allButLast = family.children.dropRight(1)
+                        first + allButLast.map { child =>
+                           s"<li style=\"margin:0;padding:0\">├${aDescendant(child.person, depth + 1)}</li>"
+                        }.mkString("\n") + last.fold("") { child =>
+                          s"<li style=\"margin:0;padding:0\">└${aDescendant(child.person, depth + 1)}</li>"
+                        }
+                    } else {
+                        appConfig.redactedMask
                     }
                 }.mkString("\n") + "</ul>"
     }
 
-    Html(s"<span class=\"govuk-!-font-size-16\">[$depth]</span>" + nameLink(dbId, person) + children)
+    if (!person.details.privacyRestriction.contains(PrivacyResn) || isAllowedToSee) {
+        Html(s"<span class=\"govuk-!-font-size-16\">[$depth]</span>" + nameLink(dbId, person) + children)
+    } else {
+        Html(s"<span class=\"govuk-!-font-size-16\">[$depth]</span>" + appConfig.redactedMask + children)
+    }
 }
 
 @main(dbId, Some(person)) {
