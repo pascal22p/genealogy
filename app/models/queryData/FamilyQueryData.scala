@@ -12,7 +12,8 @@ final case class FamilyQueryData(
     timestamp: Instant,
     privacyRestriction: Option[String],
     refn: String,
-    refnType: String
+    refnType: String,
+    base: Int
 )
 
 object FamilyQueryData {
@@ -22,8 +23,9 @@ object FamilyQueryData {
       get[Option[Int]]("familles_husb") ~
       get[Option[Instant]]("familles_timestamp") ~
       get[String]("familles_refn") ~
-      get[String]("familles_refn_type")).map {
-      case id ~ wife ~ husb ~ timestamp ~ refn ~ refnType =>
-        FamilyQueryData(id, husb, wife, timestamp.getOrElse(Instant.now), None, refn, refnType)
+      get[String]("familles_refn_type") ~
+      get[Int]("base")).map {
+      case id ~ wife ~ husb ~ timestamp ~ refn ~ refnType ~ base =>
+        FamilyQueryData(id, husb, wife, timestamp.getOrElse(Instant.now), None, refn, refnType, base)
     }
 }

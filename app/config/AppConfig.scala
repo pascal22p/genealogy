@@ -13,4 +13,6 @@ class AppConfig @Inject() (configuration: Configuration) {
   val databaseName: String = configuration.get[String]("database.name")
 
   val redactedMask: String = "*******"
+
+  val commitHash: String = sys.props.getOrElse("git.commit.hash", "unknown")
 }

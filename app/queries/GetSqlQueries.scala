@@ -364,4 +364,14 @@ final class GetSqlQueries @Inject() (db: Database, databaseExecutionContext: Dat
     }
   }(databaseExecutionContext)
 
+  def getAllFamilies(baseId: Int): Future[List[FamilyQueryData]] = Future {
+    db.withConnection { implicit conn =>
+      SQL("""SELECT *
+            |FROM genea_familles
+            |WHERE base = {id}""".stripMargin)
+        .on("id" -> baseId)
+        .as[List[FamilyQueryData]](FamilyQueryData.mysqlParser.*)
+    }
+  }(databaseExecutionContext)
+
 }

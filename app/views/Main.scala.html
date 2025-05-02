@@ -2,8 +2,10 @@
 @import views.html.components.{Block}
 @import uk.gov.hmrc.hmrcfrontend.config.AssetsConfig
 @import uk.gov.hmrc.hmrcfrontend.views.html.components._
+@import config.AppConfig
 
 @this(
+    appConfig: AppConfig,
     assetConfig: AssetsConfig,
     govukServiceNavigation: GovukServiceNavigation,
     hmrcTimeoutDialog: HmrcTimeoutDialog
@@ -169,7 +171,7 @@
 <footer>
     <div class="govuk-grid-row box_title govuk-!-margin-2">
         <div class="govuk-grid-column-full">
-            <a href="mailto:genealogie@("@")parois.net">genealogie.parois.net </a>
+            <a href="mailto:genealogie@("@")parois.net">genealogie.parois.net </a> — version @{appConfig.commitHash}
         </div>
     </div>
 </footer>

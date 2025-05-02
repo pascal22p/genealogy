@@ -16,3 +16,11 @@ POST    /database                                            controllers.add.Add
 GET     /base/:baseId/:sourCitationType/:id/sour-citation    controllers.add.AddSourCitationController.showForm(baseId: Int, id: Int, sourCitationType: SourCitationType)
 POST    /base/:baseId/:sourCitationType/:id/sour-citation    controllers.add.AddSourCitationController.onSubmit(baseId: Int, id: Int, sourCitationType: SourCitationType)
 
+GET     /base/:baseId/person/:personId/Family                controllers.add.AddPersonToFamily.showInterstitial(baseId: Int, personId: Int)
+POST    /base/:baseId/person/:personId/Family                controllers.add.AddPersonToFamily.submitInterstitial(baseId: Int, personId: Int)
+
+GET     /base/:baseId/new-family                             controllers.add.AddPersonToFamily.showNewFamilyForm(baseId: Int, personId: Int)
+POST    /base/:baseId/new-family                             controllers.add.AddPersonToFamily.submitNewFamilyForm(baseId: Int, personId: Int)
+
+GET     /base/:baseId/existing-family                        controllers.add.AddPersonToFamily.showExistingFamilyForm(baseId: Int, personId: Int)
+POST    /base/:baseId/existing-family                        controllers.add.AddPersonToFamily.submitExistingFamilyForm(baseId: Int, personId: Int)

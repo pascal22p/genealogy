@@ -21,10 +21,11 @@ object FamilyAsChildQueryData {
       get[String]("familles_refn") ~
       get[String]("familles_refn_type") ~
       get[String]("rela_type") ~
-      get[Option[String]]("rela_stat")).map {
-      case id ~ wife ~ husb ~ timestamp ~ refn ~ refnType ~ relaType ~ relaStat =>
+      get[Option[String]]("rela_stat") ~
+      get[Int]("base")).map {
+      case id ~ wife ~ husb ~ timestamp ~ refn ~ refnType ~ relaType ~ relaStat ~ base =>
         FamilyAsChildQueryData(
-          FamilyQueryData(id, husb, wife, timestamp.getOrElse(Instant.now), None, refn, refnType),
+          FamilyQueryData(id, husb, wife, timestamp.getOrElse(Instant.now), None, refn, refnType, base),
           refnType,
           relaType,
           relaStat

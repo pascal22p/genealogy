@@ -1,0 +1,65 @@
+@import views.html.components.Block
+@import models.forms.TrueOrFalseForm
+@import uk.gov.hmrc.govukfrontend.views.Implicits.*
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits.*
+@import uk.gov.hmrc.hmrcfrontend.views.Implicits.*
+@import config.AppConfig
+
+@this(
+    main: Main,
+    block: Block,
+    govukRadios: GovukRadios,
+    govukButton: GovukButton,
+    govukErrorSummary: GovukErrorSummary
+)
+
+@(dbId: Int, person: Person, form: Form[TrueOrFalseForm])(implicit request: AuthenticatedRequest[?], messages: Messages, appConfig: AppConfig)
+
+@main(1, None) {
+
+
+@block(s"Add ${person.details.shortName} (${person.events.birthAndDeathDate}) to a family") {
+    @if(form.hasGlobalErrors) {
+        @for(error <- form.globalErrors) {
+           <span class="error-message">@error.format(messages)</span>
+        }
+    }
+
+    @if(form.errors.nonEmpty) {
+        @govukErrorSummary(ErrorSummary().withFormErrorsAsHtml(form))
+    }
+
+    @helper.form(action = controllers.add.routes.AddPersonToFamily.submitInterstitial(dbId, person.details.id) ) {
+        @helper.CSRF.formField
+
+        @govukRadios(Radios(
+            fieldset = Some(Fieldset(
+                legend =
+                    Some(Legend(
+                        content = Text(s"Choose if ${person.details.shortName} needs to be added to a new or an existing family"),
+                        isPageHeading = true
+                    ))
+            )),
+            hint = None,
+            items = Seq(
+                RadioItem(
+                    content = Text("Add to a new family"),
+                    value = Some("true")
+                ),
+                RadioItem(
+                    content = Text("Add to an existing family"),
+                    value = Some("false")
+                )
+            )
+        ).withFormField(form("trueOrFalse")))
+
+        @govukButton(Button(
+            content = Text("Continue"),
+            name = Some("submit"),
+            href = None,
+            inputType = Some("submit")
+        ))
+    }
+}
+
+}

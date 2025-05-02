@@ -238,4 +238,26 @@ final class InsertSqlQueries @Inject() (db: Database, databaseExecutionContext: 
     }
   }(databaseExecutionContext)
 
+  def insertFamily(family: FamilyQueryData): OptionT[Future, Int] = OptionT(Future {
+    val parser: ResultSetParser[Option[Int]] = {
+      int("insert_id").singleOpt
+    }
+
+    db.withConnection { implicit conn =>
+      SQL(
+        """INSERT INTO genea_familles
+          | (base, familles_husb, familles_wife, familles_resn)
+          | VALUES ({base}, {familles_husb}, {familles_wife}, {familles_resn})
+        """.stripMargin
+      )
+        .on(
+          "base"          -> family.base,
+          "familles_husb" -> family.parent1,
+          "familles_wife" -> family.parent2,
+          "familles_resn" -> family.privacyRestriction
+        )
+        .executeInsert[Option[Int]](parser)
+    }
+  }(databaseExecutionContext))
+
 }
