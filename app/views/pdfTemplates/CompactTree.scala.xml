@@ -1,6 +1,8 @@
-@this()
+@import config.AppConfig
 
-@()
+@this(appConfig: AppConfig)
+
+@(a: String)
 
 <fo:root xmlns:fo="http://www.w3.org/1999/XSL/Format">
     <fo:layout-master-set>
@@ -8,6 +10,25 @@
             <fo:region-body/>
         </fo:simple-page-master>
     </fo:layout-master-set>
+
+    <fo:declarations>
+        <x:xmpmeta xmlns:x="adobe:ns:meta/">
+            <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+                <rdf:Description rdf:about=""
+                                 xmlns:dc="http://purl.org/dc/elements/1.1/">
+                    <!-- Dublin Core properties go here -->
+                    <dc:title>Tree</dc:title>
+                    <dc:creator>Pascal Parois</dc:creator>
+                    <dc:description>Tree</dc:description>
+                </rdf:Description>
+                <rdf:Description rdf:about=""
+                                 xmlns:xmp="http://ns.adobe.com/xap/1.0/">
+                    <!-- XMP properties go here -->
+                    <xmp:CreatorTool>https://github.com/pascal22p/genealogy — version @{appConfig.commitHash}</xmp:CreatorTool>
+                </rdf:Description>
+            </rdf:RDF>
+        </x:xmpmeta>
+    </fo:declarations>
 
     <fo:page-sequence master-reference="diagram-page">
         <fo:flow flow-name="xsl-region-body">
@@ -2174,7 +2195,7 @@
                                                              style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 1078px; height: 1px; padding-top: 25px; margin-left: 41px;">
                                                             <div style="box-sizing: border-box; font-size: 0; text-align: center; color: #000000; ">
                                                                 <div style="display: inline-block; font-size: 25px; font-family: &quot;Helvetica&quot;; color: light-dark(#000000, #ffffff); line-height: 1.2; pointer-events: all; white-space: normal; word-wrap: normal; ">
-                                                                    Text
+                                                                    @a
                                                                 </div>
                                                             </div>
                                                         </div>

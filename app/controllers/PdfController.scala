@@ -15,10 +15,6 @@ import play.api.mvc.BaseController
 import play.api.mvc.ControllerComponents
 import play.api.Logging
 import services.FopService
-import services.GenealogyDatabaseService
-import views.html.FirstnamesList
-import views.html.Index
-import views.html.SurnamesList
 
 @Singleton
 class PdfController @Inject() (
@@ -34,7 +30,7 @@ class PdfController @Inject() (
   def pdf(): Action[AnyContent] = authAction.async { implicit request: AuthenticatedRequest[AnyContent] =>
     Future {
       try {
-        val pdfBytes = fopService.xmlTopdf2()
+        val pdfBytes = fopService.xmlTopdf()
         // Send PDF to browser
         Ok(pdfBytes)
           .as("application/pdf")

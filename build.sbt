@@ -116,10 +116,11 @@ lazy val genealogy = (project in file("."))
       "-Xkind-projector",
       "-Wvalue-discard",
       "-Wunused:all",
-      //"-Xfatal-warnings",
+      "-Xfatal-warnings",
       //"-Yexplicit-nulls",
       "-Wsafe-init",
       "-Wconf:msg=unused import&src=html/.*:s",
+      "-Wconf:msg=unused import&src=xml/.*:s",
       "-Wconf:src=routes/.*:s"
     ),
 
