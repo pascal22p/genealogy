@@ -18,7 +18,8 @@ Test / parallelExecution := true
 Test / Keys.fork := true
 
 Universal / javaOptions ++= Seq(
-  "-Dpidfile.path=/dev/null"
+  "-Dpidfile.path=/dev/null",
+  s"-Dgit.commit.hash=v${version.value}-snapshot-$shortCommitHash"
 )
 
 packageName := "genealogy"
@@ -119,6 +120,7 @@ lazy val genealogy = (project in file("."))
       //"-Yexplicit-nulls",
       "-Wsafe-init",
       "-Wconf:msg=unused import&src=html/.*:s",
+      "-Wconf:msg=unused import&src=xml/.*:s",
       "-Wconf:src=routes/.*:s"
     ),
 

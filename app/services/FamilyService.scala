@@ -40,6 +40,45 @@ class FamilyService @Inject() (
     mariadbQueries.getFamilyIdsFromPartnerId(id)
   }
 
+  def getAllFamilies(base: Int): Future[List[Family]] = {
+    mariadbQueries
+      .getAllFamilies(base)
+      .flatMap(families =>
+        families.traverse { family =>
+          for {
+            parent1      <- family.parent1.traverse(personDetailsService.getPersonDetails).map(_.flatten)
+            events1      <- parent1.traverse(i => eventService.getIndividualEvents(i.id, true))
+            parent2      <- family.parent2.traverse(personDetailsService.getPersonDetails).map(_.flatten)
+            events2      <- parent2.traverse(i => eventService.getIndividualEvents(i.id, true))
+            familyEvents <- eventService.getFamilyEvents(family.id)
+            children     <- getChildren(family.id, true)
+          } yield {
+            Family(
+              family,
+              parent1.map(
+                Person(
+                  _,
+                  Events(events1.getOrElse(List.empty[EventDetail]), Some(family.id), FamilyEvent),
+                  Attributes(List.empty, Some(family.id), FamilyEvent),
+                  List.empty
+                )
+              ),
+              parent2.map(
+                Person(
+                  _,
+                  Events(events2.getOrElse(List.empty[EventDetail]), Some(family.id), FamilyEvent),
+                  Attributes(List.empty, Some(family.id), FamilyEvent),
+                  List.empty
+                )
+              ),
+              children,
+              familyEvents
+            )
+          }
+        }
+      )
+  }
+
   def getFamilyDetails(id: Int, omitSources: Boolean = false): Future[Option[Family]] = {
     mariadbQueries
       .getFamilyDetails(id)

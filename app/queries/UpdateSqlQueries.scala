@@ -8,6 +8,7 @@ import scala.concurrent.Future
 
 import anorm.*
 import models.*
+import models.queryData.FamilyQueryData
 import models.EventType.FamilyEvent
 import models.EventType.IndividualEvent
 import models.EventType.UnknownEvent
@@ -182,6 +183,63 @@ final class UpdateSqlQueries @Inject() (db: Database, databaseExecutionContext: 
         )
         .executeUpdate()
     }
+  }(databaseExecutionContext)
+
+  def deletePartnerFromFamily(partnerId: Int, familyId: Int): Future[Int] = Future {
+    db.withTransaction { implicit conn =>
+      val maybeFamily = SQL("""SELECT *
+                              |FROM genea_familles
+                              |WHERE familles_id = {id}""".stripMargin)
+        .on("id" -> familyId)
+        .as[Option[FamilyQueryData]](FamilyQueryData.mysqlParser.singleOpt)
+
+      maybeFamily.fold(0) { family =>
+        val setPartner = (family.parent1, family.parent2) match {
+          case (Some(parent1), _) if parent1 == partnerId => "familles_husb = NULL"
+          case (_, Some(parent2)) if parent2 == partnerId => "familles_wife = NULL"
+          case (a, b)                                     => throw new RuntimeException(s"Combination $a, $b invalid to update partner in family")
+        }
+
+        SQL(s"""UPDATE genea_familles
+               |SET $setPartner
+               |WHERE familles_id = {id}
+               |""".stripMargin)
+          .on(
+            "id" -> familyId
+          )
+          .executeUpdate()
+      }
+    }
+  }(databaseExecutionContext)
+
+  def updatePartnerFromFamily(partnerId: Int, familyId: Int): Future[Int] = Future {
+    db.withTransaction { implicit conn =>
+      val maybeFamily = SQL("""SELECT *
+                              |FROM genea_familles
+                              |WHERE familles_id = {id}""".stripMargin)
+        .on("id" -> familyId)
+        .as[Option[FamilyQueryData]](FamilyQueryData.mysqlParser.singleOpt)
+
+      maybeFamily.fold(0) { family =>
+        val setPartner = (family.parent1, family.parent2) match {
+          case (None, Some(id)) if id != partnerId => "familles_husb = {partnerId}"
+          case (Some(id), None) if id != partnerId => "familles_wife = {partnerId}"
+          case (None, None)                        => "familles_husb = {partnerId}"
+          case (a, b)                              => throw new RuntimeException(s"Combination $a, $b invalid to update partner in family")
+        }
+
+        SQL(s"""UPDATE genea_familles
+               |SET $setPartner
+               |WHERE familles_id = {id}
+               |""".stripMargin)
+          .on(
+            "partnerId" -> partnerId,
+            "id"        -> familyId
+          )
+          .executeUpdate()
+      }
+    }
+
   }(databaseExecutionContext)
 
 }

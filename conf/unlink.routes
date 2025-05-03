@@ -1,2 +1,5 @@
 GET     /base/:baseId/child/:child/family/:family       controllers.unlink.UnlinkChildController.unlinkChildConfirmation(baseId: Int, child: Int, family: Int)
 POST    /base/:baseId/child/:child/family/:family       controllers.unlink.UnlinkChildController.unlinkChildAction(baseId: Int, child: Int, family: Int)
+
+GET     /base/:baseId/partner/:partner/family/:family       controllers.unlink.UnlinkPartnerController.unlinkPartnerConfirmation(baseId: Int, partner: Int, family: Int)
+POST    /base/:baseId/partner/:partner/family/:family       controllers.unlink.UnlinkPartnerController.unlinkPartnerAction(baseId: Int, partner: Int, family: Int)

@@ -1,0 +1,104 @@
+@import config.AppConfig
+@import models.forms.FamilyForm
+@import models.{PersonDetails, Family}
+@import views.html.helper
+@import views.html.components.Block
+@import helper._
+@import utils.Constants
+@import uk.gov.hmrc.govukfrontend.views.Implicits.*
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits.*
+@import uk.gov.hmrc.hmrcfrontend.views.Implicits.*
+
+@this(
+main: Main,
+block: Block,
+govukInput: GovukInput,
+govukSelect: GovukSelect,
+govukButton: GovukButton,
+govukErrorSummary: GovukErrorSummary
+)(implicit appConfig: AppConfig)
+
+@(dbId: Int, allPersons: List[Person], person: Person, familyForm: Form[FamilyForm])(implicit request: AuthenticatedRequest[?], messages: Messages)
+
+@main(dbId, None) {
+
+
+@block(s"Add ${person.details.shortName} to a new family") {
+
+    @if(familyForm.hasGlobalErrors) {
+        @for(error <- familyForm.globalErrors) {
+            <span class="error-message">@error.format(messages)</span>
+        }
+    }
+
+    @if(familyForm.errors.nonEmpty) {
+        @govukErrorSummary(ErrorSummary().withFormErrorsAsHtml(familyForm))
+    }
+
+    @helper.form(action = controllers.add.routes.AddPersonToFamily.submitNewFamilyForm(dbId, person.details.id) ) {
+        @helper.CSRF.formField
+        @govukInput(
+            Input(
+                label = Label(content = Text("Database")),
+                hint = Some(Hint(
+                    content = HtmlContent("The database where the event is stored")
+                )),
+                classes = "govuk-!-width-one-half"
+            ).withFormField(familyForm("base"))
+        )
+        @govukSelect(
+            Select(
+                items =
+                    Seq(SelectItem(
+                        value = Some(""),
+                        text = "Unknown")) ++
+                    request.localSession.sessionData.history.map(history => SelectItem(
+                        value = Some(history.personId.toString),
+                        text = history.name
+                    )).sortBy(_.text) ++
+                    List(SelectItem(
+                        value = Some(""),
+                        text = "====================")) ++
+                    allPersons.map(person => SelectItem(
+                        value = Some(person.details.id.toString),
+                        text = s"${person.details.shortName} (${person.events.birthAndDeathDate})"
+                    )).sortBy(_.text),
+                    label = Label(content = Text("Partner 1")
+            ),
+            hint = None
+            ).withFormField(familyForm("person1Id"))
+        )
+
+        @govukSelect(
+            Select(
+                items =
+                    Seq(SelectItem(
+                        value = Some(""),
+                        text = "Unknown")) ++
+                    request.localSession.sessionData.history.map(history => SelectItem(
+                        value = Some(history.personId.toString),
+                        text = history.name
+                    )).sortBy(_.text) ++
+                    List(SelectItem(
+                        value = Some(""),
+                        text = "====================")) ++
+                    allPersons.map(person => SelectItem(
+                        value = Some(person.details.id.toString),
+                        text = s"${person.details.shortName} (${person.events.birthAndDeathDate})"
+                    )).sortBy(_.text),
+                    label = Label(content = Text("Partner 2")
+                ),
+                hint = None
+            ).withFormField(familyForm("person2Id"))
+        )
+
+        @govukButton(
+            Button(
+                element = Some("button"),
+                content = Text("Create new family")
+            )
+        )
+
+    }
+}
+}

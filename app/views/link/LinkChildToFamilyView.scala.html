@@ -46,6 +46,13 @@
                     Seq(SelectItem(
                         value = Some(""),
                         text = "Unknown")) ++
+                            request.localSession.sessionData.history.map(history => SelectItem(
+                                value = Some(history.personId.toString),
+                                text = history.name
+                            )).sortBy(_.text) ++
+                            List(SelectItem(
+                                value = None,
+                                text = "====================")) ++
                             allPersons.map(person => SelectItem(
                                 value = Some(person.details.id.toString),
                                 text = s"${person.details.shortName} (${person.events.birthAndDeathDate})"
