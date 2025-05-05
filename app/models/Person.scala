@@ -23,4 +23,8 @@ final case class Person(
     s"${details.firstname} ${details.surname}"
   }
 
+  def shortName: String = {
+    s"${details.firstname.split("\\s+").headOption.getOrElse("")} ${details.surname}"
+  }
+
 }

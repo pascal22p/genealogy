@@ -1,0 +1,5 @@
+@this()
+
+@(startX: Double, startY: Double, endX: Double, endY: Double)
+
+<path d="M @startX @startY L @endX @endY" class="line" />

@@ -14,13 +14,13 @@ import play.api.mvc.BaseController
 import play.api.mvc.ControllerComponents
 import play.api.Logging
 import services.AscendanceService
-import services.FopService
+import views.xml.pdfTemplates.SvgCompactTree
 
 @Singleton
-class PdfController @Inject() (
+class SvgController @Inject() (
     authAction: AuthAction,
-    fopService: FopService,
     ascendanceService: AscendanceService,
+    svgCompactTree: SvgCompactTree,
     val controllerComponents: ControllerComponents
 )(
     implicit ec: ExecutionContext
@@ -28,20 +28,16 @@ class PdfController @Inject() (
     with I18nSupport
     with Logging {
 
-  def pdf(id: Int): Action[AnyContent] = authAction.async { implicit request: AuthenticatedRequest[AnyContent] =>
+  def svg(id: Int): Action[AnyContent] = authAction.async { implicit request: AuthenticatedRequest[AnyContent] =>
     ascendanceService.buildSosaList(id).map { sosaList =>
-      try {
-        val pdfBytes = fopService.xmlTopdf(sosaList)
-        Ok(pdfBytes)
-          .as("application/pdf")
-          .withHeaders(
-            "Content-Disposition" -> "inline; filename=diagram.pdf"
-          )
-      } catch {
-        case e: Exception =>
-          logger.error(e.getMessage, e)
-          InternalServerError(s"Error generating PDF: ${e.getMessage}")
+      val title = sosaList.get(1).fold("") { person =>
+        s"Ascendance of ${person.name}"
       }
+      Ok(svgCompactTree(title, sosaList))
+        .as("image/svg+xml")
+        .withHeaders(
+          "Content-Disposition" -> "inline; filename=diagram.svg"
+        )
     }
   }
 }

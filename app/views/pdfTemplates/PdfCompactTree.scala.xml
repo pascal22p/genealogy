@@ -1,0 +1,43 @@
+@import config.AppConfig
+
+        @this(appConfig: AppConfig, svgCompactTree: SvgCompactTree)
+
+        @(title: String, sosaList: Map[Int, Person])(implicit request: AuthenticatedRequest[?], messages: Messages)
+
+<fo:root xmlns:fo="http://www.w3.org/1999/XSL/Format">
+    <fo:layout-master-set>
+        <fo:simple-page-master master-name="diagram-page" page-width="1169pt" page-height="827pt" margin="0pt">
+            <fo:region-body/>
+        </fo:simple-page-master>
+    </fo:layout-master-set>
+
+    <fo:declarations>
+        <x:xmpmeta xmlns:x="adobe:ns:meta/">
+            <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+                <rdf:Description rdf:about=""
+                                 xmlns:dc="http://purl.org/dc/elements/1.1/">
+                    <dc:title>Tree</dc:title>
+                    <dc:creator>Pascal Parois</dc:creator>
+                    <dc:description>Tree</dc:description>
+                </rdf:Description>
+                <rdf:Description rdf:about=""
+                                 xmlns:xmp="http://ns.adobe.com/xap/1.0/">
+                    <xmp:CreatorTool>https://github.com/pascal22p/genealogy — version @{appConfig.commitHash}
+                    </xmp:CreatorTool>
+                </rdf:Description>
+            </rdf:RDF>
+        </x:xmpmeta>
+    </fo:declarations>
+
+    <fo:page-sequence master-reference="diagram-page">
+        <fo:flow flow-name="xsl-region-body">
+            <fo:block>
+                <fo:instream-foreign-object>
+
+                    @svgCompactTree(title, sosaList)
+
+                </fo:instream-foreign-object>
+            </fo:block>
+        </fo:flow>
+    </fo:page-sequence>
+</fo:root>

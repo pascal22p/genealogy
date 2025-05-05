@@ -10,13 +10,20 @@ import javax.xml.transform.TransformerFactory
 
 import scala.concurrent.ExecutionContext
 
+import models.AuthenticatedRequest
+import models.Person
 import org.apache.fop.apps.FopFactory
 import org.apache.xmlgraphics.util.MimeConstants
-import views.xml.pdfTemplates.CompactTree
+import play.api.i18n.Messages
+import views.xml.pdfTemplates.PdfCompactTree
 
-class FopService @Inject() (compactTree: CompactTree)(implicit val ec: ExecutionContext) {
+class FopService @Inject() (compactTree: PdfCompactTree)(implicit val ec: ExecutionContext) {
 
-  def xmlTopdf() = {
+  def xmlTopdf(sosaList: Map[Int, Person])(implicit request: AuthenticatedRequest[?], messages: Messages) = {
+    val title = sosaList.get(1).fold("") { person =>
+      s"Ascendance of ${person.name}"
+    }
+
     // Initialize FOP
     val fopFactory = FopFactory.newInstance(new java.io.File(".").toURI)
     val baos       = new ByteArrayOutputStream()
@@ -24,7 +31,7 @@ class FopService @Inject() (compactTree: CompactTree)(implicit val ec: Execution
 
     // Transform XSL-FO to PDF
     val transformer = TransformerFactory.newInstance().newTransformer()
-    val src         = new StreamSource(new StringReader(compactTree("test").body))
+    val src         = new StreamSource(new StringReader(compactTree(title, sosaList).body))
     val res         = new SAXResult(fop.getDefaultHandler)
     transformer.transform(src, res)
 

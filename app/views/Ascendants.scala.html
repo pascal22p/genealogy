@@ -1,10 +1,11 @@
 @import models.Person
 @import config.AppConfig
-
+@import uk.gov.hmrc.govukfrontend.views.html.components._
 
 @this(
   main: Main,
-  govukSummaryList: GovukSummaryList
+  govukSummaryList: GovukSummaryList,
+  govukTabs : GovukTabs,
 )(
   implicit val appConfig: AppConfig
 )
@@ -19,36 +20,65 @@
   s"generation-$depth"
 }
 
+@treeTab(person: Option[Person]) = {
+  @for(person <- flatTree.headOption.flatMap(_._2.headOption)) {
+    <p class="govuk-body"><a class="govuk-link" href="@controllers.routes.PdfController.pdf(person.details.id).url">Download as pdf</a></p>
+    <img src="@controllers.routes.SvgController.svg(person.details.id).url" alt="Tree" width="100%">
+  }
+}
+
+@listTab(flatTree: List[(Int, List[Person])]) = {
+  @for(gen <- flatTree) {
+    @govukSummaryList(
+      SummaryList(
+        rows = gen._2.map { person =>
+          SummaryListRow(
+            key = Key(Text(person.details.shortName)),
+            value = Value(HtmlContent(person.events.birthAndDeathDate())),
+            classes = "govuk-summary-list__row--no-border",
+            actions = Some(Actions(
+              items = Seq(
+                ActionItem(
+                  href = controllers.routes.IndividualController.showPerson(dbId, person.details.id).url,
+                  content = Text("View")
+                )
+              )
+            ))
+          )
+        },
+        card = Some(Card(
+          title = Some(CardTitle(content = Text(header(gen._1)))),
+          actions = None,
+          classes = "govuk-!-margin-4",
+          attributes = Map.empty
+        )),
+        classes = "",
+        attributes = Map("id" -> id(gen._1))
+     )
+   )
+  }
+}
+
 
 @main(dbId, flatTree.headOption.flatMap(_._2.headOption)) {
 
-  @for(gen <- flatTree) {  
-      @govukSummaryList(
-        SummaryList(
-          rows = gen._2.map { person =>
-              SummaryListRow(
-                  key = Key(Text(person.details.shortName)),
-                  value = Value(HtmlContent(person.events.birthAndDeathDate)),
-                  classes = "govuk-summary-list__row--no-border",
-                  actions = Some(Actions(
-                      items = Seq(
-                          ActionItem(
-                              href = controllers.routes.IndividualController.showPerson(dbId, person.details.id).url,
-                              content = Text("View")
-                          )
-                      )
-                  ))
-              )
-          },
-          card = Some(Card(
-              title = Some(CardTitle(content = Text(header(gen._1)))),
-              actions = None,
-              classes = "govuk-!-margin-4",
-              attributes = Map.empty
-          )),
-          classes = "",
-          attributes = Map("id" -> id(gen._1))
+  @govukTabs(Tabs(
+    items = Seq(
+      TabItem(
+        id = Some("tree"),
+        label = "Tree",
+        panel = TabPanel(
+          content = HtmlContent(treeTab(flatTree.headOption.flatMap(_._2.headOption)))
+        )
+      ),
+      TabItem(
+        id = Some("list"),
+        label = "List",
+        panel = TabPanel(
+          content = HtmlContent(listTab(flatTree))
+        )
       )
-      )
-  }
+    )
+  ))
+
 }

@@ -71,6 +71,19 @@ months.gregorian.oct = October
 months.gregorian.nov = November
 months.gregorian.dec = December
 
+months.gregorian.jan.short = Jan
+months.gregorian.feb.short = Feb
+months.gregorian.mar.short = Mar
+months.gregorian.apr.short = Apr
+months.gregorian.may.short = May
+months.gregorian.jun.short = Jun
+months.gregorian.jul.short = Jul
+months.gregorian.aug.short = Aug
+months.gregorian.sep.short = Sep
+months.gregorian.oct.short = Oct
+months.gregorian.nov.short = Nov
+months.gregorian.dec.short = Dec
+
 months.french.vend = Vendemiaire
 months.french.brum = Brumaire
 months.french.frim = Frimaire
@@ -85,6 +98,20 @@ months.french.ther = Thermidor
 months.french.fruc = Fructidor
 months.french.comp = Jour complementaire
 
+months.french.vend.short = Vend
+months.french.brum.short = Brum
+months.french.frim.short = Frim
+months.french.nivo.short = Nivo
+months.french.pluv.short = Pluv
+months.french.vent.short = Vent
+months.french.germ.short = Germ
+months.french.flor.short = Flor
+months.french.prai.short = Prai
+months.french.mess.short = Mess
+months.french.ther.short = Ther
+months.french.fruc.short = Fruc
+months.french.comp.short = comp
+
 date.period.bet = Between
 date.period.and = and
 date.period.bef = Before
@@ -94,6 +121,16 @@ date.period.to = to
 date.period.abt = About
 date.period.cal = Calculated
 date.period.est = Estimated
+
+date.period.bet.short = Bet
+date.period.and.short = and
+date.period.bef.short = Bef
+date.period.aft.short = Aft
+date.period.from.short = From
+date.period.to.short = to
+date.period.abt.short = Abt
+date.period.cal.short = Cal
+date.period.est.short = Est
 
 sex.unknown = Unknown
 sex.male = Male
