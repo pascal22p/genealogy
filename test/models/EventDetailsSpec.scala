@@ -32,7 +32,7 @@ class EventDetailsSpec extends BaseSpec {
       val expected = "5 April 1204"
       val sut      = fakeEventDetail(events_details_gedcom_date = input)
 
-      sut.formatDate(messages) shouldBe expected
+      sut.formatDate(false)(messages) shouldBe expected
     }
 
     "format APR 1204" in {
@@ -40,7 +40,7 @@ class EventDetailsSpec extends BaseSpec {
       val expected = "April 1204"
       val sut      = fakeEventDetail(events_details_gedcom_date = input)
 
-      sut.formatDate(messages) shouldBe expected
+      sut.formatDate(false)(messages) shouldBe expected
     }
 
     "format BET FEB 1309 AND 4 DEC 1934" in {
@@ -48,7 +48,7 @@ class EventDetailsSpec extends BaseSpec {
       val expected = "Between February 1309 and 4 December 1934"
       val sut      = fakeEventDetail(events_details_gedcom_date = input)
 
-      sut.formatDate(messages) shouldBe expected
+      sut.formatDate(false)(messages) shouldBe expected
     }
 
     "format @#DJULIAN@ BEF MAY 2001" in {
@@ -56,7 +56,7 @@ class EventDetailsSpec extends BaseSpec {
       val expected = "Before May 2001"
       val sut      = fakeEventDetail(events_details_gedcom_date = input)
 
-      sut.formatDate(messages) shouldBe expected
+      sut.formatDate(false)(messages) shouldBe expected
     }
 
     "format @#DFRENCH R@ 23 FRIM 2001" in {
@@ -64,7 +64,7 @@ class EventDetailsSpec extends BaseSpec {
       val expected = "23 Frimaire 2001"
       val sut      = fakeEventDetail(events_details_gedcom_date = input)
 
-      sut.formatDate(messages) shouldBe expected
+      sut.formatDate(false)(messages) shouldBe expected
     }
 
     "format ABT 1728" in {
@@ -72,7 +72,15 @@ class EventDetailsSpec extends BaseSpec {
       val expected = "About 1728"
       val sut      = fakeEventDetail(events_details_gedcom_date = input)
 
-      sut.formatDate(messages) shouldBe expected
+      sut.formatDate(false)(messages) shouldBe expected
+    }
+
+    "format @#DFRENCH R@ 23 FRIM 2001 using short month" in {
+      val input    = "@#DFRENCH R@ 23 FRIM 2001"
+      val expected = "23 Frim 2001"
+      val sut      = fakeEventDetail(events_details_gedcom_date = input)
+
+      sut.formatDate(true)(messages) shouldBe expected
     }
 
     "redact date" when {
@@ -87,7 +95,7 @@ class EventDetailsSpec extends BaseSpec {
         val expected = appConfig.redactedMask
         val sut      = fakeEventDetail(events_details_gedcom_date = input)
 
-        sut.formatDate(messages, request) shouldBe expected
+        sut.formatDate(false)(messages, request) shouldBe expected
 
       }
       "a date range is entered" in {
@@ -101,8 +109,7 @@ class EventDetailsSpec extends BaseSpec {
         val expected = appConfig.redactedMask
         val sut      = fakeEventDetail(events_details_gedcom_date = input)
 
-        sut.formatDate(messages, request) shouldBe expected
-
+        sut.formatDate(false)(messages, request) shouldBe expected
       }
     }
   }
