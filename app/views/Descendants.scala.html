@@ -21,7 +21,7 @@
                 person.families.map { family =>
                     if (!person.details.privacyRestriction.contains(PrivacyResn) || isAllowedToSee) {
                         val first = person.findPartner(family.id).fold(""){ partner =>
-                            "<li style=\"margin:0;padding:0\">x " + nameLink(dbId, partner) + "</li>"
+                            "<li style=\"margin:0;padding:0\">x " + nameLink(dbId, partner).body + "</li>"
                         }
                         val last = family.children.reverse.headOption
                         val allButLast = family.children.dropRight(1)
@@ -37,7 +37,7 @@
     }
 
     if (!person.details.privacyRestriction.contains(PrivacyResn) || isAllowedToSee) {
-        Html(s"<span class=\"govuk-!-font-size-16\">[$depth]</span>" + nameLink(dbId, person) + children)
+        Html(s"<span class=\"govuk-!-font-size-16\">[$depth]</span>" + nameLink(dbId, person).body + children)
     } else {
         Html(s"<span class=\"govuk-!-font-size-16\">[$depth]</span>" + appConfig.redactedMask + children)
     }
