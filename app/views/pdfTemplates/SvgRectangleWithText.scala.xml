@@ -1,0 +1,45 @@
+@import config.AppConfig
+@import models.ResnType.PrivacyResn
+
+@this()(implicit appConfig: AppConfig)
+
+@(x: Double, y: Double, sosaNumber: Int, person: Option[Person])(implicit request: AuthenticatedRequest[?], messages: Messages)
+
+@backgroundColor = @{
+  if(sosaNumber % 2 == 0) { "fill: aliceblue;" } else { "fill: mistyrose;" }
+}
+
+@name(person: Person) = @{
+  val isAllowedToSee = request.localSession.sessionData.userData.fold(false)(_.seePrivacy)
+  if (!person.details.privacyRestriction.contains(PrivacyResn) || isAllowedToSee) {
+    person.shortName
+  } else {
+    appConfig.redactedMask
+  }
+}
+
+@longName(person: Person) = @{
+  val isAllowedToSee = request.localSession.sessionData.userData.fold(false)(_.seePrivacy)
+  if (!person.details.privacyRestriction.contains(PrivacyResn) || isAllowedToSee) {
+    person.name
+  } else {
+    appConfig.redactedMask
+  }
+}
+
+<g data-cell-id="sosa-@sosaNumber">
+  <clipPath id="clip-@sosaNumber">
+    <rect x="@x" y="@y" width="140" height="39" />
+  </clipPath>
+  <rect x="@x" y="@y" width="140" height="39" style="@backgroundColor" class="block" />
+  <g transform="translate(-0.5 -0.5)" clip-path="url(#clip-@sosaNumber)">
+    <a href="@controllers.routes.SvgController.svg(person.fold(0)(_.details.id)).url">
+      <text x="@{(x + 70).toString}" y="@{(y + 15).toString}" class="blockText">
+        <title>@person.fold("")(longName(_))</title>
+        @person.fold("")(name(_))
+      </text>
+    </a>
+    <text x="@{(x + 70).toString}" y="@{(y + 32).toString}" class="blockTextDate">@{person.fold("")(_.events.birthAndDeathDate(true))}
+    </text>
+  </g>
+</g>

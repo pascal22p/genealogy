@@ -53,7 +53,7 @@ object CalendarConstants {
     "@#[A-Z ]+@".r -> ""
   )
 
-  val allKeywords: Map[Regex, String] = gregorianMonths ++ frenchMonths ++ keywordsPeriod ++ calendarTypes
+  val allKeywords: Map[Regex, String] = gregorianMonths ++ frenchMonths ++ keywordsPeriod
 
   val gregorianMonthsToInt = Map(
     "JAN" -> 1,

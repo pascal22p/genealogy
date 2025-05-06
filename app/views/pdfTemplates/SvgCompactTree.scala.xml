@@ -1,0 +1,177 @@
+@this(block: SvgRectangleWithText, path: SvgPath)
+
+@(title: String, sosaList: Map[Int, Person])(implicit request: AuthenticatedRequest[?], messages: Messages)
+
+<svg xmlns="http://www.w3.org/2000/svg"
+     style="background: #ffffff; background-color: white; color-scheme: light dark;"
+     xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="1169px" height="827px"
+     viewBox="-0.5 -0.5 1169 827">
+
+    <defs>
+        <style type="text/css"><![CDATA[
+          .line {
+            stroke: black;
+            stroke-width: 2;
+          }
+
+          .block {
+            stroke: black;
+            stroke-width: 2;
+            fill: white;
+          }
+
+          .blockTextDate {
+            fill: black;
+            font-family: Helvetica;
+            font-size: 10px;
+            text-anchor: middle;
+           }
+
+          .blockText {
+            fill: black;
+            font-family: Helvetica;
+            font-size: 12px;
+            text-anchor: middle;
+           }
+        ]]></style>
+    </defs>
+
+    @block(40, 61, 32, sosaList.get(32))
+    @block(360, 60.5, 34, sosaList.get(34))
+    @path(110, 120, 110, 100)
+    @path(110, 159, 110, 180)
+    @block(40, 120, 16, sosaList.get(16))
+    @block(40, 180, 33, sosaList.get(33))
+    @path(430, 119.5, 430, 99.5)
+    @path(430, 158.5, 430, 179.5)
+    @block(360, 119.5, 17, sosaList.get(17))
+    @block(360, 179.5, 35, sosaList.get(35))
+    @path(200, 139.5, 180, 139.5)
+    @path(340, 139.5, 360, 139.43)
+    @block(200, 120, 8, sosaList.get(8))
+    @block(660, 60.5, 40, sosaList.get(40))
+    @block(980, 60, 42, sosaList.get(42))
+    @path(730, 119.5, 730, 99.5)
+    @path(730, 158.5, 730, 179.5)
+    @block(660, 119.5, 20, sosaList.get(20))
+    @block(660, 179.5, 41, sosaList.get(41))
+    @path(1050, 119, 1050, 99)
+    @path(1050, 158, 1050, 179)
+    @block(980, 119, 21, sosaList.get(21))
+    @block(980, 179, 43, sosaList.get(43))
+    @path(820, 139, 800, 139)
+    @path(960, 139, 980, 139)
+    @block(820, 119.5, 10, sosaList.get(10))
+    @block(40, 255.5, 36, sosaList.get(36))
+    @block(360, 255, 38, sosaList.get(38))
+    @path(110, 314.5, 110, 294.5)
+    @path(110, 353.5, 110, 374.5)
+    @block(40, 314.5, 18, sosaList.get(18))
+    @block(40, 374.5, 37, sosaList.get(37))
+    @path(430, 314, 430, 294)
+    @path(430, 353, 430, 374)
+    @block(360, 314, 19, sosaList.get(19))
+    @block(360, 374, 39, sosaList.get(39))
+    @path(200, 334, 180, 334)
+    @path(340, 334, 360, 334)
+    @block(200, 314.5, 9, sosaList.get(9))
+    @block(660, 255, 44, sosaList.get(44))
+    @block(980, 254.5, 46, sosaList.get(46))
+    @path(730, 314, 730, 294)
+    @path(730, 353, 730, 374)
+    @block(660, 314, 22, sosaList.get(22))
+    @block(660, 374, 45, sosaList.get(45))
+    @path(1050, 313.5, 1050, 293.5)
+    @path(1050, 352.5, 1050, 373.5)
+    @block(980, 313.5, 23, sosaList.get(23))
+    @block(980, 373.5, 47, sosaList.get(47))
+    @path(820, 333.5, 800, 333.5)
+    @path(960, 333.5, 980, 333.57)
+    @block(820, 314, 11, sosaList.get(11))
+    @path(270, 219.5, 270, 159)
+    @path(270, 258.5, 270, 314.5)
+    @block(200, 219.5, 4, sosaList.get(4))
+    @path(890, 218.5, 890, 158.5)
+    @path(890, 257.5, 890, 314)
+    @block(820, 218.5, 5, sosaList.get(5))
+    @path(510, 239, 340, 239)
+    @path(650, 239, 820, 239)
+    @block(510, 219.5, 2, sosaList.get(2))
+    @block(40, 450.5, 48, sosaList.get(48))
+    @block(360, 450, 50, sosaList.get(50))
+    @path(110, 509.5, 110, 489.5)
+    @path(110, 548.5, 110, 569.5)
+    @block(40, 509.5, 24, sosaList.get(24))
+    @block(40, 569.5, 49, sosaList.get(49))
+    @path(430, 509, 430, 489)
+    @path(430, 548, 430, 569)
+    @block(360, 509, 25, sosaList.get(25))
+    @block(360, 569, 51, sosaList.get(51))
+    @path(200, 529, 180, 529)
+    @path(340, 529, 360, 529)
+    @block(200, 509.5, 12, sosaList.get(12))
+    @block(660, 451, 56, sosaList.get(56))
+    @block(980, 450.5, 58, sosaList.get(58))
+    @path(730, 510, 730, 490)
+    @path(730, 549, 730, 570)
+    @block(660, 510, 28, sosaList.get(28))
+    @block(660, 570, 57, sosaList.get(57))
+    @path(1050, 509.5, 1050, 489.5)
+    @path(1050, 548.5, 1050, 569.5)
+    @block(980, 509.5, 29, sosaList.get(29))
+    @block(980, 569.5, 59, sosaList.get(59))
+    @path(820, 529.5, 800, 529.5)
+    @path(960, 529.5, 980, 529.57)
+    @block(820, 510, 14, sosaList.get(14))
+    @block(40, 645, 52, sosaList.get(52))
+    @block(360, 644.5, 54, sosaList.get(54))
+    @path(110, 704, 110, 684)
+    @path(110, 743, 110, 764)
+    @block(40, 704, 26, sosaList.get(26))
+    @block(40, 764, 53, sosaList.get(53))
+    @path(430, 703.5, 430, 683.5)
+    @path(430, 742.5, 430, 763.5)
+    @block(360, 703.5, 27, sosaList.get(27))
+    @block(360, 763.5, 55, sosaList.get(55))
+    @path(200, 723.5, 180, 723.5)
+    @path(340, 723.5, 360, 723.43)
+    @block(200, 704, 13, sosaList.get(13))
+    @block(660, 645.5, 60, sosaList.get(60))
+    @block(980, 645, 62, sosaList.get(62))
+    @path(730, 704.5, 730, 684.5)
+    @path(730, 743.5, 730, 764.5)
+    @block(660, 704.5, 30, sosaList.get(30))
+    @block(660, 764.5, 61, sosaList.get(61))
+    @path(1050, 704, 1050, 684)
+    @path(1050, 743, 1050, 764)
+    @block(980, 704, 31, sosaList.get(31))
+    @block(980, 764, 63, sosaList.get(63))
+    @path(820, 724, 800, 724)
+    @path(960, 724, 980, 724)
+    @block(820, 704.5, 15, sosaList.get(15))
+    @path(270, 609, 270, 548.5)
+    @path(270, 648, 270, 704)
+    @block(200, 609, 6, sosaList.get(6))
+    @path(890, 609, 890, 549)
+    @path(890, 648, 890, 704.5)
+    @block(820, 609, 7, sosaList.get(7))
+    @path(510, 628.5, 340, 628.5)
+    @path(650, 628.5, 820, 628.5)
+    @block(510, 609, 3, sosaList.get(3))
+    @path(580, 454, 580, 609)
+    @path(580, 415, 580, 258.5)
+    @block(510, 415, 1, sosaList.get(1))
+    <g data-cell-id="aG0kyMvwOv1qPLLsP6IB-127">
+        <g>
+            <rect x="40" y="10" width="1080" height="30" fill="none" stroke="none" pointer-events="all"/>
+        </g>
+        <g>
+            <g transform="translate(-0.5 -0.5)">
+                <text x="580" y="33" fill="black"
+                      font-family="Helvetica" font-size="25px" text-anchor="middle">@title
+                </text>
+            </g>
+        </g>
+    </g>
+
+</svg>

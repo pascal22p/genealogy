@@ -37,7 +37,7 @@ class PersonSummaryListRow @Inject() ()(implicit val appConfig: AppConfig) {
     if (!person.details.privacyRestriction.contains(PrivacyResn) || isAllowedToSee) {
       SummaryListRow(
         key = Key(Text(person.details.shortName)),
-        value = Value(HtmlContent(person.events.birthAndDeathDate)),
+        value = Value(HtmlContent(person.events.birthAndDeathDate())),
         classes = "govuk-summary-list__row--no-border",
         actions = Some(
           Actions(

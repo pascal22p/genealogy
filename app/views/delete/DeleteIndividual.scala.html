@@ -81,7 +81,7 @@
         person.events.eventsDetails.sortBy(_.jd_count).map { event =>
           SummaryListRow(
               key = Key(Text(messages(event.tag.get))),
-              value = Value(HtmlContent(event.formatDate)),
+              value = Value(HtmlContent(event.formatDate())),
               classes = "govuk-summary-list__row--no-border",
               actions = None
             )
