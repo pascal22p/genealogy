@@ -10,7 +10,7 @@
 @(dbId: Int, events: Events)(implicit authenticatedRequest: AuthenticatedRequest[?], messages: Messages)
 
 @eventDetailRow(event: EventDetail) = {
-    @event.formatDate @for(place <- event.place) {
+    @event.formatDate() @for(place <- event.place) {
         at @place.oneLiner()
     }
 }

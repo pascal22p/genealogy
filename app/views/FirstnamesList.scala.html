@@ -22,7 +22,7 @@
             rows = names.map { name =>
                 SummaryListRow(
                     key = Key(Text(name.details.firstname.toString)),
-                    value = Value(Text(name.events.birthAndDeathDate.toString)),
+                    value = Value(Text(name.events.birthAndDeathDate().toString)),
                     classes = "govuk-summary-list__row--no-border",
                     actions = Some(Actions(
                         items = Seq(
