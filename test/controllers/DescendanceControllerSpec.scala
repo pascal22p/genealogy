@@ -85,7 +85,7 @@ class DescendanceControllerSpec extends BaseSpec {
   val sut: DescendanceController = app.injector.instanceOf[DescendanceController]
 
   "showDescendant" must {
-    "display tree of children" ignore {
+    "display tree of children" in {
       when(mockDescendanceService.getDescendant(any(), any())).thenReturn(
         Future.successful(Some(personA))
       )
