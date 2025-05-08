@@ -22,9 +22,9 @@
 @main(dbId, None) {
 
   @block("Unlink child from family") {
-    <p class="govuk-body">Unlink @child.details.shortName (@child.events.birthAndDeathDate) from the family
-      @family.parent1.map(person => s"${person.details.shortName} (${person.events.birthAndDeathDate})") and
-      @family.parent2.map(person => s"${person.details.shortName} (${person.events.birthAndDeathDate})")</p>
+    <p class="govuk-body">Unlink @child.details.shortName (@child.events.birthAndDeathDate()) from the family
+      @family.parent1.map(person => s"${person.details.shortName} (${person.events.birthAndDeathDate()})") and
+      @family.parent2.map(person => s"${person.details.shortName} (${person.events.birthAndDeathDate()})")</p>
 
   @formWithCSRF(controllers.unlink.routes.UnlinkChildController.unlinkChildAction(dbId, child.details.id, family.id)) {
     @govukButton(Button(

@@ -61,7 +61,7 @@ govukErrorSummary: GovukErrorSummary
                         text = "====================")) ++
                     allPersons.map(person => SelectItem(
                         value = Some(person.details.id.toString),
-                        text = s"${person.details.shortName} (${person.events.birthAndDeathDate})"
+                        text = s"${person.details.shortName} (${person.events.birthAndDeathDate()})"
                     )).sortBy(_.text),
                     label = Label(content = Text("Partner 1")
             ),
@@ -84,7 +84,7 @@ govukErrorSummary: GovukErrorSummary
                         text = "====================")) ++
                     allPersons.map(person => SelectItem(
                         value = Some(person.details.id.toString),
-                        text = s"${person.details.shortName} (${person.events.birthAndDeathDate})"
+                        text = s"${person.details.shortName} (${person.events.birthAndDeathDate()})"
                     )).sortBy(_.text),
                     label = Label(content = Text("Partner 2")
                 ),

@@ -25,8 +25,8 @@
   @block("Add new child to family") {
 
     <p class="govuk-body">Add a new child the family
-        @family.parent1.map(person => s"${person.details.shortName} (${person.events.birthAndDeathDate})") and
-        @family.parent2.map(person => s"${person.details.shortName} (${person.events.birthAndDeathDate})")</p>
+        @family.parent1.map(person => s"${person.details.shortName} (${person.events.birthAndDeathDate()})") and
+        @family.parent2.map(person => s"${person.details.shortName} (${person.events.birthAndDeathDate()})")</p>
 
     @if(linkForm.hasGlobalErrors) {
         @for(error <- linkForm.globalErrors) {
@@ -55,7 +55,7 @@
                                 text = "====================")) ++
                             allPersons.map(person => SelectItem(
                                 value = Some(person.details.id.toString),
-                                text = s"${person.details.shortName} (${person.events.birthAndDeathDate})"
+                                text = s"${person.details.shortName} (${person.events.birthAndDeathDate()})"
                             )).sortBy(_.text),
                 label = Label(
                     content = Text("Child")),

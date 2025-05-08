@@ -21,10 +21,10 @@ govukErrorSummary: GovukErrorSummary
 
 @familyItem(family: Family): String = @{
     val partner1 = family.parent1.fold("") { person =>
-        s"${person.details.shortName} (${person.events.birthAndDeathDate})"
+        s"${person.details.shortName} (${person.events.birthAndDeathDate()})"
     }
     val partner2 = family.parent2.fold("") { person =>
-        s"${person.details.shortName} (${person.events.birthAndDeathDate})"
+        s"${person.details.shortName} (${person.events.birthAndDeathDate()})"
     }
     val children = s" (${family.children.size} children)"
 
