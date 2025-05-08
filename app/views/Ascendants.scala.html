@@ -23,7 +23,10 @@
 @treeTab(person: Option[Person]) = {
   @for(person <- flatTree.headOption.flatMap(_._2.headOption)) {
     <p class="govuk-body"><a class="govuk-link" href="@controllers.routes.PdfController.pdf(person.details.id).url">Download as pdf</a></p>
-    <img src="@controllers.routes.SvgController.svg(person.details.id).url" alt="Tree" width="100%">
+    <object type="image/svg+xml" id="tree" name="tree" Alt="Tree" data="@controllers.routes.SvgController.svg(person.details.id).url" width="100%" >
+      <img src="@controllers.routes.SvgController.svg(person.details.id).url" alt="Tree" width="100%">
+    </object>
+
   }
 }
 

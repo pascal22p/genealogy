@@ -18,7 +18,7 @@
 @main(1, None) {
 
 
-@block(s"Add ${person.details.shortName} (${person.events.birthAndDeathDate}) to a family") {
+@block(s"Add ${person.details.shortName} (${person.events.birthAndDeathDate()}) to a family") {
     @if(form.hasGlobalErrors) {
         @for(error <- form.globalErrors) {
            <span class="error-message">@error.format(messages)</span>
