@@ -1,6 +1,6 @@
 @this(lastModified: LastModified, govukSummaryList: GovukSummaryList)
 
-@(dbId: Int, person: Person)(implicit authenticatedRequest: AuthenticatedRequest[?], messages: Messages)
+@(dbId: Int, person: Person)(implicit messages: Messages)
 
     @lastModified(person.details.timestamp)
 

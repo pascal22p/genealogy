@@ -11,7 +11,7 @@ enablePlugins(GitPlugin)
 
 ThisBuild / version := "0.3.0"
 ThisBuild / organization := "parois.net"
-ThisBuild / scalaVersion := "3.6.4"
+ThisBuild / scalaVersion := "3.7.0"
 ThisBuild / scalafmtOnCompile := true
 
 Test / parallelExecution := true
@@ -121,7 +121,10 @@ lazy val genealogy = (project in file("."))
       "-Wsafe-init",
       "-Wconf:msg=unused import&src=html/.*:s",
       "-Wconf:msg=unused import&src=xml/.*:s",
-      "-Wconf:src=routes/.*:s"
+      "-Wconf:src=routes/.*:s",
+      "-Wconf:msg=Implicit parameters should be provided with a `using` clause&src=html/.*:i",
+      "-Wconf:msg=Implicit parameters should be provided with a `using` clause&src=xml/.*:i",
+      "-Wconf:msg=package scala contains object and package with same name.*:i"
     ),
 
     // Define Docker aliases (tags)

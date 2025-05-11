@@ -11,6 +11,13 @@
 
 @(person: Person, families: List[Family], parents: List[Parents], dbId: Int)(implicit request: AuthenticatedRequest[?], messages: Messages)
 
+@for(family <- families) {
+    <p>Family id: @{family.id}</p>
+}
+
+@for(parent <- parents) {
+<p>Parents name: @{parent.formatParentsNames}</p>
+}
 
 @main(dbId, Some(person)) {
 

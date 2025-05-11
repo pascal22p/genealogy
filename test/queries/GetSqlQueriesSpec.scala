@@ -330,7 +330,7 @@ class GetSqlQueriesSpec extends MariadbHelper with Logging {
             sqlPersonDetails(fakePersonDetails(id = 4, surname = "A", privacyRestriction = Some(PrivacyResn)))
         )
         result <- sut.getSurnamesList(1)(
-          AuthenticatedRequest(FakeRequest(), Session("sessionId", SessionData(None), LocalDateTime.now))
+          using AuthenticatedRequest(FakeRequest(), Session("sessionId", SessionData(None), LocalDateTime.now))
         )
       } yield result).futureValue
 
@@ -356,7 +356,7 @@ class GetSqlQueriesSpec extends MariadbHelper with Logging {
         _ <- executeSql(sqlIndividualEvent(person3, event3, eventTag))
         _ <- executeSql(sqlIndividualEvents(person4, List(event4, event5, event6), eventTag))
         result <- sut.getSurnamesList(1)(
-          AuthenticatedRequest(FakeRequest(), Session("sessionId", SessionData(None), LocalDateTime.now))
+          using AuthenticatedRequest(FakeRequest(), Session("sessionId", SessionData(None), LocalDateTime.now))
         )
       } yield result).futureValue
 
@@ -377,7 +377,7 @@ class GetSqlQueriesSpec extends MariadbHelper with Logging {
             sqlPersonDetails(fakePersonDetails(id = 4, surname = "A", privacyRestriction = Some(PrivacyResn)))
         )
         result <- sut.getSurnamesList(1)(
-          AuthenticatedRequest(
+          using AuthenticatedRequest(
             FakeRequest(),
             Session("sessionId", SessionData(Some(UserData(0, "username", "hashed", true, false))), LocalDateTime.now)
           )
@@ -390,7 +390,7 @@ class GetSqlQueriesSpec extends MariadbHelper with Logging {
     "returns nothing" in {
       val result = sut
         .getSurnamesList(1)(
-          AuthenticatedRequest(
+          using AuthenticatedRequest(
             FakeRequest(),
             Session("sessionId", SessionData(Some(UserData(0, "username", "hashed", true, false))), LocalDateTime.now)
           )
@@ -413,7 +413,7 @@ class GetSqlQueriesSpec extends MariadbHelper with Logging {
             )
         )
         result <- sut.getAllPersonDetails(1, Some("Z"))(
-          AuthenticatedRequest(FakeRequest(), Session("sessionId", SessionData(None), LocalDateTime.now))
+          using AuthenticatedRequest(FakeRequest(), Session("sessionId", SessionData(None), LocalDateTime.now))
         )
       } yield result).futureValue
 
@@ -431,7 +431,7 @@ class GetSqlQueriesSpec extends MariadbHelper with Logging {
             )
         )
         result <- sut.getAllPersonDetails(1, Some("Z"))(
-          AuthenticatedRequest(
+          using AuthenticatedRequest(
             FakeRequest(),
             Session("sessionId", SessionData(Some(UserData(0, "username", "hashed", true, false))), LocalDateTime.now)
           )
@@ -444,7 +444,7 @@ class GetSqlQueriesSpec extends MariadbHelper with Logging {
     "returns nothing" in {
       val result = sut
         .getAllPersonDetails(1, Some("Z"))(
-          AuthenticatedRequest(
+          using AuthenticatedRequest(
             FakeRequest(),
             Session("sessionId", SessionData(Some(UserData(0, "username", "hashed", true, false))), LocalDateTime.now)
           )

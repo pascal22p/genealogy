@@ -4,7 +4,7 @@
   block: Block,
 )
 
-@(dbId: Int, sourCitationId: Int, medias: List[ModelMedia])(implicit authenticatedRequest: AuthenticatedRequest[?], messages: Messages)
+@(dbId: Int, sourCitationId: Int, medias: List[ModelMedia])(implicit authenticatedRequest: AuthenticatedRequest[?])
 
   @block(
     title = "Medias", 

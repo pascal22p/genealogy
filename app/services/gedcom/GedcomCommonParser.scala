@@ -27,7 +27,7 @@ class GedcomCommonParser @Inject() () {
               throw new RuntimeException("found content at lower level")
             case lineRegexp(id) if id.toInt == level =>
               (lineNumber, line.trim) :: tree
-            case lineRegexp(id) =>
+            case lineRegexp(_) =>
               val (oldLineNumber, newLines) = tree.headOption.fold((0, "")) { (oldLineNumber, block) =>
                 (oldLineNumber, block + "\n" + line.trim)
               }

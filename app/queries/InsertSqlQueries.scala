@@ -48,7 +48,7 @@ final class InsertSqlQueries @Inject() (db: Database, databaseExecutionContext: 
         )
         .executeInsert[Option[Int]](parser)
     }
-  }(databaseExecutionContext))
+  }(using databaseExecutionContext))
 
   def insertEventDetail(
       eventDetailQueryData: EventDetailQueryData,
@@ -112,7 +112,7 @@ final class InsertSqlQueries @Inject() (db: Database, databaseExecutionContext: 
         }
         eventId
       }
-    }(databaseExecutionContext))
+    }(using databaseExecutionContext))
 
   def insertDatabase(genealogyDatabase: GenealogyDatabase): OptionT[Future, Int] = OptionT(Future {
     val parser: ResultSetParser[Option[Int]] = {
@@ -133,7 +133,7 @@ final class InsertSqlQueries @Inject() (db: Database, databaseExecutionContext: 
         )
         .executeInsert[Option[Int]](parser)
     }
-  }(databaseExecutionContext))
+  }(using databaseExecutionContext))
 
   def insertMedia(media: Media): OptionT[Future, Int] = OptionT(Future {
     val parser: ResultSetParser[Option[Int]] = {
@@ -155,7 +155,7 @@ final class InsertSqlQueries @Inject() (db: Database, databaseExecutionContext: 
         )
         .executeInsert[Option[Int]](parser)
     }
-  }(databaseExecutionContext))
+  }(using databaseExecutionContext))
 
   def insertSourCitation(sourCitation: SourCitationQueryData): OptionT[Future, Int] = OptionT(Future {
     val parser: ResultSetParser[Option[Int]] = {
@@ -221,7 +221,7 @@ final class InsertSqlQueries @Inject() (db: Database, databaseExecutionContext: 
       }
       sourCitationId
     }
-  }(databaseExecutionContext))
+  }(using databaseExecutionContext))
 
   def linkTable(table: String, values: List[NamedParameter]): Future[Boolean] = Future {
     db.withConnection { implicit conn =>
@@ -236,7 +236,7 @@ final class InsertSqlQueries @Inject() (db: Database, databaseExecutionContext: 
         )
         .execute()
     }
-  }(databaseExecutionContext)
+  }(using databaseExecutionContext)
 
   def insertFamily(family: FamilyQueryData): OptionT[Future, Int] = OptionT(Future {
     val parser: ResultSetParser[Option[Int]] = {
@@ -258,6 +258,6 @@ final class InsertSqlQueries @Inject() (db: Database, databaseExecutionContext: 
         )
         .executeInsert[Option[Int]](parser)
     }
-  }(databaseExecutionContext))
+  }(using databaseExecutionContext))
 
 }

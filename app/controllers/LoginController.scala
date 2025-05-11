@@ -15,7 +15,6 @@ import play.api.mvc.AnyContent
 import play.api.mvc.BaseController
 import play.api.mvc.ControllerComponents
 import play.api.mvc.Result
-import play.api.mvc.Results.Redirect
 import queries.SessionSqlQueries
 import services.LoginService
 import views.html.Login

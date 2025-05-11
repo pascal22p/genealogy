@@ -32,7 +32,7 @@ class HomeController @Inject() (
 
   def onload(): Action[AnyContent] = authAction.async { implicit request: AuthenticatedRequest[AnyContent] =>
     genealogyDatabaseService.getGenealogyDatabases.map { dbs =>
-      Ok(indexView(dbs, request.localSession.sessionData))
+      Ok(indexView(dbs))
     }
   }
 

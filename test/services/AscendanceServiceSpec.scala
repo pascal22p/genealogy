@@ -129,7 +129,7 @@ class AscendanceServiceSpec extends BaseSpec {
           "surnamePrefix",
           "nameSuffix",
           "nameGiven",
-          "surnamePrefix",
+          "nameNickname",
           None
         ),
         Events(List.empty, Some(1), IndividualEvent),
@@ -151,7 +151,7 @@ class AscendanceServiceSpec extends BaseSpec {
                     "surnamePrefix",
                     "nameSuffix",
                     "nameGiven",
-                    "surnamePrefix",
+                    "nameNickname",
                     None
                   ),
                   Events(List.empty, Some(2), IndividualEvent),
@@ -173,7 +173,7 @@ class AscendanceServiceSpec extends BaseSpec {
                               "surnamePrefix",
                               "nameSuffix",
                               "nameGiven",
-                              "surnamePrefix",
+                              "nameNickname",
                               None
                             ),
                             Events(List.empty, Some(3), IndividualEvent),
@@ -196,7 +196,7 @@ class AscendanceServiceSpec extends BaseSpec {
                                         "surnamePrefix",
                                         "nameSuffix",
                                         "nameGiven",
-                                        "surnamePrefix",
+                                        "nameNickname",
                                         None
                                       ),
                                       Events(List.empty, Some(5), IndividualEvent),
@@ -232,7 +232,7 @@ class AscendanceServiceSpec extends BaseSpec {
                               "surnamePrefix",
                               "nameSuffix",
                               "nameGiven",
-                              "surnamePrefix",
+                              "nameNickname",
                               None
                             ),
                             Events(List.empty, Some(4), IndividualEvent),

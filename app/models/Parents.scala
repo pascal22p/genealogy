@@ -1,6 +1,5 @@
 package models
 
-import anorm.SqlParser._
 import queryData.FamilyAsChildQueryData
 
 final case class Parents(family: Family, refnType: String, relaType: String, relaStat: Option[String]) {

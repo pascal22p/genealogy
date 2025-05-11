@@ -3,14 +3,12 @@ package controllers
 import javax.inject.Inject
 import javax.inject.Singleton
 
+import scala.annotation.unused
 import scala.concurrent.ExecutionContext
 
 import actions.AuthAction
 import models.AuthenticatedRequest
-import models.Events
 import models.Family
-import models.Person
-import models.PersonDetails
 import play.api.i18n.*
 import play.api.mvc.*
 import play.api.Logging
@@ -31,7 +29,7 @@ class DescendanceController @Inject() (
     with I18nSupport
     with Logging {
 
-  def showDescendant(baseId: Int, id: Int): Action[AnyContent] = authAction.async {
+  def showDescendant(@unused baseId: Int, id: Int): Action[AnyContent] = authAction.async {
     implicit authenticatedRequest: AuthenticatedRequest[AnyContent] =>
       descendanceService.getDescendant(id, 0).map {
         case Some(tree) =>

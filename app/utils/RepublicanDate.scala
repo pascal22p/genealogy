@@ -130,7 +130,7 @@ class RepublicanDate @Inject() () {
         .plusDays(day - 1)
     ) match {
       case Success(result) => Some(result)
-      case Failure(error)  => None
+      case Failure(_)      => None
     }
   }
 

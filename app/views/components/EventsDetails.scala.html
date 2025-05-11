@@ -47,7 +47,7 @@
         },
         card = Some(Card(
             title = Some(CardTitle(content = Text("Events"))),
-            actions = events.ownerId.map { ownerId => 
+            actions = events.ownerId.map { _ =>
                 Actions(
                 items = Seq(
                     ActionItem(

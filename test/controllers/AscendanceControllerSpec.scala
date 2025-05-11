@@ -12,7 +12,6 @@ import models.EventType.IndividualEvent
 import org.jsoup.Jsoup
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
-import org.scalatestplus.mockito.MockitoSugar.mock
 import org.scalatestplus.play.*
 import play.api
 import play.api.inject.bind

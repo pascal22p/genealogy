@@ -3,9 +3,7 @@ package models.forms
 import java.time.Instant
 
 import models.queryData.EventDetailQueryData
-import models.EventType
 import models.EventType.EventType
-import play.api.data.format.Formats._
 import play.api.data.Form
 import play.api.data.Forms.mapping
 import play.api.data.Forms.number

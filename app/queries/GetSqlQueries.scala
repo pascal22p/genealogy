@@ -38,7 +38,7 @@ final class GetSqlQueries @Inject() (db: Database, databaseExecutionContext: Dat
         .on("id" -> id)
         .as[List[PersonDetails]](PersonDetails.mysqlParser.*)
     }
-  }(databaseExecutionContext)
+  }(using databaseExecutionContext)
 
   def getEvents(id: Int, eventType: EventType): Future[List[EventDetailQueryData]] = Future {
     db.withConnection { implicit conn =>
@@ -95,7 +95,7 @@ final class GetSqlQueries @Inject() (db: Database, databaseExecutionContext: Dat
         .on("id" -> id)
         .as[List[EventDetailQueryData]](EventDetailQueryData.mysqlParser.*)
     }
-  }(databaseExecutionContext)
+  }(using databaseExecutionContext)
 
   def getFamiliesFromIndividualId(individualId: Int): Future[List[FamilyAsChildQueryData]] = Future {
     db.withConnection { implicit conn =>
@@ -107,7 +107,7 @@ final class GetSqlQueries @Inject() (db: Database, databaseExecutionContext: Dat
         .on("id" -> individualId)
         .as[List[FamilyAsChildQueryData]](FamilyAsChildQueryData.mysqlParser.*)
     }
-  }(databaseExecutionContext)
+  }(using databaseExecutionContext)
 
   def getFamilyIdsFromPartnerId(individualId: Int): Future[List[Int]] = Future {
     db.withConnection { implicit conn =>
@@ -117,7 +117,7 @@ final class GetSqlQueries @Inject() (db: Database, databaseExecutionContext: Dat
         .on("id" -> individualId)
         .as[List[Int]](int("familles_id").*)
     }
-  }(databaseExecutionContext)
+  }(using databaseExecutionContext)
 
   def getFamilyDetails(familyId: Int): Future[Option[FamilyQueryData]] = Future {
     db.withConnection { implicit conn =>
@@ -127,7 +127,7 @@ final class GetSqlQueries @Inject() (db: Database, databaseExecutionContext: Dat
         .on("id" -> familyId)
         .as[Option[FamilyQueryData]](FamilyQueryData.mysqlParser.singleOpt)
     }
-  }(databaseExecutionContext)
+  }(using databaseExecutionContext)
 
   def getChildren(familyId: Int): Future[List[Child]] = Future {
     db.withConnection { implicit conn =>
@@ -139,7 +139,7 @@ final class GetSqlQueries @Inject() (db: Database, databaseExecutionContext: Dat
         .on("id" -> familyId)
         .as[List[Child]](Child.mysqlParser.*)
     }
-  }(databaseExecutionContext)
+  }(using databaseExecutionContext)
 
   def getPlace(id: Int): Future[Option[Place]] = Future {
     db.withConnection { implicit conn =>
@@ -149,7 +149,7 @@ final class GetSqlQueries @Inject() (db: Database, databaseExecutionContext: Dat
         .on("id" -> id)
         .as[Option[Place]](Place.mysqlParser.singleOpt)
     }
-  }(databaseExecutionContext)
+  }(using databaseExecutionContext)
 
   def getAllPlaces: Future[List[Place]] = Future {
     db.withConnection { implicit conn =>
@@ -157,7 +157,7 @@ final class GetSqlQueries @Inject() (db: Database, databaseExecutionContext: Dat
             |FROM genea_place""".stripMargin)
         .as[List[Place]](Place.mysqlParser.*)
     }
-  }(databaseExecutionContext)
+  }(using databaseExecutionContext)
 
   def getSourCitations(id: Int, typeCitation: SourCitationType, dbId: Int): Future[List[SourCitationQueryData]] =
     Future {
@@ -195,7 +195,7 @@ final class GetSqlQueries @Inject() (db: Database, databaseExecutionContext: Dat
           )
           .as[List[SourCitationQueryData]](SourCitationQueryData.mysqlParser.*)
       }
-    }(databaseExecutionContext)
+    }(using databaseExecutionContext)
 
   def getMedias(id: Option[Int] = None, typeMedia: MediaType, dbId: Int): Future[List[Media]] = Future {
     db.withConnection { implicit conn =>
@@ -244,7 +244,7 @@ final class GetSqlQueries @Inject() (db: Database, databaseExecutionContext: Dat
         )
         .as[List[Media]](Media.mysqlParser.*)
     }
-  }(databaseExecutionContext)
+  }(using databaseExecutionContext)
 
   def getGenealogyDatabase(id: Int): OptionT[Future, GenealogyDatabase] = OptionT(Future {
     db.withConnection { implicit conn =>
@@ -254,7 +254,7 @@ final class GetSqlQueries @Inject() (db: Database, databaseExecutionContext: Dat
         .on("id" -> id)
         .as[Option[GenealogyDatabase]](GenealogyDatabase.mysqlParser.singleOpt)
     }
-  }(databaseExecutionContext))
+  }(using databaseExecutionContext))
 
   def getGenealogyDatabases: Future[List[GenealogyDatabase]] = Future {
     db.withConnection { implicit conn =>
@@ -263,7 +263,7 @@ final class GetSqlQueries @Inject() (db: Database, databaseExecutionContext: Dat
             |ORDER BY nom""".stripMargin)
         .as[List[GenealogyDatabase]](GenealogyDatabase.mysqlParser.*)
     }
-  }(databaseExecutionContext)
+  }(using databaseExecutionContext)
 
   def getSurnamesList(
       id: Int
@@ -295,7 +295,7 @@ final class GetSqlQueries @Inject() (db: Database, databaseExecutionContext: Dat
           .on("id" -> id)
           .as(mysqlParser.*)
       }
-    }(databaseExecutionContext)
+    }(using databaseExecutionContext)
 
   def getAllPersonDetails(id: Int, name: Option[String] = None)(
       implicit authenticatedRequest: AuthenticatedRequest[?]
@@ -316,7 +316,7 @@ final class GetSqlQueries @Inject() (db: Database, databaseExecutionContext: Dat
         .on("id" -> id, "name" -> name.getOrElse(""))
         .as(PersonDetails.mysqlParser.*)
     }
-  }(databaseExecutionContext)
+  }(using databaseExecutionContext)
 
   def getUserData(username: String): Future[Option[UserData]] = Future {
     db.withConnection { implicit conn =>
@@ -326,7 +326,7 @@ final class GetSqlQueries @Inject() (db: Database, databaseExecutionContext: Dat
         .on("email" -> username)
         .as(UserData.mysqlParser.singleOpt)
     }
-  }(databaseExecutionContext)
+  }(using databaseExecutionContext)
 
   def getSourRecord(id: Int): Future[Option[SourRecord]] = Future {
     db.withConnection { implicit conn =>
@@ -336,7 +336,7 @@ final class GetSqlQueries @Inject() (db: Database, databaseExecutionContext: Dat
         .on("id" -> id)
         .as[Option[SourRecord]](SourRecord.mysqlParser.singleOpt)
     }
-  }(databaseExecutionContext)
+  }(using databaseExecutionContext)
 
   def getAllEvents: Future[List[EventDetailOnlyQueryData]] = Future {
     db.withConnection { implicit conn =>
@@ -344,7 +344,7 @@ final class GetSqlQueries @Inject() (db: Database, databaseExecutionContext: Dat
             |FROM genea_events_details""".stripMargin)
         .as[List[EventDetailOnlyQueryData]](EventDetailOnlyQueryData.mysqlParser.*)
     }
-  }(databaseExecutionContext)
+  }(using databaseExecutionContext)
 
   def getAllSourRecords: Future[List[SourRecord]] = Future {
     db.withConnection { implicit conn =>
@@ -352,7 +352,7 @@ final class GetSqlQueries @Inject() (db: Database, databaseExecutionContext: Dat
             |FROM genea_sour_records""".stripMargin)
         .as[List[SourRecord]](SourRecord.mysqlParser.*)
     }
-  }(databaseExecutionContext)
+  }(using databaseExecutionContext)
 
   def getSourRecords(dbId: Int): Future[List[SourRecord]] = Future {
     db.withConnection { implicit conn =>
@@ -362,7 +362,7 @@ final class GetSqlQueries @Inject() (db: Database, databaseExecutionContext: Dat
         .on("dbId" -> dbId)
         .as[List[SourRecord]](SourRecord.mysqlParser.*)
     }
-  }(databaseExecutionContext)
+  }(using databaseExecutionContext)
 
   def getAllFamilies(baseId: Int): Future[List[FamilyQueryData]] = Future {
     db.withConnection { implicit conn =>
@@ -372,6 +372,6 @@ final class GetSqlQueries @Inject() (db: Database, databaseExecutionContext: Dat
         .on("id" -> baseId)
         .as[List[FamilyQueryData]](FamilyQueryData.mysqlParser.*)
     }
-  }(databaseExecutionContext)
+  }(using databaseExecutionContext)
 
 }

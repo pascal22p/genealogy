@@ -1,7 +1,6 @@
 package services
 
 import java.io.ByteArrayOutputStream
-import java.io.File
 import java.io.StringReader
 import javax.inject.Inject
 import javax.xml.transform.sax.SAXResult
@@ -19,7 +18,9 @@ import views.xml.pdfTemplates.PdfCompactTree
 
 class FopService @Inject() (compactTree: PdfCompactTree)(implicit val ec: ExecutionContext) {
 
-  def xmlTopdf(sosaList: Map[Int, Person])(implicit request: AuthenticatedRequest[?], messages: Messages) = {
+  def xmlTopdf(
+      sosaList: Map[Int, Person]
+  )(implicit request: AuthenticatedRequest[?], messages: Messages): Array[Byte] = {
     val title = sosaList.get(1).fold("") { person =>
       s"Ascendance of ${person.name}"
     }

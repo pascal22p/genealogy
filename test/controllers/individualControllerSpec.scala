@@ -15,7 +15,6 @@ import models.SessionData
 import models.UserData
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
-import org.scalatestplus.mockito.MockitoSugar.mock
 import org.scalatestplus.play.*
 import play.api
 import play.api.inject.bind

@@ -48,7 +48,7 @@ object SourCitationQueryData {
       get[Option[Int]]("owner_id") ~
       get[String]("source_type") ~
       get[Int]("genea_sour_citations.base")).map {
-      case id ~ recordId ~ page ~ even ~ role ~ dates ~ text ~ quay ~ subm ~ timeStamp ~
+      case id ~ _ ~ page ~ even ~ role ~ dates ~ text ~ quay ~ subm ~ timeStamp ~
           sourRecordId ~ auth ~ title ~ abbr ~ publ ~ agnc ~ rin ~ sourRecordTimestamp ~ repoId ~ repoCaln ~ repoMedi ~
           ownerId ~ sourceType ~ base =>
         SourCitationQueryData(

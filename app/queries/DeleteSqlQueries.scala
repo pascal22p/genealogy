@@ -31,7 +31,7 @@ final class DeleteSqlQueries @Inject() (db: Database, databaseExecutionContext: 
         )
         .executeUpdate()
     }
-  }(databaseExecutionContext)
+  }(using databaseExecutionContext)
 
   def deleteGenealogyDatabase(id: Int): Future[Int] = Future {
     db.withConnection { implicit conn =>
@@ -43,7 +43,7 @@ final class DeleteSqlQueries @Inject() (db: Database, databaseExecutionContext: 
         )
         .executeUpdate()
     }
-  }(databaseExecutionContext)
+  }(using databaseExecutionContext)
 
   def deleteChildFromFamily(childId: Int, familyId: Int): Future[Int] = Future {
     db.withConnection { implicit conn =>
@@ -56,6 +56,6 @@ final class DeleteSqlQueries @Inject() (db: Database, databaseExecutionContext: 
         )
         .executeUpdate()
     }
-  }(databaseExecutionContext)
+  }(using databaseExecutionContext)
 
 }

@@ -24,7 +24,7 @@ final class SessionSqlQueries @Inject() (db: Database, databaseExecutionContext:
         .on("id" -> sessionId)
         .as(Session.mysqlParser.singleOpt)
     }
-  }(databaseExecutionContext)
+  }(using databaseExecutionContext)
 
   def putSessionData(session: Session): Future[Option[String]] = Future {
     db.withConnection { implicit conn =>
@@ -38,7 +38,7 @@ final class SessionSqlQueries @Inject() (db: Database, databaseExecutionContext:
         )
         .executeInsert(str(1).singleOpt)
     }
-  }(databaseExecutionContext)
+  }(using databaseExecutionContext)
 
   def updateSessionData(session: Session): Future[Int] = Future {
     db.withConnection { implicit conn =>
@@ -49,7 +49,7 @@ final class SessionSqlQueries @Inject() (db: Database, databaseExecutionContext:
         .on("id" -> session.sessionId, "data" -> Json.toJson(session.sessionData).toString)
         .executeUpdate()
     }
-  }(databaseExecutionContext)
+  }(using databaseExecutionContext)
 
   def removeSessionData(session: Session): Future[Int] = Future {
     db.withConnection { implicit conn =>
@@ -59,7 +59,7 @@ final class SessionSqlQueries @Inject() (db: Database, databaseExecutionContext:
         .on("id" -> session.sessionId)
         .executeUpdate()
     }
-  }(databaseExecutionContext)
+  }(using databaseExecutionContext)
 
   def sessionKeepAlive(sessionId: String): Future[Int] = Future {
     db.withConnection { implicit conn =>
@@ -69,5 +69,5 @@ final class SessionSqlQueries @Inject() (db: Database, databaseExecutionContext:
         .on("id" -> sessionId)
         .executeUpdate()
     }
-  }(databaseExecutionContext)
+  }(using databaseExecutionContext)
 }

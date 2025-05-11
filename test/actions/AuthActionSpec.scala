@@ -2,7 +2,6 @@ package actions
 
 import java.time.LocalDateTime
 
-import scala.concurrent.ExecutionContext
 import scala.concurrent.ExecutionContext.global
 import scala.concurrent.Future
 
@@ -14,7 +13,6 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.when
-import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.http.Status.OK
 import play.api.http.Status.SEE_OTHER
 import play.api.mvc.Action
@@ -44,7 +42,7 @@ class AuthActionSpec extends BaseSpec {
 
   def fakeController: Harness = {
     val authAction =
-      new AuthActionImpl(mockSqlQueries, messagesControllerComponents)(global)
+      new AuthActionImpl(mockSqlQueries, messagesControllerComponents)(using global)
     new Harness(authAction)
   }
 

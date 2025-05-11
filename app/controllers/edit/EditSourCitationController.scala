@@ -9,7 +9,6 @@ import scala.concurrent.Future
 import actions.AuthJourney
 import models.forms.SourCitationForm
 import models.SourCitation
-import models.SourCitationType
 import models.SourCitationType.EventSourCitation
 import models.SourCitationType.IndividualSourCitation
 import models.SourCitationType.UnknownSourCitation

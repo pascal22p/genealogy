@@ -20,7 +20,7 @@
   s"generation-$depth"
 }
 
-@treeTab(person: Option[Person]) = {
+@treeTab(flatTree: List[(Int, List[Person])]) = {
   @for(person <- flatTree.headOption.flatMap(_._2.headOption)) {
     <p class="govuk-body"><a class="govuk-link" href="@controllers.routes.PdfController.pdf(person.details.id).url">Download as pdf</a></p>
     <object type="image/svg+xml" id="tree" name="tree" Alt="Tree" data="@controllers.routes.SvgController.svg(person.details.id).url" width="100%" >
@@ -71,7 +71,7 @@
         id = Some("tree"),
         label = "Tree",
         panel = TabPanel(
-          content = HtmlContent(treeTab(flatTree.headOption.flatMap(_._2.headOption)))
+          content = HtmlContent(treeTab(flatTree))
         )
       ),
       TabItem(
