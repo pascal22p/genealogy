@@ -7,7 +7,7 @@
   sourRecord: SourRecord,
   govukSummaryList: GovukSummaryList)
 
-@(dbId: Int, source: ModelSourCitation)(implicit request: AuthenticatedRequest[?], messages: Messages)
+@(dbId: Int, source: ModelSourCitation)(implicit request: AuthenticatedRequest[?])
 
   @govukSummaryList(
     SummaryList(

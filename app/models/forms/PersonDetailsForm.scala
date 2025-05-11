@@ -4,7 +4,6 @@ import java.time.Instant
 
 import models.PersonDetails
 import models.ResnType
-import models.ResnType._
 import models.Sex
 import play.api.data.Form
 import play.api.data.Forms.mapping

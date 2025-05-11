@@ -16,6 +16,7 @@ import models.Place
 import models.ResnType.PrivacyResn
 import play.api.data.Form
 import play.api.i18n.I18nSupport
+import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.BaseController
 import play.api.mvc.ControllerComponents
@@ -46,22 +47,22 @@ class EditEventDetailController @Inject() (
     with I18nSupport
     with Logging {
 
-  def showForm(baseId: Int, id: Int) = authJourney.authWithAdminRight.async { implicit request =>
-    handleEvent(id) { (event, person, allPlace) =>
+  def showForm(baseId: Int, id: Int): Action[AnyContent] = authJourney.authWithAdminRight.async { implicit request =>
+    handleEvent(id) { (event, _, allPlace) =>
       val form = EventDetailForm.eventDetailForm.fill(event.toForm)
       Future.successful(Ok(editEventDetail(baseId, form, allPlace, event)))
     }
   }
 
-  def onSubmit(baseId: Int, id: Int) = authJourney.authWithAdminRight.async { implicit request =>
+  def onSubmit(baseId: Int, id: Int): Action[AnyContent] = authJourney.authWithAdminRight.async { implicit request =>
     def errorFunction: Form[EventDetailForm] => Future[Result] = { (formWithErrors: Form[EventDetailForm]) =>
-      handleEvent(id) { (event, person, allPlace) =>
+      handleEvent(id) { (event, _, allPlace) =>
         Future.successful(BadRequest(editEventDetail(baseId, formWithErrors, allPlace, event)))
       }
     }
 
     val successFunction: EventDetailForm => Future[Result] = { (dataForm: EventDetailForm) =>
-      handleEvent(id) { (event, person, allPlace) =>
+      handleEvent(id) { (event, _, allPlace) =>
         updateSqlQueries.updateEventDetails(event.fromForm(dataForm, allPlace)).map {
           case 1 => Redirect(controllers.routes.EventController.showEvent(baseId, id))
           case _ => InternalServerError(serviceUnavailableView("No record was updated"))

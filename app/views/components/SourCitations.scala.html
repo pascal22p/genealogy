@@ -8,7 +8,7 @@
   oneSourCitation: OneSourCitation
 )
 
-@(dbId: Int, sources: List[ModelSourCitation], ownerId: Int, ownerType: SourCitationType)(implicit request: AuthenticatedRequest[?], messages: Messages)
+@(dbId: Int, sources: List[ModelSourCitation], ownerId: Int, ownerType: SourCitationType)(implicit request: AuthenticatedRequest[?])
 
 @block("Sources", Some(Actions(
   items = Seq(

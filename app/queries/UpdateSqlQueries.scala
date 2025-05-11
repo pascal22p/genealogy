@@ -49,7 +49,7 @@ final class UpdateSqlQueries @Inject() (db: Database, databaseExecutionContext: 
         )
         .executeUpdate()
     }
-  }(databaseExecutionContext)
+  }(using databaseExecutionContext)
 
   def updateEventDetails(event: EventDetail): Future[Int] = Future {
     db.withTransaction { implicit conn =>
@@ -107,7 +107,7 @@ final class UpdateSqlQueries @Inject() (db: Database, databaseExecutionContext: 
       }
 
     }
-  }(databaseExecutionContext)
+  }(using databaseExecutionContext)
 
   def updateSourCitation(sourCitation: SourCitation): Future[Int] = Future {
     db.withConnection { implicit conn =>
@@ -137,7 +137,7 @@ final class UpdateSqlQueries @Inject() (db: Database, databaseExecutionContext: 
         )
         .executeUpdate()
     }
-  }(databaseExecutionContext)
+  }(using databaseExecutionContext)
 
   def updateSourRecord(sourRecord: SourRecord): Future[Int] = Future {
     db.withConnection { implicit conn =>
@@ -169,7 +169,7 @@ final class UpdateSqlQueries @Inject() (db: Database, databaseExecutionContext: 
         )
         .executeUpdate()
     }
-  }(databaseExecutionContext)
+  }(using databaseExecutionContext)
 
   def updateEventNumberOfDays(eventId: Int, days: Option[Long]): Future[Int] = Future {
     db.withConnection { implicit conn =>
@@ -183,7 +183,7 @@ final class UpdateSqlQueries @Inject() (db: Database, databaseExecutionContext: 
         )
         .executeUpdate()
     }
-  }(databaseExecutionContext)
+  }(using databaseExecutionContext)
 
   def deletePartnerFromFamily(partnerId: Int, familyId: Int): Future[Int] = Future {
     db.withTransaction { implicit conn =>
@@ -210,7 +210,7 @@ final class UpdateSqlQueries @Inject() (db: Database, databaseExecutionContext: 
           .executeUpdate()
       }
     }
-  }(databaseExecutionContext)
+  }(using databaseExecutionContext)
 
   def updatePartnerFromFamily(partnerId: Int, familyId: Int): Future[Int] = Future {
     db.withTransaction { implicit conn =>
@@ -240,6 +240,6 @@ final class UpdateSqlQueries @Inject() (db: Database, databaseExecutionContext: 
       }
     }
 
-  }(databaseExecutionContext)
+  }(using databaseExecutionContext)
 
 }

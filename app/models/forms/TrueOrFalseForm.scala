@@ -1,6 +1,5 @@
 package models.forms
 
-import play.api.data.format.Formats.*
 import play.api.data.Form
 import play.api.data.Forms.boolean
 import play.api.data.Forms.mapping

@@ -56,7 +56,7 @@ trait BaseSpec
     surnamePrefix,
     nameSuffix,
     nameGiven,
-    surnamePrefix,
+    nameNickname,
     privacyRestriction
   )
 

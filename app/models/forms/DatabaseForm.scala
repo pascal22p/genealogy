@@ -1,7 +1,6 @@
 package models.forms
 
 import models.GenealogyDatabase
-import play.api.data.format.Formats._
 import play.api.data.Form
 import play.api.data.Forms.mapping
 import play.api.data.Forms.text

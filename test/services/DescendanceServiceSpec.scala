@@ -9,9 +9,7 @@ import models.EventType.FamilyEvent
 import models.EventType.IndividualEvent
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito
 import org.mockito.Mockito.when
-import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -100,7 +98,7 @@ class DescendanceServiceSpec extends BaseSpec {
           "surnamePrefix",
           "nameSuffix",
           "nameGiven",
-          "surnamePrefix",
+          "nameNickname",
           None
         ),
         Events(List.empty, Some(1), IndividualEvent),
@@ -128,7 +126,7 @@ class DescendanceServiceSpec extends BaseSpec {
                     "surnamePrefix",
                     "nameSuffix",
                     "nameGiven",
-                    "surnamePrefix",
+                    "nameNickname",
                     None
                   ),
                   Events(List.empty, Some(2), IndividualEvent),
@@ -156,7 +154,7 @@ class DescendanceServiceSpec extends BaseSpec {
                               "surnamePrefix",
                               "nameSuffix",
                               "nameGiven",
-                              "surnamePrefix",
+                              "nameNickname",
                               None
                             ),
                             Events(List.empty, Some(3), IndividualEvent),
@@ -184,7 +182,7 @@ class DescendanceServiceSpec extends BaseSpec {
                                         "surnamePrefix",
                                         "nameSuffix",
                                         "nameGiven",
-                                        "surnamePrefix",
+                                        "nameNickname",
                                         None
                                       ),
                                       Events(List.empty, Some(5), IndividualEvent),
@@ -216,7 +214,7 @@ class DescendanceServiceSpec extends BaseSpec {
                               "surnamePrefix",
                               "nameSuffix",
                               "nameGiven",
-                              "surnamePrefix",
+                              "nameNickname",
                               None
                             ),
                             Events(List.empty, Some(4), IndividualEvent),

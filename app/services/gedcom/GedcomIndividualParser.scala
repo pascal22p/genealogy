@@ -49,14 +49,14 @@ class GedcomIndividualParser @Inject() (
         +1 <<MULTIMEDIA_LINK>> {0:M} p.37, 26
      */
 
-    val (xref, name) = (node.xref, node.name) match {
+    val (xref, _) = (node.xref, node.name) match {
       case (Some(xref), name) if name == "INDI" => (xref, name)
       case (None, name) if name != "INDI" =>
         throw new RuntimeException(
           s"line ${node.lineNumber}: `${node.line}` tag name is invalid INDI is expected and xref is missing"
         )
       case (None, _) => throw new RuntimeException(s"line ${node.lineNumber}: `${node.line}` xref is missing")
-      case (_, name) =>
+      case (_, _) =>
         throw new RuntimeException(s"line ${node.lineNumber}: `${node.line}` tag name is invalid INDI is expected")
     }
 
@@ -105,11 +105,11 @@ class GedcomIndividualParser @Inject() (
       }
 
     for {
-      name    <- nameStructure
-      resn    <- resnIor
-      sex     <- sexIor
-      events  <- eventsIor
-      ignored <- ignoredContent
+      name   <- nameStructure
+      resn   <- resnIor
+      sex    <- sexIor
+      events <- eventsIor
+      _      <- ignoredContent
     } yield {
       GedcomIndiBlock(
         name,

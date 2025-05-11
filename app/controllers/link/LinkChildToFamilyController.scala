@@ -66,8 +66,9 @@ class LinkChildToFamilyController @Inject() (
 
   def onSubmit(dbId: Int, familyId: Int): Action[AnyContent] = authJourney.authWithAdminRight.async {
     implicit authenticatedRequest =>
-      val errorFunction: Form[LinkForm] => Future[Result] = { (formWithErrors: Form[LinkForm]) =>
-        getSqlQueries.getMedias(None, UnknownMedia, dbId).map { allMedias =>
+      // TODO: finish this
+      val errorFunction: Form[LinkForm] => Future[Result] = { (_: Form[LinkForm]) =>
+        getSqlQueries.getMedias(None, UnknownMedia, dbId).map { _ =>
           BadRequest("linkSourCitationToMediaView(dbId, sourCitationId, formWithErrors, allMedias)")
         }
       }

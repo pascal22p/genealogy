@@ -14,11 +14,9 @@ import models.Session
 import models.SessionData
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito
 import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.when
-import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -62,14 +60,14 @@ class GenealogyDatabaseServiceSpec extends BaseSpec {
         Events(fakeEventDetails2, Some(2), IndividualEvent),
         Attributes(List.empty, Some(2), IndividualEvent)
       )
-      when(mockMariadbQueries.getAllPersonDetails(any(), any())(any())).thenReturn(
+      when(mockMariadbQueries.getAllPersonDetails(any(), any())(using any())).thenReturn(
         Future.successful(List(fakePersonDetail1, fakePersonDetail2))
       )
       when(mockEventService.getIndividualEvents(any(), any[Boolean]))
         .thenReturn(Future.successful(fakeEventDetails1))
         .thenReturn(Future.successful(fakeEventDetails2))
 
-      val result: List[Person] = sut.getFirstnamesList(1, "Test")(fakeAuthenticatedRequest).futureValue
+      val result: List[Person] = sut.getFirstnamesList(1, "Test")(using fakeAuthenticatedRequest).futureValue
       result mustBe List(person1, person2)
       verify(mockEventService, times(2)).getIndividualEvents(argumentCaptor.capture(), any[Boolean])
       val capturedPersonIds = argumentCaptor.getAllValues.asScala.toList

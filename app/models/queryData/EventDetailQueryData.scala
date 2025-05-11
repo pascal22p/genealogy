@@ -7,7 +7,6 @@ import anorm.SqlParser.*
 import models.EventType
 import models.EventType.EventType
 import models.ResnType
-import models.ResnType.ResnType
 
 final case class EventDetailQueryData(
     dbId: Int,

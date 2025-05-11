@@ -38,7 +38,7 @@ object SourRecordForm {
       "repoCaln"   -> text,
       "repoMedi"   -> text,
       "parentId"   -> number,
-      "parentType" -> of[SourCitationType.SourCitationType](SourCitationType.formatter)
+      "parentType" -> of[SourCitationType.SourCitationType](using SourCitationType.formatter)
     )(SourRecordForm.apply)(SourRecordForm.unapply)
   )
 }

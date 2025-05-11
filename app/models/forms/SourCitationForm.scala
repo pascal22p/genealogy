@@ -3,7 +3,6 @@ package models.forms
 import java.time.Instant
 
 import models.SourCitationQueryData
-import models.SourCitationType
 import models.SourCitationType.SourCitationType
 import models.SourRecord
 import play.api.data.Form
@@ -22,7 +21,7 @@ final case class SourCitationForm(
     quay: Option[Int],
     recordId: Option[Int]
 ) {
-  def toSourCitationQueryData(ownerId: Int, dbId: Int, ownerType: SourCitationType) =
+  def toSourCitationQueryData(ownerId: Int, dbId: Int, ownerType: SourCitationType): SourCitationQueryData =
     SourCitationQueryData(
       id = 0,
       record = recordId.map(id => SourRecord(id, "", "", "", "", "", "", None, "", "", Instant.now())),

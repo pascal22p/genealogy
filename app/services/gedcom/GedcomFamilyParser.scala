@@ -40,14 +40,14 @@ class GedcomFamilyParser @Inject() (
       +1 <<MULTIMEDIA_LINK>>
      */
 
-    val (xref, name) = (node.xref, node.name) match {
+    val (xref, _) = (node.xref, node.name) match {
       case (Some(xref), name) if name == "FAM" => (xref, name)
       case (None, name) if name != "FAM" =>
         throw new RuntimeException(
           s"line ${node.lineNumber}: `${node.line}` tag name is invalid FAM is expected and xref is missing"
         )
       case (None, _) => throw new RuntimeException(s"line ${node.lineNumber}: `${node.line}` xref is missing")
-      case (_, name) =>
+      case (_, _) =>
         throw new RuntimeException(s"line ${node.lineNumber}: `${node.line}` tag name is invalid FAM is expected")
     }
 
@@ -105,7 +105,7 @@ class GedcomFamilyParser @Inject() (
       wife     <- wifeIor
       children <- childrenIor
       events   <- eventsIor
-      -        <- ignoredContent
+      _        <- ignoredContent
     } yield {
       GedcomFamilyBlock(
         gedcomHashIdTable.getFamilyIdFromString(xref),

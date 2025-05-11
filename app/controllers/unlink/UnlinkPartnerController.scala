@@ -6,7 +6,6 @@ import scala.concurrent.ExecutionContext
 
 import actions.AuthJourney
 import models.AuthenticatedRequest
-import models.Person
 import models.ResnType.PrivacyResn
 import play.api.i18n.*
 import play.api.mvc.*

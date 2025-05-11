@@ -38,7 +38,7 @@ class GedcomImportService @Inject() (
         }
         .reduce(_ && _)
     }
-  }(databaseExecutionContext)
+  }(using databaseExecutionContext)
 
   val startTransaction: List[SimpleSql[Row]] = List(
     SQL("SET FOREIGN_KEY_CHECKS=1").on(),
