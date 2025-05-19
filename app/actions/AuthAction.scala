@@ -33,6 +33,7 @@ class AuthActionImpl @Inject() (
     @SuppressWarnings(Array("org.wartremover.warts.ToString"))
     val uuid      = UUID.randomUUID().toString
     val sessionId = request.session.get("sessionId").getOrElse(uuid)
+
     sqlQueries.getSessionData(sessionId).flatMap {
       case Some(session) =>
         sqlQueries.sessionKeepAlive(sessionId).flatMap { _ =>
@@ -44,7 +45,7 @@ class AuthActionImpl @Inject() (
           }
         }
       case None =>
-        val session = Session(uuid, SessionData(None), LocalDateTime.now())
+        val session = Session(sessionId, SessionData(None), LocalDateTime.now())
         sqlQueries.putSessionData(session).flatMap { _ =>
           block {
             AuthenticatedRequest(
