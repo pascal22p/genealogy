@@ -5,16 +5,17 @@ import java.time.LocalDateTime
 import scala.concurrent.ExecutionContext.global
 import scala.concurrent.Future
 
+import filters.SessionFilter
 import models.AuthenticatedRequest
 import models.Session
 import models.SessionData
 import models.UserData
+import org.apache.pekko.stream.Materializer
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.when
 import play.api.http.Status.OK
-import play.api.http.Status.SEE_OTHER
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.InjectedController
@@ -22,6 +23,7 @@ import play.api.mvc.MessagesControllerComponents
 import play.api.test.FakeRequest
 import play.api.test.Helpers.contentAsString
 import play.api.test.Helpers.defaultAwaitTimeout
+import play.api.test.Helpers.session
 import play.api.test.Helpers.status
 import queries.SessionSqlQueries
 import testUtils.BaseSpec
@@ -53,8 +55,14 @@ class AuthActionSpec extends BaseSpec {
       Future.successful(None)
     )
 
-    val result = fakeController.onPageLoad(FakeRequest("GET", "/"))
-    status(result) mustBe SEE_OTHER
+    implicit val mat: Materializer = app.materializer
+    val filter                     = new SessionFilter()(using mat, global)
+    val filteredAction             = filter(fakeController.onPageLoad)
+    val result                     = filteredAction(FakeRequest("GET", "/"))
+
+    status(result) mustBe OK
+    val uuidV4Regex = """^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"""
+    (session(result).get("sessionId").get must include).regex(uuidV4Regex)
   }
 
   "A user with existing session" in {
