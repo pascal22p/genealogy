@@ -17,7 +17,7 @@
             }
         }
 
-        @helper.form(action = controllers.routes.LoginController.onSubmit() ) {
+        @helper.form(action = controllers.routes.SessionController.loginOnSubmit() ) {
             @helper.CSRF.formField
             <input type="hidden" value="@userForm("returnUrl").value" name="returnUrl" />
             @helper.inputText(userForm("username"))

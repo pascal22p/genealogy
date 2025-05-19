@@ -1,6 +1,5 @@
 package actions
 
-import java.time.LocalDateTime
 import java.util.UUID
 import javax.inject.Inject
 
@@ -9,8 +8,6 @@ import scala.concurrent.Future
 
 import com.google.inject.ImplementedBy
 import models.AuthenticatedRequest
-import models.Session
-import models.SessionData
 import play.api.mvc.ActionBuilder
 import play.api.mvc.ActionFunction
 import play.api.mvc.AnyContent
@@ -45,8 +42,7 @@ class AuthActionImpl @Inject() (
           }
         }
       case None =>
-        val session = Session(uuid, SessionData(None), LocalDateTime.now())
-        sqlQueries.putSessionData(session).map(_ => Redirect(request.uri).withSession("sessionId" -> uuid))
+        Future.successful(Redirect(controllers.routes.SessionController.addNewSession(request.uri)))
     }
   }
 
