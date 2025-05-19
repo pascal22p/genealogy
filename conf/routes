@@ -28,7 +28,6 @@ GET     /switch-lang/:lang                        controllers.IndividualControll
 GET     /login                                    controllers.SessionController.loginOnLoad()
 POST    /login                                    controllers.SessionController.loginOnSubmit()
 GET     /logout                                   controllers.SessionController.logoutOnLoad()
-GET     /new-session                              controllers.SessionController.addNewSession(continueUrl: String)
 
 GET     /assets/*file                             controllers.Assets.versioned(path="/public", file: Asset)
 GET     /medias/:filename                         controllers.MediaController.serveMedia(filename: String)

@@ -1,7 +1,5 @@
 package controllers
 
-import java.time.LocalDateTime
-import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -10,7 +8,6 @@ import scala.concurrent.Future
 
 import actions.AuthAction
 import models.forms.UserDataForm
-import models.Session
 import models.SessionData
 import play.api.data.Form
 import play.api.http.HeaderNames
@@ -35,17 +32,6 @@ class SessionController @Inject() (
     implicit ec: ExecutionContext
 ) extends BaseController
     with I18nSupport {
-
-  def addNewSession(continueUrl: String): Action[AnyContent] = Action.async { implicit request =>
-    val uri           = new java.net.URI(continueUrl)
-    val path          = uri.getPath
-    val query         = Option(uri.getQuery).getOrElse("")
-    val pathWithQuery = if (query.nonEmpty) s"$path?$query" else path
-
-    val uuid    = UUID.randomUUID().toString
-    val session = Session(uuid, SessionData(None), LocalDateTime.now())
-    sqlQueries.putSessionData(session).map(_ => Redirect(pathWithQuery).withSession("sessionId" -> uuid))
-  }
 
   def loginOnLoad: Action[AnyContent] = authAction.async { implicit authenticatedRequest =>
     val returnUrl =
