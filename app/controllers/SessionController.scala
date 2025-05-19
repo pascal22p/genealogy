@@ -36,17 +36,6 @@ class SessionController @Inject() (
 ) extends BaseController
     with I18nSupport {
 
-  def addNewSession(continueUrl: String): Action[AnyContent] = Action.async { implicit request =>
-    val uri           = new java.net.URI(continueUrl)
-    val path          = uri.getPath
-    val query         = Option(uri.getQuery).getOrElse("")
-    val pathWithQuery = if (query.nonEmpty) s"$path?$query" else path
-
-    val uuid    = UUID.randomUUID().toString
-    val session = Session(uuid, SessionData(None), LocalDateTime.now())
-    sqlQueries.putSessionData(session).map(_ => Redirect(pathWithQuery).withSession("sessionId" -> uuid))
-  }
-
   def loginOnLoad: Action[AnyContent] = authAction.async { implicit authenticatedRequest =>
     val returnUrl =
       authenticatedRequest.request.getQueryString("returnUrl").getOrElse(controllers.routes.HomeController.onload().url)
