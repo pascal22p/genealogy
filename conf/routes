@@ -25,9 +25,10 @@ GET     /base/:baseId/ascendant/:id               controllers.AscendanceControll
 GET     /base/:baseId/medias/show                 controllers.MediaListController.showMedias(baseId: Int)
 GET     /switch-lang/:lang                        controllers.IndividualController.languageSwitch(lang: String)
 
-GET     /login                                    controllers.LoginController.onLoad()
-POST    /login                                    controllers.LoginController.onSubmit()
-GET     /logout                                   controllers.LogoutController.onLoad()
+GET     /login                                    controllers.SessionController.loginOnLoad()
+POST    /login                                    controllers.SessionController.loginOnSubmit()
+GET     /logout                                   controllers.SessionController.logoutOnLoad()
+GET     /new-session                              controllers.SessionController.addNewSession(continueUrl: String)
 
 GET     /assets/*file                             controllers.Assets.versioned(path="/public", file: Asset)
 GET     /medias/:filename                         controllers.MediaController.serveMedia(filename: String)

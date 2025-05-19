@@ -22,7 +22,6 @@ import play.api.mvc.MessagesControllerComponents
 import play.api.test.FakeRequest
 import play.api.test.Helpers.contentAsString
 import play.api.test.Helpers.defaultAwaitTimeout
-import play.api.test.Helpers.session
 import play.api.test.Helpers.status
 import queries.SessionSqlQueries
 import testUtils.BaseSpec
@@ -56,7 +55,6 @@ class AuthActionSpec extends BaseSpec {
 
     val result = fakeController.onPageLoad(FakeRequest("GET", "/"))
     status(result) mustBe SEE_OTHER
-    session(result).data.keys must contain("sessionId")
   }
 
   "A user with existing session" in {

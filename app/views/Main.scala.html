@@ -18,7 +18,7 @@
     @hmrcTimeoutDialog(TimeoutDialog(
       timeout = Some(900),
       countdown = Some(2),
-      signOutUrl = Some(controllers.routes.LogoutController.onLoad().url),
+      signOutUrl = Some(controllers.routes.SessionController.logoutOnLoad().url),
       keepAliveUrl = Some("#"),
       signOutButtonText = Some("Log out")
     ))
@@ -28,7 +28,7 @@
     if(request.localSession.sessionData.userData.isEmpty) {
         Some(ServiceNavigationItem(
             content = Text("Login"),
-            href = s"${controllers.routes.LoginController.onLoad().url}?returnUrl=${request.request.uri}",
+            href = s"${controllers.routes.SessionController.loginOnLoad().url}?returnUrl=${request.request.uri}",
             active = false,
             current = false,
             classes = "",
@@ -37,7 +37,7 @@
     } else {
         Some(ServiceNavigationItem(
             content = Text("Logout"),
-            href = controllers.routes.LogoutController.onLoad().url,
+            href = controllers.routes.SessionController.logoutOnLoad().url,
             active = false,
             current = false,
             classes = "",
