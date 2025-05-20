@@ -30,6 +30,9 @@ final class SessionSqlQueries @Inject() (db: Database, databaseExecutionContext:
     db.withConnection { implicit conn =>
       SQL("""INSERT INTO genea_sessions (sessionId, sessionData, timeStamp)
             |VALUES ({id}, {data}, {timeStamp})
+            |ON DUPLICATE KEY UPDATE
+            |sessionData = VALUES(sessionData),
+            |timeStamp = VALUES(timeStamp);
             |""".stripMargin)
         .on(
           "id"        -> session.sessionId,

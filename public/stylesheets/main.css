@@ -7,11 +7,14 @@ html
 	color:black;
 }
 
-
+.govuk-link {
+  color: #01427b !important;
+}
 
 /* liens */
 a:link
 {
+  color:#013d72;
   padding:1px;
   border:none;
   color:inherit;
@@ -110,7 +113,7 @@ DIV.box_title
 /* box */
 .box
 {
-    background-color:#e3d2af;
+    background-color:#e6d6b7;
 }
 
 /* fin boxes */

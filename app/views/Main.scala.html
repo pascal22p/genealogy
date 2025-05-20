@@ -55,9 +55,9 @@
     <meta http-equiv="Content-language" content="fr" />
     <meta charset="UTF-8" />
 
-    <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/main.css")">
     <link rel="stylesheet" media="screen" href="@assetConfig.hmrcFrontendCssUrl">
-    <script type="module" src="@assetConfig.hmrcFrontendJsUrl" type="text/javascript"></script>
+    <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/main.css")">
+    <script type="module" src="@{assetConfig.hmrcFrontendJsUrl}" type="text/javascript"></script>
 
     @if(request.localSession.sessionData.userData.isDefined){
       @timeoutDialog
