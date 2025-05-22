@@ -7,6 +7,8 @@ import play.api.Configuration
 
 @Singleton
 class AppConfig @Inject() (configuration: Configuration) {
+  val protocol: String    = configuration.get[String]("protocol")
+  val allowedHost: String = configuration.get[String]("allowedHost")
 
   val mediaPath: String = configuration.get[String]("media-path")
 
