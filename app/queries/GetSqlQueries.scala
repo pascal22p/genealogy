@@ -297,7 +297,7 @@ final class GetSqlQueries @Inject() (db: Database, databaseExecutionContext: Dat
       }
     }(using databaseExecutionContext)
 
-  def getAllPersonDetails(id: Int, name: Option[String] = None)(
+  def getAllPersonDetails(dbId: Int, name: Option[String] = None)(
       implicit authenticatedRequest: AuthenticatedRequest[?]
   ): Future[List[PersonDetails]] = Future {
     db.withConnection { implicit conn =>
@@ -313,7 +313,7 @@ final class GetSqlQueries @Inject() (db: Database, databaseExecutionContext: Dat
              |FROM genea_individuals
              |WHERE base = {id} $filter $isExcluded
              |ORDER BY indi_prenom""".stripMargin)
-        .on("id" -> id, "name" -> name.getOrElse(""))
+        .on("id" -> dbId, "name" -> name.getOrElse(""))
         .as(PersonDetails.mysqlParser.*)
     }
   }(using databaseExecutionContext)
