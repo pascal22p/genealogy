@@ -88,4 +88,58 @@ class SiteMapController @Inject() (
       }
   }
 
+  def sitemapFamilies: Action[AnyContent] = authAction.async { implicit request =>
+    genealogyDatabaseService.getGenealogyDatabases
+      .flatMap { databases =>
+        databases
+          .traverse { database =>
+            getSqlQueries.getAllFamilies(database.id).map { families =>
+              families.map { family =>
+                controllers.routes.FamilyController.showFamily(database.id, family.id).url
+              }
+            }
+          }
+          .map(_.flatten)
+      }
+      .map { urls =>
+        Ok(sitemapXmlView(urls)).as("application/xml")
+      }
+  }
+
+  def sitemapDescendants: Action[AnyContent] = authAction.async { implicit request =>
+    genealogyDatabaseService.getGenealogyDatabases
+      .flatMap { databases =>
+        databases
+          .traverse { database =>
+            getSqlQueries.getAllPersonDetails(database.id, None).map { individuals =>
+              individuals.map { individual =>
+                controllers.routes.DescendanceController.showDescendant(database.id, individual.id).url
+              }
+            }
+          }
+          .map(_.flatten)
+      }
+      .map { urls =>
+        Ok(sitemapXmlView(urls)).as("application/xml")
+      }
+  }
+
+  def sitemapAscendants: Action[AnyContent] = authAction.async { implicit request =>
+    genealogyDatabaseService.getGenealogyDatabases
+      .flatMap { databases =>
+        databases
+          .traverse { database =>
+            getSqlQueries.getAllPersonDetails(database.id, None).map { individuals =>
+              individuals.map { individual =>
+                controllers.routes.AscendanceController.showAscendant(database.id, individual.id).url
+              }
+            }
+          }
+          .map(_.flatten)
+      }
+      .map { urls =>
+        Ok(sitemapXmlView(urls)).as("application/xml")
+      }
+  }
+
 }

@@ -40,3 +40,6 @@ GET     /sitemap/sitemap-individuals.xml          controllers.SiteMapController.
 GET     /sitemap/sitemap-events.xml               controllers.SiteMapController.sitemapEvents
 GET     /sitemap/sitemap-surnames.xml             controllers.SiteMapController.sitemapSurnames
 GET     /sitemap/sitemap-firstnames.xml           controllers.SiteMapController.sitemapFirstnames
+GET     /sitemap/sitemap-ascendants.xml           controllers.SiteMapController.sitemapAscendants
+GET     /sitemap/sitemap-descendants.xml          controllers.SiteMapController.sitemapDescendants
+GET     /sitemap/sitemap-families.xml             controllers.SiteMapController.sitemapFamilies
