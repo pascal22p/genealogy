@@ -1,26 +1,28 @@
-@this()
+@import config.AppConfig
+
+@this(appConfig: AppConfig)
 
 @()
 
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
-        <loc>/sitemap/sitemap-individuals.xml</loc>
+        <loc>@{appConfig.protocol}@{appConfig.allowedHost}/sitemap/sitemap-individuals.xml</loc>
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>
     </url>
     <url>
-        <loc>/sitemap/sitemap-events.xml</loc>
+        <loc>@{appConfig.protocol}@{appConfig.allowedHost}/sitemap/sitemap-events.xml</loc>
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>
     </url>
     <url>
-        <loc>/sitemap/sitemap-surnames.xml</loc>
+        <loc>@{appConfig.protocol}@{appConfig.allowedHost}/sitemap/sitemap-surnames.xml</loc>
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>
     </url>
     <url>
-        <loc>/sitemap/sitemap-firstnames.xml</loc>
+        <loc>@{appConfig.protocol}@{appConfig.allowedHost}/sitemap/sitemap-firstnames.xml</loc>
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>
     </url>
