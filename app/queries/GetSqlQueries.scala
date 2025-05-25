@@ -119,7 +119,7 @@ final class GetSqlQueries @Inject() (db: Database, databaseExecutionContext: Dat
     }
   }(using databaseExecutionContext)
 
-  def getFamilyDetails(familyId: Int): Future[Option[FamilyQueryData]] = Future {
+  def getFamilyDetails(familyId: Int): OptionT[Future, FamilyQueryData] = OptionT(Future {
     db.withConnection { implicit conn =>
       SQL("""SELECT *
             |FROM genea_familles
@@ -127,7 +127,7 @@ final class GetSqlQueries @Inject() (db: Database, databaseExecutionContext: Dat
         .on("id" -> familyId)
         .as[Option[FamilyQueryData]](FamilyQueryData.mysqlParser.singleOpt)
     }
-  }(using databaseExecutionContext)
+  }(using databaseExecutionContext))
 
   def getChildren(familyId: Int): Future[List[Child]] = Future {
     db.withConnection { implicit conn =>
@@ -141,7 +141,7 @@ final class GetSqlQueries @Inject() (db: Database, databaseExecutionContext: Dat
     }
   }(using databaseExecutionContext)
 
-  def getPlace(id: Int): Future[Option[Place]] = Future {
+  def getPlace(id: Int): OptionT[Future, Place] = OptionT(Future {
     db.withConnection { implicit conn =>
       SQL("""SELECT *
             |FROM genea_place
@@ -149,7 +149,7 @@ final class GetSqlQueries @Inject() (db: Database, databaseExecutionContext: Dat
         .on("id" -> id)
         .as[Option[Place]](Place.mysqlParser.singleOpt)
     }
-  }(using databaseExecutionContext)
+  }(using databaseExecutionContext))
 
   def getAllPlaces: Future[List[Place]] = Future {
     db.withConnection { implicit conn =>
@@ -318,7 +318,7 @@ final class GetSqlQueries @Inject() (db: Database, databaseExecutionContext: Dat
     }
   }(using databaseExecutionContext)
 
-  def getUserData(username: String): Future[Option[UserData]] = Future {
+  def getUserData(username: String): OptionT[Future, UserData] = OptionT(Future {
     db.withConnection { implicit conn =>
       SQL("""SELECT *
             |FROM genea_membres
@@ -326,9 +326,9 @@ final class GetSqlQueries @Inject() (db: Database, databaseExecutionContext: Dat
         .on("email" -> username)
         .as(UserData.mysqlParser.singleOpt)
     }
-  }(using databaseExecutionContext)
+  }(using databaseExecutionContext))
 
-  def getSourRecord(id: Int): Future[Option[SourRecord]] = Future {
+  def getSourRecord(id: Int): OptionT[Future, SourRecord] = OptionT(Future {
     db.withConnection { implicit conn =>
       SQL("""SELECT *
             |FROM genea_sour_records
@@ -336,7 +336,7 @@ final class GetSqlQueries @Inject() (db: Database, databaseExecutionContext: Dat
         .on("id" -> id)
         .as[Option[SourRecord]](SourRecord.mysqlParser.singleOpt)
     }
-  }(using databaseExecutionContext)
+  }(using databaseExecutionContext))
 
   def getAllEvents: Future[List[EventDetailOnlyQueryData]] = Future {
     db.withConnection { implicit conn =>
@@ -371,6 +371,68 @@ final class GetSqlQueries @Inject() (db: Database, databaseExecutionContext: Dat
             |WHERE base = {id}""".stripMargin)
         .on("id" -> baseId)
         .as[List[FamilyQueryData]](FamilyQueryData.mysqlParser.*)
+    }
+  }(using databaseExecutionContext)
+
+  def getOrphanedIndividuals(baseId: Int): Future[List[PersonDetails]] = Future {
+    db.withConnection { implicit conn =>
+      SQL("""SELECT * FROM genea_individuals WHERE
+            |base = {dbId} AND
+            |NOT EXISTS (SELECT * FROM genea_familles WHERE indi_id = familles_wife OR indi_id = familles_husb) AND
+            |NOT EXISTS (SELECT * FROM rel_familles_indi WHERE genea_individuals.indi_id = rel_familles_indi.indi_id)
+            |""".stripMargin)
+        .on("dbId" -> baseId)
+        .as[List[PersonDetails]](PersonDetails.mysqlParser.*)
+    }
+  }(using databaseExecutionContext)
+
+  def getOrphanedFamilies(baseId: Int): Future[List[FamilyQueryData]] = Future {
+    db.withConnection { implicit conn =>
+      SQL("""SELECT * FROM genea_familles WHERE
+            |base = {dbId} AND
+            |familles_wife IS NULL AND familles_husb IS NULL
+            |""".stripMargin)
+        .on("dbId" -> baseId)
+        .as[List[FamilyQueryData]](FamilyQueryData.mysqlParser.*)
+    }
+  }(using databaseExecutionContext)
+
+  def getOrphanedSourCitations(baseId: Int): Future[List[SourCitationQueryData]] = Future {
+    db.withConnection { implicit conn =>
+      SQL("""SELECT * FROM genea_sour_citations AS sources WHERE
+            |base = {dbId} AND
+            |NOT EXISTS (SELECT * FROM rel_events_sources WHERE sources.sour_citations_id = rel_events_sources.sour_citations_id) AND
+            |NOT EXISTS (SELECT * FROM rel_familles_sources WHERE sources.sour_citations_id = rel_familles_sources.sour_citations_id) AND
+            |NOT EXISTS (SELECT * FROM rel_indi_sources WHERE sources.sour_citations_id = rel_indi_sources.sour_citations_id)
+            |""".stripMargin)
+        .on("dbId" -> baseId)
+        .as[List[SourCitationQueryData]](SourCitationQueryData.mysqlParserCitationOnly.*)
+    }
+  }(using databaseExecutionContext)
+
+  def getMedia(baseId: Int, id: Int): OptionT[Future, Media] = OptionT(Future {
+    db.withConnection { implicit conn =>
+      SQL("""SELECT *
+            |FROM genea_multimedia
+            |WHERE base = {baseId} AND
+            |media_id = {id}
+            |""".stripMargin)
+        .on("baseId" -> baseId, "id" -> id)
+        .as[Option[Media]](Media.mysqlParserMediaOnly.singleOpt)
+    }
+  }(using databaseExecutionContext))
+
+  def getOrphanedEvents(baseId: Int): Future[List[EventDetailQueryData]] = Future {
+    db.withConnection { implicit conn =>
+      SQL("""SELECT *
+            |FROM genea_events_details
+            |WHERE base = {baseId} AND
+            |NOT EXISTS (SELECT * FROM rel_indi_events WHERE genea_events_details.events_details_id = rel_indi_events.events_details_id) AND
+            |NOT EXISTS (SELECT * FROM rel_indi_attributes WHERE genea_events_details.events_details_id = rel_indi_attributes.events_details_id) AND
+            |NOT EXISTS (SELECT * FROM rel_familles_events WHERE genea_events_details.events_details_id = rel_familles_events.events_details_id)
+            |""".stripMargin)
+        .on("baseId" -> baseId)
+        .as[List[EventDetailQueryData]](EventDetailQueryData.mysqlParserEventDetailOnly.*)
     }
   }(using databaseExecutionContext)
 

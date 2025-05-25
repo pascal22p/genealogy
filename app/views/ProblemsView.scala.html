@@ -1,0 +1,166 @@
+@import models.{Events, Media}
+@import models.queryData.{FamilyQueryData, EventDetailQueryData}
+@import views.html.components.{EventsDetails, LastModified}
+@import config.AppConfig
+
+@this(
+    main: Main,
+    govukSummaryList: GovukSummaryList,
+    eventsDetails: EventsDetails,
+    lastModified: LastModified
+)
+
+@(
+  dbId: Int,
+  medias: List[Media],
+  persons: List[Person],
+  families: List[Family],
+  citations: List[SourCitationQueryData],
+  events: Events
+)(implicit request: AuthenticatedRequest[?], messages: Messages, appConfig: AppConfig)
+
+@keyContent(media: Media): String = @{
+    if(media.title.isEmpty) {
+        media.filename
+    } else {
+        media.title
+    }
+}
+
+@main(1, None) {
+
+@govukSummaryList(
+    SummaryList(
+        rows = medias.filter(_.ownerId.isEmpty).map { media =>
+            SummaryListRow(
+                key = Key(HtmlContent(keyContent(media))),
+                value = Value(HtmlContent(s"""${lastModified(media.timestamp)}<br /><img src="${routes.MediaController.serveMedia(media.filename)}" style="width:90%;"/>""")),
+                classes = "",
+                actions = Some(Actions(
+                    items = Seq(
+                        Some(ActionItem(
+                            href = controllers.delete.routes.DeleteMediaController.deleteMediaConfirmation(dbId, media.id).url,
+                            content = Text("Delete")
+                        ))
+                    ).flatten
+                ))
+            )
+        },
+        card = Some(Card(
+            title = Some(CardTitle(content = Text("Orphaned medias"))),
+            actions = None,
+            classes = "govuk-!-margin-4",
+            attributes = Map.empty
+        )),
+        classes = "",
+        attributes = Map.empty
+    )
+)
+
+
+@govukSummaryList(
+    SummaryList(
+        rows = persons.map { person =>
+            SummaryListRow(
+                key = Key(HtmlContent(person.name)),
+                value = Value(HtmlContent(person.events.birthAndDeathDate())),
+                classes = "",
+                actions = Some(Actions(
+                    items = Seq(
+                        ActionItem(
+                            href = controllers.delete.routes.DeleteIndividualController.deletePersonConfirmation(dbId, person.details.id).url,
+                            content = Text("Delete")
+                        ),
+                        ActionItem(
+                            href = controllers.routes.IndividualController.showPerson(dbId, person.details.id).url,
+                            content = Text("View")
+                        ),
+                        ActionItem(
+                           href = controllers.add.routes.AddPersonToFamily.showInterstitial(dbId, person.details.id).url,
+                           content = Text("Add to family")
+                        )
+                    )
+                ))
+            )
+        },
+        card = Some(Card(
+            title = Some(CardTitle(content = Text("Orphaned individuals"))),
+            actions = None,
+            classes = "govuk-!-margin-4",
+            attributes = Map.empty
+        )),
+        classes = "",
+        attributes = Map.empty
+    )
+)
+
+
+@govukSummaryList(
+    SummaryList(
+        rows = families.map { family =>
+            SummaryListRow(
+                    key = Key(HtmlContent(family.events.eventsDetails.map(e => s"${e.tag.getOrElse("Unknown")} (${e.formatDate()})").mkString(" - "))),
+                value = Value(HtmlContent("")),
+                classes = "",
+                actions = Some(Actions(
+                    items = Seq(
+                        ActionItem(
+                            href = controllers.delete.routes.DeleteFamilyController.deleteFamilyConfirmation(dbId, family.id).url,
+                            content = Text("Delete")
+                        ),
+                        ActionItem(
+                            href = controllers.routes.FamilyController.showFamily(dbId, family.id).url,
+                            content = Text("View")
+                        ),
+                    )
+                ))
+            )
+        },
+        card = Some(Card(
+            title = Some(CardTitle(content = Text("Orphaned families"))),
+            actions = None,
+            classes = "govuk-!-margin-4",
+            attributes = Map.empty
+        )),
+        classes = "",
+        attributes = Map.empty
+    )
+)
+
+@eventsDetails(dbId, events, "Orphaned events")
+
+
+@govukSummaryList(
+    SummaryList(
+        rows = citations.map { citation =>
+            SummaryListRow(
+                key = Key(HtmlContent(s"${citation.page} -- ${citation.even} -- ${citation.role}")),
+                value = Value(HtmlContent("")),
+                classes = "",
+                actions = Some(Actions(
+                    items = Seq(
+                        ActionItem(
+                            href = "#",
+                            content = Text("Delete")
+                        ),
+                        ActionItem(
+                            href = controllers.routes.SourCitationController.showSourCitation(dbId, citation.id).url,
+                            content = Text("View")
+                        )
+                    )
+                ))
+            )
+        },
+        card = Some(Card(
+            title = Some(CardTitle(content = Text("Orphaned source citations"))),
+            actions = None,
+            classes = "govuk-!-margin-4",
+            attributes = Map.empty
+        )),
+        classes = "",
+        attributes = Map.empty
+    )
+)
+
+}
+

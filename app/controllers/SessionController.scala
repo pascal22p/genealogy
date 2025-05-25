@@ -45,11 +45,12 @@ class SessionController @Inject() (
     }
 
     val successFunction: UserDataForm => Future[Result] = { (userDataForm: UserDataForm) =>
-      loginService.getUserData(userDataForm.username, userDataForm.password).flatMap { resultOption =>
-        val returnUrl = new java.net.URI(
-          Option(userDataForm.returnUrl).filter(_.trim.nonEmpty).getOrElse(routes.HomeController.onload().url)
-        ).getPath
-        resultOption.fold(Future.successful(Redirect(routes.SessionController.loginOnLoad()))) { result =>
+      loginService
+        .getUserData(userDataForm.username, userDataForm.password)
+        .foldF(Future.successful(Redirect(routes.SessionController.loginOnLoad()))) { result =>
+          val returnUrl = new java.net.URI(
+            Option(userDataForm.returnUrl).filter(_.trim.nonEmpty).getOrElse(routes.HomeController.onload().url)
+          ).getPath
           val newLocalSession = authenticatedRequest.localSession
             .copy(sessionData = authenticatedRequest.localSession.sessionData.copy(userData = Some(result)))
           sqlQueries.updateSessionData(newLocalSession).map {
@@ -57,7 +58,6 @@ class SessionController @Inject() (
             case _ => InternalServerError("Could not update session data")
           }
         }
-      }
     }
 
     val formValidationResult = UserDataForm.userForm.bindFromRequest()

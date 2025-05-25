@@ -56,7 +56,7 @@ class LinkChildToFamilyController @Inject() (
             )
           }
         }
-        family <- familyService.getFamilyDetails(familyId, true)
+        family <- familyService.getFamilyDetails(familyId, true).value
       } yield {
         family.fold(NotFound(s"Family id $familyId not found")) { someFamily =>
           Ok(linkChildToFamilyView(dbId, allPersons, someFamily, form))

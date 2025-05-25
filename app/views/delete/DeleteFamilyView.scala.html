@@ -1,0 +1,25 @@
+@import models.SessionData
+@import models.Family
+@import views.html.components.FamilyView
+
+@this(
+        main: Main,
+        familyView: FamilyView,
+        formWithCSRF: FormWithCSRF,
+        govukButton: GovukButton
+)
+
+@(dbId: Int, family: Family)(implicit request: AuthenticatedRequest[?], messages: Messages)
+
+@main(1, None) {
+
+  @familyView(dbId, family, None)
+
+  @formWithCSRF(controllers.delete.routes.DeleteFamilyController.deleteFamilyAction(dbId, family.id)) {
+    @govukButton(Button(
+      inputType = Some("submit"),
+      content = Text("Delete this family"),
+      classes = "govuk-button--warning"
+    ))
+  }
+}

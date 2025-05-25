@@ -5,6 +5,7 @@ import java.time.Instant
 import anorm.*
 import anorm.SqlParser.*
 import models.SourCitationType.SourCitationType
+import models.SourCitationType.UnknownSourCitation
 
 final case class SourCitationQueryData(
     id: Int,
@@ -25,7 +26,6 @@ final case class SourCitationQueryData(
 object SourCitationQueryData {
   val mysqlParser: RowParser[SourCitationQueryData] =
     (get[Int]("genea_sour_citations.sour_citations_id") ~
-      get[Option[Int]]("sour_records_id") ~
       get[String]("sour_citations_page") ~
       get[String]("sour_citations_even") ~
       get[String]("sour_citations_even_role") ~
@@ -48,7 +48,7 @@ object SourCitationQueryData {
       get[Option[Int]]("owner_id") ~
       get[String]("source_type") ~
       get[Int]("genea_sour_citations.base")).map {
-      case id ~ _ ~ page ~ even ~ role ~ dates ~ text ~ quay ~ subm ~ timeStamp ~
+      case id ~ page ~ even ~ role ~ dates ~ text ~ quay ~ subm ~ timeStamp ~
           sourRecordId ~ auth ~ title ~ abbr ~ publ ~ agnc ~ rin ~ sourRecordTimestamp ~ repoId ~ repoCaln ~ repoMedi ~
           ownerId ~ sourceType ~ base =>
         SourCitationQueryData(
@@ -78,6 +78,35 @@ object SourCitationQueryData {
           timeStamp.getOrElse(Instant.now),
           ownerId,
           SourCitationType.fromString(sourceType),
+          base
+        )
+    }
+
+  val mysqlParserCitationOnly: RowParser[SourCitationQueryData] =
+    (get[Int]("genea_sour_citations.sour_citations_id") ~
+      get[String]("sour_citations_page") ~
+      get[String]("sour_citations_even") ~
+      get[String]("sour_citations_even_role") ~
+      get[String]("sour_citations_data_dates") ~
+      get[String]("sour_citations_data_text") ~
+      get[Option[Int]]("sour_citations_quay") ~
+      get[String]("sour_citations_subm") ~
+      get[Option[Instant]]("sour_citations_timestamp") ~
+      get[Int]("genea_sour_citations.base")).map {
+      case id ~ page ~ even ~ role ~ dates ~ text ~ quay ~ subm ~ timeStamp ~ base =>
+        SourCitationQueryData(
+          id,
+          None,
+          page,
+          even,
+          role,
+          dates,
+          text,
+          quay,
+          subm,
+          timeStamp.getOrElse(Instant.now),
+          None,
+          UnknownSourCitation,
           base
         )
     }

@@ -29,14 +29,14 @@ class PersonService @Inject() (
     if (omitFamilies) {
       Future.successful(List.empty[Family])
     } else {
-      familyService.getFamilyIdsFromPartnerId(id).flatMap { families =>
-        families
-          .map { id =>
-            familyService.getFamilyDetails(id, omitSources)
+      familyService
+        .getFamilyIdsFromPartnerId(id)
+        .flatMap { (families: List[Int]) =>
+          families.traverse { id =>
+            familyService.getFamilyDetails(id, omitSources).value
           }
-          .sequence
-          .map(_.flatten)
-      }
+        }
+        .map(_.flatten)
     }
   }
 

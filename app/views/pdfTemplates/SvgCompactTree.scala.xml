@@ -1,9 +1,11 @@
 @this(block: SvgRectangleWithText, path: SvgPath)
 
-@(title: String, sosaList: Map[Int, Person])(implicit request: AuthenticatedRequest[?], messages: Messages)
+@(title: String, sosaList: Map[Int, Person], isEmbedded: Boolean = false)(implicit request: AuthenticatedRequest[?], messages: Messages)
 
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+@if(!isEmbedded) {
+    <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+    <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+}
 
 <svg xmlns="http://www.w3.org/2000/svg"
      style="background: #ffffff; background-color: white; color-scheme: light dark;"
