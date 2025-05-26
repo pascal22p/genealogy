@@ -1,40 +1,38 @@
 package controllers.delete
 
 import javax.inject.*
-
 import scala.concurrent.ExecutionContext
-
 import actions.AuthJourney
 import cats.implicits.*
 import models.AuthenticatedRequest
 import play.api.i18n.*
 import play.api.mvc.*
 import queries.DeleteSqlQueries
-import queries.GetSqlQueries
-import views.html.delete.DeleteMediaView
+import services.SourCitationService
+import views.html.delete.DeleteSourCitationView
 
 @Singleton
-class DeleteMediaController @Inject() (
+class DeleteSourCitationController @Inject() (
     authJourney: AuthJourney,
-    deleteMediaView: DeleteMediaView,
-    getSqlQueries: GetSqlQueries,
+    deleteSourCitationView: DeleteSourCitationView,
     deleteSqlQueries: DeleteSqlQueries,
+    sourCitationService: SourCitationService,
     val controllerComponents: ControllerComponents
 )(
     implicit ec: ExecutionContext
 ) extends BaseController
     with I18nSupport {
 
-  def deleteMediaConfirmation(baseId: Int, id: Int): Action[AnyContent] = authJourney.authWithAdminRight.async {
+  def deleteSourCitationConfirmation(baseId: Int, id: Int): Action[AnyContent] = authJourney.authWithAdminRight.async {
     implicit authenticatedRequest: AuthenticatedRequest[AnyContent] =>
-      getSqlQueries.getMedia(baseId, id).fold(NotFound("Nothing here")) { media =>
-        Ok(deleteMediaView(baseId, media))
+      sourCitationService.getSourCitation(id, baseId).fold(NotFound("Nothing here")) { sourCitation =>
+        Ok(deleteSourCitationView(baseId, sourCitation))
       }
   }
 
-  def deleteMediaAction(baseId: Int, id: Int): Action[AnyContent] = authJourney.authWithAdminRight.async {
+  def deleteSourCitationAction(baseId: Int, id: Int): Action[AnyContent] = authJourney.authWithAdminRight.async {
     implicit authenticatedRequest: AuthenticatedRequest[AnyContent] =>
-      deleteSqlQueries.deleteMedia(id).map { _ =>
+      deleteSqlQueries.deleteSourCitation(id).map { _ =>
         Redirect(controllers.routes.HomeController.showSurnames(baseId))
       }
   }

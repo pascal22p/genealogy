@@ -1,5 +1,3 @@
--- Adminer 4.8.1 MySQL 11.4.2-MariaDB-ubu2404 dump
-
 SET NAMES utf8;
 SET time_zone = '+00:00';
 SET foreign_key_checks = 0;
@@ -458,7 +456,9 @@ CREATE TABLE `rel_asso_indi` (
   `indi_id2` mediumint(8) unsigned NOT NULL DEFAULT 0,
   `description` varchar(255) NOT NULL DEFAULT '',
   PRIMARY KEY (`indi_id1`,`indi_id2`),
-  KEY `indi_id2` (`indi_id2`)
+  KEY `indi_id2` (`indi_id2`),
+  CONSTRAINT `rel_asso_indi_ibfk_1` FOREIGN KEY (`indi_id1`) REFERENCES `genea_individuals` (`indi_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `rel_asso_indi_ibfk_2` FOREIGN KEY (`indi_id2`) REFERENCES `genea_individuals` (`indi_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Association d''une relation non familiale Ã  un individu';
 
 
@@ -597,8 +597,11 @@ CREATE TABLE `rel_indi_notes` (
   `notes_id` mediumint(8) unsigned NOT NULL DEFAULT 0,
   `indi_id` mediumint(8) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`indi_id`,`notes_id`),
-  KEY `notes_id` (`notes_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `notes_id` (`notes_id`),
+  CONSTRAINT `rel_indi_notes_ibfk_1` FOREIGN KEY (`indi_id`) REFERENCES `genea_individuals` (`indi_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `rel_indi_notes_ibfk_2` FOREIGN KEY (`notes_id`) REFERENCES `genea_notes` (`notes_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
+
 
 
 DROP TABLE IF EXISTS `rel_indi_refn`;
@@ -606,7 +609,9 @@ CREATE TABLE `rel_indi_refn` (
   `indi_id` mediumint(8) unsigned NOT NULL,
   `refn_id` mediumint(8) unsigned NOT NULL,
   PRIMARY KEY (`indi_id`,`refn_id`),
-  KEY `refn_id` (`refn_id`)
+  KEY `refn_id` (`refn_id`),
+  CONSTRAINT `rel_indi_refn_ibfk_1` FOREIGN KEY (`indi_id`) REFERENCES `genea_individuals` (`indi_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `rel_indi_refn_ibfk_2` FOREIGN KEY (`refn_id`) REFERENCES `genea_refn` (`refn_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci;
 
 
@@ -615,8 +620,10 @@ CREATE TABLE `rel_indi_sources` (
   `sour_citations_id` mediumint(8) unsigned NOT NULL DEFAULT 0,
   `indi_id` mediumint(8) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`indi_id`,`sour_citations_id`),
-  KEY `sources_id` (`sour_citations_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `sources_id` (`sour_citations_id`),
+  CONSTRAINT `rel_indi_sources_ibfk_1` FOREIGN KEY (`indi_id`) REFERENCES `genea_individuals` (`indi_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `rel_indi_sources_ibfk_2` FOREIGN KEY (`sour_citations_id`) REFERENCES `genea_sour_citations` (`sour_citations_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
 
 
 DROP TABLE IF EXISTS `rel_multimedia_notes`;
@@ -624,8 +631,10 @@ CREATE TABLE `rel_multimedia_notes` (
   `notes_id` mediumint(8) unsigned NOT NULL DEFAULT 0,
   `media_id` mediumint(8) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`notes_id`,`media_id`),
-  KEY `media_id` (`media_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Association d''un objet multimedia Ã  une source';
+  KEY `media_id` (`media_id`),
+  CONSTRAINT `rel_multimedia_notes_ibfk_1` FOREIGN KEY (`media_id`) REFERENCES `genea_multimedia` (`media_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `rel_multimedia_notes_ibfk_2` FOREIGN KEY (`notes_id`) REFERENCES `genea_notes` (`notes_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci COMMENT='Association d''un objet multimedia Ã  une source';
 
 
 DROP TABLE IF EXISTS `rel_place_notes`;
@@ -633,8 +642,10 @@ CREATE TABLE `rel_place_notes` (
   `place_id` mediumint(8) unsigned NOT NULL,
   `notes_id` mediumint(8) unsigned NOT NULL,
   PRIMARY KEY (`place_id`,`notes_id`),
-  KEY `note_id` (`notes_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `note_id` (`notes_id`),
+  CONSTRAINT `rel_place_notes_ibfk_1` FOREIGN KEY (`place_id`) REFERENCES `genea_place` (`place_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `rel_place_notes_ibfk_2` FOREIGN KEY (`notes_id`) REFERENCES `genea_notes` (`notes_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
 
 
 DROP TABLE IF EXISTS `rel_repo_notes`;
@@ -642,8 +653,10 @@ CREATE TABLE `rel_repo_notes` (
   `notes_id` mediumint(8) unsigned NOT NULL DEFAULT 0,
   `repo_id` mediumint(8) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`notes_id`,`repo_id`),
-  KEY `media_id` (`repo_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Association d''un objet multimedia Ã  une source';
+  KEY `media_id` (`repo_id`),
+  CONSTRAINT `rel_repo_notes_ibfk_1` FOREIGN KEY (`repo_id`) REFERENCES `genea_repository` (`repo_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `rel_repo_notes_ibfk_2` FOREIGN KEY (`notes_id`) REFERENCES `genea_notes` (`notes_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci COMMENT='Association d''un objet multimedia Ã  une source';
 
 
 DROP TABLE IF EXISTS `rel_sour_citations_multimedia`;
@@ -651,8 +664,11 @@ CREATE TABLE `rel_sour_citations_multimedia` (
   `sour_citations_id` mediumint(8) unsigned NOT NULL DEFAULT 0,
   `media_id` mediumint(8) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`sour_citations_id`,`media_id`),
-  KEY `media_id` (`media_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Association d''un objet multimedia Ã  une source';
+  KEY `media_id` (`media_id`),
+  CONSTRAINT `rel_sour_citations_multimedia_ibfk_1` FOREIGN KEY (`sour_citations_id`) REFERENCES `genea_sour_citations` (`sour_citations_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `rel_sour_citations_multimedia_ibfk_2` FOREIGN KEY (`media_id`) REFERENCES `genea_multimedia` (`media_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci COMMENT='Association d''un objet multimedia Ã  une source';
+
 
 
 DROP TABLE IF EXISTS `rel_sour_citations_notes`;
@@ -660,8 +676,10 @@ CREATE TABLE `rel_sour_citations_notes` (
   `notes_id` mediumint(8) unsigned NOT NULL DEFAULT 0,
   `sour_citations_id` mediumint(8) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`notes_id`,`sour_citations_id`),
-  KEY `media_id` (`sour_citations_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Association d''un objet multimedia Ã  une source';
+  KEY `media_id` (`sour_citations_id`),
+  CONSTRAINT `rel_sour_citations_notes_ibfk_1` FOREIGN KEY (`sour_citations_id`) REFERENCES `genea_sour_citations` (`sour_citations_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `rel_sour_citations_notes_ibfk_2` FOREIGN KEY (`notes_id`) REFERENCES `genea_notes` (`notes_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci COMMENT='Association d''un objet multimedia Ã  une source';
 
 
 DROP TABLE IF EXISTS `rel_sour_records_notes`;
@@ -669,10 +687,9 @@ CREATE TABLE `rel_sour_records_notes` (
   `notes_id` mediumint(8) unsigned NOT NULL DEFAULT 0,
   `sour_records_id` mediumint(8) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`notes_id`,`sour_records_id`),
-  KEY `media_id` (`sour_records_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Association d''un objet multimedia Ã  une source';
+  KEY `media_id` (`sour_records_id`),
+  CONSTRAINT `rel_sour_records_notes_ibfk_1` FOREIGN KEY (`notes_id`) REFERENCES `genea_notes` (`notes_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `rel_sour_records_notes_ibfk_2` FOREIGN KEY (`sour_records_id`) REFERENCES `genea_sour_records` (`sour_records_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci COMMENT='Association d''un objet multimedia Ã  une source';
 
-
-
--- 2024-07-15 15:47:18
 

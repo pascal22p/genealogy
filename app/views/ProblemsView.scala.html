@@ -140,7 +140,7 @@
                 actions = Some(Actions(
                     items = Seq(
                         ActionItem(
-                            href = "#",
+                            href = controllers.delete.routes.DeleteSourCitationController.deleteSourCitationConfirmation(dbId, citation.id).url,
                             content = Text("Delete")
                         ),
                         ActionItem(

@@ -1,0 +1,30 @@
+@import models.SessionData
+@import models.SourCitation
+@import models.MediaType.MediaType
+@import models.MediaType.{EventMedia, IndividualMedia, FamilyMedia, SourCitationMedia}
+@import views.html.components.{OneSourCitation, LastModified}
+
+@this(
+        main: Main,
+        lastModified: LastModified,
+        oneSourCitation: OneSourCitation,
+        govukSummaryList: GovukSummaryList,
+        formWithCSRF: FormWithCSRF,
+        govukButton: GovukButton
+)
+
+@(dbId: Int, sourCitation: SourCitation)(implicit request: AuthenticatedRequest[?], messages: Messages)
+
+@main(1, None) {
+
+@oneSourCitation(dbId, sourCitation)
+
+
+  @formWithCSRF(controllers.delete.routes.DeleteSourCitationController.deleteSourCitationAction(dbId, sourCitation.id)) {
+    @govukButton(Button(
+      inputType = Some("submit"),
+      content = Text("Delete this source citation"),
+      classes = "govuk-button--warning"
+    ))
+  }
+}

@@ -10,15 +10,10 @@ import cats.implicits.*
 import models.AuthenticatedRequest
 import models.EventType.UnknownEvent
 import models.Events
-import models.Person
-import models.ResnType.PrivacyResn
 import play.api.i18n.*
 import play.api.mvc.*
 import queries.DeleteSqlQueries
-import queries.GetSqlQueries
 import services.EventService
-import services.PersonDetailsService
-import services.PersonService
 import views.html.delete.DeleteEventView
 
 @Singleton

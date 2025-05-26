@@ -7,22 +7,16 @@ import scala.concurrent.ExecutionContext
 import actions.AuthJourney
 import cats.implicits.*
 import models.AuthenticatedRequest
-import models.Person
-import models.ResnType.PrivacyResn
 import play.api.i18n.*
 import play.api.mvc.*
 import queries.DeleteSqlQueries
 import services.FamilyService
-import services.PersonDetailsService
-import services.PersonService
 import views.html.delete.DeleteFamilyView
 
 @Singleton
 class DeleteFamilyController @Inject() (
     authJourney: AuthJourney,
-    personService: PersonService,
     familyService: FamilyService,
-    personDetailsService: PersonDetailsService,
     deleteFamilyView: DeleteFamilyView,
     deleteSqlQueries: DeleteSqlQueries,
     val controllerComponents: ControllerComponents
