@@ -27,7 +27,7 @@ class MediaController @Inject() (
         if (path.exists()) {
           Ok.sendFile(path)
         } else {
-          NotFound(s"File `${path.getName()}` not found")
+          NotFound(s"File `${path.getName}` not found")
         }
       case Failure(exception) =>
         InternalServerError(s"An error occurred while looking for a filename: ${exception.getMessage}")

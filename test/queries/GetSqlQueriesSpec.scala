@@ -232,7 +232,7 @@ class GetSqlQueriesSpec extends MariadbHelper with Logging {
       val idFamily = 3
       val result = (for {
         _      <- executeSql(sqlFamily(idFamily, person1, person2, List.empty, List.empty))
-        result <- sut.getFamilyDetails(idFamily)
+        result <- sut.getFamilyDetails(idFamily).value
       } yield result).futureValue
 
       result mustBe a[Some[FamilyQueryData]]
@@ -243,7 +243,7 @@ class GetSqlQueriesSpec extends MariadbHelper with Logging {
 
     "returns nothing" in {
       val idPerson = 1
-      val result   = sut.getFamilyDetails(idPerson).futureValue
+      val result   = sut.getFamilyDetails(idPerson).value.futureValue
 
       result mustBe None
     }
@@ -288,7 +288,7 @@ class GetSqlQueriesSpec extends MariadbHelper with Logging {
       val place = fakePlace(id = 1)
       val result = (for {
         _      <- executeSql(sqlPlace(place))
-        result <- sut.getPlace(place.id)
+        result <- sut.getPlace(place.id).value
       } yield result).futureValue
 
       result mustBe Some(place)
@@ -296,7 +296,7 @@ class GetSqlQueriesSpec extends MariadbHelper with Logging {
 
     "returns nothing" in {
       val idPerson = 1
-      val result   = sut.getPlace(idPerson).futureValue
+      val result   = sut.getPlace(idPerson).value.futureValue
 
       result mustBe None
     }

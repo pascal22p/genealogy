@@ -5,6 +5,7 @@ import javax.inject.*
 import scala.concurrent.ExecutionContext
 
 import actions.AuthJourney
+import cats.data.OptionT
 import models.AuthenticatedRequest
 import models.ResnType.PrivacyResn
 import play.api.i18n.*
@@ -29,24 +30,18 @@ class UnlinkPartnerController @Inject() (
 
   def unlinkPartnerConfirmation(baseId: Int, partnerId: Int, familyId: Int): Action[AnyContent] =
     authJourney.authWithAdminRight.async { implicit authenticatedRequest: AuthenticatedRequest[AnyContent] =>
-      for {
-        familyOption  <- familyService.getFamilyDetails(familyId)
-        partnerOption <- personService.getPerson(partnerId)
+      (for {
+        family  <- familyService.getFamilyDetails(familyId)
+        partner <- OptionT(personService.getPerson(partnerId))
       } yield {
-        (partnerOption, familyOption) match {
-          case (Some(partner), Some(family)) =>
-            val isAllowedToSee = authenticatedRequest.localSession.sessionData.userData.fold(false)(_.seePrivacy)
+        val isAllowedToSee = authenticatedRequest.localSession.sessionData.userData.fold(false)(_.seePrivacy)
 
-            if (!partner.details.privacyRestriction.contains(PrivacyResn) || isAllowedToSee) {
-              Ok(unlinkPartnerView(partner, family, baseId))
-            } else {
-              Forbidden("Not allowed")
-            }
-
-          case (_, _) => NotImplemented("Not implemented")
+        if (!partner.details.privacyRestriction.contains(PrivacyResn) || isAllowedToSee) {
+          Ok(unlinkPartnerView(partner, family, baseId))
+        } else {
+          Forbidden("Not allowed")
         }
-
-      }
+      }).getOrElse(NotImplemented("Not implemented"))
     }
 
   def unlinkPartnerAction(baseId: Int, partnerId: Int, familyId: Int): Action[AnyContent] =

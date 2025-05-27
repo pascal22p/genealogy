@@ -34,7 +34,7 @@
             <fo:block>
                 <fo:instream-foreign-object>
 
-                    @svgCompactTree(title, sosaList)
+                    @svgCompactTree(title, sosaList, isEmbedded=true)
 
                 </fo:instream-foreign-object>
             </fo:block>

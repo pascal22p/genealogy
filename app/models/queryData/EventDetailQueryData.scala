@@ -6,6 +6,7 @@ import anorm.*
 import anorm.SqlParser.*
 import models.EventType
 import models.EventType.EventType
+import models.EventType.UnknownEvent
 import models.ResnType
 
 final case class EventDetailQueryData(
@@ -79,6 +80,49 @@ object EventDetailQueryData {
           sourCount.getOrElse(0),
           ownerId,
           resn.flatMap(ResnType.fromString)
+        )
+    }
+
+  val mysqlParserEventDetailOnly: RowParser[EventDetailQueryData] =
+    (get[Int]("base") ~
+      get[Int]("genea_events_details.events_details_id") ~
+      get[Option[Int]]("place_id") ~
+      get[Option[Int]]("addr_id") ~
+      get[String]("events_details_descriptor") ~
+      get[String]("events_details_gedcom_date") ~
+      get[String]("events_details_age") ~
+      get[String]("events_details_cause") ~
+      get[Option[Int]]("jd_count") ~
+      get[Option[Int]]("jd_precision") ~
+      get[Option[String]]("jd_calendar") ~
+      get[Option[Int]]("events_details_famc") ~
+      get[Option[String]]("events_details_adop") ~
+      get[Option[Instant]]("events_details_timestamp")).map {
+      case base ~ events_details_id ~ place_id ~ addr_id ~
+          events_details_descriptor ~ events_details_gedcom_date ~ events_details_age ~ events_details_cause ~
+          jd_count ~ jd_precision ~ jd_calendar ~
+          events_details_famc ~ events_details_adop ~ events_details_timestamp =>
+        EventDetailQueryData(
+          base,
+          events_details_id,
+          place_id,
+          addr_id,
+          events_details_descriptor,
+          events_details_gedcom_date,
+          events_details_age,
+          events_details_cause,
+          jd_count,
+          jd_precision,
+          jd_calendar,
+          events_details_famc,
+          events_details_adop,
+          events_details_timestamp.getOrElse(Instant.now),
+          None,
+          None,
+          UnknownEvent,
+          0,
+          None,
+          None
         )
     }
 }

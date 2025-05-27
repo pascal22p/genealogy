@@ -7,7 +7,6 @@ import scala.concurrent.ExecutionContext
 import actions.AuthJourney
 import cats.implicits.*
 import models.AuthenticatedRequest
-import models.Person
 import models.ResnType.PrivacyResn
 import play.api.i18n.*
 import play.api.mvc.*
@@ -35,7 +34,7 @@ class DeleteIndividualController @Inject() (
     implicit authenticatedRequest: AuthenticatedRequest[AnyContent] =>
       for {
         familiesIdPartners <- familyService.getFamilyIdsFromPartnerId(id)
-        families           <- familiesIdPartners.traverse(id => familyService.getFamilyDetails(id))
+        families           <- familiesIdPartners.traverse(id => familyService.getFamilyDetails(id).value)
         parents            <- personDetailsService.getParents(id)
         personOption       <- personService.getPerson(id)
       } yield {
@@ -53,17 +52,8 @@ class DeleteIndividualController @Inject() (
 
   def deletePersonAction(baseId: Int, id: Int): Action[AnyContent] = authJourney.authWithAdminRight.async {
     implicit authenticatedRequest: AuthenticatedRequest[AnyContent] =>
-      personService.getPerson(id).map { (personOption: Option[Person]) =>
-        personOption.fold(NotFound("Nothing here")) { person =>
-          val isAllowedToSee = authenticatedRequest.localSession.sessionData.userData.fold(false)(_.seePrivacy)
-
-          if (!person.details.privacyRestriction.contains(PrivacyResn) || isAllowedToSee) {
-            deleteSqlQueries.deletePersonDetails(person.details.id)
-            Redirect(controllers.routes.HomeController.showSurnames(baseId))
-          } else {
-            Forbidden("Not allowed")
-          }
-        }
+      deleteSqlQueries.deletePersonDetails(id).map { _ =>
+        Redirect(controllers.routes.HomeController.showSurnames(baseId))
       }
   }
 

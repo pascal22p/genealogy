@@ -5,6 +5,7 @@ import javax.inject.*
 import scala.concurrent.ExecutionContext
 
 import actions.AuthJourney
+import cats.data.OptionT
 import models.AuthenticatedRequest
 import models.ResnType.PrivacyResn
 import play.api.i18n.*
@@ -29,24 +30,18 @@ class UnlinkChildController @Inject() (
 
   def unlinkChildConfirmation(baseId: Int, childId: Int, familyId: Int): Action[AnyContent] =
     authJourney.authWithAdminRight.async { implicit authenticatedRequest: AuthenticatedRequest[AnyContent] =>
-      for {
-        familyOption <- familyService.getFamilyDetails(familyId)
-        childOption  <- personService.getPerson(childId)
+      (for {
+        family <- familyService.getFamilyDetails(familyId)
+        child  <- OptionT(personService.getPerson(childId))
       } yield {
-        (childOption, familyOption) match {
-          case (Some(child), Some(family)) =>
-            val isAllowedToSee = authenticatedRequest.localSession.sessionData.userData.fold(false)(_.seePrivacy)
+        val isAllowedToSee = authenticatedRequest.localSession.sessionData.userData.fold(false)(_.seePrivacy)
 
-            if (!child.details.privacyRestriction.contains(PrivacyResn) || isAllowedToSee) {
-              Ok(unlinkChildView(child, family, baseId))
-            } else {
-              Forbidden("Not allowed")
-            }
-
-          case (_, _) => NotImplemented("Not implemented")
+        if (!child.details.privacyRestriction.contains(PrivacyResn) || isAllowedToSee) {
+          Ok(unlinkChildView(child, family, baseId))
+        } else {
+          Forbidden("Not allowed")
         }
-
-      }
+      }).getOrElse(NotImplemented("Not implemented"))
     }
 
   def unlinkChildAction(baseId: Int, childId: Int, familyId: Int): Action[AnyContent] =

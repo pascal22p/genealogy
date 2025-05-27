@@ -23,10 +23,8 @@ class FamilyController @Inject() (
 
   def showFamily(baseId: Int, id: Int): Action[AnyContent] = authAction.async {
     implicit request: AuthenticatedRequest[AnyContent] =>
-      familyService.getFamilyDetails(id).map { familyOption =>
-        familyOption.fold(NotFound("Family cannot be found")) { family =>
-          Ok(familyPage(baseId, family))
-        }
+      familyService.getFamilyDetails(id).fold(NotFound("Family cannot be found")) { family =>
+        Ok(familyPage(baseId, family))
       }
   }
 }

@@ -3,3 +3,15 @@ POST    /base/:baseId/person-details/:id                controllers.delete.Delet
 
 GET     /base/:baseId                controllers.delete.DeleteDatabaseController.deleteDatabaseConfirmation(baseId: Int)
 POST    /base/:baseId                controllers.delete.DeleteDatabaseController.deleteDatabaseAction(baseId: Int)
+
+GET     /base/:baseId/media/:id                controllers.delete.DeleteMediaController.deleteMediaConfirmation(baseId: Int, id: Int)
+POST    /base/:baseId/media/:id                controllers.delete.DeleteMediaController.deleteMediaAction(baseId: Int, id: Int)
+
+GET     /base/:baseId/family/:id                controllers.delete.DeleteFamilyController.deleteFamilyConfirmation(baseId: Int, id: Int)
+POST    /base/:baseId/family/:id                controllers.delete.DeleteFamilyController.deleteFamilyAction(baseId: Int, id: Int)
+
+GET     /base/:baseId/event/:id                controllers.delete.DeleteEventController.deleteEventConfirmation(baseId: Int, id: Int)
+POST    /base/:baseId/event/:id                controllers.delete.DeleteEventController.deleteEventAction(baseId: Int, id: Int)
+
+GET     /base/:baseId/source-citation/:id                controllers.delete.DeleteSourCitationController.deleteSourCitationConfirmation(baseId: Int, id: Int)
+POST    /base/:baseId/source-citation/:id                controllers.delete.DeleteSourCitationController.deleteSourCitationAction(baseId: Int, id: Int)

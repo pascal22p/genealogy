@@ -6,6 +6,7 @@ import javax.inject.Singleton
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
+import cats.data.OptionT
 import cats.implicits.*
 import models.queryData.EventDetailQueryData
 import models.EventDetail
@@ -45,6 +46,12 @@ class EventService @Inject() (mariadbQueries: GetSqlQueries, sourCitationService
     }
   }
 
+  def getOrphanedEvents(dbId: Int) = {
+    mariadbQueries.getOrphanedEvents(dbId).map { events =>
+      events.map(event => EventDetail(event, none, List.empty))
+    }
+  }
+
   private def fillExtraData(event: EventDetailQueryData, omitSources: Boolean = false): Future[EventDetail] = {
     def getSourCitations: Future[List[SourCitation]] = {
       if (omitSources) {
@@ -59,10 +66,10 @@ class EventService @Inject() (mariadbQueries: GetSqlQueries, sourCitationService
     }
 
     for {
-      place: Option[Option[Place]] <- event.place_id.traverse(mariadbQueries.getPlace)
-      sources: List[SourCitation]  <- getSourCitations
+      place                       <- OptionT.fromOption[Future](event.place_id).flatMap(mariadbQueries.getPlace).value
+      sources: List[SourCitation] <- getSourCitations
     } yield {
-      EventDetail(event, place.flatten, sources)
+      EventDetail(event, place, sources)
     }
   }
 

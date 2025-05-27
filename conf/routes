@@ -35,6 +35,8 @@ GET     /medias/:filename                         controllers.MediaController.se
 GET     /pdf/ascendance/:id                       controllers.PdfController.pdf(id: Int)
 GET     /svg/ascendance/:id                       controllers.SvgController.svg(id: Int)
 
+GET     /base/:baseId/problems                    controllers.ProblemsController.onload(baseId: Int)
+
 GET     /sitemap.xml                              controllers.SiteMapController.sitemapIndex
 GET     /sitemap/sitemap-individuals.xml          controllers.SiteMapController.sitemapIndividuals
 GET     /sitemap/sitemap-events.xml               controllers.SiteMapController.sitemapEvents

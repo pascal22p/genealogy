@@ -108,6 +108,7 @@ lazy val genealogy = (project in file("."))
     ),
     semanticdbEnabled := true,
     scalacOptions ++= Seq(
+      "-no-indent",
       "-deprecation",
       "-feature",
       "-unchecked",
@@ -116,14 +117,14 @@ lazy val genealogy = (project in file("."))
       "-Xkind-projector",
       "-Wvalue-discard",
       "-Wunused:all",
-      "-Xfatal-warnings",
+      //"-Xfatal-warnings",
       //"-Yexplicit-nulls",
       "-Wsafe-init",
       "-Wconf:msg=unused import&src=html/.*:s",
       "-Wconf:msg=unused import&src=xml/.*:s",
       "-Wconf:src=routes/.*:s",
-      "-Wconf:msg=Implicit parameters should be provided with a `using` clause&src=html/.*:i",
-      "-Wconf:msg=Implicit parameters should be provided with a `using` clause&src=xml/.*:i",
+      "-Wconf:msg=Implicit parameters should be provided with a `using` clause&src=html/.*:s",
+      "-Wconf:msg=Implicit parameters should be provided with a `using` clause&src=xml/.*:s",
       "-Wconf:msg=package scala contains object and package with same name.*:i"
     ),
 

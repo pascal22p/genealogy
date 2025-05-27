@@ -1,0 +1,29 @@
+@import models.SessionData
+@import models.MediaType.MediaType
+@import models.MediaType.{EventMedia, IndividualMedia, FamilyMedia, SourCitationMedia}
+@import views.html.components.{EventsDetails, LastModified}
+
+@this(
+        main: Main,
+        lastModified: LastModified,
+        eventsDetails: EventsDetails,
+        govukSummaryList: GovukSummaryList,
+        formWithCSRF: FormWithCSRF,
+        govukButton: GovukButton
+)
+
+@(dbId: Int, event: Events)(implicit request: AuthenticatedRequest[?], messages: Messages)
+
+@main(1, None) {
+
+@eventsDetails(dbId, event)
+
+
+  @formWithCSRF(controllers.delete.routes.DeleteEventController.deleteEventAction(dbId, event.eventsDetails.headOption.fold(0)(_.events_details_id))) {
+    @govukButton(Button(
+      inputType = Some("submit"),
+      content = Text("Delete this event"),
+      classes = "govuk-button--warning"
+    ))
+  }
+}

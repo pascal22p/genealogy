@@ -7,7 +7,7 @@
   implicit val appConfig: AppConfig
 )
 
-@(dbId: Int, events: Events)(implicit authenticatedRequest: AuthenticatedRequest[?], messages: Messages)
+@(dbId: Int, events: Events, title: String = "Events")(implicit authenticatedRequest: AuthenticatedRequest[?], messages: Messages)
 
 @eventDetailRow(event: EventDetail) = {
     @event.formatDate() @for(place <- event.place) {
@@ -32,7 +32,7 @@
     SummaryList(
         rows = events.eventsDetails.sortBy(_.jd_count).map { event =>
             SummaryListRow(
-                key = Key(Text(messages(event.tag.get))),
+                key = Key(Text(event.tag.fold("Unknown")(tag => messages(tag)))),
                 value = Value(HtmlContent(eventDetailRow(event))),
                 classes = "govuk-summary-list__row--no-border",
                 actions = Some(Actions(
@@ -40,13 +40,17 @@
                         ActionItem(
                             href = controllers.routes.EventController.showEvent(dbId, event.events_details_id).url,
                             content = Text(source(event))
+                        ),
+                        ActionItem(
+                            href = controllers.delete.routes.DeleteEventController.deleteEventConfirmation(dbId, event.events_details_id).url,
+                            content = Text("Delete")
                         )
                     )
                 ))
             )
         },
         card = Some(Card(
-            title = Some(CardTitle(content = Text("Events"))),
+            title = Some(CardTitle(content = Text(title))),
             actions = events.ownerId.map { _ =>
                 Actions(
                 items = Seq(

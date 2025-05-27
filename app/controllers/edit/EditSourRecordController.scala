@@ -43,11 +43,8 @@ class EditSourRecordController @Inject() (
 
   private def handleSourRecord(id: Int)(
       block: SourRecord => Future[Result]
-  ): Future[Result] = {
-    sourRecordService.getSourRecord(id).flatMap { sourRecord =>
-      sourRecord.fold(Future.successful(NotFound("SourCitation could not be found")))(block)
-    }
-  }
+  ): Future[Result] =
+    sourRecordService.getSourRecord(id).foldF(Future.successful(NotFound("SourCitation could not be found")))(block)
 
   def showForm(baseId: Int, sourRecordId: Int, sourCitationType: SourCitationType, sourCitationId: Int) =
     authJourney.authWithAdminRight.async { implicit request =>
