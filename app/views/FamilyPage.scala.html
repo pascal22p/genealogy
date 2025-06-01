@@ -13,8 +13,13 @@
 
 @(dbId: Int, family: Family)(implicit request: AuthenticatedRequest[?], messages: Messages)
 
+@title(family: Family) = {
+  Family
+  @family.parent1.map(_.details.surname).getOrElse("Unknown") —
+  @family.parent2.map(_.details.surname).getOrElse("Unknown")
+}
 
-@main(dbId, None) {
+@main(dbId, None, title(family).toString) {
 
   @familyView(dbId, family, None)
   

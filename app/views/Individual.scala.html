@@ -1,24 +1,45 @@
-@import models.Person
-@import views.html.components.{FamilyView, PersonDetails, EventsDetails, Parents}
+@import models.{Family, Person}
+@import views.html.components.{Block, FamilyView, PersonDetails, EventsDetails, Parents}
 
 @this(
   main: Main,
   familyView: FamilyView,
+  block: Block,
   personDetails: PersonDetails,
   individualEvents: EventsDetails,
   parents: Parents)
 
 @(person: Person, dbId: Int)(implicit request: AuthenticatedRequest[?], messages: Messages)
 
+@title(family: Family) = {
+  Family
+  @family.parent1.map(_.details.surname).getOrElse("Unknown") —
+  @family.parent2.map(_.details.surname).getOrElse("Unknown")
+}
 
-@main(dbId, Some(person)) {
+@main(dbId, Some(person), person.name) {
 
   @personDetails(dbId, person)
   
   @individualEvents(dbId, person.events)
 
   @for(family <- person.families) {
-    @familyView(dbId, family, person.findPartner(family.id))
+    @block(title(family).toString,
+      Some(Actions(
+        items = Seq(ActionItem(
+          href = controllers.delete.routes.DeleteFamilyController.deleteFamilyConfirmation(dbId, family.id).url,
+          content = Text("Delete")
+        ))
+      )),
+      Some(Actions(
+        items = Seq(ActionItem(
+          href = controllers.routes.FamilyController.showFamily(dbId, family.id).url,
+          content = Text("View")
+        ))
+      ))
+    ) {
+      @familyView(dbId, family, person.findPartner(family.id))
+    }
   }
 
   @parents(dbId, person)

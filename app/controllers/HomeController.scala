@@ -6,6 +6,7 @@ import javax.inject.Singleton
 import scala.concurrent.ExecutionContext
 
 import actions.AuthAction
+import cats.data.OptionT
 import models.AuthenticatedRequest
 import play.api.i18n.I18nSupport
 import play.api.mvc.Action
@@ -38,15 +39,18 @@ class HomeController @Inject() (
 
   def showSurnames(id: Int): Action[AnyContent] = authAction.async {
     implicit request: AuthenticatedRequest[AnyContent] =>
-      genealogyDatabaseService.getSurnamesList(id).map { names =>
-        Ok(surnamesView(names, id))
-      }
+      (for {
+        database <- OptionT(genealogyDatabaseService.getGenealogyDatabases.map(_.find(_.id == id)))
+        surnames <- OptionT.liftF(genealogyDatabaseService.getSurnamesList(id))
+      } yield {
+        Ok(surnamesView(surnames, database))
+      }).getOrElse(NotFound(s"Genealogy database $id not found"))
   }
 
   def showFirstnames(id: Int, name: String): Action[AnyContent] = authAction.async {
     implicit request: AuthenticatedRequest[AnyContent] =>
       genealogyDatabaseService.getFirstnamesList(id, name).map { names =>
-        Ok(firstnamesView(names, id))
+        Ok(firstnamesView(names, id, s"Surname $name"))
       }
   }
 }

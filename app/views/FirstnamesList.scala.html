@@ -7,15 +7,9 @@
   implicit val appConfig: AppConfig
 )
 
-@(names: List[Person], dbId: Int)(implicit request: AuthenticatedRequest[?], messages: Messages)
+@(names: List[Person], dbId: Int, title: String)(implicit request: AuthenticatedRequest[?], messages: Messages)
 
-@boxTitle(names: List[Person]) = @{
-    names.headOption.fold("Individuals") { name =>
-        s"People with lastname ${name.details.surname}"
-    }
-}
-
-@main(dbId, None) {
+@main(dbId, None, title) {
 
     @govukSummaryList(
         SummaryList(
@@ -35,7 +29,7 @@
                 )
             },
             card = Some(Card(
-                title = Some(CardTitle(content = Text(boxTitle(names)))),
+                title = Some(CardTitle(content = Text("Firstnames"))),
                 actions = Some(Actions(
                     items = Seq(
                         ActionItem(

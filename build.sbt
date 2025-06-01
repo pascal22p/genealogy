@@ -87,6 +87,7 @@ lazy val scoverageSettings = {
 lazy val genealogy = (project in file("."))
   .enablePlugins(PlayScala)
   .enablePlugins(JavaAppPackaging)
+  .enablePlugins(SbtWeb)
   .settings(
     PlayKeys.playDefaultPort := 9123,
     libraryDependencies ++= LibDependencies.all,

@@ -8,11 +8,12 @@
     appConfig: AppConfig,
     assetConfig: AssetsConfig,
     govukServiceNavigation: GovukServiceNavigation,
+    govukBreadcrumbs: GovukBreadcrumbs,
     hmrcTimeoutDialog: HmrcTimeoutDialog
 )
 
 
-@(dbId: Int, personOption: Option[Person])(contentBlock: Html)(implicit authenticatedRequest: AuthenticatedRequest[?], messages: Messages)
+@(dbId: Int, personOption: Option[Person], title: String = "My family tree", breadcrumbs: Option[Breadcrumbs] = None)(contentBlock: Html)(implicit authenticatedRequest: AuthenticatedRequest[?], messages: Messages)
 
 @timeoutDialog = {  
     @hmrcTimeoutDialog(TimeoutDialog(
@@ -49,16 +50,18 @@
 
 
 <!DOCTYPE html>
-<html lang="fr" >
+<html lang="fr" class="govuk-template">
 <head>
-    <title>Genealogie</title>
+    <title>@title</title>
     <meta name="Description" content="" />
     <meta name="Keywords" content="genealogie, genealogy" />
     <meta name="Author" content="Pascal Parois" />
     <meta http-equiv="Content-language" content="fr" />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#0b0c0c">
 
+    <link rel="icon" type="image/png" href="@routes.Assets.versioned("images/favicon.png")">
     <link rel="stylesheet" media="screen" href="@assetConfig.hmrcFrontendCssUrl">
     <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/main.css")">
     <script type="module" src="@{assetConfig.hmrcFrontendJsUrl}" type="text/javascript"></script>
@@ -71,29 +74,12 @@
 <body class="govuk-frontend-supported">
     <a href="#main-content" class="govuk-skip-link" data-module="govuk-skip-link">Skip to main content</a>
     <header>
-        <div class="govuk-grid-row box_title govuk-!-margin-left-2 govuk-!-margin-right-2 govuk-!-margin-bottom-0">
-            <div class="govuk-grid-column-full">
-                <div class="govuk-header__logo">&nbsp;</div>
-                <div class="govuk-header__content">
-                    <h1 class="govuk-heading-xl govuk-!-margin-4">My genealogy tree</h1>
-                </div>
-            </div>
-        </div>
-
-        <div class="govuk-grid-row box_title govuk-!-margin-left-2 govuk-!-margin-right-2 govuk-!-margin-top-0">
+        <div class="govuk-grid-row">
             <div class="govuk-grid-column-full">
         @govukServiceNavigation(ServiceNavigation(
-            serviceName = None,
-            serviceUrl = None,
+            serviceName = Some("Parois.net"),
+            serviceUrl = Some("/"),
             navigation = Seq(
-                Some(ServiceNavigationItem(
-                    content = Text("Home"),
-                    href = "/",
-                    active = false,
-                    current = false,
-                    classes = "",
-                    attributes = Map.empty
-                )),
                 Some(ServiceNavigationItem(
                     content = Text("Surnames"),
                     href = controllers.routes.HomeController.showSurnames(dbId).url,
@@ -152,8 +138,8 @@
             classes = "",
             attributes = Map.empty,
             ariaLabel = None,
-            menuButtonText = Some("menuButtonText"),
-            menuButtonLabel = Some("menuButtonLabel"),
+            menuButtonText = Some("Menu"),
+            menuButtonLabel = Some("Menu"),
             slots = Some(ServiceNavigationSlot(
                 start = None,
                 end =  None,
@@ -166,22 +152,31 @@
 
     </header>
 
-    <div class="govuk-width-container">
-        <main class="govuk-main-wrapper">
-         <div class="govuk-grid-row">
-            <div class="govuk-grid-column-full box" id="main-content">
+    @for(someBreadcrumbs <- breadcrumbs) {
+        @govukBreadcrumbs(someBreadcrumbs)
+    }
+
+    <main class="govuk-main-wrapper">
+        <div class="govuk-width-container">
+            <div class="hmrc-page-heading ">
+                <h1 id="pageHeading" class="govuk-heading-l govuk-!-margin-bottom-3">@title</h1>
+            </div>
+
+            <div class="govuk-grid-row">
+                <div class="govuk-grid-column-full box" id="main-content">
                     @contentBlock
+                </div>
             </div>
         </div>
     </main>
-</div>
 
-<footer>
-    <div class="govuk-grid-row box_title govuk-!-margin-2">
-        <div class="govuk-grid-column-full">
-            <a href="mailto:genealogie@("@")parois.net">genealogie.parois.net </a> — version @{appConfig.commitHash} — session: @{authenticatedRequest.localSession.sessionId}
+    <footer>
+        <div class="govuk-grid-row box_title govuk-!-margin-2">
+            <div class="govuk-grid-column-full">
+                <a href="mailto:genealogie@("@")parois.net">genealogie.parois.net </a> — version @{appConfig.commitHash} — session: @{authenticatedRequest.localSession.sessionId}
+            </div>
         </div>
-    </div>
-</footer>
+    </footer>
     
-</body></html>
+</body>
+</html>

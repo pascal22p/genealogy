@@ -42,7 +42,7 @@ class EventControllerSpec extends BaseSpec {
 
         val result = sut.showEvent(1, 1).apply(FakeRequest().withHeaders(("seePrivacy", "true")))
         status(result) mustBe OK
-        contentAsString(result) must include("Orphan event")
+        contentAsString(result) must include("Event details for Unknown")
       }
     }
 
@@ -53,7 +53,7 @@ class EventControllerSpec extends BaseSpec {
 
       val result = sut.showEvent(1, 1).apply(FakeRequest().withHeaders(("seePrivacy", "false")))
       status(result) mustBe OK
-      contentAsString(result) must include("Orphan event")
+      contentAsString(result) must include("Event details for Unknown")
     }
   }
 
