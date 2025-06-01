@@ -11,20 +11,6 @@
 
 @(dbId: Int, family: Family, partnerOption: Option[Person])(implicit authenticatedRequest: AuthenticatedRequest[?], messages: Messages)
 
-@title = {
-    Family 
-    @family.parent1.map(_.details.surname).getOrElse("Unknown") —
-    @family.parent2.map(_.details.surname).getOrElse("Unknown")
-}
-
-@block(title.toString, 
-Some(Actions(
-    items = Seq(ActionItem(
-            href = controllers.delete.routes.DeleteFamilyController.deleteFamilyConfirmation(dbId, family.id).url,
-            content = Text("Delete")
-        ))
-))) {
-
 @for(partner <- partnerOption) {
     @govukSummaryList(
         SummaryList(
@@ -98,4 +84,3 @@ Some(Actions(
     )
 )
 
-}

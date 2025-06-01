@@ -63,7 +63,7 @@
 }
 
 
-@main(dbId, flatTree.headOption.flatMap(_._2.headOption)) {
+@main(dbId, flatTree.headOption.flatMap(_._2.headOption), s"Ascendance of ${flatTree.headOption.flatMap(_._2.headOption).fold("Unknown")(_.details.shortName)}") {
 
   @govukTabs(Tabs(
     items = Seq(
