@@ -39,11 +39,6 @@ class DeleteFamilyController @Inject() (
         .map { _ =>
           Redirect(controllers.routes.HomeController.showSurnames(baseId))
         }
-        .recover {
-          case ex =>
-            println(s"OOOOOO  + ${ex.getClass}")
-            throw ex
-        }
   }
 
 }
