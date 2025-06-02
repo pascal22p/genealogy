@@ -22,10 +22,6 @@
 Breadcrumbs(
   items = Seq(
     BreadcrumbsItem(
-      content = Text("Home"),
-      href = Some("#")
-    ),
-    BreadcrumbsItem(
       content = Text(event.description.getOrElse("Unknown")),
       href = Some(
         event.eventType match {
