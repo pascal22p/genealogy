@@ -25,12 +25,14 @@ import play.api.test.Helpers.contentAsString
 import play.api.test.Helpers.defaultAwaitTimeout
 import play.api.test.Helpers.session
 import play.api.test.Helpers.status
+import queries.GetSqlQueries
 import queries.SessionSqlQueries
 import testUtils.BaseSpec
 
 class AuthActionSpec extends BaseSpec {
 
   val mockSqlQueries: SessionSqlQueries                          = mock[SessionSqlQueries]
+  val mockGetSqlQueries: GetSqlQueries                           = mock[GetSqlQueries]
   def messagesControllerComponents: MessagesControllerComponents = inject[MessagesControllerComponents]
 
   class Harness(authAction: AuthAction) extends InjectedController {
@@ -43,7 +45,7 @@ class AuthActionSpec extends BaseSpec {
 
   def fakeController: Harness = {
     val authAction =
-      new AuthActionImpl(mockSqlQueries, messagesControllerComponents)(using global)
+      new AuthActionImpl(mockSqlQueries, mockGetSqlQueries, messagesControllerComponents)(using global)
     new Harness(authAction)
   }
 

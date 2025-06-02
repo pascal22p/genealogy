@@ -21,7 +21,8 @@ class EventDetailsSpec extends BaseSpec {
   implicit val request: AuthenticatedRequest[AnyContentAsEmpty.type] =
     AuthenticatedRequest(
       FakeRequest(),
-      Session("", SessionData(Some(UserData(0, "", "", true, true))), LocalDateTime.now)
+      Session("", SessionData(Some(UserData(0, "", "", true, true))), LocalDateTime.now),
+      None
     )
   implicit val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
 
@@ -87,7 +88,8 @@ class EventDetailsSpec extends BaseSpec {
         implicit val request: AuthenticatedRequest[AnyContentAsEmpty.type] =
           AuthenticatedRequest(
             FakeRequest(),
-            Session("", SessionData(Some(UserData(0, "", "", false, false))), LocalDateTime.now)
+            Session("", SessionData(Some(UserData(0, "", "", false, false))), LocalDateTime.now),
+            None
           )
 
         val input    = "1 JAN 1928"
@@ -101,7 +103,8 @@ class EventDetailsSpec extends BaseSpec {
         implicit val request: AuthenticatedRequest[AnyContentAsEmpty.type] =
           AuthenticatedRequest(
             FakeRequest(),
-            Session("", SessionData(Some(UserData(0, "", "", false, false))), LocalDateTime.now)
+            Session("", SessionData(Some(UserData(0, "", "", false, false))), LocalDateTime.now),
+            None
           )
 
         val input    = "BET 1 JAN 1728 AND 2 FEB 2005"

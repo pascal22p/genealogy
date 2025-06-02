@@ -29,7 +29,7 @@ class FakeAuthAction(localSession: Session) extends AuthAction {
           LocalDateTime.now
         )
     }
-    block(AuthenticatedRequest(request, newSession))
+    block(AuthenticatedRequest(request, newSession, None))
   }
 
   protected def executionContext: ExecutionContext = scala.concurrent.ExecutionContext.global
