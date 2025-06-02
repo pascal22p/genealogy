@@ -47,7 +47,30 @@
     }
 }
 
+@breadcrumbsMenu = @{
+    val homeEntry = BreadcrumbsItem(
+        content = Text("Home"),
+        href = Some(controllers.routes.HomeController.onload().url),
+        attributes = Map.empty
+    )
 
+    val databaseEntry = authenticatedRequest.genealogyDatabase.fold(Seq(homeEntry)){ database =>
+        Seq(
+            homeEntry,
+            BreadcrumbsItem(
+                content = Text(s"Database ${database.name}"),
+                href = Some(controllers.routes.HomeController.showSurnames(database.id).url),
+                attributes = Map.empty
+            )
+        )
+    }
+
+    breadcrumbs.fold(Breadcrumbs(databaseEntry)) { someBreadcrumbs =>
+        Breadcrumbs(
+            items = databaseEntry ++ someBreadcrumbs.items
+        )
+    }
+}
 
 <!DOCTYPE html>
 <html lang="fr" class="govuk-template">
@@ -152,9 +175,8 @@
 
     </header>
 
-    @for(someBreadcrumbs <- breadcrumbs) {
-        @govukBreadcrumbs(someBreadcrumbs)
-    }
+    @govukBreadcrumbs(breadcrumbsMenu)
+
 
     <main class="govuk-main-wrapper">
         <div class="govuk-width-container">
@@ -170,10 +192,27 @@
         </div>
     </main>
 
-    <footer>
-        <div class="govuk-grid-row box_title govuk-!-margin-2">
-            <div class="govuk-grid-column-full">
-                <a href="mailto:genealogie@("@")parois.net">genealogie.parois.net </a> — version @{appConfig.commitHash} — session: @{authenticatedRequest.localSession.sessionId}
+    <footer class="govuk-footer">
+        <div class="govuk-width-container">
+            <div class="govuk-footer__meta">
+                <div class="govuk-footer__meta-item">
+                    <a class="govuk-footer__link" href="mailto:genealogie@("@")parois.net">genealogie.parois.net </a>
+                </div>
+                <div class="govuk-footer__meta-item govuk-footer__meta-item--grow">
+                    <ul class="govuk-footer__list">
+                        <li class="govuk-footer__list-item">
+                            Version @{appConfig.commitHash}
+                        </li>
+                        <li class="govuk-footer__list-item">
+                            Session: @{authenticatedRequest.localSession.sessionId}
+                        </li>
+                        <li class="govuk-footer__list-item">
+                            <a class="govuk-footer__link" href="https://github.com/pascal22p/genealogy/">
+                                On github
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
     </footer>

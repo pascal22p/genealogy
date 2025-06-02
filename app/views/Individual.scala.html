@@ -17,7 +17,18 @@
   @family.parent2.map(_.details.surname).getOrElse("Unknown")
 }
 
-@main(dbId, Some(person), person.name) {
+@breadcrumbs = @{
+  Breadcrumbs(
+    items = Seq(
+      BreadcrumbsItem(
+        content = Text(person.details.surname),
+        href = Some(controllers.routes.HomeController.showFirstnames(dbId, person.details.surname).url)
+      )
+    )
+  )
+}
+
+@main(dbId, Some(person), person.name, Some(breadcrumbs)) {
 
   @personDetails(dbId, person)
   
