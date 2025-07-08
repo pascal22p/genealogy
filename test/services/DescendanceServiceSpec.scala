@@ -56,7 +56,7 @@ class DescendanceServiceSpec extends BaseSpec {
           families = List(familyC)
         )
 
-      val childC: Child = Child(personC.copy(families = List.empty), "relaType", None)
+      val childC: Child   = Child(personC.copy(families = List.empty), "relaType", None)
       val familyB: Family = Family(
         1,
         None,
@@ -75,7 +75,7 @@ class DescendanceServiceSpec extends BaseSpec {
           families = List(familyB)
         )
 
-      val childB: Child = Child(personB.copy(families = List.empty), "relaType", None)
+      val childB: Child   = Child(personB.copy(families = List.empty), "relaType", None)
       val familyA: Family =
         Family(1, None, None, timeStamp, None, "", List(childB), Events(List.empty, Some(1), FamilyEvent))
       val personA: Person =

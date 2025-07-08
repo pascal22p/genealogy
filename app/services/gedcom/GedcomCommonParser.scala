@@ -44,11 +44,11 @@ class GedcomCommonParser @Inject() () {
     val blocks = getBlocks(gedcomString, level)
     blocks.map {
       case (lineNumber, block) =>
-        val subBlock               = scala.io.Source.fromString(block).getLines
-        val subBlockHeader: String = subBlock.nextOption().getOrElse("")
-        val subBlockBody           = subBlock.mkString("\n")
+        val subBlock                 = scala.io.Source.fromString(block).getLines
+        val subBlockHeader: String   = subBlock.nextOption().getOrElse("")
+        val subBlockBody             = subBlock.mkString("\n")
         val (xref, tagName, content) = subBlockHeader match {
-          case level0TagAndXrefRegexp(_, xref, tagName) => (Option(xref), tagName, None)
+          case level0TagAndXrefRegexp(_, xref, tagName)    => (Option(xref), tagName, None)
           case tagAndXrefRegexp(tagName, _, xref, content) =>
             val newOption = Option(content) match {
               case Some(s) if s.isEmpty => None

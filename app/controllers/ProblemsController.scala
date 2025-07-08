@@ -41,7 +41,7 @@ class ProblemsController @Inject() (
   def onload(dbId: Int): Action[AnyContent] = authJourney.authWithAdminRight.async {
     implicit request: AuthenticatedRequest[AnyContent] =>
       for {
-        orphanedMedias <- getSqlQueries.getMedias(None, UnknownMedia, dbId)
+        orphanedMedias      <- getSqlQueries.getMedias(None, UnknownMedia, dbId)
         orphanedIndividuals <- getSqlQueries
           .getOrphanedIndividuals(dbId)
           .flatMap(_.traverse(individual => personService.getPerson(individual.id)))

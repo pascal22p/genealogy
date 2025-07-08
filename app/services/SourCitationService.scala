@@ -45,7 +45,7 @@ class SourCitationService @Inject() (mariadbQueries: GetSqlQueries)(
         .map {
           case Nil                 => None
           case sourCitation :: Nil => Some(sourCitation)
-          case sourCitations =>
+          case sourCitations       =>
             throw new IllegalStateException(
               s"Expected one sour citation, but found multiple: ${sourCitations.size}"
             )

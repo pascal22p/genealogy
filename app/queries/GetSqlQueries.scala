@@ -204,7 +204,7 @@ final class GetSqlQueries @Inject() (db: Database, databaseExecutionContext: Dat
           case _: EventMedia.type =>
             "WHERE rel_events_multimedia.events_details_id = {id} AND genea_multimedia.base = {dbId}"
           case _: IndividualMedia.type => "WHERE rel_indi_multimedia.indi_id = {id} AND genea_multimedia.base = {dbId}"
-          case _: FamilyMedia.type =>
+          case _: FamilyMedia.type     =>
             "WHERE rel_familles_multimedia.familles_id = {id} AND genea_multimedia.base = {dbId}"
           case _: SourCitationMedia.type =>
             "WHERE rel_sour_citations_multimedia.sour_citations_id = {id} AND genea_multimedia.base = {dbId}"
@@ -271,7 +271,7 @@ final class GetSqlQueries @Inject() (db: Database, databaseExecutionContext: Dat
     Future {
       val mysqlParser: RowParser[(String, Int, Option[Int], Option[Int])] =
         (get[String]("indi_nom") ~
-          get[Int]("count") ~
+          get[Int]("unique_count") ~
           get[Option[Int]]("min_jd_count") ~
           get[Option[Int]]("max_jd_count")).map {
           case name ~ count ~ minDayCount ~ maxDayCount =>
@@ -280,11 +280,11 @@ final class GetSqlQueries @Inject() (db: Database, databaseExecutionContext: Dat
 
       db.withConnection { implicit conn =>
         val excludePrivate = "AND indi_resn IS NULL"
-        val isExcluded = authenticatedRequest.localSession.sessionData.userData.fold(excludePrivate) { userData =>
+        val isExcluded     = authenticatedRequest.localSession.sessionData.userData.fold(excludePrivate) { userData =>
           if (userData.seePrivacy) "" else excludePrivate
         }
         SQL(
-          s"""SELECT MIN(jd_count) AS min_jd_count, MAX(jd_count) AS max_jd_count, indi_nom, COUNT(*) AS count
+          s"""SELECT MIN(jd_count) AS min_jd_count, MAX(jd_count) AS max_jd_count, indi_nom, COUNT(DISTINCT genea_individuals.indi_id) AS unique_count
              | FROM genea_individuals
              | LEFT JOIN rel_indi_events ON genea_individuals.indi_id = rel_indi_events.indi_id
              | LEFT JOIN genea_events_details ON genea_events_details.events_details_id = rel_indi_events.events_details_id
@@ -302,7 +302,7 @@ final class GetSqlQueries @Inject() (db: Database, databaseExecutionContext: Dat
   ): Future[List[PersonDetails]] = Future {
     db.withConnection { implicit conn =>
       val excludePrivate = "AND indi_resn IS NULL"
-      val isExcluded = authenticatedRequest.localSession.sessionData.userData.fold(excludePrivate) { userData =>
+      val isExcluded     = authenticatedRequest.localSession.sessionData.userData.fold(excludePrivate) { userData =>
         if (userData.seePrivacy) "" else excludePrivate
       }
       val filter = name.fold("") { _ =>

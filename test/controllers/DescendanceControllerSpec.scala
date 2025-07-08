@@ -52,7 +52,7 @@ class DescendanceControllerSpec extends BaseSpec {
       families = List(familyC)
     )
 
-  val childC: Child = Child(personC, "relaType", None)
+  val childC: Child   = Child(personC, "relaType", None)
   val familyB: Family =
     Family(2, None, None, Instant.now, None, "", List(childC, childD), Events(List.empty, Some(2), FamilyEvent))
   val personB: Person =
@@ -63,7 +63,7 @@ class DescendanceControllerSpec extends BaseSpec {
       families = List(familyB)
     )
 
-  val childB: Child = Child(personB, "relaType", None)
+  val childB: Child   = Child(personB, "relaType", None)
   val familyA: Family =
     Family(1, None, None, Instant.now, None, "", List(childB), Events(List.empty, Some(1), FamilyEvent))
   val personA: Person =

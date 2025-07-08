@@ -115,7 +115,7 @@ class GetSqlQueriesSpec extends MariadbHelper with Logging {
       val person   = fakePersonDetails(id = 1)
       val event    = fakeEventDetail(events_details_id = 2)
       val eventTag = "BIRT"
-      val result = (for {
+      val result   = (for {
         _      <- executeSql(sqlIndividualEvent(person, event, eventTag))
         result <- sut.getEvents(person.id, IndividualEvent)
       } yield result).futureValue
@@ -139,7 +139,7 @@ class GetSqlQueriesSpec extends MariadbHelper with Logging {
       val person2  = fakePersonDetails(id = 2)
       val idFamily = 3
       val event    = fakeEventDetail(events_details_id = 4, tag = Some("BIRT"))
-      val result = (for {
+      val result   = (for {
         _      <- executeSql(sqlFamily(idFamily, person1, person2, List.empty, List(event)))
         result <- sut.getEvents(idFamily, FamilyEvent)
       } yield result).futureValue
@@ -162,7 +162,7 @@ class GetSqlQueriesSpec extends MariadbHelper with Logging {
       val person1  = fakePersonDetails(id = 1)
       val person2  = fakePersonDetails(id = 2)
       val idFamily = 3
-      val child =
+      val child    =
         Child(
           Person(
             fakePersonDetails(id = 5),
@@ -197,7 +197,7 @@ class GetSqlQueriesSpec extends MariadbHelper with Logging {
       val person1  = fakePersonDetails(id = 1)
       val person2  = fakePersonDetails(id = 2)
       val idFamily = 3
-      val result = (for {
+      val result   = (for {
         _      <- executeSql(sqlFamily(idFamily, person1, person2, List.empty, List.empty))
         result <- sut.getFamilyIdsFromPartnerId(person1.id)
       } yield result).futureValue
@@ -209,7 +209,7 @@ class GetSqlQueriesSpec extends MariadbHelper with Logging {
       val person1  = fakePersonDetails(id = 1)
       val person2  = fakePersonDetails(id = 2)
       val idFamily = 3
-      val result = (for {
+      val result   = (for {
         _      <- executeSql(sqlFamily(idFamily, person1, person2, List.empty, List.empty))
         result <- sut.getFamilyIdsFromPartnerId(person2.id)
       } yield result).futureValue
@@ -230,7 +230,7 @@ class GetSqlQueriesSpec extends MariadbHelper with Logging {
       val person1  = fakePersonDetails(id = 1)
       val person2  = fakePersonDetails(id = 2)
       val idFamily = 3
-      val result = (for {
+      val result   = (for {
         _      <- executeSql(sqlFamily(idFamily, person1, person2, List.empty, List.empty))
         result <- sut.getFamilyDetails(idFamily).value
       } yield result).futureValue
@@ -254,7 +254,7 @@ class GetSqlQueriesSpec extends MariadbHelper with Logging {
       val person1  = fakePersonDetails(id = 1)
       val person2  = fakePersonDetails(id = 2)
       val idFamily = 3
-      val child =
+      val child    =
         Child(
           Person(
             fakePersonDetails(id = 4),
@@ -285,7 +285,7 @@ class GetSqlQueriesSpec extends MariadbHelper with Logging {
 
   "getPlace" must {
     "returns a place" in {
-      val place = fakePlace(id = 1)
+      val place  = fakePlace(id = 1)
       val result = (for {
         _      <- executeSql(sqlPlace(place))
         result <- sut.getPlace(place.id).value
@@ -351,17 +351,17 @@ class GetSqlQueriesSpec extends MariadbHelper with Logging {
       val event6   = fakeEventDetail(events_details_id = 66, jd_count = Some(10000))
 
       val result = (for {
-        _ <- executeSql(sqlIndividualEvent(person1, event1, eventTag))
-        _ <- executeSql(sqlIndividualEvent(person2, event2, eventTag))
-        _ <- executeSql(sqlIndividualEvent(person3, event3, eventTag))
-        _ <- executeSql(sqlIndividualEvents(person4, List(event4, event5, event6), eventTag))
+        _      <- executeSql(sqlIndividualEvent(person1, event1, eventTag))
+        _      <- executeSql(sqlIndividualEvent(person2, event2, eventTag))
+        _      <- executeSql(sqlIndividualEvent(person3, event3, eventTag))
+        _      <- executeSql(sqlIndividualEvents(person4, List(event4, event5, event6), eventTag))
         result <- sut.getSurnamesList(1)(
           using AuthenticatedRequest(FakeRequest(), Session("sessionId", SessionData(None), LocalDateTime.now), None)
         )
       } yield result).futureValue
 
       result mustBe List(
-        ("A", 3, Some(100), Some(10000)),
+        ("A", 1, Some(100), Some(10000)),
         ("B", 1, None, None),
         ("C", 1, None, None),
         ("D", 1, None, None)

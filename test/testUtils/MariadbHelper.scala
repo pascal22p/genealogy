@@ -32,7 +32,7 @@ trait MariadbHelper extends BaseSpec with BeforeAndAfterEach with Logging {
         .map { query =>
           if (logMe) logger.error("Query: " + query)
           Try(SQL(query).execute()) match {
-            case Success(bool) => bool
+            case Success(bool)  => bool
             case Failure(error) =>
               logger.error("Error with query: " + query)
               throw error
@@ -44,7 +44,7 @@ trait MariadbHelper extends BaseSpec with BeforeAndAfterEach with Logging {
 
   def createTables(): Future[Boolean] = {
     val source = scala.io.Source.fromFile("doc/tables.sql")
-    val lines =
+    val lines  =
       try source.mkString
       finally source.close()
     val queries =

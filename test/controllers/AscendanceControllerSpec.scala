@@ -38,7 +38,7 @@ class AscendanceControllerSpec extends BaseSpec {
 
   "showAscendant" must {
     "display list of ascendants" in {
-      val timeStamp = Instant.now
+      val timeStamp       = Instant.now
       val personD: Person =
         Person(
           fakePersonDetails(firstname = "Firstname4", id = 4, timestamp = timeStamp),
@@ -55,7 +55,7 @@ class AscendanceControllerSpec extends BaseSpec {
       val familyC: Family =
         Family(3, None, Some(personE), timeStamp, None, "", List.empty, Events(List.empty, Some(3), FamilyEvent))
       val parentsC: Parents = Parents(familyC, "", "", None)
-      val personC: Person =
+      val personC: Person   =
         Person(
           fakePersonDetails(firstname = "Firstname3", id = 3, timestamp = timeStamp),
           Events(List.empty, Some(3), IndividualEvent),
@@ -74,7 +74,7 @@ class AscendanceControllerSpec extends BaseSpec {
         Events(List.empty, Some(2), FamilyEvent)
       )
       val parentsB: Parents = Parents(familyB, "", "", None)
-      val personB: Person =
+      val personB: Person   =
         Person(
           fakePersonDetails(firstname = "Firstname2", id = 2, timestamp = timeStamp),
           Events(List.empty, Some(2), IndividualEvent),
@@ -85,7 +85,7 @@ class AscendanceControllerSpec extends BaseSpec {
       val familyA: Family =
         Family(1, Some(personB), None, timeStamp, None, "", List.empty, Events(List.empty, Some(1), FamilyEvent))
       val parentsA: Parents = Parents(familyA, "", "", None)
-      val personA: Person =
+      val personA: Person   =
         Person(
           fakePersonDetails(firstname = "Firstname1", id = 1, timestamp = timeStamp),
           Events(List.empty, Some(1), IndividualEvent),
@@ -128,7 +128,7 @@ class AscendanceControllerSpec extends BaseSpec {
       val familyC: Family =
         Family(4, None, Some(personE), Instant.now, None, "", List.empty, Events(List.empty, Some(4), FamilyEvent))
       val parentsC: Parents = Parents(familyC, "", "", None)
-      val personC: Person =
+      val personC: Person   =
         Person(
           fakePersonDetails(firstname = "Firstname3", id = 3),
           Events(List.empty, Some(3), IndividualEvent),
@@ -147,7 +147,7 @@ class AscendanceControllerSpec extends BaseSpec {
         Events(List.empty, Some(3), FamilyEvent)
       )
       val parentsB: Parents = Parents(familyB, "", "", None)
-      val personB: Person =
+      val personB: Person   =
         Person(
           fakePersonDetails(firstname = "Firstname2", id = 2),
           Events(List.empty, Some(2), IndividualEvent),
@@ -174,7 +174,7 @@ class AscendanceControllerSpec extends BaseSpec {
         Events(List.empty, Some(1), FamilyEvent)
       )
       val parentsA: Parents = Parents(familyA, "", "", None)
-      val personA: Person =
+      val personA: Person   =
         Person(
           fakePersonDetails(firstname = "Firstname1", id = 1),
           Events(List.empty, Some(1), IndividualEvent),

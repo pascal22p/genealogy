@@ -14,7 +14,7 @@ import queries.SessionSqlQueries
 class SessionService @Inject() (sqlQueries: SessionSqlQueries) {
   def insertPersonInHistory(person: Person)(implicit request: AuthenticatedRequest[?]): Future[Int] = {
     val currentHistory = request.localSession.sessionData.history
-    val newHistory =
+    val newHistory     =
       List(HistoryElement(person.details.id, person.name)) ++ currentHistory.filterNot(_.personId == person.details.id)
     val newSessionData = request.localSession.sessionData.copy(history = newHistory.take(5))
     val newSession     = request.localSession.copy(sessionData = newSessionData)
