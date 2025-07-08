@@ -17,7 +17,7 @@ class EventDetailsSpec extends BaseSpec {
 
   implicit def messagesApi: MessagesApi = app.injector.instanceOf[MessagesApi]
 
-  implicit lazy val messages: Messages = MessagesImpl(Lang("en"), messagesApi)
+  implicit lazy val messages: Messages                               = MessagesImpl(Lang("en"), messagesApi)
   implicit val request: AuthenticatedRequest[AnyContentAsEmpty.type] =
     AuthenticatedRequest(
       FakeRequest(),

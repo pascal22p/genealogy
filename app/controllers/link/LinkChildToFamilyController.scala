@@ -45,7 +45,7 @@ class LinkChildToFamilyController @Inject() (
       val form = LinkForm.linkForm
       for {
         allPersonsDetails <- getSqlQueries.getAllPersonDetails(dbId)
-        allPersons <- allPersonsDetails.traverse { person =>
+        allPersons        <- allPersonsDetails.traverse { person =>
           eventService.getIndividualEvents(person.id).map { events =>
             Person(
               person,

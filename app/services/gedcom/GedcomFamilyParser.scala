@@ -42,12 +42,12 @@ class GedcomFamilyParser @Inject() (
 
     val (xref, _) = (node.xref, node.name) match {
       case (Some(xref), name) if name == "FAM" => (xref, name)
-      case (None, name) if name != "FAM" =>
+      case (None, name) if name != "FAM"       =>
         throw new RuntimeException(
           s"line ${node.lineNumber}: `${node.line}` tag name is invalid FAM is expected and xref is missing"
         )
       case (None, _) => throw new RuntimeException(s"line ${node.lineNumber}: `${node.line}` xref is missing")
-      case (_, _) =>
+      case (_, _)    =>
         throw new RuntimeException(s"line ${node.lineNumber}: `${node.line}` tag name is invalid FAM is expected")
     }
 

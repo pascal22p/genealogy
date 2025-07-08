@@ -11,7 +11,7 @@ class GedcomIndividualParserServiceSpec extends BaseSpec {
 
   val gedcomHashIdTable = new GedcomHashIdTable
   val gedcomEventParser = new GedcomEventParser(gedcomHashIdTable)
-  val sut = new GedcomIndividualParser(
+  val sut               = new GedcomIndividualParser(
     new GedcomCommonParser,
     gedcomHashIdTable,
     gedcomEventParser

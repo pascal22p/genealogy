@@ -51,12 +51,12 @@ class GedcomIndividualParser @Inject() (
 
     val (xref, _) = (node.xref, node.name) match {
       case (Some(xref), name) if name == "INDI" => (xref, name)
-      case (None, name) if name != "INDI" =>
+      case (None, name) if name != "INDI"       =>
         throw new RuntimeException(
           s"line ${node.lineNumber}: `${node.line}` tag name is invalid INDI is expected and xref is missing"
         )
       case (None, _) => throw new RuntimeException(s"line ${node.lineNumber}: `${node.line}` xref is missing")
-      case (_, _) =>
+      case (_, _)    =>
         throw new RuntimeException(s"line ${node.lineNumber}: `${node.line}` tag name is invalid INDI is expected")
     }
 
@@ -179,7 +179,7 @@ class GedcomIndividualParser @Inject() (
   }
 
   def gedcomIndiBlock2Sql(node: GedcomIndiBlock, base: Int): SimpleSql[Row] = {
-    val nameRegex = "([^/]*)/([^/]*)/(.*)".r
+    val nameRegex            = "([^/]*)/([^/]*)/(.*)".r
     val (firstname, surname) = node.nameStructure.name match {
       case nameRegex(firstname, surname, other) => (firstname, surname + " " + other)
       case _                                    => ("", "")

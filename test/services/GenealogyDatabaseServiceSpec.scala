@@ -26,7 +26,7 @@ import queries.GetSqlQueries
 import testUtils.BaseSpec
 
 class GenealogyDatabaseServiceSpec extends BaseSpec {
-  val sut: GenealogyDatabaseService = app.injector.instanceOf[GenealogyDatabaseService]
+  val sut: GenealogyDatabaseService                                          = app.injector.instanceOf[GenealogyDatabaseService]
   val fakeAuthenticatedRequest: AuthenticatedRequest[AnyContentAsEmpty.type] =
     AuthenticatedRequest(FakeRequest(), Session("id", SessionData(None), LocalDateTime.now), None)
 

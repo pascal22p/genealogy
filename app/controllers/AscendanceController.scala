@@ -35,7 +35,7 @@ class AscendanceController @Inject() (
   def showAscendant(@unused baseId: Int, id: Int): Action[AnyContent] = authAction.async {
     implicit authenticatedRequest: AuthenticatedRequest[AnyContent] =>
       ascendanceService.getAscendant(id, 0).map {
-        case None => NotFound("Nothing here")
+        case None       => NotFound("Nothing here")
         case Some(tree) =>
           sessionService.insertPersonInHistory(tree.copy(parents = List.empty[Parents]))
           val flattenTree = Map(0 -> List(tree.copy(parents = List.empty[Parents]))) ++ treeUtils.flattenTree(tree)

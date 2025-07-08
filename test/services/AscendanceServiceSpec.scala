@@ -59,7 +59,7 @@ class AscendanceServiceSpec extends BaseSpec {
         Events(List.empty, Some(1), FamilyEvent)
       )
       val parentsC: Parents = Parents(familyC, "", "", None)
-      val personC: Person =
+      val personC: Person   =
         Person(
           fakePersonDetails(firstname = "Firstname3", id = 3, timestamp = timeStamp),
           Events(List.empty, Some(3), IndividualEvent),
@@ -78,7 +78,7 @@ class AscendanceServiceSpec extends BaseSpec {
         Events(List.empty, Some(1), FamilyEvent)
       )
       val parentsB: Parents = Parents(familyB, "", "", None)
-      val personB: Person =
+      val personB: Person   =
         Person(
           fakePersonDetails(firstname = "Firstname2", id = 2, timestamp = timeStamp),
           Events(List.empty, Some(2), IndividualEvent),
@@ -98,7 +98,7 @@ class AscendanceServiceSpec extends BaseSpec {
           Events(List.empty, Some(1), FamilyEvent)
         )
       val parentsA: Parents = Parents(familyA, "", "", None)
-      val personA: Person =
+      val personA: Person   =
         Person(
           fakePersonDetails(firstname = "Firstname1", id = 1, timestamp = timeStamp),
           Events(List.empty, Some(1), IndividualEvent),

@@ -21,7 +21,7 @@ class FakeAuthAction(localSession: Session) extends AuthAction {
     val seePrivacy = request.headers.get("seePrivacy").exists(_.toBoolean)
     val userData   = request.headers.get("userData").forall(_.toBoolean)
     val newSession = (userData, seePrivacy) match {
-      case (false, _) => Session("1", localSession.sessionData.copy(userData = None), LocalDateTime.now)
+      case (false, _)      => Session("1", localSession.sessionData.copy(userData = None), LocalDateTime.now)
       case (true, privacy) =>
         Session(
           "1",

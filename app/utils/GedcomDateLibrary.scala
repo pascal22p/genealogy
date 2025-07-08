@@ -42,7 +42,7 @@ class GedcomDateLibrary @Inject() (
 
     trimmedGedcomDate match {
       case republicanDateRegex(_) => republicanDate.parseRepublicanStringToGregorianDate(gedcomDate)
-      case _ => {
+      case _                      => {
         val localDate = Try(LocalDate.parse(trimmedGedcomDate, dateFormatter))
           .map(Some(_))
           .getOrElse(None)

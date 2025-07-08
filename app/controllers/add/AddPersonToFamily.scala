@@ -87,7 +87,7 @@ class AddPersonToFamily @Inject() (
     implicit authenticatedRequest: AuthenticatedRequest[AnyContent] =>
       for {
         allPersonsDetails <- getSqlQueries.getAllPersonDetails(baseId)
-        allPersons <- allPersonsDetails.traverse { person =>
+        allPersons        <- allPersonsDetails.traverse { person =>
           eventService.getIndividualEvents(person.id).map { events =>
             Person(
               person,
@@ -112,7 +112,7 @@ class AddPersonToFamily @Inject() (
       val errorFunction: Form[FamilyForm] => Future[Result] = { (formWithErrors: Form[FamilyForm]) =>
         for {
           allPersonsDetails <- getSqlQueries.getAllPersonDetails(baseId)
-          allPersons <- allPersonsDetails.traverse { person =>
+          allPersons        <- allPersonsDetails.traverse { person =>
             eventService.getIndividualEvents(person.id).map { events =>
               Person(
                 person,
