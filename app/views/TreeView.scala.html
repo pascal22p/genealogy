@@ -1,0 +1,37 @@
+@import views.html.components.Block
+@import models.Person
+
+@this(
+        main: Main,
+        block: Block
+)
+
+@(dbId: Int, person: Person, depth: Int)(implicit request: AuthenticatedRequest[?], messages: Messages)
+
+
+@breadcrumbs = @{
+  Breadcrumbs(
+    items = Seq(
+      BreadcrumbsItem(
+        content = Text(person.shortName),
+        href = Some(controllers.routes.IndividualController.showPerson(dbId, person.details.id).url)
+      )
+    )
+  )
+}
+
+@main(dbId, Some(person), person.name, Some(breadcrumbs)) {
+
+@block("Tree view", Some(Actions(
+  items = Seq(
+    ActionItem(
+      href = controllers.routes.TreeController.showPdf(dbId, person.details.id, depth).url,
+      content = Text("Download pdf")
+    )
+  )
+))) {
+      <object type="image/svg+xml" id="tree" name="tree" Alt="Tree" data="@controllers.routes.TreeController.showSvg(dbId, person.details.id, depth).url" width="100%" >
+        <img src="@controllers.routes.TreeController.showSvg(dbId, person.details.id, depth).url" alt="Tree" width="100%">
+      </object>
+  }
+}

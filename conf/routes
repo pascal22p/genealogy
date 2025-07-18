@@ -23,6 +23,13 @@ GET     /base/:baseId/family/:id                  controllers.FamilyController.s
 GET     /base/:baseId/descendant/:id              controllers.DescendanceController.showDescendant(baseId: Int, id: Int)
 GET     /base/:baseId/ascendant/:id               controllers.AscendanceController.showAscendant(baseId: Int, id: Int)
 GET     /base/:baseId/medias/show                 controllers.MediaListController.showMedias(baseId: Int)
+
+GET     /base/:baseId/tree/:id/depth/:depth/svg   controllers.TreeController.showSvg(baseId: Int, id: Int, depth: Int)
+GET     /base/:baseId/tree/:id/depth/:depth/pdf   controllers.TreeController.showPdf(baseId: Int, id: Int, depth: Int)
+GET     /base/:baseId/tree/:id/depth/:depth/png   controllers.TreeController.showPng(baseId: Int, id: Int, depth: Int)
+GET     /base/:baseId/tree/:id/depth/:depth/dot   controllers.TreeController.showDot(baseId: Int, id: Int, depth: Int)
+GET     /base/:baseId/tree/:id                    controllers.TreeController.showTree(baseId: Int, id: Int)
+
 GET     /switch-lang/:lang                        controllers.IndividualController.languageSwitch(lang: String)
 
 GET     /login                                    controllers.SessionController.loginOnLoad()
