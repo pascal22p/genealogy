@@ -7,7 +7,6 @@ import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
-import cats.data.OptionT
 import com.google.inject.ImplementedBy
 import models.AuthenticatedRequest
 import models.GenealogyDatabase

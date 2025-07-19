@@ -13,7 +13,6 @@ import models.EventDetail
 import models.EventType.FamilyEvent
 import models.EventType.IndividualEvent
 import models.EventType.UnknownEvent
-import models.Place
 import models.SourCitation
 import models.SourCitationType.EventSourCitation
 import queries.GetSqlQueries

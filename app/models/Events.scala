@@ -6,6 +6,7 @@ import play.twirl.api.Html
 
 final case class Events(eventsDetails: List[EventDetail], ownerId: Option[Int], ownerType: EventType.EventType)
     extends EventsOrAttributes {
+
   def birthAndDeathDate(shortMonth: Boolean = false)(
       implicit messages: Messages,
       authenticatedRequest: AuthenticatedRequest[?],
@@ -24,4 +25,16 @@ final case class Events(eventsDetails: List[EventDetail], ownerId: Option[Int], 
       case (Some(date1), Some(date2)) => Html(s"°$date1 – †$date2")
     }
   }
+
+  def weddingDate(shortMonth: Boolean = false)(
+      implicit messages: Messages,
+      authenticatedRequest: AuthenticatedRequest[?],
+      appConfig: AppConfig
+  ): Html = {
+    val weddingTags = List("MARR", "MARB")
+    val weddingDate =
+      eventsDetails.find(event => weddingTags.contains(event.tag.getOrElse(""))).map(_.formatDate(shortMonth))
+    weddingDate.fold(Html(""))(date => Html(s"x $date"))
+  }
+
 }

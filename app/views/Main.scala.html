@@ -134,6 +134,16 @@
                     )
                 },
                 personOption.map { person =>
+                    ServiceNavigationItem(
+                        content = Text("Tree"),
+                        href = controllers.routes.TreeController.showTree(dbId, person.details.id).url,
+                        active = false,
+                        current = false,
+                        classes = "",
+                        attributes = Map.empty
+                    )
+                },
+                personOption.map { person =>
                   ServiceNavigationItem(
                     content = Text("Descendants"),
                     href = controllers.routes.DescendanceController.showDescendant(dbId, person.details.id).url,

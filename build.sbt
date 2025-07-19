@@ -1,7 +1,6 @@
-import com.typesafe.sbt.packager.docker.DockerChmodType
-import wartremover.Wart.{DefaultArguments, Equals, ImplicitParameter, Overloading, Recursion, Any, Throw, SeqApply, Nothing, IterableOps, MutableDataStructures, Var}
+import com.typesafe.sbt.packager.docker.{Cmd, DockerAlias, DockerChmodType, ExecCmd}
+import wartremover.Wart.{Any, DefaultArguments, Equals, ImplicitParameter, IterableOps, MutableDataStructures, Nothing, Overloading, Recursion, SeqApply, Throw, Var}
 import play.twirl.sbt.Import.TwirlKeys
-import com.typesafe.sbt.packager.docker.DockerAlias
 import com.github.sbt.git.SbtGit.git
 
 import scala.sys.process.Process
@@ -27,6 +26,15 @@ dockerBaseImage := "eclipse-temurin:21"
 dockerExposedPorts ++= Seq(9123)
 dockerChmodType := DockerChmodType.UserGroupWriteExecute
 dockerUsername := Some("pascal22p")
+dockerCommands ++= Seq(
+  Cmd("USER", "root"),
+  ExecCmd("RUN", "apt-get", "update"),
+  ExecCmd("RUN", "apt-get", "install", "-y", "graphviz"),
+  ExecCmd("RUN", "apt-get", "clean"),
+  ExecCmd("RUN", "rm", "-rf", "/var/lib/apt/lists/*"),
+  Cmd("USER", "1001:0")
+)
+dockerBuildOptions ++= Seq("--load")
 
 // Helper to get the short Git commit hash
 def shortCommitHash: String = {
@@ -118,7 +126,7 @@ lazy val genealogy = (project in file("."))
       "-Xkind-projector",
       "-Wvalue-discard",
       "-Wunused:all",
-      //"-Xfatal-warnings",
+      "-Xfatal-warnings",
       //"-Yexplicit-nulls",
       "-Wsafe-init",
       "-Wconf:msg=unused import&src=html/.*:s",
