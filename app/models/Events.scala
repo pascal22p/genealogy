@@ -32,7 +32,6 @@ final case class Events(eventsDetails: List[EventDetail], ownerId: Option[Int], 
       appConfig: AppConfig
   ): Html = {
     val weddingTags = List("MARR", "MARB")
-    println(eventsDetails)
     val weddingDate =
       eventsDetails.find(event => weddingTags.contains(event.tag.getOrElse(""))).map(_.formatDate(shortMonth))
     weddingDate.fold(Html(""))(date => Html(s"x $date"))

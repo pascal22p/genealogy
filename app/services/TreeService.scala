@@ -8,11 +8,13 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
 import cats.implicits.*
+import config.AppConfig
 import models.EventType.UnknownEvent
 import models.Events
 import models.Family
 import models.Person
 import models.ResnType.PrivacyResn
+import play.api.Logging
 
 final case class Tree(
     individuals: mutable.Map[Int, Person],
@@ -21,19 +23,19 @@ final case class Tree(
     groups: mutable.Map[Int, Set[Int]]
 ) {
   def addPerson(person: Person): Unit = {
-    individuals.put(person.details.id, person.copy(families = List.empty, parents = List.empty))
+    individuals.put(person.details.id, person.copy(families = List.empty, parents = List.empty)): Unit
   }
 
   def addFamily(family: Family): Unit = {
-    families.put(family.id, family)
+    families.put(family.id, family): Unit
   }
 
   def addLink(source: String, destination: String): Unit = {
-    links.add((source, destination))
+    links.add((source, destination)): Unit
   }
 
   def addGroup(id: Int, indis: Set[Int]): Unit = {
-    groups.put(id, indis)
+    groups.put(id, indis): Unit
   }
 }
 
@@ -42,30 +44,26 @@ object Tree {
 }
 
 @Singleton
-class TreeService @Inject() (personService: PersonService, familyService: FamilyService)(
+class TreeService @Inject() (personService: PersonService, familyService: FamilyService, appConfig: AppConfig)(
     implicit ec: ExecutionContext
-) {
+) extends Logging {
   def loadTree(id: Int, depth: Int = 0, maxDepth: Int = 2, tree: Tree, isAllowedToSee: Boolean): Future[Boolean] = {
     personService.getPerson(id, omitSources = true).flatMap {
       case Some(person) if tree.individuals.contains(person.details.id) =>
         Future.successful(true)
       case Some(person) if depth == maxDepth || depth == -maxDepth =>
-        println(s"Reached max depth for person with ID ${person.details.id}, skipping.")
+        logger.info(s"Reached max depth for person with ID ${person.details.id}, skipping.")
         tree.addPerson(person)
         Future.successful(true)
       case Some(person) if person.details.privacyRestriction.contains(PrivacyResn) && !isAllowedToSee =>
         tree.addPerson(
           person.copy(
-            details = person.details.copy(firstname = "*****", surname = "*****"),
+            details = person.details.copy(firstname = appConfig.redactedMask, surname = appConfig.redactedMask),
             events = Events(List.empty, None, UnknownEvent)
           )
         )
         Future.successful(true)
       case Some(person) =>
-        if (person.details.id == 230) {
-          println(s"${person.details.id} ${person.families}")
-        }
-
         tree.addPerson(person)
 
         val familiesFuture = person.families.traverse { family =>
@@ -104,7 +102,6 @@ class TreeService @Inject() (personService: PersonService, familyService: Family
 
           } yield {
             tree.addFamily(family)
-            // println(s"AAAAA $family")
             tree.addGroup(family.id, Set(family.parent1.map(_.details.id), family.parent2.map(_.details.id)).flatten)
           }
         }

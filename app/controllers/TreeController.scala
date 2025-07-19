@@ -3,8 +3,8 @@ package controllers
 import javax.inject.Inject
 import javax.inject.Singleton
 
+import scala.annotation.unused
 import scala.concurrent.ExecutionContext
-import scala.concurrent.Future
 
 import actions.AuthAction
 import config.AppConfig
@@ -51,7 +51,7 @@ class TreeController @Inject() (
       }
   }
 
-  def showSvg(baseId: Int, id: Int, depth: Int): Action[AnyContent] = authAction.async {
+  def showSvg(@unused baseId: Int, id: Int, depth: Int): Action[AnyContent] = authAction.async {
     implicit request: AuthenticatedRequest[AnyContent] =>
       val tree           = Tree.empty
       val isAllowedToSee = request.localSession.sessionData.userData.fold(false)(_.seePrivacy)
@@ -68,7 +68,7 @@ class TreeController @Inject() (
       }
   }
 
-  def showPdf(baseId: Int, id: Int, depth: Int): Action[AnyContent] = authAction.async {
+  def showPdf(@unused baseId: Int, id: Int, depth: Int): Action[AnyContent] = authAction.async {
     implicit request: AuthenticatedRequest[AnyContent] =>
       val tree           = Tree.empty
       val isAllowedToSee = request.localSession.sessionData.userData.fold(false)(_.seePrivacy)
@@ -85,7 +85,7 @@ class TreeController @Inject() (
       }
   }
 
-  def showPng(baseId: Int, id: Int, depth: Int): Action[AnyContent] = authAction.async {
+  def showPng(@unused baseId: Int, id: Int, depth: Int): Action[AnyContent] = authAction.async {
     implicit request: AuthenticatedRequest[AnyContent] =>
       val tree           = Tree.empty
       val isAllowedToSee = request.localSession.sessionData.userData.fold(false)(_.seePrivacy)
@@ -102,7 +102,7 @@ class TreeController @Inject() (
       }
   }
 
-  def showDot(baseId: Int, id: Int, depth: Int): Action[AnyContent] = authAction.async {
+  def showDot(@unused baseId: Int, id: Int, depth: Int): Action[AnyContent] = authAction.async {
     implicit request: AuthenticatedRequest[AnyContent] =>
       val tree           = Tree.empty
       val isAllowedToSee = request.localSession.sessionData.userData.fold(false)(_.seePrivacy)
