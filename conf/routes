@@ -36,8 +36,8 @@ GET     /login                                    controllers.SessionController.
 POST    /login                                    controllers.SessionController.loginOnSubmit()
 GET     /logout                                   controllers.SessionController.logoutOnLoad()
 
-GET     /assets/*file                             controllers.Assets.versioned(path="/public", file: Asset)
-GET     /medias/:filename                         controllers.MediaController.serveMedia(filename: String)
+GET     /assets/*file                             controllers.AssetsController.get(file: String)
+GET     /medias/:baseId/:filename                 controllers.MediaController.serveMedia(baseId: Int, filename: String)
 
 GET     /pdf/ascendance/:id                       controllers.PdfController.pdf(id: Int)
 GET     /svg/ascendance/:id                       controllers.SvgController.svg(id: Int)

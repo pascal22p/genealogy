@@ -151,6 +151,7 @@ CREATE TABLE `genea_infos` (
   `entetes` text NOT NULL,
   `ged_corp` varchar(90) NOT NULL DEFAULT '',
   `subm` mediumint(8) unsigned DEFAULT NULL,
+  `medias` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `subm` (`subm`),
   CONSTRAINT `genea_infos_ibfk_1` FOREIGN KEY (`subm`) REFERENCES `genea_submitters` (`sub_id`) ON DELETE CASCADE ON UPDATE CASCADE
