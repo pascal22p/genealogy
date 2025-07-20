@@ -248,7 +248,7 @@ final class GetSqlQueries @Inject() (db: Database, databaseExecutionContext: Dat
 
   def getGenealogyDatabase(id: Int): OptionT[Future, GenealogyDatabase] = OptionT(Future {
     db.withConnection { implicit conn =>
-      SQL("""SELECT id, nom, descriptif
+      SQL("""SELECT id, nom, descriptif, medias
             |FROM genea_infos
             |WHERE id = {id}""".stripMargin)
         .on("id" -> id)
@@ -258,7 +258,7 @@ final class GetSqlQueries @Inject() (db: Database, databaseExecutionContext: Dat
 
   def getGenealogyDatabases: Future[List[GenealogyDatabase]] = Future {
     db.withConnection { implicit conn =>
-      SQL("""SELECT id, nom, descriptif
+      SQL("""SELECT id, nom, descriptif, medias
             |FROM genea_infos
             |ORDER BY nom""".stripMargin)
         .as[List[GenealogyDatabase]](GenealogyDatabase.mysqlParser.*)

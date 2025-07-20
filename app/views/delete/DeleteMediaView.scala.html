@@ -27,7 +27,7 @@
   SummaryList(
     rows = Seq(SummaryListRow(
         key = Key(HtmlContent(keyContent(media))),
-        value = Value(HtmlContent(s"""${lastModified(media.timestamp)}<br /><img src="${routes.MediaController.serveMedia(media.filename)}" style="width:90%;"/>""")),
+        value = Value(HtmlContent(s"""${lastModified(media.timestamp)}<br /><img src="${routes.MediaController.serveMedia(dbId, media.filename)}" style="width:90%;"/>""")),
         classes = "",
         actions = None
     )),
