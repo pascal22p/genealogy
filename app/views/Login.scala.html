@@ -1,8 +1,12 @@
 @import views.html.helper
 @import models.forms.UserDataForm
+@import uk.gov.hmrc.govukfrontend.views.Implicits.*
 
 @this(
-        main: Main
+        main: Main,
+        formWithCSRF: FormWithCSRF,
+        govukInput: GovukInput,
+        govukButton: GovukButton
 )
 
 @(userForm: Form[UserDataForm])(implicit request: AuthenticatedRequest[?], messages: Messages)
@@ -15,11 +19,28 @@
             }
         }
 
-        @helper.form(action = controllers.routes.SessionController.loginOnSubmit() ) {
-            @helper.CSRF.formField
-            <input type="hidden" value="@userForm("returnUrl").value" name="returnUrl" />
-            @helper.inputText(userForm("username"))
-            @helper.inputPassword(userForm("password"))
-            <button type="submit">Submit</button>
+        @formWithCSRF(controllers.routes.SessionController.loginOnSubmit()) {
+            @govukInput(
+                Input(
+                    label = Label(content = Text("Username or email address")),
+                    classes = "govuk-!-width-one-half"
+                ).withFormField(userForm("username"))
+            )
+
+            @govukInput(
+                Input(
+                    label = Label(content = Text("Your password")),
+                    inputType = "password",
+                    classes = "govuk-!-width-one-half"
+                ).withFormField(userForm("password"))
+            )
+
+            @govukButton(
+                Button(
+                    element = Some("button"),
+                    content = Text("Submit")
+                )
+            )
+
         }
 }

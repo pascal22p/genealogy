@@ -28,7 +28,11 @@ class GraphVizDotService @Inject() () {
       } else {
         ""
       }
-      s"I${person._1} [label=\"${person._2.shortName}\\n${person._2.events.birthAndDeathDate(true)}\" $attributes];"
+      s"I${person._1} [" +
+        s"label=\"${person._2.shortName}\\n${person._2.events.birthAndDeathDate(true)}\" " +
+        s"href=\"${controllers.routes.TreeController.showTree(person._2.details.base, person._2.details.id).url}\" " +
+        s"target=\"_top\" " +
+        s"$attributes];"
     }
 
     def familyNode(family: (Int, Family)): String =

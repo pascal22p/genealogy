@@ -43,7 +43,7 @@ class TreeController @Inject() (
       personService.getPerson(id, true, true, true).map { maybePerson =>
         maybePerson.fold(NotFound("Person cannot be found")) { person =>
           if (person.details.privacyRestriction.isEmpty || isAllowedToSee) {
-            Ok(treeView(baseId, person, 2))
+            Ok(treeView(baseId, person, 1))
           } else {
             Forbidden("Not allowed to see this person")
           }
