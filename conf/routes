@@ -37,6 +37,7 @@ POST    /login                                    controllers.SessionController.
 GET     /logout                                   controllers.SessionController.logoutOnLoad()
 
 GET     /assets/*file                             controllers.AssetsController.get(file: String)
+GET     /robots.txt                               controllers.AssetsController.get(file: String = "robots.txt")
 GET     /medias/:baseId/:filename                 controllers.MediaController.serveMedia(baseId: Int, filename: String)
 
 GET     /pdf/ascendance/:id                       controllers.PdfController.pdf(id: Int)
