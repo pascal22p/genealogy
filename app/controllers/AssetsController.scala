@@ -26,7 +26,7 @@ class AssetsController @Inject() (
   def get(filename: String): Action[AnyContent] = {
     Try(new File(filename)) match {
       case Success(file) =>
-        val path = new File(s"${appConfig.externalAssetsPath}/assets/$file")
+        val path = new File(s"${appConfig.externalAssetsPath}/$file")
         if (path.exists()) {
           Action(Ok.sendFile(path))
         } else {
