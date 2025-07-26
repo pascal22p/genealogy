@@ -1,0 +1,24 @@
+services:
+  genealogy:
+    platform: linux/amd64
+    image: pascal22p/genealogy:latest-snapshot
+    container_name: genealogy
+    restart: unless-stopped
+    environment:
+      APP_SECRET: ${APP_SECRET}
+      DB_URL: ${DB_URL}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      MEDIA_PATH: /tmp/Medias/
+      EXTERNAL_ASSETS_PATH: /tmp/external-assets
+      PLAY_FILTERS_HOSTS: genealogy.example.com
+      PROTOCOL: https://
+    ports:
+      - "127.0.0.1:9123:9123"
+    volumes:
+      - ./Medias/:/tmp/Medias/
+      - ./Assets/:/tmp/external-assets
+    logging:
+      options:
+        tag: "{{.ImageName}}|{{.Name}}|{{.ImageFullID}}|{{.FullID}}"
+
