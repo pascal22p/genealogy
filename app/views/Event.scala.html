@@ -21,7 +21,7 @@
 Breadcrumbs(
   items = Seq(
     BreadcrumbsItem(
-      content = Text(event.description.getOrElse("Unknown")),
+      content = Text(event.description.getOrElse(messages("Unknown"))),
       href = Some(
         event.eventType match {
           case _: IndividualEvent.type =>
@@ -39,10 +39,11 @@ Breadcrumbs(
 @main(
   dbId,
   person,
-  s"Event details for ${event.description.getOrElse("Unknown")}",
+  s"Event details for ${event.description.getOrElse(messages("Unknown"))}",
   Some(breadcrumbs)
 ) {
 
+  <div id="event-details">
   @lastModified(event.events_details_timestamp)
 
   @govukSummaryList(
@@ -50,7 +51,7 @@ Breadcrumbs(
         rows = Seq(
           event.tag.map { tag =>
             SummaryListRow(
-                key = Key(Text("Type")),
+                key = Key(Text(messages("Type"))),
                 value = Value(Text(messages(tag))),
                 classes = "govuk-summary-list__row--no-border",
                 actions = None
@@ -58,59 +59,58 @@ Breadcrumbs(
           },
           event.place.map { place =>
             SummaryListRow(
-                key = Key(Text("Place")),
+                key = Key(Text(messages("Place"))),
                 value = Value(HtmlContent(place.oneLiner(false))),
                 classes = "govuk-summary-list__row--no-border",
                 actions = None
             )
           },
           Some(SummaryListRow(
-                key = Key(Text("Description")),
+                key = Key(Text(messages("Description"))),
                 value = Value(Text(event.events_details_descriptor)),
                 classes = "govuk-summary-list__row--no-border",
                 actions = None
             )),
             Some(SummaryListRow(
-              key = Key(Text("Date")),
+              key = Key(Text(messages("Date"))),
               value = Value(Text(event.formatDate())),
               classes = "govuk-summary-list__row--no-border",
               actions = None
             )),
             Some(SummaryListRow(
-              key = Key(Text("Age")),
+              key = Key(Text(messages("Age"))),
               value = Value(Text(event.events_details_age)),
               classes = "govuk-summary-list__row--no-border",
               actions = None
             )),
             Some(SummaryListRow(
-              key = Key(Text("Cause")),
+              key = Key(Text(messages("Cause"))),
               value = Value(Text(event.events_details_cause)),
               classes = "govuk-summary-list__row--no-border",
               actions = None
             )) 
         ).flatten,
         card = Some(Card(
-            title = Some(CardTitle(content = Text("Event details"))),
+            title = Some(CardTitle(content = Text(messages("event.details")))),
             actions = Some(Actions(
               items = Seq(
                   ActionItem(
                       href = controllers.edit.routes.EditEventDetailController.showForm(dbId, event.events_details_id).url,
-                      content = Text("Edit")
+                      content = Text(messages("Edit"))
                   ),
                   ActionItem(
                       href = "#",
-                      content = Text("Delete")
+                      content = Text(messages("Delete"))
                   )
               )
           )),
-            classes = "govuk-!-margin-4",
-            attributes = Map.empty
+            classes = "govuk-!-margin-4"
         )),
-        classes = "",
-        attributes = Map.empty
+        classes = ""
     )
   )
 
   @sourCitations(dbId, event.sourCitations, event.events_details_id, EventSourCitation)
+  </div>
   
 }

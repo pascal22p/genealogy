@@ -27,7 +27,7 @@
     }
 }
 
-@main(1, None, "Problems") {
+@main(1, None, messages("problems.title")) {
 
 @govukSummaryList(
     SummaryList(
@@ -40,14 +40,14 @@
                     items = Seq(
                         Some(ActionItem(
                             href = controllers.delete.routes.DeleteMediaController.deleteMediaConfirmation(dbId, media.id).url,
-                            content = Text("Delete")
+                            content = Text(messages("Delete"))
                         ))
                     ).flatten
                 ))
             )
         },
         card = Some(Card(
-            title = Some(CardTitle(content = Text("Orphaned medias"))),
+            title = Some(CardTitle(content = Text(messages("medias.orphaned")))),
             actions = None,
             classes = "govuk-!-margin-4",
             attributes = Map.empty
@@ -69,22 +69,22 @@
                     items = Seq(
                         ActionItem(
                             href = controllers.delete.routes.DeleteIndividualController.deletePersonConfirmation(dbId, person.details.id).url,
-                            content = Text("Delete")
+                            content = Text(messages("Delete"))
                         ),
                         ActionItem(
                             href = controllers.routes.IndividualController.showPerson(dbId, person.details.id).url,
-                            content = Text("View")
+                            content = Text(messages("View"))
                         ),
                         ActionItem(
                            href = controllers.add.routes.AddPersonToFamily.showInterstitial(dbId, person.details.id).url,
-                           content = Text("Add to family")
+                           content = Text(messages("problems.add.to.family"))
                         )
                     )
                 ))
             )
         },
         card = Some(Card(
-            title = Some(CardTitle(content = Text("Orphaned individuals"))),
+            title = Some(CardTitle(content = Text(messages("problems.orphaned.individuals")))),
             actions = None,
             classes = "govuk-!-margin-4",
             attributes = Map.empty
@@ -99,25 +99,25 @@
     SummaryList(
         rows = families.map { family =>
             SummaryListRow(
-                    key = Key(HtmlContent(family.events.eventsDetails.map(e => s"${e.tag.getOrElse("Unknown")} (${e.formatDate()})").mkString(" - "))),
+                    key = Key(HtmlContent(family.events.eventsDetails.map(e => s"${e.tag.getOrElse(messages("Unknown"))} (${e.formatDate()})").mkString(" - "))),
                 value = Value(HtmlContent("")),
                 classes = "",
                 actions = Some(Actions(
                     items = Seq(
                         ActionItem(
                             href = controllers.delete.routes.DeleteFamilyController.deleteFamilyConfirmation(dbId, family.id).url,
-                            content = Text("Delete")
+                            content = Text(messages("Delete"))
                         ),
                         ActionItem(
                             href = controllers.routes.FamilyController.showFamily(dbId, family.id).url,
-                            content = Text("View")
+                            content = Text(messages("View"))
                         ),
                     )
                 ))
             )
         },
         card = Some(Card(
-            title = Some(CardTitle(content = Text("Orphaned families"))),
+            title = Some(CardTitle(content = Text(messages("problems.orphaned.families")))),
             actions = None,
             classes = "govuk-!-margin-4",
             attributes = Map.empty
@@ -127,7 +127,7 @@
     )
 )
 
-@eventsDetails(dbId, events, "Orphaned events")
+@eventsDetails(dbId, events, messages("problems.orphaned.events"))
 
 
 @govukSummaryList(
@@ -141,18 +141,18 @@
                     items = Seq(
                         ActionItem(
                             href = controllers.delete.routes.DeleteSourCitationController.deleteSourCitationConfirmation(dbId, citation.id).url,
-                            content = Text("Delete")
+                            content = Text(messages("Delete"))
                         ),
                         ActionItem(
                             href = controllers.routes.SourCitationController.showSourCitation(dbId, citation.id).url,
-                            content = Text("View")
+                            content = Text(messages("View"))
                         )
                     )
                 ))
             )
         },
         card = Some(Card(
-            title = Some(CardTitle(content = Text("Orphaned source citations"))),
+            title = Some(CardTitle(content = Text(messages("problems.orphaned.sources")))),
             actions = None,
             classes = "govuk-!-margin-4",
             attributes = Map.empty

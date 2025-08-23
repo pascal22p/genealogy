@@ -32,7 +32,7 @@
 @main(1, None) {
 
 
-  @block("Add a new event") {
+  @block(messages("add.event.title")) {
 
     @if(eventDetailForm.hasGlobalErrors) {
         @for(error <- eventDetailForm.globalErrors) {
@@ -49,9 +49,9 @@
         <input type="hidden" name="personId" value="@ownerId" />
         @govukInput(
             Input(
-                label = Label(content = Text("Database")),
+                label = Label(content = Text(messages("Database"))),
                 hint = Some(Hint(
-                    content = HtmlContent("The database where the event is stored")
+                    content = HtmlContent(messages("add.event.which.database"))
                 )),
                 classes = "govuk-!-width-one-half"
             ).withFormField(eventDetailForm("base"))
@@ -59,19 +59,19 @@
         @govukSelect(
             Select(
                 items =
-                    Seq(SelectItem(value = Some(""), text = "Unknown")) ++ allPlaces.map(p => SelectItem(value = Some(p.id.toString), text = p.oneLinerString)).sortBy(_.text),
+                    Seq(SelectItem(value = Some(""), text = messages("Unknown"))) ++ allPlaces.map(p => SelectItem(value = Some(p.id.toString), text = p.oneLinerString)).sortBy(_.text),
                 label = Label(
-                    content = Text("Location")),
+                    content = Text(messages("Location"))),
                 hint = Some(Hint(
-                    content = HtmlContent("Location where the event happened")
+                    content = HtmlContent(messages("add.event.location.description"))
                 ))    
             ).withFormField(eventDetailForm("place"))
         )
         @govukInput(
             Input(
-                label = Label(content = Text("Address")),
+                label = Label(content = Text(messages("Address"))),
                 hint = Some(Hint(
-                    content = HtmlContent("id of an address. Use Location instead if possible")
+                    content = HtmlContent(messages("add.event.address.description"))
                 )),
                 classes = "govuk-!-width-one-half"
             ).withFormField(eventDetailForm("addr_id"))
@@ -80,18 +80,18 @@
             Select(
                 items = eventType match {
                     case _: IndividualEvent.type => {
-                        Seq(SelectItem(value = None, text = "Unknown")) ++ Constants.individualsEvents.map(e => SelectItem(value = Some(e), text = messages(e))).sortBy(_.text)
+                        Seq(SelectItem(value = None, text = messages("Unknown"))) ++ Constants.individualsEvents.map(e => SelectItem(value = Some(e), text = messages(e))).sortBy(_.text)
                     }
-                    case _ => { Seq(SelectItem(value = None, text = "Unknown")) ++ Constants.familyEvents.map(e => SelectItem(value = Some(e), text = messages(e))).sortBy(_.text) }
+                    case _ => { Seq(SelectItem(value = None, text = messages("Unknown"))) ++ Constants.familyEvents.map(e => SelectItem(value = Some(e), text = messages(e))).sortBy(_.text) }
                   },
                 label = Label(
-                    content = Text("Type of event")),
+                    content = Text(messages("add.event.type.description"))),
                 hint = None
             ).withFormField(eventDetailForm("events_tag"))
         )        
         @govukInput(
             Input(
-                label = Label(content = Text("Event detail descriptor")),
+                label = Label(content = Text(messages("add.event.descriptor.description"))),
                 hint = Some(Hint(
                     content = HtmlContent("Text describing a particular event pertaining to the individual or family.")
                 )),
@@ -100,27 +100,27 @@
         )
         @govukInput(
             Input(
-                label = Label(content = Text("Date of the event")),
+                label = Label(content = Text(messages("add.event.date.description"))),
                 hint = Some(Hint(
-                    content = HtmlContent("Date of the event in the format Gedcom.")
+                    content = HtmlContent(messages("add.event.date.hint"))
                 )),
                 classes = "govuk-!-width-one-half"
             ).withFormField(eventDetailForm("events_details_gedcom_date"))
         )
         @govukInput(
             Input(
-                label = Label(content = Text("Age")),
+                label = Label(content = Text(messages("Age"))),
                 hint = Some(Hint(
-                    content = HtmlContent("Age of the individual on the day of the event.")
+                    content = HtmlContent(messages("add.event.age.description"))
                 )),
                 classes = "govuk-!-width-one-half"
             ).withFormField(eventDetailForm("events_details_age"))
         )
         @govukInput(
             Input(
-                label = Label(content = Text("Cause")),
+                label = Label(content = Text(messages("Cause"))),
                 hint = Some(Hint(
-                    content = HtmlContent("Used in special cases to record the reasons which precipitated an event.")
+                    content = HtmlContent(messages("add.event.cause.description"))
                 )),
                 classes = "govuk-!-width-one-half"
             ).withFormField(eventDetailForm("events_details_cause"))
@@ -128,7 +128,7 @@
         @govukButton(
             Button(
                 element = Some("button"),
-                content = Text("Submit")
+                content = Text(messages("Submit"))
             )
         )
     }

@@ -14,8 +14,8 @@
 
 @title(family: Family) = {
   Family
-  @family.parent1.map(_.details.surname).getOrElse("Unknown") —
-  @family.parent2.map(_.details.surname).getOrElse("Unknown")
+  @family.parent1.map(_.details.surname).getOrElse(messages("Unknown")) —
+  @family.parent2.map(_.details.surname).getOrElse(messages("Unknown"))
 }
 
 @main(dbId, None, title(family).toString) {

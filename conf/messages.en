@@ -1,10 +1,41 @@
 # https://www.playframework.com/documentation/latest/ScalaI18N
 
-surname = Surname
-firstname = Firstname
-sex = Sex
+Address = Address
+Add = Add
+Age = Age
+Ascendants = Ascendants
+Cause = Cause
+Database = Database
+Date = Date
+Delete = Delete
+Descendants = Descendants
+Description = Description
+Details = Details
+Edit = Edit
+Firstname = Firstname
+Firstnames = Firstnames
+Home = Home
 id = Id
+Location = Location
+Login = Login
+Logout = Logout
+Medias = Medias
+Menu = Menu
+Name = Name
+Partner = Partner
+person.details = Person details
+Place = Place
 resn = Privacy restriction
+sex = Sex
+Submit = Submit
+surname = Surname
+Surnames = Surnames
+Tree = Tree
+Type = Type
+Unknown = Unknown
+View = View
+
+service.unavailable = Service unavailable
 
 ABBR = Titre, description...
 ADDR = Adresse
@@ -96,7 +127,7 @@ months.french.prai = Prairial
 months.french.mess = Messidor
 months.french.ther = Thermidor
 months.french.fruc = Fructidor
-months.french.comp = Jour complementaire
+months.french.comp = Jour complémentaire
 
 months.french.vend.short = Vend
 months.french.brum.short = Brum
@@ -136,3 +167,61 @@ sex.unknown = Unknown
 sex.male = Male
 sex.female = Female
 
+ascendants.download.pdf = Download as pdf
+ascendants.generation = Generation {0}
+descendants.title = Descendance of {0}
+
+event.details = Event details
+
+list.of.databases = List of databases
+
+login.into.account = Login into your account
+login.username = Username or email address
+login.password = Password
+
+Database.title = Database {0}
+
+medias.orphaned = Orphaned medias
+
+problems.title = Problems
+problems.add.to.family = Add to family
+problems.orphaned.individuals = Orphaned individuals
+problems.orphaned.families = Orphaned families
+problems.orphaned.medias = Orphaned medias
+problems.orphaned.events = Orphaned events
+problems.orphaned.sources = Orphaned source citations
+
+sourCitation.see.event = See Event
+sourCitation.see.individual = See Individual
+sourCitation.see.family = See Family
+sourCitation.not.attached = Source not attached to anything
+
+surnames.individuals = {0} Individual{1}
+surnames.individual.in.year = {0} Individual{1} in {2}
+surnames.individuals.between = {0} Individual{1} from {2} to {3}
+surnames.individuals.from = {0} Individual{1} from {2}
+surnames.individuals.until = {0} Individual{1} until {2}
+
+tree.download.pdf = Download as pdf
+
+database.shortName = Short name of the database
+
+add.event.title = Add a new event
+add.event.which.database = The database where the event is stored
+add.event.location.description = Location where the event happened
+add.event.address.description = Id of an address. Use Location instead if possible
+add.event.type.description = Type of event
+add.event.descriptor.description = Event detail descriptor
+add.event.date.description = Date of the event
+add.event.date.hint = Date of the event in the format Gedcom
+add.event.age.description = Age of the individual on the day of the event
+add.event.cause.description = Used in special cases to record the reasons which precipitated an event
+
+add.existing.family.title = Add {} to a en existing family
+add.existing.family.button = Add to family
+
+add.family.title = Add {} to a new family
+add.family.database.hint = The database where the event is stored
+add.family.person1.description = Partner 1
+add.family.person2.description = Partner 2
+add.family.button = Create new family

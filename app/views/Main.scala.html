@@ -28,7 +28,7 @@
 @loginOrlogout = @{
     if(authenticatedRequest.localSession.sessionData.userData.isEmpty) {
         Some(ServiceNavigationItem(
-            content = Text("Login"),
+            content = Text(messages("Login")),
             href = s"${controllers.routes.SessionController.loginOnLoad().url}?returnUrl=${authenticatedRequest.request.uri}",
             active = false,
             current = false,
@@ -37,7 +37,7 @@
         ))
     } else {
         Some(ServiceNavigationItem(
-            content = Text("Logout"),
+            content = Text(messages("Logout")),
             href = controllers.routes.SessionController.logoutOnLoad().url,
             active = false,
             current = false,
@@ -49,7 +49,7 @@
 
 @breadcrumbsMenu = @{
     val homeEntry = BreadcrumbsItem(
-        content = Text("Home"),
+        content = Text(messages("Home")),
         href = Some(controllers.routes.HomeController.onload().url),
         attributes = Map.empty
     )
@@ -58,7 +58,7 @@
         Seq(
             homeEntry,
             BreadcrumbsItem(
-                content = Text(s"Database ${database.name}"),
+                content = Text(messages("Database.title", database.name)),
                 href = Some(controllers.routes.HomeController.showSurnames(database.id).url),
                 attributes = Map.empty
             )
@@ -104,7 +104,7 @@
             serviceUrl = Some("/"),
             navigation = Seq(
                 Some(ServiceNavigationItem(
-                    content = Text("Surnames"),
+                    content = Text(messages("Surnames")),
                     href = controllers.routes.HomeController.showSurnames(dbId).url,
                     active = false,
                     current = false,
@@ -125,7 +125,7 @@
                 },
                 personOption.map { person =>
                     ServiceNavigationItem(
-                        content = Text("Person details"),
+                        content = Text(messages("person.details")),
                         href = controllers.routes.IndividualController.showPerson(dbId, person.details.id).url,
                         active = false,
                         current = false,
@@ -135,7 +135,7 @@
                 },
                 personOption.map { person =>
                     ServiceNavigationItem(
-                        content = Text("Tree"),
+                        content = Text(messages("Tree")),
                         href = controllers.routes.TreeController.showTree(dbId, person.details.id).url,
                         active = false,
                         current = false,
@@ -145,7 +145,7 @@
                 },
                 personOption.map { person =>
                   ServiceNavigationItem(
-                    content = Text("Descendants"),
+                    content = Text(messages("Descendants")),
                     href = controllers.routes.DescendanceController.showDescendant(dbId, person.details.id).url,
                     active = false,
                     current = false,
@@ -155,7 +155,7 @@
                 },
                 personOption.map { person =>
                   ServiceNavigationItem(
-                    content = Text("Ascendants"),
+                    content = Text(messages("Ascendants")),
                     href = controllers.routes.AscendanceController.showAscendant(dbId, person.details.id).url,
                     active = false,
                     current = false,
@@ -171,8 +171,8 @@
             classes = "",
             attributes = Map.empty,
             ariaLabel = None,
-            menuButtonText = Some("Menu"),
-            menuButtonLabel = Some("Menu"),
+            menuButtonText = Some(messages("Menu")),
+            menuButtonLabel = Some(messages("Menu")),
             slots = Some(ServiceNavigationSlot(
                 start = None,
                 end =  None,
@@ -185,8 +185,14 @@
 
     </header>
 
-    @govukBreadcrumbs(breadcrumbsMenu)
-
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
+        <div class="govuk-body">@govukBreadcrumbs(breadcrumbsMenu)</div>
+      </div>
+      <div class="govuk-grid-column-one-third">
+        <div class="govuk-body govuk-!-margin-top-3"><a class="govuk-link" href="@routes.LanguageController.switchToLanguage("fr")">Français</a> | <a class="govuk-link" href="@routes.LanguageController.switchToLanguage("en")">English</a></div>
+      </div>
+    </div>
 
     <main class="govuk-main-wrapper">
         <div class="govuk-width-container">

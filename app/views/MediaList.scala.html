@@ -42,24 +42,24 @@
             items = Seq(
               link(media.ownerId.getOrElse(-1), media.dbId, media.mediaType).map { aLink => ActionItem(
                 href = aLink,
-                content = Text("View")
+                content = Text(messages("View"))
               )},
               Some(ActionItem(
                 href = "#",
-                content = Text("Delete")
+                content = Text(messages("Delete"))
               ))
             ).flatten
           ))
         )
       },
       card = Some(Card(
-        title = Some(CardTitle(content = Text("Orphaned medias"))),
+        title = Some(CardTitle(content = Text(messages("medias.orphaned")))),
         actions = Some(
           Actions(
             items = Seq(
               ActionItem(
                 href = controllers.add.routes.AddMediaController.showForm(dbId).url,
-                content = Text("Add")
+                content = Text(messages("Add"))
               )
             )
           )),
@@ -82,24 +82,24 @@
             items = Seq(
               link(media.ownerId.getOrElse(-1), media.dbId, media.mediaType).map { aLink => ActionItem(
                 href = aLink,
-                content = Text("View")
+                content = Text(messages("View"))
               )},
               Some(ActionItem(
                 href = "#",
-                content = Text("Delete")
+                content = Text(messages("Delete"))
               ))
             ).flatten
           ))
         )
       },
       card = Some(Card(
-        title = Some(CardTitle(content = Text("Medias"))),
+        title = Some(CardTitle(content = Text(messages("Medias")))),
         actions = Some(
           Actions(
             items = Seq(
               ActionItem(
                 href = controllers.add.routes.AddMediaController.showForm(dbId).url,
-                content = Text("Add")
+                content = Text(messages("Add"))
               )
             )
           )),

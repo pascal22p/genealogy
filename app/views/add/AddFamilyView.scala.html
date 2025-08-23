@@ -23,7 +23,7 @@ govukErrorSummary: GovukErrorSummary
 @main(dbId, None) {
 
 
-@block(s"Add ${person.details.shortName} to a new family") {
+@block(messages("add.family.title", person.details.shortName)) {
 
     @if(familyForm.hasGlobalErrors) {
         @for(error <- familyForm.globalErrors) {
@@ -39,9 +39,9 @@ govukErrorSummary: GovukErrorSummary
         @helper.CSRF.formField
         @govukInput(
             Input(
-                label = Label(content = Text("Database")),
+                label = Label(content = Text(messages("Database"))),
                 hint = Some(Hint(
-                    content = HtmlContent("The database where the event is stored")
+                    content = HtmlContent(messages("add.family.database.hint"))
                 )),
                 classes = "govuk-!-width-one-half"
             ).withFormField(familyForm("base"))
@@ -51,7 +51,7 @@ govukErrorSummary: GovukErrorSummary
                 items =
                     Seq(SelectItem(
                         value = Some(""),
-                        text = "Unknown")) ++
+                        text = messages("Unknown"))) ++
                     request.localSession.sessionData.history.map(history => SelectItem(
                         value = Some(history.personId.toString),
                         text = history.name
@@ -63,7 +63,7 @@ govukErrorSummary: GovukErrorSummary
                         value = Some(person.details.id.toString),
                         text = s"${person.details.shortName} (${person.events.birthAndDeathDate()})"
                     )).sortBy(_.text),
-                    label = Label(content = Text("Partner 1")
+                    label = Label(content = Text(messages("add.family.person1.description"))
             ),
             hint = None
             ).withFormField(familyForm("person1Id"))
@@ -74,7 +74,7 @@ govukErrorSummary: GovukErrorSummary
                 items =
                     Seq(SelectItem(
                         value = Some(""),
-                        text = "Unknown")) ++
+                        text = messages("Unknown"))) ++
                     request.localSession.sessionData.history.map(history => SelectItem(
                         value = Some(history.personId.toString),
                         text = history.name
@@ -86,7 +86,7 @@ govukErrorSummary: GovukErrorSummary
                         value = Some(person.details.id.toString),
                         text = s"${person.details.shortName} (${person.events.birthAndDeathDate()})"
                     )).sortBy(_.text),
-                    label = Label(content = Text("Partner 2")
+                    label = Label(content = Text(messages("add.family.person2.description"))
                 ),
                 hint = None
             ).withFormField(familyForm("person2Id"))
@@ -95,7 +95,7 @@ govukErrorSummary: GovukErrorSummary
         @govukButton(
             Button(
                 element = Some("button"),
-                content = Text("Create new family")
+                content = Text(messages("add.family.button"))
             )
         )
 

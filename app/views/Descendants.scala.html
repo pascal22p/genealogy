@@ -43,7 +43,7 @@
     }
 }
 
-@main(dbId, Some(person), s"Descendance of ${person.name}") {
+@main(dbId, Some(person), messages("descendants.title", person.name)) {
 
     @block("Descendants") {
   <ul class="govuk-list"><li style="margin:0;padding:0">

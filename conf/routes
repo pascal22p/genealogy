@@ -30,7 +30,7 @@ GET     /base/:baseId/tree/:id/depth/:depth/png   controllers.TreeController.sho
 GET     /base/:baseId/tree/:id/depth/:depth/dot   controllers.TreeController.showDot(baseId: Int, id: Int, depth: Int)
 GET     /base/:baseId/tree/:id                    controllers.TreeController.showTree(baseId: Int, id: Int)
 
-GET     /switch-lang/:lang                        controllers.IndividualController.languageSwitch(lang: String)
+GET     /language/:lang                           controllers.LanguageController.switchToLanguage(lang: String)
 
 GET     /login                                    controllers.SessionController.loginOnLoad()
 POST    /login                                    controllers.SessionController.loginOnSubmit()

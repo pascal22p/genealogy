@@ -26,7 +26,7 @@
   items = Seq(
     ActionItem(
       href = controllers.routes.TreeController.showPdf(dbId, person.details.id, depth).url,
-      content = Text("Download pdf")
+      content = Text(messages("tree.download.pdf"))
     )
   )
 ))) {
