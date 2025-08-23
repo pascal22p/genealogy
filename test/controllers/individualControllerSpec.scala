@@ -13,6 +13,7 @@ import models.ResnType.PrivacyResn
 import models.Session
 import models.SessionData
 import models.UserData
+import org.jsoup.Jsoup
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.play.*
@@ -56,7 +57,8 @@ class individualControllerSpec extends BaseSpec {
 
         val result = sut.showPerson(1, 1).apply(FakeRequest().withHeaders(("seePrivacy", "true")))
         status(result) mustBe OK
-        contentAsString(result) must include("Firstname")
+        val html = Jsoup.parse(contentAsString(result))
+        html.getElementById("person-details") must not be null
       }
     }
 

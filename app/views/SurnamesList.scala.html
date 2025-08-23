@@ -11,11 +11,11 @@
 @nameText(name: SurnameElement) = @{
     val plural = if(name.count > 1) "s" else ""
     (name.startYear, name.endYear) match {
-        case (None, None) => s"${name._2} Individual$plural"
-        case (Some(startYear), Some(endYear)) if startYear == endYear => s"${name.count} Individual$plural in $startYear"
-        case (Some(startYear), Some(endYear)) => s"${name.count} Individual$plural from $startYear to $endYear"
-        case (Some(startYear), None) => s"${name.count} Individual$plural from $startYear"
-        case (None, Some(endYear)) => s"${name.count} Individual$plural until $endYear"
+        case (None, None) => messages("surnames.individuals", name._2, plural)
+        case (Some(startYear), Some(endYear)) if startYear == endYear => messages("surnames.individual.in.year", name.count, plural, startYear)
+        case (Some(startYear), Some(endYear)) => messages("surnames.individuals.between", name.count, plural, startYear, endYear)
+        case (Some(startYear), None) => messages("surnames.individuals.from", name.count, plural, startYear)
+        case (None, Some(endYear)) => messages("surnames.individuals.until", name.count, plural, endYear)
     }
 }
 

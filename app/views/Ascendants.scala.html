@@ -12,17 +12,13 @@
 
 @(flatTree: List[(Int, List[Person])], dbId: Int)(implicit request: AuthenticatedRequest[?], messages: Messages)
 
-@header(depth: Int) = @{
-  s"""Generation $depth"""
-}
-
 @id(depth: Int) = @{
   s"generation-$depth"
 }
 
 @treeTab(flatTree: List[(Int, List[Person])]) = {
   @for(person <- flatTree.headOption.flatMap(_._2.headOption)) {
-    <p class="govuk-body"><a class="govuk-link" href="@controllers.routes.PdfController.pdf(person.details.id).url">Download as pdf</a></p>
+    <p class="govuk-body"><a class="govuk-link" href="@controllers.routes.PdfController.pdf(person.details.id).url">@messages("ascendants.download.pdf")</a></p>
     <object type="image/svg+xml" id="tree" name="tree" Alt="Tree" data="@controllers.routes.SvgController.svg(person.details.id).url" width="100%" >
       <img src="@controllers.routes.SvgController.svg(person.details.id).url" alt="Tree" width="100%">
     </object>
@@ -43,14 +39,14 @@
               items = Seq(
                 ActionItem(
                   href = controllers.routes.IndividualController.showPerson(dbId, person.details.id).url,
-                  content = Text("View")
+                  content = Text(messages("Details"))
                 )
               )
             ))
           )
         },
         card = Some(Card(
-          title = Some(CardTitle(content = Text(header(gen._1)))),
+          title = Some(CardTitle(content = Text(messages("ascendants.generation", gen._1)))),
           actions = None,
           classes = "govuk-!-margin-4",
           attributes = Map.empty

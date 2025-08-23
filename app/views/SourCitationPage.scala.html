@@ -16,10 +16,10 @@
 @main(dbId, None) {
 
   @(modelSourCitation.sourceType, modelSourCitation.ownerId)  match {
-    case (_: EventSourCitation.type, Some(id)) => { <a href="@routes.EventController.showEvent(dbId, id)">See Event</a> }
-    case (_: IndividualSourCitation.type, Some(id)) => { <a href="@routes.IndividualController.showPerson(dbId, id)">See Individual</a> }
-    case (_: FamilySourCitation.type, Some(id)) => { <a href="@routes.FamilyController.showFamily(dbId, id)">See Family</a> }
-    case _ => { Source not attached to anything }
+    case (_: EventSourCitation.type, Some(id)) => { <a href="@routes.EventController.showEvent(dbId, id)">@messages("sourCitation.see.event")</a> }
+    case (_: IndividualSourCitation.type, Some(id)) => { <a href="@routes.IndividualController.showPerson(dbId, id)">@messages("sourCitation.see.individual")</a> }
+    case (_: FamilySourCitation.type, Some(id)) => { <a href="@routes.FamilyController.showFamily(dbId, id)">@messages("sourCitation.see.family")</a> }
+    case _ => { @messages("sourCitation.not.attached") }
   }
 
   @oneSourCitation(dbId, modelSourCitation)

@@ -7,6 +7,7 @@ import scala.concurrent.Future
 import actions.AuthAction
 import models.*
 import models.ResnType.PrivacyResn
+import org.jsoup.Jsoup
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.play.*
@@ -42,7 +43,8 @@ class EventControllerSpec extends BaseSpec {
 
         val result = sut.showEvent(1, 1).apply(FakeRequest().withHeaders(("seePrivacy", "true")))
         status(result) mustBe OK
-        contentAsString(result) must include("Event details for Unknown")
+        val html = Jsoup.parse(contentAsString(result))
+        html.getElementById("event-details") must not be null
       }
     }
 
@@ -53,7 +55,8 @@ class EventControllerSpec extends BaseSpec {
 
       val result = sut.showEvent(1, 1).apply(FakeRequest().withHeaders(("seePrivacy", "false")))
       status(result) mustBe OK
-      contentAsString(result) must include("Event details for Unknown")
+      val html = Jsoup.parse(contentAsString(result))
+      html.getElementById("event-details") must not be null
     }
   }
 

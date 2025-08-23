@@ -21,23 +21,23 @@
                         items = Seq(
                             ActionItem(
                                 href = controllers.routes.HomeController.showSurnames(db.id).url,
-                                content = Text("View")
+                                content = Text(messages("View"))
                             ),
                             ActionItem(
                                 href = controllers.delete.routes.DeleteDatabaseController.deleteDatabaseConfirmation(db.id).url,
-                                content = Text("Delete")
+                                content = Text(messages("Delete"))
                             )
                         )
                     ))
                 )
             },
             card = Some(Card(
-                title = Some(CardTitle(content = Text("List of databases"))),
+                title = Some(CardTitle(content = Text(messages("list.of.databases")))),
                 actions = Some(Actions(
                     items = Seq(
                         ActionItem(
                             href = controllers.add.routes.AddDatabaseController.showForm.url,
-                            content = Text("Add")
+                            content = Text(messages("Add"))
                         )
                     )
                 )),

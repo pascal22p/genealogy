@@ -36,23 +36,23 @@
         @helper.CSRF.formField
         @govukInput(
             Input(
-                label = Label(content = Text("Name")),
+                label = Label(content = Text(messages("Name"))),
                 hint = Some(Hint(
-                    content = HtmlContent("Short name of the database")
+                    content = HtmlContent(messages("database.shortName"))
                 )),
                 classes = "govuk-!-width-one-half"
             ).withFormField(databaseForm("name"))
         )
         @govukInput(
             Input(
-                label = Label(content = Text("Description")),
+                label = Label(content = Text(messages("Description"))),
                 classes = "govuk-!-width-one-half"
             ).withFormField(databaseForm("description"))
         )
         @govukButton(
             Button(
                 element = Some("button"),
-                content = Text("Submit")
+                content = Text(messages("Submit"))
             )
         )
     }

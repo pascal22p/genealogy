@@ -1,10 +1,41 @@
 # https://www.playframework.com/documentation/latest/ScalaI18N
 
-surname = Nom:
-firstname = Prénom:
-sex = Sexe:
-id = Id:
-resn = Resn:
+Address = Addresse
+Add = Ajouter
+Age = Age
+Ascendants = Ascendants
+Cause = Cause
+Database = Base de données
+Date = Date
+Delete = Supprimer
+Descendants = Descendants
+Description = Description
+Details = Détails
+Edit = Modifier
+Firstname = Prénom
+Firstnames = Prénoms
+Home = Accueil
+id = Id
+Location = Lieu
+Login = Connexion
+Logout = Déconnexion
+Medias = Médias
+Menu = Menu
+Name = Nom
+Partner = Partenaire
+person.details = Détails de la personne
+Place = Lieu
+resn = Restriction de confidentialité
+sex = Sexe
+Submit = Soumettre
+surname = Nom de famille
+Surnames = Noms de famille
+Tree = Arbre
+Type = Type
+Unknown = Inconnu
+View = Voir
+
+service.unavailable = Service indisponible
 
 date.period.bet = Entre
 date.period.and = et
@@ -16,3 +47,219 @@ date.period.abt = Environ
 date.period.cal = Calculé
 date.period.est = Estimaté
 
+date.period.bet.short = Entre
+date.period.and.short = et
+date.period.bef.short = Avant
+date.period.aft.short = Apres
+date.period.from.short = Depuis
+date.period.to.short = jusque
+date.period.abt.short = Environ
+date.period.cal.short = Calculé
+date.period.est.short = Estimé
+
+sex.unknown = Inconnu
+sex.male = Masculin
+sex.female = Feminin
+
+ABBR = Titre, description...
+ADDR = Adresse
+ADOP = Adoption
+AGE = Age
+AGNC = Entreprise ou Institution
+ANUL = Déclaration de nullité d'un mariage
+ASSO = Relation
+AUTH = Auteur qui a relevés les informations
+BAPM = Baptème
+BIRT = Naissance
+BURI = Inhumation
+CAST = Rang ou status
+CAUS = Cause d'un évènement
+CHIL = Enfant
+CHR = Baptème religieux
+CHRA = Baptème religieux (Adulte)
+CONF = Confirmation
+FCOM = Première communion
+CHIL = Enfant
+CREM = Incinération
+DEAT = Décès
+DIV = Divorce
+ENGA = Fiançaille
+MARR = Mariage
+OCCU = Profession
+ORDN = Ordination
+NATU = Naturalisation
+EMIG = Emigration
+IMMI = Immigration
+CENS = Resencement
+DIVF = Dossier de divorce
+MARB = Publication des bans de mariage
+MARC = Contrat de mariage
+MARL = Autorisation de mariage
+MARS = Contrat avant mariage
+PROB = Validation d’un testament
+WILL = Testament
+BLES = Bénédiction
+BARM = BAR MITZVAH (garçon)
+BASM = BAR MITZVAH (fille)
+GRAD = Diplôme
+RETI = Retraite
+DSCR = Description
+EDUC = Niveau d'instruction
+IDNO = Matricule/numéro
+NATI = Nationalité
+PROP = Possession
+RELI = Religion
+TITL = Titre
+EVEN = Evènement
+BAPL = Baptème mormons
+
+months.gregorian.jan = Janvier
+months.gregorian.feb = Fevrier
+months.gregorian.mar = Mars
+months.gregorian.apr = Avril
+months.gregorian.may = May
+months.gregorian.jun = Juin
+months.gregorian.jul = Juillet
+months.gregorian.aug = Aout
+months.gregorian.sep = Septembre
+months.gregorian.oct = Octobre
+months.gregorian.nov = Novembre
+months.gregorian.dec = Décembre
+
+months.gregorian.jan.short = Jan
+months.gregorian.feb.short = Fev
+months.gregorian.mar.short = Mar
+months.gregorian.apr.short = Avr
+months.gregorian.may.short = Mai
+months.gregorian.jun.short = Jui
+months.gregorian.jul.short = Jui
+months.gregorian.aug.short = Aou
+months.gregorian.sep.short = Sep
+months.gregorian.oct.short = Oct
+months.gregorian.nov.short = Nov
+months.gregorian.dec.short = Dec
+
+months.french.vend = Vendemiaire
+months.french.brum = Brumaire
+months.french.frim = Frimaire
+months.french.nivo = Nivose
+months.french.pluv = Pluviose
+months.french.vent = Ventose
+months.french.germ = Germinal
+months.french.flor = Floreal
+months.french.prai = Prairial
+months.french.mess = Messidor
+months.french.ther = Thermidor
+months.french.fruc = Fructidor
+months.french.comp = Jour complémentaire
+
+months.french.vend.short = Vend
+months.french.brum.short = Brum
+months.french.frim.short = Frim
+months.french.nivo.short = Nivo
+months.french.pluv.short = Pluv
+months.french.vent.short = Vent
+months.french.germ.short = Germ
+months.french.flor.short = Flor
+months.french.prai.short = Prai
+months.french.mess.short = Mess
+months.french.ther.short = Ther
+months.french.fruc.short = Fruc
+months.french.comp.short = comp
+
+ascendants.download.pdf = Télécharger en pdf
+ascendants.generation = Génération {0}
+
+descendants.title = Descendance de {0}
+
+event.details = Détails de l'événement
+
+list.of.databases = Liste des bases de données
+
+login.into.account = Connexion à votre compte
+login.username = Nom d'utilisateur ou addresse email
+login.password = Mot de passe
+
+Database.title = Base de données {0}
+
+medias.orphaned = Médias orphelins
+
+problems.title = Problèmes
+problems.add.to.family = Ajouter à une famille
+problems.orphaned.individuals = Individus orphelins
+problems.orphaned.families = Familles orphelines
+problems.orphaned.medias = Médias orphelins
+problems.orphaned.events = Événements orphelins
+problems.orphaned.sources = Sources orphelines
+
+sourCitation.see.event = Voir événement
+sourCitation.see.individual = Voir individu
+sourCitation.see.family = Voir famille
+sourCitation.not.attached = Source non attachée à quoi que ce soit
+
+surnames.individuals = {0} Individu{1}
+surnames.individual.in.year = {0} Individu{1} en {2}
+surnames.individuals.between = {0} Individu{1} entre {2} et {3}
+surnames.individuals.from = {0} Individu{1} depuis {2}
+surnames.individuals.until = {0} Individu{1} jusque {2}
+
+tree.download.pdf = Télécharger en pdf
+
+ascendants.download.pdf = Télécharger en pdf
+ascendants.generation = Génération {0}
+descendants.title = Descendance de {0}
+
+event.details = Détails de l'événement
+
+list.of.databases = Liste des bases de données
+
+login.into.account = Connexion à votre compte
+login.username = Nom d'utilisateur ou adresse email
+login.password = Mot de passe
+
+Database.title = Base de données {0}
+
+medias.orphaned = Médias orphelins
+
+problems.title = Problèmes
+problems.add.to.family = Ajouter à une famille
+problems.orphaned.individuals = Individus orphelins
+problems.orphaned.families = Familles orphelines
+problems.orphaned.medias = Médias orphelins
+problems.orphaned.events = Événements orphelins
+problems.orphaned.sources = Sources orphelines
+
+sourCitation.see.event = Voir Événement
+sourCitation.see.individual = Voir Individu
+sourCitation.see.family = Voir Famille
+sourCitation.not.attached = Source non attachée à quoi que ce soit
+
+surnames.individuals = {0} Individu{1}
+surnames.individual.in.year = {0} Individu{1} en {2}
+surnames.individuals.between = {0} Individu{1} entre {2} et {3}
+surnames.individuals.from = {0} Individu{1} depuis {2}
+surnames.individuals.until = {0} Individu{1} jusque {2}
+
+tree.download.pdf = Télécharger en pdf
+
+database.shortName = Nom court de la base de données
+
+add.event.title = Ajouter un nouvel événement
+add.event.which.database = Base de données où l'événement est stocké
+add.event.location.description = Lieu où l'événement a eu lieu
+add.event.address.description = Adresse du lieu de l'événement. Utillisation de lieu est recommandée pour les lieux géographiques
+add.event.type.description = Type d'événement
+add.event.descriptor.description = Event detail descriptor
+add.event.date.description = Date de l'événement
+add.event.date.hint = Date de l'événement au format Gedcom
+add.event.age.description = Âge de l'individu le jour de l'événement
+add.event.cause.description = Utilisé dans des cas spéciaux pour enregistrer les raisons qui ont précipité un événement
+
+add.existing.family.title = Ajouter {} à une famille existante
+add.existing.family.button = Ajouter à la famille
+
+add.family.title = Ajouter {} à une nouvelle famille
+add.family.database.hint = Base de données où l'événement est stocké
+add.family.person1.description = Partenaire 1
+add.family.person2.description = Partenaire 2
+add.family.button = Créer une nouvelle famille

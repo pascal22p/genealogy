@@ -34,7 +34,7 @@ govukErrorSummary: GovukErrorSummary
 @main(dbId, None) {
 
 
-@block(s"Add ${person.details.shortName} to a en existing family") {
+@block(messages("add.existing.family.title", person.details.shortName)) {
 
     @if(familyForm.hasGlobalErrors) {
         @for(error <- familyForm.globalErrors) {
@@ -55,7 +55,7 @@ govukErrorSummary: GovukErrorSummary
                         value = Some(family.id.toString),
                         text = familyItem(family)
                     )).sortBy(_.text),
-                    label = Label(content = Text("Partner")
+                    label = Label(content = Text(messages("Partner"))
             ),
             hint = None
             ).withFormField(familyForm("linkId"))
@@ -64,7 +64,7 @@ govukErrorSummary: GovukErrorSummary
         @govukButton(
             Button(
                 element = Some("button"),
-                content = Text("Add to family")
+                content = Text(messages("add.existing.family.button"))
             )
         )
 

@@ -13,8 +13,8 @@
 
 @title(family: Family) = {
   Family
-  @family.parent1.map(_.details.surname).getOrElse("Unknown") —
-  @family.parent2.map(_.details.surname).getOrElse("Unknown")
+  @family.parent1.map(_.details.surname).getOrElse(messages("Unknown")) —
+  @family.parent2.map(_.details.surname).getOrElse(messages("Unknown"))
 }
 
 @breadcrumbs = @{
@@ -30,6 +30,7 @@
 
 @main(dbId, Some(person), person.name, Some(breadcrumbs)) {
 
+  <div id="person-details">
   @personDetails(dbId, person)
   
   @individualEvents(dbId, person.events)
@@ -39,13 +40,13 @@
       Some(Actions(
         items = Seq(ActionItem(
           href = controllers.delete.routes.DeleteFamilyController.deleteFamilyConfirmation(dbId, family.id).url,
-          content = Text("Delete")
+          content = Text(messages("Delete"))
         ))
       )),
       Some(Actions(
         items = Seq(ActionItem(
           href = controllers.routes.FamilyController.showFamily(dbId, family.id).url,
-          content = Text("View")
+          content = Text(messages("View"))
         ))
       ))
     ) {
@@ -54,5 +55,6 @@
   }
 
   @parents(dbId, person)
+  </div>
 
 }
