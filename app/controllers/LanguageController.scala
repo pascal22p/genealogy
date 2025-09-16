@@ -25,7 +25,7 @@ class LanguageController @Inject() (
   def switchToLanguage(lang: String): Action[AnyContent] = authAction.async { implicit request =>
     val newLang = Lang.get(lang).getOrElse(Lang.defaultLang)
     Future.successful(
-      Redirect(request.headers.get(REFERER).getOrElse("/"))
+      Redirect(new java.net.URI(request.headers.get(REFERER).getOrElse("/")).getPath)
         .withLang(newLang)
     )
   }
