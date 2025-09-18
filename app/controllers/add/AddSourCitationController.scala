@@ -12,7 +12,6 @@ import models.SourCitationType.SourCitationType
 import play.api.data.Form
 import play.api.i18n.*
 import play.api.mvc.*
-import play.api.Logging
 import queries.GetSqlQueries
 import queries.InsertSqlQueries
 import views.html.add.AddSourCitation
@@ -29,8 +28,7 @@ class AddSourCitationController @Inject() (
 )(
     implicit ec: ExecutionContext
 ) extends BaseController
-    with I18nSupport
-    with Logging {
+    with I18nSupport {
 
   def showForm(baseId: Int, ownerId: Int, sourCitationType: SourCitationType): Action[AnyContent] =
     authJourney.authWithAdminRight.async { implicit authenticatedRequest: AuthenticatedRequest[AnyContent] =>

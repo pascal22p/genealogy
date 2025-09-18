@@ -18,7 +18,6 @@ import play.api.mvc.AnyContent
 import play.api.mvc.BaseController
 import play.api.mvc.ControllerComponents
 import play.api.mvc.MultipartFormData
-import play.api.Logging
 import queries.GetSqlQueries
 import queries.InsertSqlQueries
 import views.html.add.AddMedia
@@ -34,8 +33,7 @@ class AddMediaController @Inject() (
     val controllerComponents: ControllerComponents
 )(implicit ec: ExecutionContext)
     extends BaseController
-    with I18nSupport
-    with Logging {
+    with I18nSupport {
 
   def showForm(baseId: Int): Action[AnyContent] = authJourney.authWithAdminRight.async { implicit request =>
     Future.successful(Ok(addMediaView(baseId)))

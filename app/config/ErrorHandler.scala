@@ -4,14 +4,14 @@ import javax.inject.Singleton
 
 import scala.concurrent.*
 
+import models.LoggingWithRequest
 import play.api.http.HttpErrorHandler
 import play.api.http.Status.NOT_FOUND
 import play.api.mvc.*
 import play.api.mvc.Results.*
-import play.api.Logging
 
 @Singleton
-class ErrorHandler extends HttpErrorHandler with Logging {
+class ErrorHandler extends HttpErrorHandler with LoggingWithRequest {
   def onClientError(request: RequestHeader, statusCode: Int, message: String): Future[Result] = {
     if (statusCode == NOT_FOUND) {
       Future.successful(NotFound("Page not found"))
@@ -23,7 +23,7 @@ class ErrorHandler extends HttpErrorHandler with Logging {
   }
 
   def onServerError(request: RequestHeader, exception: Throwable): Future[Result] = {
-    logger.error(exception.getMessage, exception)
+    logger.error(exception.getMessage, exception)(using requestHeaderToMarkerContext(using request))
     Future.successful(
       InternalServerError("A server error occurred: " + exception.getMessage)
     )

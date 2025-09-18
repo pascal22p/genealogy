@@ -23,7 +23,6 @@ import play.api.mvc.AnyContent
 import play.api.mvc.BaseController
 import play.api.mvc.ControllerComponents
 import play.api.mvc.Result
-import play.api.Logging
 import queries.GetSqlQueries
 import queries.InsertSqlQueries
 import queries.UpdateSqlQueries
@@ -48,8 +47,7 @@ class AddPersonToFamily @Inject() (
     val controllerComponents: ControllerComponents
 )(implicit ec: ExecutionContext, appConfig: AppConfig)
     extends BaseController
-    with I18nSupport
-    with Logging {
+    with I18nSupport {
 
   def showInterstitial(baseId: Int, personId: Int): Action[AnyContent] = authJourney.authWithAdminRight.async {
     implicit authenticatedRequest: AuthenticatedRequest[AnyContent] =>

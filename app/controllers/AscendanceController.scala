@@ -12,7 +12,6 @@ import cats.implicits.*
 import models.*
 import play.api.i18n.*
 import play.api.mvc.*
-import play.api.Logging
 import services.AscendanceService
 import services.SessionService
 import utils.TreeUtils
@@ -29,8 +28,7 @@ class AscendanceController @Inject() (
 )(
     implicit ec: ExecutionContext
 ) extends BaseController
-    with I18nSupport
-    with Logging {
+    with I18nSupport {
 
   def showAscendant(@unused baseId: Int, id: Int): Action[AnyContent] = authAction.async {
     implicit authenticatedRequest: AuthenticatedRequest[AnyContent] =>

@@ -12,9 +12,10 @@ import config.AppConfig
 import models.EventType.UnknownEvent
 import models.Events
 import models.Family
+import models.LoggingWithRequest
 import models.Person
 import models.ResnType.PrivacyResn
-import play.api.Logging
+import play.api.mvc.Request
 
 final case class Tree(
     individuals: mutable.Map[Int, Person],
@@ -46,8 +47,10 @@ object Tree {
 @Singleton
 class TreeService @Inject() (personService: PersonService, familyService: FamilyService, appConfig: AppConfig)(
     implicit ec: ExecutionContext
-) extends Logging {
-  def loadTree(id: Int, depth: Int = 0, maxDepth: Int = 2, tree: Tree, isAllowedToSee: Boolean): Future[Boolean] = {
+) extends LoggingWithRequest {
+  def loadTree(id: Int, depth: Int = 0, maxDepth: Int = 2, tree: Tree, isAllowedToSee: Boolean)(
+      implicit request: Request[?]
+  ): Future[Boolean] = {
     personService.getPerson(id, omitSources = true).flatMap {
       case Some(person) if tree.individuals.contains(person.details.id) =>
         Future.successful(true)

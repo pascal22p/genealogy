@@ -19,7 +19,6 @@ import play.api.i18n.I18nSupport
 import play.api.mvc.BaseController
 import play.api.mvc.ControllerComponents
 import play.api.mvc.Result
-import play.api.Logging
 import queries.UpdateSqlQueries
 import services.SourCitationService
 import services.SourRecordService
@@ -38,8 +37,7 @@ class EditSourRecordController @Inject() (
 )(
     implicit ec: ExecutionContext
 ) extends BaseController
-    with I18nSupport
-    with Logging {
+    with I18nSupport {
 
   private def handleSourRecord(id: Int)(
       block: SourRecord => Future[Result]

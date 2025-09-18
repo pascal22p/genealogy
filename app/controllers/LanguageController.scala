@@ -12,15 +12,13 @@ import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.BaseController
 import play.api.mvc.ControllerComponents
-import play.api.Logging
 
 @Singleton
 class LanguageController @Inject() (
     authAction: AuthAction,
     val controllerComponents: ControllerComponents
 ) extends BaseController
-    with I18nSupport
-    with Logging {
+    with I18nSupport {
 
   def switchToLanguage(lang: String): Action[AnyContent] = authAction.async { implicit request =>
     val newLang = Lang.get(lang).getOrElse(Lang.defaultLang)
