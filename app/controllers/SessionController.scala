@@ -68,7 +68,9 @@ class SessionController @Inject() (
   def logoutOnLoad: Action[AnyContent] = authAction.async { implicit authenticatedRequest =>
     sqlQueries.removeSessionData(authenticatedRequest.localSession)
     val returnUrl =
-      new java.net.URI(authenticatedRequest.request.headers.get(HeaderNames.REFERER).getOrElse(routes.HomeController.onload().url)).getPath
+      new java.net.URI(
+        authenticatedRequest.request.headers.get(HeaderNames.REFERER).getOrElse(routes.HomeController.onload().url)
+      ).getPath
     Future.successful(Redirect(returnUrl))
   }
 }

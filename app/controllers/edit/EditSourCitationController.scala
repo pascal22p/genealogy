@@ -17,7 +17,6 @@ import play.api.i18n.I18nSupport
 import play.api.mvc.BaseController
 import play.api.mvc.ControllerComponents
 import play.api.mvc.Result
-import play.api.Logging
 import queries.UpdateSqlQueries
 import services.SourCitationService
 import views.html.edit.EditSourCitation
@@ -34,8 +33,7 @@ class EditSourCitationController @Inject() (
 )(
     implicit ec: ExecutionContext
 ) extends BaseController
-    with I18nSupport
-    with Logging {
+    with I18nSupport {
 
   private def handleSourCitation(baseId: Int, id: Int)(
       block: SourCitation => Future[Result]

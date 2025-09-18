@@ -7,12 +7,12 @@ import scala.concurrent.ExecutionContext
 
 import actions.AuthAction
 import models.AuthenticatedRequest
+import models.LoggingWithRequest
 import play.api.i18n.I18nSupport
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.BaseController
 import play.api.mvc.ControllerComponents
-import play.api.Logging
 import services.AscendanceService
 import services.FopService
 
@@ -26,7 +26,7 @@ class PdfController @Inject() (
     implicit ec: ExecutionContext
 ) extends BaseController
     with I18nSupport
-    with Logging {
+    with LoggingWithRequest {
 
   def pdf(id: Int): Action[AnyContent] = authAction.async { implicit request: AuthenticatedRequest[AnyContent] =>
     ascendanceService.buildSosaList(id).map { sosaList =>

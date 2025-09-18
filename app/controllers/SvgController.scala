@@ -12,7 +12,6 @@ import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.BaseController
 import play.api.mvc.ControllerComponents
-import play.api.Logging
 import services.AscendanceService
 import views.xml.pdfTemplates.SvgCompactTree
 
@@ -25,8 +24,7 @@ class SvgController @Inject() (
 )(
     implicit ec: ExecutionContext
 ) extends BaseController
-    with I18nSupport
-    with Logging {
+    with I18nSupport {
 
   def svg(id: Int): Action[AnyContent] = authAction.async { implicit request: AuthenticatedRequest[AnyContent] =>
     ascendanceService.buildSosaList(id).map { sosaList =>

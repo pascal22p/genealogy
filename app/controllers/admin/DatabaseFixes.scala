@@ -14,7 +14,6 @@ import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.BaseController
 import play.api.mvc.ControllerComponents
-import play.api.Logging
 import queries.GetSqlQueries
 import queries.UpdateSqlQueries
 import utils.CalendarConstants
@@ -30,8 +29,7 @@ class DatabaseFixes @Inject() (
 )(
     implicit ec: ExecutionContext
 ) extends BaseController
-    with I18nSupport
-    with Logging {
+    with I18nSupport {
 
   def calculateDaysForDates: Action[AnyContent] = authJourney.authWithAdminRight.async { implicit request =>
     val result: Future[List[Option[Int]]] = getSqlQueries.getAllEvents.flatMap { events =>

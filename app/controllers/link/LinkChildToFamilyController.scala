@@ -18,7 +18,6 @@ import models.Person
 import play.api.data.Form
 import play.api.i18n.*
 import play.api.mvc.*
-import play.api.Logging
 import queries.GetSqlQueries
 import queries.InsertSqlQueries
 import services.EventService
@@ -37,8 +36,7 @@ class LinkChildToFamilyController @Inject() (
 )(
     implicit ec: ExecutionContext
 ) extends BaseController
-    with I18nSupport
-    with Logging {
+    with I18nSupport {
 
   def showForm(dbId: Int, familyId: Int): Action[AnyContent] = authJourney.authWithAdminRight.async {
     implicit authenticatedRequest: AuthenticatedRequest[AnyContent] =>

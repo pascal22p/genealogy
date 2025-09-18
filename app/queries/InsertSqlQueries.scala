@@ -17,11 +17,11 @@ import models.SourCitationType.EventSourCitation
 import models.SourCitationType.FamilySourCitation
 import models.SourCitationType.IndividualSourCitation
 import play.api.db.Database
-import play.api.Logging
+import play.api.mvc.Request
 
 @Singleton
 final class InsertSqlQueries @Inject() (db: Database, databaseExecutionContext: DatabaseExecutionContext)
-    extends Logging {
+    extends LoggingWithRequest {
 
   def insertPersonDetails(personDetails: PersonDetails): OptionT[Future, Int] = OptionT(Future {
     val parser: ResultSetParser[Option[Int]] = {
@@ -52,7 +52,7 @@ final class InsertSqlQueries @Inject() (db: Database, databaseExecutionContext: 
 
   def insertEventDetail(
       eventDetailQueryData: EventDetailQueryData,
-  ): OptionT[Future, Int] =
+  )(implicit request: Request[?]): OptionT[Future, Int] =
     OptionT(Future {
       val parser: ResultSetParser[Option[Int]] = {
         int("insert_id").singleOpt
@@ -157,71 +157,72 @@ final class InsertSqlQueries @Inject() (db: Database, databaseExecutionContext: 
     }
   }(using databaseExecutionContext))
 
-  def insertSourCitation(sourCitation: SourCitationQueryData): OptionT[Future, Int] = OptionT(Future {
-    val parser: ResultSetParser[Option[Int]] = {
-      int("insert_id").singleOpt
-    }
-
-    db.withTransaction { implicit conn =>
-      val sourCitationId =
-        SQL(
-          """INSERT INTO `genea_sour_citations`
-            | (`sour_records_id`, `sour_citations_page`, `sour_citations_even`, `sour_citations_even_role`, `sour_citations_data_dates`, `sour_citations_data_text`, `sour_citations_quay`, `sour_citations_subm`, `base`)
-            | VALUES ({sour_records_id}, {sour_citations_page}, {sour_citations_even}, {sour_citations_even_role}, {sour_citations_data_dates}, {sour_citations_data_text}, {sour_citations_quay}, {sour_citations_subm}, {base})
-        """.stripMargin
-        )
-          .on(
-            "sour_records_id"           -> sourCitation.record.map(_.id),
-            "sour_citations_page"       -> sourCitation.page,
-            "sour_citations_even"       -> sourCitation.even,
-            "sour_citations_even_role"  -> sourCitation.role,
-            "sour_citations_data_dates" -> sourCitation.dates,
-            "sour_citations_data_text"  -> sourCitation.text,
-            "sour_citations_quay"       -> sourCitation.quay,
-            "sour_citations_subm"       -> sourCitation.subm,
-            "base"                      -> sourCitation.dbId
-          )
-          .executeInsert[Option[Int]](parser)
-
-      sourCitation.sourceType match {
-        case _: EventSourCitation.type =>
-          SQL("""INSERT INTO rel_events_sources
-                | (events_details_id, sour_citations_id)
-                | VALUES ({events_details_id}, {sour_citations_id})
-            """.stripMargin)
-            .on(
-              "events_details_id" -> sourCitation.ownerId,
-              "sour_citations_id" -> sourCitationId
-            )
-            .execute()
-        case _: IndividualSourCitation.type =>
-          SQL("""INSERT INTO rel_indi_sources
-                | (indi_id, sour_citations_id)
-                | VALUES ({indi_id}, {sour_citations_id})
-            """.stripMargin)
-            .on(
-              "indi_id"           -> sourCitation.ownerId,
-              "sour_citations_id" -> sourCitationId
-            )
-            .execute()
-        case _: FamilySourCitation.type =>
-          SQL("""INSERT INTO rel_familles_sources
-                | (familles_id, sour_citations_id)
-                | VALUES ({familles_id}, {sour_citations_id})
-            """.stripMargin)
-            .on(
-              "familles_id"       -> sourCitation.ownerId,
-              "sour_citations_id" -> sourCitationId
-            )
-            .execute()
-        case _ =>
-          val ex = new RuntimeException(s"The type `${sourCitation.sourceType}` is not supported")
-          logger.error(ex.getMessage, ex)
-          None
+  def insertSourCitation(sourCitation: SourCitationQueryData)(implicit reuqest: Request[?]): OptionT[Future, Int] =
+    OptionT(Future {
+      val parser: ResultSetParser[Option[Int]] = {
+        int("insert_id").singleOpt
       }
-      sourCitationId
-    }
-  }(using databaseExecutionContext))
+
+      db.withTransaction { implicit conn =>
+        val sourCitationId =
+          SQL(
+            """INSERT INTO `genea_sour_citations`
+              | (`sour_records_id`, `sour_citations_page`, `sour_citations_even`, `sour_citations_even_role`, `sour_citations_data_dates`, `sour_citations_data_text`, `sour_citations_quay`, `sour_citations_subm`, `base`)
+              | VALUES ({sour_records_id}, {sour_citations_page}, {sour_citations_even}, {sour_citations_even_role}, {sour_citations_data_dates}, {sour_citations_data_text}, {sour_citations_quay}, {sour_citations_subm}, {base})
+        """.stripMargin
+          )
+            .on(
+              "sour_records_id"           -> sourCitation.record.map(_.id),
+              "sour_citations_page"       -> sourCitation.page,
+              "sour_citations_even"       -> sourCitation.even,
+              "sour_citations_even_role"  -> sourCitation.role,
+              "sour_citations_data_dates" -> sourCitation.dates,
+              "sour_citations_data_text"  -> sourCitation.text,
+              "sour_citations_quay"       -> sourCitation.quay,
+              "sour_citations_subm"       -> sourCitation.subm,
+              "base"                      -> sourCitation.dbId
+            )
+            .executeInsert[Option[Int]](parser)
+
+        sourCitation.sourceType match {
+          case _: EventSourCitation.type =>
+            SQL("""INSERT INTO rel_events_sources
+                  | (events_details_id, sour_citations_id)
+                  | VALUES ({events_details_id}, {sour_citations_id})
+            """.stripMargin)
+              .on(
+                "events_details_id" -> sourCitation.ownerId,
+                "sour_citations_id" -> sourCitationId
+              )
+              .execute()
+          case _: IndividualSourCitation.type =>
+            SQL("""INSERT INTO rel_indi_sources
+                  | (indi_id, sour_citations_id)
+                  | VALUES ({indi_id}, {sour_citations_id})
+            """.stripMargin)
+              .on(
+                "indi_id"           -> sourCitation.ownerId,
+                "sour_citations_id" -> sourCitationId
+              )
+              .execute()
+          case _: FamilySourCitation.type =>
+            SQL("""INSERT INTO rel_familles_sources
+                  | (familles_id, sour_citations_id)
+                  | VALUES ({familles_id}, {sour_citations_id})
+            """.stripMargin)
+              .on(
+                "familles_id"       -> sourCitation.ownerId,
+                "sour_citations_id" -> sourCitationId
+              )
+              .execute()
+          case _ =>
+            val ex = new RuntimeException(s"The type `${sourCitation.sourceType}` is not supported")
+            logger.error(ex.getMessage, ex)
+            None
+        }
+        sourCitationId
+      }
+    }(using databaseExecutionContext))
 
   def linkTable(table: String, values: List[NamedParameter]): Future[Boolean] = Future {
     db.withConnection { implicit conn =>

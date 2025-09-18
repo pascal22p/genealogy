@@ -13,7 +13,6 @@ import models.ResnType.PrivacyResn
 import play.api.data.Form
 import play.api.i18n.*
 import play.api.mvc.*
-import play.api.Logging
 import queries.UpdateSqlQueries
 import services.PersonService
 import services.SessionService
@@ -32,8 +31,7 @@ class EditPersonDetailsController @Inject() (
 )(
     implicit ec: ExecutionContext
 ) extends BaseController
-    with I18nSupport
-    with Logging {
+    with I18nSupport {
 
   def showForm(baseId: Int, id: Int): Action[AnyContent] = authJourney.authWithAdminRight.async {
     implicit authenticatedRequest: AuthenticatedRequest[AnyContent] =>

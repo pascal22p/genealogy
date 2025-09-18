@@ -21,7 +21,6 @@ import play.api.mvc.AnyContent
 import play.api.mvc.BaseController
 import play.api.mvc.ControllerComponents
 import play.api.mvc.Result
-import play.api.Logging
 import queries.GetSqlQueries
 import queries.UpdateSqlQueries
 import services.EventService
@@ -44,8 +43,7 @@ class EditEventDetailController @Inject() (
 )(
     implicit ec: ExecutionContext
 ) extends BaseController
-    with I18nSupport
-    with Logging {
+    with I18nSupport {
 
   def showForm(baseId: Int, id: Int): Action[AnyContent] = authJourney.authWithAdminRight.async { implicit request =>
     handleEvent(id) { (event, _, allPlace) =>

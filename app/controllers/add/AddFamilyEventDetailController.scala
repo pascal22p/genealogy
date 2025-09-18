@@ -12,7 +12,6 @@ import models.EventType.FamilyEvent
 import play.api.data.Form
 import play.api.i18n.*
 import play.api.mvc.*
-import play.api.Logging
 import queries.GetSqlQueries
 import queries.InsertSqlQueries
 import views.html.add.AddEventDetail
@@ -29,8 +28,7 @@ class AddFamilyEventDetailController @Inject() (
 )(
     implicit ec: ExecutionContext
 ) extends BaseController
-    with I18nSupport
-    with Logging {
+    with I18nSupport {
 
   def showForm(baseId: Int, familyId: Int): Action[AnyContent] = authJourney.authWithAdminRight.async {
     implicit authenticatedRequest: AuthenticatedRequest[AnyContent] =>

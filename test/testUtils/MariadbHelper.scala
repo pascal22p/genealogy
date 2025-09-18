@@ -7,12 +7,14 @@ import scala.util.Success
 import scala.util.Try
 
 import anorm.SQL
+import models.LoggingWithRequest
 import org.scalatest.BeforeAndAfterEach
 import play.api.db.Database
+import play.api.mvc.Request
+import play.api.test.FakeRequest
 import play.api.Application
-import play.api.Logging
 
-trait MariadbHelper extends BaseSpec with BeforeAndAfterEach with Logging {
+trait MariadbHelper extends BaseSpec with BeforeAndAfterEach with LoggingWithRequest {
   lazy val db: Database                  = app.injector.instanceOf[Database]
   implicit lazy val ec: ExecutionContext = app.injector.instanceOf[ExecutionContext]
 
@@ -25,7 +27,7 @@ trait MariadbHelper extends BaseSpec with BeforeAndAfterEach with Logging {
     )
     .build()
 
-  def executeSql(queries: String, logMe: Boolean = false): Future[Boolean] = Future {
+  def executeSql(queries: String, logMe: Boolean = false)(implicit request: Request[?]): Future[Boolean] = Future {
     db.withConnection { implicit conn =>
       queries.trim
         .split(";")
@@ -42,7 +44,7 @@ trait MariadbHelper extends BaseSpec with BeforeAndAfterEach with Logging {
     }
   }
 
-  def createTables(): Future[Boolean] = {
+  def createTables(implicit request: Request[?]): Future[Boolean] = {
     val source = scala.io.Source.fromFile("doc/tables.sql")
     val lines  =
       try source.mkString
@@ -58,7 +60,7 @@ trait MariadbHelper extends BaseSpec with BeforeAndAfterEach with Logging {
 
   override def beforeEach(): Unit = {
     super.beforeEach()
-    createTables().map(_ => ()).futureValue
+    createTables(using FakeRequest()).map(_ => ()).futureValue
   }
 
 }

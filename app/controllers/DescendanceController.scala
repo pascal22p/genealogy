@@ -11,7 +11,6 @@ import models.AuthenticatedRequest
 import models.Family
 import play.api.i18n.*
 import play.api.mvc.*
-import play.api.Logging
 import services.DescendanceService
 import services.SessionService
 import views.html.Descendants
@@ -26,8 +25,7 @@ class DescendanceController @Inject() (
 )(
     implicit ec: ExecutionContext
 ) extends BaseController
-    with I18nSupport
-    with Logging {
+    with I18nSupport {
 
   def showDescendant(@unused baseId: Int, id: Int): Action[AnyContent] = authAction.async {
     implicit authenticatedRequest: AuthenticatedRequest[AnyContent] =>

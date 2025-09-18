@@ -9,12 +9,18 @@ import models.queryData.FamilyQueryData
 import models.EventType.FamilyEvent
 import models.EventType.IndividualEvent
 import models.ResnType.PrivacyResn
+import play.api.mvc.Request
 import play.api.test.FakeRequest
 import play.api.Logging
 import testUtils.MariadbHelper
 
 class GetSqlQueriesSpec extends MariadbHelper with Logging {
   lazy val sut: GetSqlQueries = app.injector.instanceOf[GetSqlQueries]
+
+  implicit val request: Request[?] = FakeRequest()
+    .withHeaders("X-Request-ID" -> "requestID")
+    .addAttr(Attrs.RequestId, "requestID")
+    .addAttr(Attrs.SessionId, "sessionID")
 
   def sqlPersonDetails(person: PersonDetails): String =
     s"""INSERT INTO `genea_individuals` (`indi_id`, `base`, `indi_nom`, `indi_prenom`, `indi_sexe`, `indi_npfx`, `indi_givn`, `indi_nick`, `indi_spfx`, `indi_nsfx`, `indi_resn`) VALUES
