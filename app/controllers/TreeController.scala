@@ -38,7 +38,6 @@ class TreeController @Inject() (
 
   def showTree(baseId: Int, id: Int): Action[AnyContent] = authAction.async {
     implicit request: AuthenticatedRequest[AnyContent] =>
-      logger.info("test")
       val isAllowedToSee = request.localSession.sessionData.userData.fold(false)(_.seePrivacy)
 
       personService.getPerson(id, true, true, true).map { maybePerson =>

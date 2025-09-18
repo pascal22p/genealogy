@@ -18,7 +18,7 @@ class GetSqlQueriesSpec extends MariadbHelper with Logging {
   lazy val sut: GetSqlQueries = app.injector.instanceOf[GetSqlQueries]
 
   implicit val request: Request[?] = FakeRequest()
-    .withHeaders("X-Request-ID" -> "requestID")
+    .withHeaders("X-Request-Id" -> "requestID")
     .addAttr(Attrs.RequestId, "requestID")
     .addAttr(Attrs.SessionId, "sessionID")
 
