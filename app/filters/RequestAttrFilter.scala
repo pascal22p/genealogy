@@ -17,7 +17,7 @@ class RequestAttrFilter @Inject() (
 ) extends Filter
     with Logging {
 
-  private val headerName = "X-Request-ID"
+  private val headerName = "X-Request-Id"
 
   override def apply(next: RequestHeader => Future[Result])(request: RequestHeader): Future[Result] = {
     val requestId = request.headers.get(headerName).getOrElse(UUID.randomUUID().toString)
@@ -31,6 +31,9 @@ class RequestAttrFilter @Inject() (
     logger.debug(s"RequestIdAttrFilter assigned requestId=$requestId to ${request.method} ${request.uri}")
 
     // Also put it on the response headers (optional, useful for clients/debugging)
-    next(enrichedRequest).map(_.withHeaders(headerName -> requestId))(using ec)
+    next(enrichedRequest).map { req =>
+      val newHeaders = (req.header.headers - headerName) + (headerName -> requestId)
+      req.withHeaders(newHeaders.toSeq*)
+    }
   }
 }
