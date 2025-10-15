@@ -28,7 +28,9 @@ class RequestAttrFilter @Inject() (
       .addAttr(Attrs.RequestId, requestId)
       .addAttr(Attrs.SessionId, sessionId)
 
-    logger.info(s"RequestAttrFilter assigned sessionId=`$sessionId` requestId=`$requestId` to ${request.method} ${request.uri}")
+    logger.info(
+      s"RequestAttrFilter assigned sessionId=`$sessionId` requestId=`$requestId` to ${request.method} ${request.uri}"
+    )
 
     // Also put it on the response headers (optional, useful for clients/debugging)
     next(enrichedRequest).map { req =>
