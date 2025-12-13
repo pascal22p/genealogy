@@ -131,10 +131,11 @@ lazy val genealogy = (project in file("."))
       "-Wsafe-init",
       "-Wconf:msg=unused import&src=html/.*:s",
       "-Wconf:msg=unused import&src=xml/.*:s",
+      "-Wconf:msg=unused import&src=txt/.*:s",
       "-Wconf:src=routes/.*:s",
       "-Wconf:msg=Implicit parameters should be provided with a `using` clause&src=html/.*:s",
       "-Wconf:msg=Implicit parameters should be provided with a `using` clause&src=xml/.*:s",
-      "-Wconf:msg=package scala contains object and package with same name.*:i"
+      "-Wconf:msg=package scala contains object and package with same name.*:i",
     ),
 
     // Define Docker aliases (tags)

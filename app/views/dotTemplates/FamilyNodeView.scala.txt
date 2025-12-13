@@ -1,0 +1,11 @@
+@import config.AppConfig
+@import models.{Family, AuthenticatedRequest}
+
+@this()
+
+@(family: (Int, Family))(implicit authenticatedRequest: AuthenticatedRequest[?], messages: Messages, appConfig: AppConfig)
+
+F@family._1 [
+  label = "@family._2.events.weddingDate(true)"
+  shape = "oval"
+];

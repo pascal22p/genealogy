@@ -1,0 +1,48 @@
+@import models.{Tree, AuthenticatedRequest}
+@import views.txt.dotTemplates.IndividualNodeView
+@import config.AppConfig
+
+@this(
+  individualNodeView: IndividualNodeView,
+  familyNodeView: FamilyNodeView
+)
+
+@(tree: Tree, origin: Int)(implicit authenticatedRequest: AuthenticatedRequest[?], messages: Messages, appConfig: AppConfig)
+
+digraph family {
+  ranksep = "0.3";
+  node [
+    shape = record,
+    fontname = "Arial",
+    fontsize = "16"
+  ];
+
+  @for(group <- tree.groups) {
+    subgraph cluster_@{group._1} {
+      peripheries = 0
+
+      @for(indiId <- group._2) {
+        @for(indi <- tree.individuals.find(_._1 == indiId)) {
+          @individualNodeView(indi, origin)
+        }
+      }
+
+    }
+  }
+
+  node [
+    group=""
+  ];
+
+  @for(indi <- tree.individuals.filterNot(x => tree.groups.values.flatten.toList.contains(x._1))) {
+    @individualNodeView(indi, origin)
+  }
+
+  @for(family <- tree.families) {
+    @familyNodeView(family)
+  }
+
+  @for(link <- tree.links) {
+    @link._1 -> @link._2;
+  }
+}

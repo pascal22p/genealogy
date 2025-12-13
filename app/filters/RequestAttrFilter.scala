@@ -5,16 +5,19 @@ import javax.inject.Inject
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
+import scala.util.control.NonFatal
 
 import models.Attrs
 import org.apache.pekko.stream.Materializer
 import play.api.mvc.*
 import play.api.Logging
+import config.ErrorHandler
 
 class RequestAttrFilter @Inject() (
-    implicit val mat: Materializer,
-    ec: ExecutionContext
-) extends Filter
+    errorHandler: ErrorHandler,
+    implicit val mat: Materializer
+)(implicit ec: ExecutionContext)
+    extends Filter
     with Logging {
 
   private val headerName = "X-Request-Id"
@@ -33,9 +36,15 @@ class RequestAttrFilter @Inject() (
     )
 
     // Also put it on the response headers (optional, useful for clients/debugging)
-    next(enrichedRequest).map { req =>
-      val newHeaders = (req.header.headers - headerName) + (headerName -> requestId)
-      req.withHeaders(newHeaders.toSeq*)
-    }
+    next(enrichedRequest)
+      .map { req =>
+        val newHeaders = (req.header.headers - headerName) + (headerName -> requestId)
+        req.withHeaders(newHeaders.toSeq*)
+      }
+      .recoverWith {
+        // workaround so that the new attributes are available in the error handler
+        // from https://github.com/playframework/playframework/issues/7968
+        case NonFatal(e) => errorHandler.onServerError(enrichedRequest, e)
+      }
   }
 }

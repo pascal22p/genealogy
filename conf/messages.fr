@@ -196,6 +196,7 @@ sourCitation.see.event = Voir événement
 sourCitation.see.individual = Voir individu
 sourCitation.see.family = Voir famille
 sourCitation.not.attached = Source non attachée à quoi que ce soit
+sourCitation.title = Mon arbre généalogique
 
 surnames.individuals = {0} Individu{1}
 surnames.individual.in.year = {0} Individu{1} en {2}
@@ -263,3 +264,11 @@ add.family.database.hint = Base de données où l'événement est stocké
 add.family.person1.description = Partenaire 1
 add.family.person2.description = Partenaire 2
 add.family.button = Créer une nouvelle famille
+
+index.title = Mon arbre généalogique
+
+mediaList.title = Mon arbre généalogique
+
+addDatabase.title = Mon arbre généalogique
+
+defaultTitle = Mon arbre généalogique

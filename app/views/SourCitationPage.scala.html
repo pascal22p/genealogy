@@ -13,7 +13,7 @@
 @(dbId: Int, modelSourCitation: ModelSourCitation)(implicit request: AuthenticatedRequest[?], messages: Messages)
 
 
-@main(dbId, None) {
+@main(dbId, None, title = messages("sourCitation.title")) {
 
   @(modelSourCitation.sourceType, modelSourCitation.ownerId)  match {
     case (_: EventSourCitation.type, Some(id)) => { <a href="@routes.EventController.showEvent(dbId, id)">@messages("sourCitation.see.event")</a> }

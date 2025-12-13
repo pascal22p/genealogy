@@ -17,7 +17,7 @@ import play.api.mvc.BaseController
 import play.api.mvc.ControllerComponents
 import services.GraphVizDotService
 import services.PersonService
-import services.Tree
+import models.Tree
 import services.TreeService
 import views.html.TreeView
 
