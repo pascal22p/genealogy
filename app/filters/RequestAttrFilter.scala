@@ -42,6 +42,8 @@ class RequestAttrFilter @Inject() (
         req.withHeaders(newHeaders.toSeq*)
       }
       .recoverWith {
+        // workaround so that the new attributes are available in the error handler
+        // from https://github.com/playframework/playframework/issues/7968
         case NonFatal(e) => errorHandler.onServerError(enrichedRequest, e)
       }
   }
