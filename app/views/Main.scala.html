@@ -1,5 +1,5 @@
 @import models.AuthenticatedRequest
-@import views.html.components.{Block}
+@import views.html.components.{Block, LanguageToggle}
 @import uk.gov.hmrc.hmrcfrontend.config.AssetsConfig
 @import uk.gov.hmrc.hmrcfrontend.views.html.components._
 @import config.AppConfig
@@ -9,11 +9,12 @@
     assetConfig: AssetsConfig,
     govukServiceNavigation: GovukServiceNavigation,
     govukBreadcrumbs: GovukBreadcrumbs,
-    hmrcTimeoutDialog: HmrcTimeoutDialog
+    hmrcTimeoutDialog: HmrcTimeoutDialog,
+    languageToggle: LanguageToggle
 )
 
 
-@(dbId: Int, personOption: Option[Person], title: String = "My family tree", breadcrumbs: Option[Breadcrumbs] = None)(contentBlock: Html)(implicit authenticatedRequest: AuthenticatedRequest[?], messages: Messages)
+@(dbId: Int, personOption: Option[Person], title: String = "", breadcrumbs: Option[Breadcrumbs] = None)(contentBlock: Html)(implicit authenticatedRequest: AuthenticatedRequest[?], messages: Messages)
 
 @timeoutDialog = {  
     @hmrcTimeoutDialog(TimeoutDialog(
@@ -73,13 +74,13 @@
 }
 
 <!DOCTYPE html>
-<html lang="fr" class="govuk-template">
+<html lang="@messages.lang.code" class="govuk-template">
 <head>
     <title>@title</title>
     <meta name="Description" content="" />
     <meta name="Keywords" content="genealogie, genealogy" />
     <meta name="Author" content="Pascal Parois" />
-    <meta http-equiv="Content-language" content="fr" />
+    <meta http-equiv="Content-language" content="@messages.lang.code" />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#0b0c0c">
@@ -87,7 +88,7 @@
     <link rel="icon" type="image/png" href="@routes.AssetsController.get("images/favicon.png")">
     <link rel="stylesheet" media="screen" href="@assetConfig.hmrcFrontendCssUrl">
     <link rel="stylesheet" media="screen" href="@routes.AssetsController.get("stylesheets/main.css")">
-    <script type="module" src="@{assetConfig.hmrcFrontendJsUrl}" type="text/javascript"></script>
+    <script type="module" src="@{assetConfig.hmrcFrontendJsUrl}"></script>
 
     @if(authenticatedRequest.localSession.sessionData.userData.isDefined){
       @timeoutDialog
@@ -168,12 +169,12 @@
             navigationClasses = "",
             navigationId = "navigation",
             navigationLabel = Some("navigationLabel"),
-            classes = "",
+            classes = "hmrc-service-navigation--with-language-select",
             attributes = Map.empty,
             ariaLabel = None,
             menuButtonText = Some(messages("Menu")),
             menuButtonLabel = Some(messages("Menu")),
-            slots = None
+            slots = Some(ServiceNavigationSlot(end = HtmlContent(languageToggle(messages.lang.code))))
         ))
         </div>
         </div>
@@ -183,9 +184,6 @@
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-two-thirds">
         <div class="govuk-body">@govukBreadcrumbs(breadcrumbsMenu)</div>
-      </div>
-      <div class="govuk-grid-column-one-third">
-        <div class="govuk-body govuk-!-margin-top-3"><a class="govuk-link" href="@routes.LanguageController.switchToLanguage("fr")">Français</a> | <a class="govuk-link" href="@routes.LanguageController.switchToLanguage("en")">English</a></div>
       </div>
     </div>
 

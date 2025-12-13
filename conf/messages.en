@@ -195,6 +195,7 @@ sourCitation.see.event = See Event
 sourCitation.see.individual = See Individual
 sourCitation.see.family = See Family
 sourCitation.not.attached = Source not attached to anything
+sourCitation.title = My family tree
 
 surnames.individuals = {0} Individual{1}
 surnames.individual.in.year = {0} Individual{1} in {2}
@@ -225,3 +226,11 @@ add.family.database.hint = The database where the event is stored
 add.family.person1.description = Partner 1
 add.family.person2.description = Partner 2
 add.family.button = Create new family
+
+index.title = My family tree
+
+mediaList.title = My family tree
+
+addDatabase.title = My family tree
+
+defaultTitle = My family tree

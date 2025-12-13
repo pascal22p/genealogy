@@ -1,0 +1,27 @@
+@this()
+
+@(langCode: String)
+
+<nav class="hmrc-service-navigation-language-select" aria-label="Language switcher">
+    <ul class="hmrc-service-navigation-language-select__list">
+        @if(langCode == "en") {
+            <li class="hmrc-service-navigation-language-select__list-item">
+                <a href="@routes.LanguageController.switchToLanguage("fr")" hreflang="fr" lang="fr" rel="alternate" class="govuk-link govuk-service-navigation__link">
+                FR<span class="govuk-visually-hidden"> – Changer la langue en Français</span>
+                </a>
+            </li>
+            <li class="hmrc-service-navigation-language-select__list-item">
+                <span aria-current="true">EN</span>
+            </li>
+        } else {
+            <li class="hmrc-service-navigation-language-select__list-item">
+                <span aria-current="true">FR</span>
+            </li>
+            <li class="hmrc-service-navigation-language-select__list-item">
+                <a href="@routes.LanguageController.switchToLanguage("en")" hreflang="en" lang="en" rel="alternate" class="govuk-link govuk-service-navigation__link">
+                EN<span class="govuk-visually-hidden"> – Change the language to English</span>
+                </a>
+            </li>
+        }
+    </ul>
+</nav>
