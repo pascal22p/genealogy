@@ -3,7 +3,6 @@ package services
 import javax.inject.Inject
 import javax.inject.Singleton
 
-import scala.collection.mutable
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
@@ -11,9 +10,7 @@ import cats.implicits.*
 import config.AppConfig
 import models.EventType.UnknownEvent
 import models.Events
-import models.Family
 import models.LoggingWithRequest
-import models.Person
 import models.ResnType.PrivacyResn
 import models.Tree
 import play.api.mvc.Request

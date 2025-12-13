@@ -10,9 +10,7 @@ import scala.sys.process.ProcessLogger
 
 import config.AppConfig
 import models.AuthenticatedRequest
-import models.Family
 import models.LoggingWithRequest
-import models.Person
 import models.Tree
 import play.api.i18n.Messages
 import views.txt.dotTemplates.DotMainView
