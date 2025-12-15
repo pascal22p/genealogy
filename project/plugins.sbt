@@ -9,6 +9,6 @@ addSbtPlugin("org.scoverage"       % "sbt-scoverage"            % "2.4.2")
 
 addSbtPlugin("org.wartremover" % "sbt-wartremover" % "3.4.1")
 
-addSbtPlugin("ch.epfl.scala" % "sbt-scalafix" % "0.14.4")
+addSbtPlugin("ch.epfl.scala" % "sbt-scalafix" % "0.14.5")
 
 addSbtPlugin("com.github.sbt" % "sbt-git" % "2.1.0")
