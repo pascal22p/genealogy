@@ -5,7 +5,7 @@ object LibDependencies {
   val libraryDependenciesCompile: Seq[ModuleID] = Seq(
     guice,
     jdbc,
-    "org.mariadb.jdbc"        %  "mariadb-java-client" % "3.5.6",
+    "org.mariadb.jdbc"        %  "mariadb-java-client" % "3.5.7",
     "org.playframework.anorm" %% "anorm"               % "2.8.1",
     "org.typelevel"           %% "cats-core"           % "2.13.0",
     "org.mindrot"             %  "jbcrypt"             % "0.4",
