@@ -7,54 +7,66 @@ import scala.collection.concurrent.TrieMap
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
-import models.journeyCache.JourneyCache
-import models.journeyCache.JourneyCacheItem
+import models.forms.CaseClassForms
+import models.journeyCache.UserAnswers
+import models.journeyCache.UserAnswersItem
+import models.AuthenticatedRequest
 
 trait JourneyCacheRepository {
 
-  def get(journeyId: String)(implicit ec: ExecutionContext): Future[Option[JourneyCache]]
+  def get(implicit ec: ExecutionContext, request: AuthenticatedRequest[?]): Future[Option[UserAnswers]]
+
+  def get(
+      key: UserAnswersItem
+  )(implicit ec: ExecutionContext, request: AuthenticatedRequest[?]): Future[Option[key.Value]]
 
   def upsert(
-      journeyId: String,
-      key: JourneyCacheItem,
-      value: String
-  )(implicit ec: ExecutionContext): Future[JourneyCache]
+      key: UserAnswersItem,
+      value: CaseClassForms
+  )(implicit ec: ExecutionContext, request: AuthenticatedRequest[?]): Future[UserAnswers]
 
-  def clear(journeyId: String)(implicit ec: ExecutionContext): Future[Unit]
+  def clear(implicit ec: ExecutionContext, request: AuthenticatedRequest[?]): Future[Unit]
 }
 
 @Singleton
 class InMemoryJourneyCacheRepository @Inject() () extends JourneyCacheRepository {
 
-  private val store: TrieMap[String, Map[JourneyCacheItem, String]] =
+  private val store: TrieMap[String, Map[UserAnswersItem, CaseClassForms]] =
     TrieMap.empty
 
-  override def get(
-      journeyId: String
-  )(implicit ec: ExecutionContext): Future[Option[JourneyCache]] =
+  private def journeyId(implicit request: AuthenticatedRequest[?]): String =
+    request.localSession.sessionId
+
+  override def get(implicit ec: ExecutionContext, request: AuthenticatedRequest[?]): Future[Option[UserAnswers]] =
     Future.successful {
       store.get(journeyId).map { data =>
-        JourneyCache(journeyId, data)
+        UserAnswers(journeyId, data)
       }
     }
 
+  def get(
+      key: UserAnswersItem
+  )(implicit ec: ExecutionContext, request: AuthenticatedRequest[?]): Future[Option[key.Value]] = {
+    get.map {
+      case Some(userAnswers) => userAnswers.get(key)
+      case _                 => None
+    }
+  }
+
   override def upsert(
-      journeyId: String,
-      key: JourneyCacheItem,
-      value: String
-  )(implicit ec: ExecutionContext): Future[JourneyCache] =
+      key: UserAnswersItem,
+      value: CaseClassForms
+  )(implicit ec: ExecutionContext, request: AuthenticatedRequest[?]): Future[UserAnswers] =
     Future.successful {
       val updatedData =
         store.getOrElse(journeyId, Map.empty) + (key -> value)
 
       store.put(journeyId, updatedData)
 
-      JourneyCache(journeyId, updatedData)
+      UserAnswers(journeyId, updatedData)
     }
 
-  override def clear(
-      journeyId: String
-  )(implicit ec: ExecutionContext): Future[Unit] =
+  override def clear(implicit ec: ExecutionContext, request: AuthenticatedRequest[?]): Future[Unit] =
     Future.successful {
       store.remove(journeyId)
       ()

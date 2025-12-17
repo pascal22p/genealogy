@@ -8,7 +8,7 @@ import play.api.data.Forms.text
 final case class DatabaseForm(
     name: String,
     description: String
-) {
+) extends CaseClassForms {
   def toGenealogyDatabase: GenealogyDatabase = {
     GenealogyDatabase(
       0,

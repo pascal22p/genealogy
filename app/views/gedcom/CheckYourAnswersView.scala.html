@@ -1,4 +1,4 @@
-@import models.journeyCache.JourneyCacheItem
+@import models.journeyCache.*
 
 @this(
     main: Main,
@@ -6,27 +6,34 @@
     formWithCSRF: FormWithCSRF
 )
 
-@(answers: Map[JourneyCacheItem, String])(implicit messages: Messages, request: AuthenticatedRequest[?])
+@(answers: JourneyCache)(implicit messages: Messages, request: AuthenticatedRequest[?])
+
+@gedcomPath = @{
+    answers.get(GedcomPath).map { form =>
+        SummaryListRow(
+            key = Key(Text(messages(GedcomPath.name))),
+            value = Value(Text(form.selectedFile)),
+            classes = "govuk-summary-list__row--no-border govuk-summary-list__row--no-actions",
+            actions = Some(Actions(
+                items = Seq(
+                    ActionItem(
+                        href = GedcomPath.page.url,
+                        content = Text(messages("Change"))
+                    )
+                )
+            ))
+        )
+    }
+}
+
 
 @main(1, None, title = messages("importGedcom.checkYourAnswers.title")) {
 
     @govukSummaryList(
         SummaryList(
-            rows = answers.map { case (key, value) =>
-                    SummaryListRow(
-                        key = Key(Text(messages(key.name))),
-                        value = Value(Text(value)),
-                        classes = "govuk-summary-list__row--no-border govuk-summary-list__row--no-actions",
-                        actions = Some(Actions(
-                            items = Seq(
-                                ActionItem(
-                                    href = key.page.url,
-                                    content = Text(messages("Change"))
-                                )
-                            )
-                        ))
-                    )
-                }.toSeq,
+            rows = Seq(
+                gedcomPath
+            ).flatten,
             card = Some(Card(
                 title = Some(CardTitle(content = Text("Check your answers"))),
                 actions = None

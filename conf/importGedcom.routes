@@ -3,6 +3,8 @@ GET     /                                      controllers.gedcom.ImportGedcomCo
 GET     /list                                  controllers.gedcom.ImportGedcomController.showGedcomList
 POST    /list                                  controllers.gedcom.ImportGedcomController.gedcomListOnSubmit
 
+GET     /gedcom-stats                          controllers.gedcom.ImportGedcomController.gedcomStats
+
 GET     /ask-new-database                      controllers.gedcom.ImportGedcomController.showNewDatabaseQuestion
 POST    /ask-new-database                      controllers.gedcom.ImportGedcomController.newDatabaseQuestionOnSubmit
 

@@ -28,11 +28,12 @@ class GedcomImportService @Inject() (
 ) {
 
   def gedcom2sql(gedcomString: String, dbId: Int): Future[Boolean] = Future {
-    val nodes = gedcomCommonParser.getTree(gedcomString)
-    val sqls  = convertTree2SQL(nodes, dbId)
+    val nodes   = gedcomCommonParser.getTree(gedcomString)
+    val sqlsIor = convertTree2SQL(nodes, dbId)
 
     db.withTransaction { implicit conn =>
-      sqls
+      sqlsIor
+        .getOrElse(List.empty)
         .map { sql =>
           sql.execute()
         }
@@ -57,7 +58,7 @@ class GedcomImportService @Inject() (
 
   val commitTransaction: List[SimpleSql[Row]] = List(SQL("COMMIT;").on())
 
-  def convertTree2SQL(nodes: List[GedcomNode], base: Int): List[SimpleSql[Row]] = {
+  def convertTree2SQL(nodes: List[GedcomNode], base: Int): Ior[List[String], List[SimpleSql[Row]]] = {
     val indisIor: Ior[List[String], List[GedcomIndiBlock]] = nodes
       .filter(_.name == "INDI")
       .map(gedcomIndividualParser.readIndiBlock)
@@ -199,7 +200,10 @@ class GedcomImportService @Inject() (
       println(warning)
     }
 
-    startTransaction ++ indiSqls ++ individualEventsSql ++ familySqls ++ familyEventsSql ++ commitTransaction
+    Ior.Both(
+      warnings,
+      startTransaction ++ indiSqls ++ individualEventsSql ++ familySqls ++ familyEventsSql ++ commitTransaction
+    )
   }
 
 }

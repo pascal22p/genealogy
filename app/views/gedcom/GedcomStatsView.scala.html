@@ -1,0 +1,35 @@
+@import views.html.components.Block
+@import helper._
+@import uk.gov.hmrc.govukfrontend.views.Implicits.*
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits.*
+@import uk.gov.hmrc.hmrcfrontend.views.Implicits.*
+
+@this(
+    main: Main,
+    block: Block
+)
+
+@(warnings: List[String])(implicit request: AuthenticatedRequest[?], messages: Messages)
+
+@main(1, None) {
+
+    <a href="@controllers.gedcom.routes.ImportGedcomController.showNewDatabaseQuestion.url" role="button" class="govuk-button" data-module="govuk-button">
+        Continue
+    </a>
+
+    @block("Gedcom contents") {
+        <ul class="govuk-list">
+            <li>
+                Individuals
+            </li>
+        </ul>
+    }
+
+    @block("Warnings") {
+        <ul class="govuk-list">
+            @for(warning <- warnings) {
+                <li>@warning</li>
+            }
+        </ul>
+    }
+}

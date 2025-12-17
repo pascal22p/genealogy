@@ -16,15 +16,20 @@ import play.api.i18n.*
 import play.api.mvc.*
 import play.api.mvc.AnyContent
 import config.AppConfig
+import models.forms.extensions.FillFormExtension.filledWith
 import models.forms.DatabaseForm
 import models.forms.GedcomListForm
 import models.forms.TrueOrFalseForm
 import models.journeyCache.*
-import models.journeyCache.JourneyValidation.validate
+import models.journeyCache.GedcomPath
 import repositories.JourneyCacheRepository
+import services.gedcom.GedcomCommonParser
+import services.gedcom.GedcomImportService
+import utils.ReadFile
 import views.html.add.AddDatabase
 import views.html.gedcom.CheckYourAnswersView
 import views.html.gedcom.GedcomListView
+import views.html.gedcom.GedcomStatsView
 import views.html.gedcom.NewDatabaseQuestionView
 
 @Singleton
@@ -32,7 +37,11 @@ class ImportGedcomController @Inject() (
     authJourney: AuthJourney,
     journeyCacheRepository: JourneyCacheRepository,
     appConfig: AppConfig,
+    readFile: ReadFile,
+    gedcomCommonParser: GedcomCommonParser,
+    gedcomImportService: GedcomImportService,
     gedcomListView: GedcomListView,
+    gedcomStatsView: GedcomStatsView,
     newDatabaseQuestionView: NewDatabaseQuestionView,
     addDatabaseView: AddDatabase,
     checkYourAnswersView: CheckYourAnswersView,
@@ -65,8 +74,10 @@ class ImportGedcomController @Inject() (
 
   def showGedcomList: Action[AnyContent] = authJourney.authWithAdminRight.async {
     implicit request: AuthenticatedRequest[AnyContent] =>
-      val form = GedcomListForm.form
-      Future.successful(Ok(gedcomListView(form, listGedcomFiles)))
+      journeyCacheRepository.get(GedcomPath).map { defaults =>
+        val form = GedcomListForm.form(appConfig.uploadPath).filledWith(defaults)
+        Ok(gedcomListView(form, listGedcomFiles))
+      }
   }
 
   def gedcomListOnSubmit: Action[AnyContent] = authJourney.authWithAdminRight.async {
@@ -76,28 +87,40 @@ class ImportGedcomController @Inject() (
       }
 
       val successFunction: GedcomListForm => Future[Result] = { (dataForm: GedcomListForm) =>
-        val basePath = Paths.get(appConfig.uploadPath)
-        val sanitise = s"./${basePath.resolve(dataForm.selectedFile).normalize()}"
-        if (sanitise.startsWith(s"$basePath") && Files.exists(Paths.get(sanitise))) {
-          // val gedcomTxt = readFile.asString(sanitise)
-          // val nodes     = gedcomCommonParser.getTree(gedcomTxt)
-          // val sqls      = gedcomImportService.convertTree2SQL(nodes, 4)
-          journeyCacheRepository.upsert(request.localSession.sessionId, GedcomPath, sanitise).map { _ =>
-            Redirect(controllers.gedcom.routes.ImportGedcomController.showNewDatabaseQuestion)
-          }
-        } else {
-          throw new IllegalArgumentException("Invalid file path")
+        journeyCacheRepository.upsert(GedcomPath, dataForm).map { _ =>
+          Redirect(controllers.gedcom.routes.ImportGedcomController.gedcomStats)
         }
       }
 
-      val formValidationResult = GedcomListForm.form.bindFromRequest()
+      val formValidationResult = GedcomListForm.form(appConfig.uploadPath).bindFromRequest()
       formValidationResult.fold(errorFunction, successFunction)
+  }
+
+  def gedcomStats: Action[AnyContent] = authJourney.authWithAdminRight.async {
+    implicit request: AuthenticatedRequest[AnyContent] =>
+      journeyCacheRepository.get(GedcomPath).map {
+        case None                 => Redirect(controllers.gedcom.routes.ImportGedcomController.startJourney)
+        case Some(gedcomListForm) =>
+          val basePath = Paths.get(appConfig.uploadPath)
+          val sanitise = s"./${basePath.resolve(gedcomListForm.selectedFile).normalize()}"
+          if (sanitise.startsWith(s"$basePath") && Files.exists(Paths.get(sanitise))) {
+            val gedcomTxt = readFile.asString(sanitise)
+            val nodes     = gedcomCommonParser.getTree(gedcomTxt)
+            val sqls      = gedcomImportService.convertTree2SQL(nodes, 4)
+
+            Ok(gedcomStatsView(sqls.swap.getOrElse(List.empty)))
+          } else {
+            InternalServerError("Gedcom file path should be valid")
+          }
+      }
   }
 
   def showNewDatabaseQuestion: Action[AnyContent] = authJourney.authWithAdminRight.async {
     implicit request: AuthenticatedRequest[AnyContent] =>
-      val form = TrueOrFalseForm.trueOrFalseForm
-      Future.successful(Ok(newDatabaseQuestionView(form)))
+      journeyCacheRepository.get(NewDatabaseQuestion).map { defaults =>
+        val form = TrueOrFalseForm.trueOrFalseForm.filledWith(defaults)
+        Ok(newDatabaseQuestionView(form))
+      }
   }
 
   def newDatabaseQuestionOnSubmit: Action[AnyContent] = authJourney.authWithAdminRight.async {
@@ -108,7 +131,7 @@ class ImportGedcomController @Inject() (
 
       val successFunction: TrueOrFalseForm => Future[Result] = { (dataForm: TrueOrFalseForm) =>
         journeyCacheRepository
-          .upsert(request.localSession.sessionId, NewDatabaseQuestion, s"${dataForm.trueOrFalse}")
+          .upsert(NewDatabaseQuestion, dataForm)
           .map { _ =>
             if (dataForm.trueOrFalse) {
               Redirect(controllers.gedcom.routes.ImportGedcomController.addNewDatabase)
@@ -124,8 +147,10 @@ class ImportGedcomController @Inject() (
 
   def addNewDatabase: Action[AnyContent] = authJourney.authWithAdminRight.async {
     implicit request: AuthenticatedRequest[AnyContent] =>
-      val form = DatabaseForm.databaseForm
-      Future.successful(Ok(addDatabaseView(form, newDatabaseOnSubmitLink)))
+      journeyCacheRepository.get(NewDatabase).map { defaults =>
+        val form = DatabaseForm.databaseForm.filledWith(defaults)
+        Ok(addDatabaseView(form, newDatabaseOnSubmitLink))
+      }
   }
 
   def addNewDatabaseOnSubmit: Action[AnyContent] = authJourney.authWithAdminRight.async {
@@ -136,12 +161,7 @@ class ImportGedcomController @Inject() (
 
       val successFunction: DatabaseForm => Future[Result] = { (dataForm: DatabaseForm) =>
         for {
-          _ <- journeyCacheRepository.upsert(request.localSession.sessionId, NewDatabaseName, s"${dataForm.name}")
-          _ <- journeyCacheRepository.upsert(
-            request.localSession.sessionId,
-            NewDatabaseDescription,
-            s"${dataForm.description}"
-          )
+          _ <- journeyCacheRepository.upsert(NewDatabase, dataForm)
         } yield Redirect(controllers.gedcom.routes.ImportGedcomController.checkYourAnswersImportGedcom)
       }
 
@@ -151,12 +171,10 @@ class ImportGedcomController @Inject() (
 
   def checkYourAnswersImportGedcom: Action[AnyContent] = authJourney.authWithAdminRight.async {
     implicit request: AuthenticatedRequest[AnyContent] =>
-      journeyCacheRepository.get(request.localSession.sessionId).map {
+      journeyCacheRepository.get.map {
         case None        => Redirect(controllers.gedcom.routes.ImportGedcomController.showGedcomList)
         case Some(cache) =>
-          val validatedAnswers = cache.data.filterNot((key, _) => cache.data.validate.contains(key))
-
-          Ok(checkYourAnswersView(validatedAnswers))
+          Ok(checkYourAnswersView(cache.validated))
       }
   }
 
