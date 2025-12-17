@@ -4,9 +4,12 @@ genealogy = Genealogie
 
 Address = Addresse
 Add = Ajouter
+Admin = Admin
 Age = Age
 Ascendants = Ascendants
 Cause = Cause
+Change = Changer
+Continue = Continuer
 Database = Base de données
 Date = Date
 Delete = Supprimer
@@ -279,3 +282,5 @@ gedcom.newDatabase.question.title = Où souhaitez-vous que les données soient i
 gedcom.newDatabase.question.yes = Dans une nouvelle base de donnés
 gedcom.newDatabase.question.no = Dans une base de données existante
 gedcom.newDatabase.question.hint = Choisissez si les données doivent être importées dans une nouvelle base de données à créer ou dans une base de données existante.
+
+importGedcom.checkYourAnswers.title = Importer un fichier Gedcom

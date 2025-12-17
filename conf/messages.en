@@ -2,11 +2,14 @@
 
 genealogy = Genealogy
 
+Admin = Admin
 Address = Address
 Add = Add
 Age = Age
 Ascendants = Ascendants
 Cause = Cause
+Change = Change
+Continue = Continue
 Database = Database
 Date = Date
 Delete = Delete
@@ -242,4 +245,4 @@ gedcom.newDatabase.question.yes = In a new database
 gedcom.newDatabase.question.no = In an existing database
 gedcom.newDatabase.question.hint = Choose if the data need to be imported in a new database to be created or an existing one
 
-
+importGedcom.checkYourAnswers.title = Import a Gedcom file
