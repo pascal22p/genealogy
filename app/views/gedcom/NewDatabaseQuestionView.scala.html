@@ -1,0 +1,65 @@
+@import views.html.components.Block
+@import models.forms.TrueOrFalseForm
+@import uk.gov.hmrc.govukfrontend.views.Implicits.*
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits.*
+@import uk.gov.hmrc.hmrcfrontend.views.Implicits.*
+@import controllers.gedcom.routes
+
+@this(
+    main: Main,
+    block: Block,
+    govukRadios: GovukRadios,
+    govukButton: GovukButton,
+    govukErrorSummary: GovukErrorSummary
+)
+
+@(form: Form[TrueOrFalseForm])(implicit request: AuthenticatedRequest[?], messages: Messages)
+
+@main(1, None) {
+
+
+@block("Where do you want the data to be imported?") {
+    @if(form.hasGlobalErrors) {
+        @for(error <- form.globalErrors) {
+           <span class="error-message">@error.format(messages)</span>
+        }
+    }
+
+    @if(form.errors.nonEmpty) {
+        @govukErrorSummary(ErrorSummary().withFormErrorsAsHtml(form))
+    }
+
+    @helper.form(action = controllers.gedcom.routes.ImportGedcomController.newDatabaseQuestionOnSubmit ) {
+        @helper.CSRF.formField
+
+        @govukRadios(Radios(
+            fieldset = Some(Fieldset(
+                legend =
+                    Some(Legend(
+                        content = Text(s"Choose if the data need to be imported in a new database to be created or an existing one"),
+                        isPageHeading = true
+                    ))
+            )),
+            hint = None,
+            items = Seq(
+                RadioItem(
+                    content = Text("In a new database"),
+                    value = Some("true")
+                ),
+                RadioItem(
+                    content = Text("In an existing database"),
+                    value = Some("false")
+                )
+            )
+        ).withFormField(form("trueOrFalse")))
+
+        @govukButton(Button(
+            content = Text("Continue"),
+            name = Some("submit"),
+            href = None,
+            inputType = Some("submit")
+        ))
+    }
+}
+
+}

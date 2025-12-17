@@ -1,0 +1,18 @@
+@import uk.gov.hmrc.govukfrontend.views.Implicits.*
+
+@this(
+        main: Main,
+)
+
+@()(implicit request: AuthenticatedRequest[?], messages: Messages)
+
+@main(1, None, messages("Admin")) {
+<ul class="govuk-list">
+  <li>
+    <a class="govuk-link" href="@controllers.admin.routes.ProblemsController.onload(1).url">Problems</a>
+  </li>
+  <li>
+    <a class="govuk-link" href="@controllers.gedcom.routes.ImportGedcomController.startJourney.url">Import gedcom</a>
+  </li>
+</ul>
+}

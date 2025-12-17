@@ -6,6 +6,7 @@ import anorm.Row
 import anorm.SQL
 import anorm.SimpleSql
 import cats.data.Ior
+import cats.implicits.toTraverseOps
 import com.google.inject.Singleton
 import models.gedcom.GedComPersonalNameStructure
 import models.gedcom.GedcomEventBlock
@@ -92,12 +93,31 @@ class GedcomIndividualParser @Inject() (
           result.combine(gedcomEventParser.readEventBlock(node).map(List(_)))
       }
 
-    val allTagList = List("RESN", "SEX", "NAME") ++ eventsIor.right.fold(List.empty[String])(_.map(_.tag))
+    val famsLinksIor: Ior[List[String], List[Int]] = node.children
+      .filter(_.name == "FAMS")
+      .map { node =>
+        node.xref.fold(
+          Ior.left(List(s"line ${node.lineNumber}: `${node.line}` FAMS in INDI is invalid xref is expected"))
+        )(xref => Ior.right(gedcomHashIdTable.getFamilyIdFromString(xref)))
+      }
+      .sequence
+
+    val famcLinksIor: Ior[List[String], List[Int]] = node.children
+      .filter(_.name == "FAMC")
+      .map { node =>
+        node.xref.fold(
+          Ior.left(List(s"line ${node.lineNumber}: `${node.line}` FAMS in INDI is invalid xref is expected"))
+        )(xref => Ior.right(gedcomHashIdTable.getFamilyIdFromString(xref)))
+      }
+      .sequence
+
+    val allTagList =
+      List("RESN", "SEX", "NAME", "FAMS", "FAMC") ++ eventsIor.right.fold(List.empty[String])(_.map(_.tag))
 
     val ignoredContent: Ior[List[String], Map[String, String]] = node.children
       .filterNot(child => allTagList.contains(child.name))
       .map { node =>
-        Ior.Left(List(s"Line ${node.lineNumber}: `${node.line}` is not supported"))
+        Ior.Left(List(s"Line ${node.lineNumber}: `${node.line}` in individual is not supported"))
       }
       .foldLeft(Ior.Right(Map.empty): Ior[List[String], Map[String, String]]) {
         case (result, element) =>
@@ -105,18 +125,22 @@ class GedcomIndividualParser @Inject() (
       }
 
     for {
-      name   <- nameStructure
-      resn   <- resnIor
-      sex    <- sexIor
-      events <- eventsIor
-      _      <- ignoredContent
+      name      <- nameStructure
+      resn      <- resnIor
+      sex       <- sexIor
+      events    <- eventsIor
+      famcLinks <- famcLinksIor
+      famsLinks <- famsLinksIor
+      _         <- ignoredContent
     } yield {
       GedcomIndiBlock(
         name,
         resn.getOrElse("RESN", None),
         sex.getOrElse("SEX", ""),
         gedcomHashIdTable.getIndividualIdFromString(xref),
-        events
+        events,
+        famcLinks,
+        famsLinks
       )
     }
 
@@ -154,7 +178,7 @@ class GedcomIndividualParser @Inject() (
       val ignoredContent: List[Ior[List[String], Map[String, String]]] = node.children
         .filterNot(child => tagList.contains(child.name))
         .map { node =>
-          Ior.Left(List(s"Line ${node.lineNumber}: `${node.line}` is not supported"))
+          Ior.Left(List(s"Line ${node.lineNumber}: `${node.line}` in name is not supported"))
         }
 
       val mergedContent: Ior[List[String], Map[String, String]] =

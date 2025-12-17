@@ -26,25 +26,19 @@
     ))
   }
 
-@loginOrlogout = @{
+@loginOrlogoutUrl = @{
     if(authenticatedRequest.localSession.sessionData.userData.isEmpty) {
-        Some(ServiceNavigationItem(
-            content = Text(messages("Login")),
-            href = s"${controllers.routes.SessionController.loginOnLoad().url}?returnUrl=${authenticatedRequest.request.uri}",
-            active = false,
-            current = false,
-            classes = "",
-            attributes = Map.empty
-        ))
+        s"${controllers.routes.SessionController.loginOnLoad().url}?returnUrl=${authenticatedRequest.request.uri}"
     } else {
-        Some(ServiceNavigationItem(
-            content = Text(messages("Logout")),
-            href = controllers.routes.SessionController.logoutOnLoad().url,
-            active = false,
-            current = false,
-            classes = "",
-            attributes = Map.empty
-        ))
+        controllers.routes.SessionController.logoutOnLoad().url
+    }
+}
+
+@loginOrlogoutText = @{
+    if(authenticatedRequest.localSession.sessionData.userData.isEmpty) {
+        messages("Login")
+    } else {
+        messages("Logout")
     }
 }
 
@@ -85,10 +79,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#0b0c0c">
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
     <link rel="icon" type="image/png" href="@routes.AssetsController.get("images/favicon.png")">
     <link rel="stylesheet" media="screen" href="@assetConfig.hmrcFrontendCssUrl">
-    <link rel="stylesheet" media="screen" href="@routes.AssetsController.get("stylesheets/main.css")">
     <script type="module" src="@{assetConfig.hmrcFrontendJsUrl}"></script>
+    <link rel="stylesheet" media="screen" href="@routes.AssetsController.get("stylesheets/main.css")">
 
     @if(authenticatedRequest.localSession.sessionData.userData.isDefined){
       @timeoutDialog
@@ -96,12 +94,28 @@
 
 </head>
 <body class="govuk-frontend-supported">
-    <a href="#main-content" class="govuk-skip-link" data-module="govuk-skip-link">Skip to main content</a>
-    <header>
+    <header class="govuk-header" data-module="govuk-header">
+        <div class="govuk-header__container govuk-heading-m">
+            <div class="govuk-grid-row">
+            <div class="govuk-grid-column-full">
+                <div class="govuk-width-container">
+                <div class="govuk-grid-column-one-half" style=" padding-left:0">
+                    Parois.net - @messages("genealogy")
+                </div>
+                <div class="govuk-grid-column-one-half" style="display: flex; justify-content: flex-end;padding-right:0">
+                    <a class="govuk-link hmrc-sign-out-nav__link govuk-!-text-align-right" href="@loginOrlogoutUrl">
+                        @loginOrlogoutText
+                    </a>
+                </div>
+            </div>
+            </div>
+            </div>
+        </div>
+
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-full">
         @govukServiceNavigation(ServiceNavigation(
-            serviceName = Some("Parois.net"),
+            serviceName = None,
             serviceUrl = Some("/"),
             navigation = Seq(
                 Some(ServiceNavigationItem(
@@ -112,18 +126,6 @@
                     classes = "",
                     attributes = Map.empty
                 )),
-                if(authenticatedRequest.localSession.sessionData.userData.fold(false)(_.isAdmin)) {
-                    Some(ServiceNavigationItem(
-                        content = Text("Problems"),
-                        href = controllers.routes.ProblemsController.onload(dbId).url,
-                        active = false,
-                        current = false,
-                        classes = "",
-                        attributes = Map.empty
-                    ))
-                } else {
-                    None
-                },
                 personOption.map { person =>
                     ServiceNavigationItem(
                         content = Text(messages("person.details")),
@@ -164,7 +166,18 @@
                     attributes = Map.empty
                   )
                 },
-                loginOrlogout
+                if(authenticatedRequest.localSession.sessionData.userData.fold(false)(_.isAdmin)) {
+                    Some(ServiceNavigationItem(
+                        content = Text("Admin"),
+                        href = controllers.admin.routes.ProblemsController.onload(dbId).url,
+                        active = false,
+                        current = false,
+                        classes = "",
+                        attributes = Map.empty
+                    ))
+                } else {
+                    None
+                }
             ).flatten,
             navigationClasses = "",
             navigationId = "navigation",

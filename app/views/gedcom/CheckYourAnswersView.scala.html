@@ -1,0 +1,43 @@
+@import models.journeyCache.JourneyCacheItem
+
+@this(
+    main: Main,
+    govukSummaryList: GovukSummaryList,
+    formWithCSRF: FormWithCSRF
+)
+
+@(answers: Map[JourneyCacheItem, String])(implicit messages: Messages, request: AuthenticatedRequest[?])
+
+@main(1, None, title = messages("Import a Gedcom file")) {
+
+    @govukSummaryList(
+        SummaryList(
+            rows = answers.map { case (key, value) =>
+                    SummaryListRow(
+                        key = Key(Text(messages(key.name))),
+                        value = Value(Text(value)),
+                        classes = "govuk-summary-list__row--no-border govuk-summary-list__row--no-actions",
+                        actions = Some(Actions(
+                            items = Seq(
+                                ActionItem(
+                                    href = key.page.url,
+                                    content = Text(messages("Change"))
+                                )
+                            )
+                        ))
+                    )
+                }.toSeq,
+            card = Some(Card(
+                title = Some(CardTitle(content = Text("Check your answers"))),
+                actions = None
+            )),
+            classes = ""
+        )
+    )
+
+    @formWithCSRF(controllers.gedcom.routes.ImportGedcomController.checkYourAnswersImportGedcomOnSubmit) {
+        <button class="govuk-button" type="submit">
+            Confirm and continue
+        </button>
+    }
+}

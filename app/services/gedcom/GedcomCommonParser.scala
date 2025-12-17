@@ -11,7 +11,7 @@ import models.gedcom.GedcomNode
 @Singleton
 class GedcomCommonParser @Inject() () {
   private val lineRegexp: Regex             = "^([0-9]+)\\s+.*".r
-  private val tagAndXrefRegexp: Regex       = "^\\s*[0-9]+\\s+([A-Za-z]+)\\s*(@([^@]+)@|)\\s*(.+|)".r
+  private val tagAndXrefRegexp: Regex       = "^\\s*[0-9]+\\s+([_A-Za-z]+)\\s*(@([^@]+)@|)\\s*(.+|)".r
   private val level0TagAndXrefRegexp: Regex = "^\\s*0\\s+(@([^@]+)@|)\\s*([A-Za-z]+).*".r
 
   def getBlocks(gedcomString: String, level: Int = 0): List[(Int, String)] = {

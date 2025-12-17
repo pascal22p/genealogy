@@ -1,0 +1,64 @@
+@import views.html.components.Block
+@import helper._
+@import uk.gov.hmrc.govukfrontend.views.Implicits.*
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits.*
+@import uk.gov.hmrc.hmrcfrontend.views.Implicits.*
+@import models.forms.GedcomListForm
+@import config.AppConfig
+
+@this(
+    main: Main,
+    block: Block,
+    appConfig: AppConfig,
+    govukButton: GovukButton,
+    govukRadios: GovukRadios,
+    govukErrorSummary: GovukErrorSummary
+)
+
+@(form: Form[GedcomListForm], gedcomFiles: List[String])(implicit request: AuthenticatedRequest[?], messages: Messages)
+
+@main(1, None) {
+
+    @block("Select a Gedcom file") {
+
+        @if(form.hasErrors) {
+            @govukErrorSummary(ErrorSummary(
+                errorList = form.errors.map { error =>
+                    ErrorLink(
+                        href = Some(s"#${error.key}"),
+                        content = Text(messages(error.message))
+                    )
+                },
+                title = Text("There is a problem")
+            ))
+        }
+
+        @helper.form(action = controllers.gedcom.routes.ImportGedcomController.gedcomListOnSubmit ) {
+            @helper.CSRF.formField
+
+            @govukRadios(Radios(
+                fieldset = Some(Fieldset(
+                    legend = Some(Legend(
+                        content = Text("Choose a file"),
+                        classes = "govuk-fieldset__legend--m"
+                    ))
+                )),
+                name = "selectedFile",
+                items = gedcomFiles.map { file =>
+                    RadioItem(
+                        content = Text(file.replace(appConfig.uploadPath, "")),
+                        value = Some(file.replace(appConfig.uploadPath, "")),
+                        checked = form("selectedFile").value.contains(file)
+                    )
+                },
+                errorMessage = form("selectedFile").error.map(err =>
+                    ErrorMessage(content = Text(messages(err.message)))
+                )
+            ).withFormField(form("selectedFile")))
+
+            @govukButton(Button(
+                content = Text("Continue")
+            ))
+        }
+    }
+}

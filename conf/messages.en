@@ -1,5 +1,7 @@
 # https://www.playframework.com/documentation/latest/ScalaI18N
 
+genealogy = Genealogy
+
 Address = Address
 Add = Add
 Age = Age
@@ -23,7 +25,7 @@ Medias = Medias
 Menu = Menu
 Name = Name
 Partner = Partner
-person.details = Person details
+person.details = Details
 Place = Place
 resn = Privacy restriction
 sex = Sex
@@ -234,3 +236,10 @@ mediaList.title = My family tree
 addDatabase.title = My family tree
 
 defaultTitle = My family tree
+
+gedcom.newDatabase.question.title = Where do you want the data to be imported?
+gedcom.newDatabase.question.yes = In a new database
+gedcom.newDatabase.question.no = In an existing database
+gedcom.newDatabase.question.hint = Choose if the data need to be imported in a new database to be created or an existing one
+
+

@@ -7,15 +7,14 @@ import play.api.data.Forms.text
 
 final case class DatabaseForm(
     name: String,
-    description: String,
-    medias: String
+    description: String
 ) {
   def toGenealogyDatabase: GenealogyDatabase = {
     GenealogyDatabase(
       0,
       name,
       description,
-      Some(medias)
+      None
     )
   }
 
@@ -25,19 +24,17 @@ object DatabaseForm {
 
   def unapply(
       u: DatabaseForm
-  ): Some[(String, String, String)] = Some(
+  ): Some[(String, String)] = Some(
     (
       u.name,
-      u.description,
-      u.medias
+      u.description
     )
   )
 
   val databaseForm: Form[DatabaseForm] = Form(
     mapping(
       "name"        -> text,
-      "description" -> text,
-      "medias"      -> text
+      "description" -> text
     )(DatabaseForm.apply)(DatabaseForm.unapply)
   )
 }

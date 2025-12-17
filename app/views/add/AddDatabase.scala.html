@@ -15,12 +15,12 @@
         govukErrorSummary: GovukErrorSummary
 )
 
-@(databaseForm: Form[DatabaseForm])(implicit request: AuthenticatedRequest[?], messages: Messages)
+@(databaseForm: Form[DatabaseForm], onSubmit: Call)(implicit request: AuthenticatedRequest[?], messages: Messages)
 
 @main(1, None, title = messages("addDatabase.title")) {
 
 
-  @block("Add new database") {
+  @block("Add a new database") {
 
     @if(databaseForm.hasGlobalErrors) {
         @for(error <- databaseForm.globalErrors) {
@@ -32,7 +32,7 @@
         @govukErrorSummary(ErrorSummary().withFormErrorsAsHtml(databaseForm))
     }
     
-    @helper.form(action = controllers.add.routes.AddDatabaseController.onSubmit ) {
+    @helper.form(action = onSubmit ) {
         @helper.CSRF.formField
         @govukInput(
             Input(
@@ -52,7 +52,7 @@
         @govukButton(
             Button(
                 element = Some("button"),
-                content = Text(messages("Submit"))
+                content = Text(messages("Continue"))
             )
         )
     }
