@@ -1,7 +1,5 @@
 package models.journeyCache
 
-import models.forms.UserAnswersItem
-
 object JourneyValidation {
 
   extension (answers: Map[UserAnswersKey[?], UserAnswersItem]) {

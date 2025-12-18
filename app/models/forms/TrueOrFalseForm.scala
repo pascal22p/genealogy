@@ -1,5 +1,6 @@
 package models.forms
 
+import models.journeyCache.UserAnswersItem
 import play.api.data.Form
 import play.api.data.Forms.boolean
 import play.api.data.Forms.mapping

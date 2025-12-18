@@ -7,8 +7,8 @@ import scala.collection.concurrent.TrieMap
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
-import models.forms.UserAnswersItem
 import models.journeyCache.UserAnswers
+import models.journeyCache.UserAnswersItem
 import models.journeyCache.UserAnswersKey
 import models.AuthenticatedRequest
 

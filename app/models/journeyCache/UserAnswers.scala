@@ -1,6 +1,5 @@
 package models.journeyCache
 
-import models.forms.UserAnswersItem
 import models.journeyCache.JourneyValidation.validate
 import models.journeyCache.UserAnswersKey
 import play.api.libs.json.Format

@@ -3,7 +3,6 @@ package models.journeyCache
 import models.forms.DatabaseForm
 import models.forms.GedcomListForm
 import models.forms.TrueOrFalseForm
-import models.forms.UserAnswersItem
 import play.api.libs.json.*
 import play.api.mvc.Call
 

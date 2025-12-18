@@ -3,8 +3,9 @@ package models.forms
 import java.nio.file.Files
 import java.nio.file.Paths
 
+import models.journeyCache.UserAnswersItem
 import play.api.data.*
-import play.api.data.validation._
+import play.api.data.validation.*
 import play.api.data.Forms.*
 
 final case class GedcomListForm(selectedFile: String) extends UserAnswersItem

@@ -1,7 +1,5 @@
 package models.journeyCache
 
-import models.forms.UserAnswersItem
-
 sealed trait ItemRequirements
 
 object ItemRequirements {
