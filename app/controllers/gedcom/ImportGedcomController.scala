@@ -20,8 +20,9 @@ import models.forms.extensions.FillFormExtension.filledWith
 import models.forms.DatabaseForm
 import models.forms.GedcomListForm
 import models.forms.TrueOrFalseForm
-import models.journeyCache.*
-import models.journeyCache.GedcomPath
+import models.journeyCache.UserAnswers
+import models.journeyCache.UserAnswersKey.*
+import play.api.libs.json.Json
 import repositories.JourneyCacheRepository
 import services.gedcom.GedcomCommonParser
 import services.gedcom.GedcomImportService
@@ -174,6 +175,9 @@ class ImportGedcomController @Inject() (
       journeyCacheRepository.get.map {
         case None        => Redirect(controllers.gedcom.routes.ImportGedcomController.showGedcomList)
         case Some(cache) =>
+          val jsonString = s"${Json.toJson(cache)}"
+          println(jsonString)
+          println(Json.parse(jsonString).as[UserAnswers])
           Ok(checkYourAnswersView(cache.validated))
       }
   }

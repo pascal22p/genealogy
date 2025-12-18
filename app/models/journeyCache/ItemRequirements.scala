@@ -1,14 +1,14 @@
 package models.journeyCache
 
-import models.forms.CaseClassForms
+import models.forms.UserAnswersItem
 
 sealed trait ItemRequirements
 
 object ItemRequirements {
   final case class Always() extends ItemRequirements
 
-  final case class IfCaseClassFormsIs(
-      item: UserAnswersItem,
-      predicate: CaseClassForms => Boolean
+  final case class IfCaseClassFormsIs[A <: UserAnswersItem](
+      item: UserAnswersKey[A],
+      predicate: UserAnswersItem => Boolean
   ) extends ItemRequirements
 }

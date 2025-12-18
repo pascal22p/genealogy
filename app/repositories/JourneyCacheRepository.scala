@@ -7,22 +7,22 @@ import scala.collection.concurrent.TrieMap
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
-import models.forms.CaseClassForms
+import models.forms.UserAnswersItem
 import models.journeyCache.UserAnswers
-import models.journeyCache.UserAnswersItem
+import models.journeyCache.UserAnswersKey
 import models.AuthenticatedRequest
 
 trait JourneyCacheRepository {
 
   def get(implicit ec: ExecutionContext, request: AuthenticatedRequest[?]): Future[Option[UserAnswers]]
 
-  def get(
-      key: UserAnswersItem
-  )(implicit ec: ExecutionContext, request: AuthenticatedRequest[?]): Future[Option[key.Value]]
+  def get[A <: UserAnswersItem](
+      key: UserAnswersKey[A]
+  )(implicit ec: ExecutionContext, request: AuthenticatedRequest[?]): Future[Option[A]]
 
   def upsert(
-      key: UserAnswersItem,
-      value: CaseClassForms
+      key: UserAnswersKey[?],
+      value: UserAnswersItem
   )(implicit ec: ExecutionContext, request: AuthenticatedRequest[?]): Future[UserAnswers]
 
   def clear(implicit ec: ExecutionContext, request: AuthenticatedRequest[?]): Future[Unit]
@@ -31,7 +31,7 @@ trait JourneyCacheRepository {
 @Singleton
 class InMemoryJourneyCacheRepository @Inject() () extends JourneyCacheRepository {
 
-  private val store: TrieMap[String, Map[UserAnswersItem, CaseClassForms]] =
+  private val store: TrieMap[String, Map[UserAnswersKey[?], UserAnswersItem]] =
     TrieMap.empty
 
   private def journeyId(implicit request: AuthenticatedRequest[?]): String =
@@ -44,9 +44,9 @@ class InMemoryJourneyCacheRepository @Inject() () extends JourneyCacheRepository
       }
     }
 
-  def get(
-      key: UserAnswersItem
-  )(implicit ec: ExecutionContext, request: AuthenticatedRequest[?]): Future[Option[key.Value]] = {
+  def get[A <: UserAnswersItem](
+      key: UserAnswersKey[A]
+  )(implicit ec: ExecutionContext, request: AuthenticatedRequest[?]): Future[Option[A]] = {
     get.map {
       case Some(userAnswers) => userAnswers.get(key)
       case _                 => None
@@ -54,8 +54,8 @@ class InMemoryJourneyCacheRepository @Inject() () extends JourneyCacheRepository
   }
 
   override def upsert(
-      key: UserAnswersItem,
-      value: CaseClassForms
+      key: UserAnswersKey[?],
+      value: UserAnswersItem
   )(implicit ec: ExecutionContext, request: AuthenticatedRequest[?]): Future[UserAnswers] =
     Future.successful {
       val updatedData =

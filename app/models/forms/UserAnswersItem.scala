@@ -1,3 +1,3 @@
 package models.forms
 
-trait CaseClassForms
+trait UserAnswersItem

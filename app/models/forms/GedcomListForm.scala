@@ -7,7 +7,7 @@ import play.api.data.*
 import play.api.data.validation._
 import play.api.data.Forms.*
 
-final case class GedcomListForm(selectedFile: String) extends CaseClassForms
+final case class GedcomListForm(selectedFile: String) extends UserAnswersItem
 
 object GedcomListForm {
   def unapply(

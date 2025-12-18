@@ -1,11 +1,11 @@
 package models.journeyCache
 
-import models.forms.CaseClassForms
+import models.forms.UserAnswersItem
 
 object JourneyValidation {
 
-  extension (answers: Map[UserAnswersItem, CaseClassForms]) {
-    def validate: List[UserAnswersItem] =
+  extension (answers: Map[UserAnswersKey[?], UserAnswersItem]) {
+    def validate: List[UserAnswersKey[?]] =
       answers.keys.flatMap { keyToCheck =>
         keyToCheck.requirement match {
           case ItemRequirements.IfCaseClassFormsIs(key, predicate) =>

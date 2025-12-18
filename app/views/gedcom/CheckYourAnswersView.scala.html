@@ -1,4 +1,5 @@
-@import models.journeyCache.*
+@import models.journeyCache.UserAnswersItem.*
+@import models.journeyCache.UserAnswers
 
 @this(
     main: Main,
@@ -6,12 +7,12 @@
     formWithCSRF: FormWithCSRF
 )
 
-@(answers: JourneyCache)(implicit messages: Messages, request: AuthenticatedRequest[?])
+@(answers: UserAnswers)(implicit messages: Messages, request: AuthenticatedRequest[?])
 
 @gedcomPath = @{
     answers.get(GedcomPath).map { form =>
         SummaryListRow(
-            key = Key(Text(messages(GedcomPath.name))),
+            key = Key(Text(messages(s"$GedcomPath"))),
             value = Value(Text(form.selectedFile)),
             classes = "govuk-summary-list__row--no-border govuk-summary-list__row--no-actions",
             actions = Some(Actions(

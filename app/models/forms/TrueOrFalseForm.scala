@@ -6,7 +6,7 @@ import play.api.data.Forms.mapping
 
 final case class TrueOrFalseForm(
     trueOrFalse: Boolean
-) extends CaseClassForms
+) extends UserAnswersItem
 
 object TrueOrFalseForm {
 
