@@ -1,5 +1,5 @@
-@import models.journeyCache.UserAnswers
-@import models.journeyCache.UserAnswersKey.GedcomPath
+@import models.journeyCache.UserAnswersKey
+@import uk.gov.hmrc.govukfrontend.views.html.components.SummaryListRow
 
 @this(
     main: Main,
@@ -7,34 +7,30 @@
     formWithCSRF: FormWithCSRF
 )
 
-@(answers: UserAnswers)(implicit messages: Messages, request: AuthenticatedRequest[?])
-
-@gedcomPath = @{
-    answers.get(GedcomPath).map { form =>
-        SummaryListRow(
-            key = Key(Text(messages(s"$GedcomPath"))),
-            value = Value(Text(form.selectedFile)),
-            classes = "govuk-summary-list__row--no-border govuk-summary-list__row--no-actions",
-            actions = Some(Actions(
-                items = Seq(
-                    ActionItem(
-                        href = GedcomPath.page.url,
-                        content = Text(messages("Change"))
-                    )
-                )
-            ))
-        )
-    }
-}
+@(answers: Map[UserAnswersKey[?], Map[String, String]])(implicit messages: Messages, request: AuthenticatedRequest[?])
 
 
 @main(1, None, title = messages("importGedcom.checkYourAnswers.title")) {
 
     @govukSummaryList(
         SummaryList(
-            rows = Seq(
-                gedcomPath
-            ).flatten,
+            rows = answers.flatMap { case (userAnswersKey, valuesMap) =>
+                valuesMap.map { case (key, value) =>
+                    SummaryListRow(
+                        key = Key(Text(messages(s"$userAnswersKey.$key"))),
+                        value = Value(Text(value)),
+                        classes = "govuk-summary-list__row--no-border govuk-summary-list__row--no-actions",
+                        actions = Some(Actions(
+                            items = Seq(
+                                ActionItem(
+                                    href = userAnswersKey.page.url,
+                                    content = Text(messages("Change"))
+                                )
+                            )
+                        ))
+                    )
+                }
+            }.toSeq,
             card = Some(Card(
                 title = Some(CardTitle(content = Text("Check your answers"))),
                 actions = None

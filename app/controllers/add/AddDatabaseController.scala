@@ -27,7 +27,7 @@ class AddDatabaseController @Inject() (
 ) extends BaseController
     with I18nSupport {
 
-  val onSubmitDestination: Call = controllers.add.routes.AddDatabaseController.onSubmit
+  private val onSubmitDestination: Call = controllers.add.routes.AddDatabaseController.onSubmit
 
   def showForm: Action[AnyContent] = authJourney.authWithAdminRight.async {
     implicit authenticatedRequest: AuthenticatedRequest[AnyContent] =>

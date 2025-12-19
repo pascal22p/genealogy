@@ -8,16 +8,20 @@ import play.api.mvc.Call
 
 enum UserAnswersKey[A <: UserAnswersItem](
     val page: Call,
-    val requirement: ItemRequirements
-)(using val format: OFormat[A]) {
+    val requirement: ItemRequirements,
+    val checkYourAnswerFormat: Option[OFormat[A]] = None // optional format for check your answers page.
+)(using val format: OFormat[A]) { // format used to serialize/deserialize A (not used currently). Also used as default if checkYourAnswerFormat is None.
 
+  /*
+  // Not needed currently, but kept for reference. Used to serialize UserAnswers to Json for storage
   @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
   def writeAsJson(value: UserAnswersItem): JsValue =
-    format.asInstanceOf[OFormat[UserAnswersItem]].writes(value)
+    format.writes(value.asInstanceOf[A])
 
-  @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
   def readFromJson(json: JsValue): JsResult[UserAnswersItem] =
-    format.asInstanceOf[OFormat[UserAnswersItem]].reads(json)
+    format.reads(json)
+
+   */
 
   case GedcomPath
       extends UserAnswersKey[GedcomListForm](
@@ -34,7 +38,7 @@ enum UserAnswersKey[A <: UserAnswersItem](
   case NewDatabase
       extends UserAnswersKey[DatabaseForm](
         page = controllers.gedcom.routes.ImportGedcomController.addNewDatabase,
-        requirement = ItemRequirements.IfCaseClassFormsIs(
+        requirement = ItemRequirements.IfUserAnswersItemIs(
           NewDatabaseQuestion,
           {
             case TrueOrFalseForm(true) => true
@@ -45,17 +49,16 @@ enum UserAnswersKey[A <: UserAnswersItem](
 
 }
 
+/*
+// Not needed currently, but kept for reference. Used to serialize UserAnswers to Json for storage
 object UserAnswersKey {
   implicit val userAnswersItemWrites: Writes[UserAnswersKey[?]] = Writes { item =>
     JsString(s"$item")
   }
 
   implicit val userAnswersItemReads: Reads[UserAnswersKey[?]] = Reads {
-    case JsString(name) =>
-      UserAnswersKey.values.find(item => s"$item" == name) match {
-        case Some(item) => JsSuccess(item)
-        case None       => JsError(s"Unknown UserAnswersItem: $name")
-      }
+    case JsString(name) => JsSuccess(UserAnswersKey.valueOf(item))
     case _ => JsError("String value expected")
   }
 }
+ */
