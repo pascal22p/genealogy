@@ -5,17 +5,9 @@ import scala.annotation.tailrec
 object JourneyValidation {
 
   extension (answers: Map[UserAnswersKey[?], UserAnswersItem]) {
-    def validate: List[UserAnswersKey[?]] =
-      answers.keys.flatMap { keyToCheck =>
-        keyToCheck.requirement match {
-          case ItemRequirements.IfUserAnswersItemIs(key, predicate) =>
-            answers.get(key) match {
-              case Some(v) if predicate(v) => Nil
-              case _                       => List(keyToCheck)
-            }
-
-          case _ => Nil
-        }
+    def validateRecursive: List[UserAnswersKey[?]] =
+      answers.keys.filterNot { key =>
+        isValid(key)
       }.toList
 
     @tailrec
@@ -41,11 +33,6 @@ object JourneyValidation {
             }
         }
       }
-
-    def validateRecursive: List[UserAnswersKey[?]] =
-      answers.keys.filterNot { key =>
-        isValid(key)
-      }.toList
 
   }
 }
