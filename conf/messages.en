@@ -39,6 +39,9 @@ Tree = Tree
 Type = Type
 Unknown = Unknown
 View = View
+Yes = Yes
+No = No
+CheckYourAnswers = Check your answers
 
 service.unavailable = Service unavailable
 
@@ -246,3 +249,7 @@ gedcom.newDatabase.question.no = In an existing database
 gedcom.newDatabase.question.hint = Choose if the data need to be imported in a new database to be created or an existing one
 
 importGedcom.checkYourAnswers.title = Import a Gedcom file
+importGedcom.GedcomPath.selectedFile = File to import
+importGedcom.NewDatabaseQuestion.trueOrFalse = Create a new database
+importGedcom.NewDatabase.name = Name of the new database
+importGedcom.NewDatabase.description = Description of the new database

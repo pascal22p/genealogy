@@ -39,6 +39,9 @@ Tree = Arbre
 Type = Type
 Unknown = Inconnu
 View = Voir
+Yes = Oui
+No = Non
+CheckYourAnswers = Vérifiez vos réponses
 
 service.unavailable = Service indisponible
 
@@ -284,3 +287,7 @@ gedcom.newDatabase.question.no = Dans une base de données existante
 gedcom.newDatabase.question.hint = Choisissez si les données doivent être importées dans une nouvelle base de données à créer ou dans une base de données existante.
 
 importGedcom.checkYourAnswers.title = Importer un fichier Gedcom
+importGedcom.GedcomPath.selectedFile = Fichier à importer
+importGedcom.NewDatabaseQuestion.trueOrFalse = Créer une nouvelle base de données
+importGedcom.NewDatabase.name = Nom de la nouvelle base de données
+importGedcom.NewDatabase.description = Description de la nouvelle base de données

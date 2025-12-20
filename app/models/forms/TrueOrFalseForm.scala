@@ -4,6 +4,10 @@ import models.journeyCache.UserAnswersItem
 import play.api.data.Form
 import play.api.data.Forms.boolean
 import play.api.data.Forms.mapping
+import play.api.i18n.Messages
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
 
 final case class TrueOrFalseForm(
     trueOrFalse: Boolean
@@ -21,5 +25,18 @@ object TrueOrFalseForm {
     mapping(
       "trueOrFalse" -> boolean
     )(TrueOrFalseForm.apply)(TrueOrFalseForm.unapply)
+  )
+
+  def cyaWrites(using messages: Messages): OWrites[TrueOrFalseForm] =
+    OWrites { form =>
+      Json.obj(
+        "trueOrFalse" ->
+          messages(if (form.trueOrFalse) "Yes" else "No")
+      )
+    }
+
+  def cyaFormat(using messages: Messages): OFormat[TrueOrFalseForm] = OFormat(
+    Json.reads[TrueOrFalseForm],
+    cyaWrites
   )
 }

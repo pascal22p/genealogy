@@ -3,25 +3,22 @@ package models.journeyCache
 import models.forms.DatabaseForm
 import models.forms.GedcomListForm
 import models.forms.TrueOrFalseForm
+import play.api.i18n.Messages
 import play.api.libs.json.*
 import play.api.mvc.Call
 
 enum UserAnswersKey[A <: UserAnswersItem](
     val page: Call,
     val requirement: ItemRequirements,
-    val checkYourAnswerFormat: Option[OFormat[A]] = None // optional format for check your answers page.
-)(using val format: OFormat[A]) { // format used to serialize/deserialize A (not used currently). Also used as default if checkYourAnswerFormat is None.
+    val checkYourAnswerWrites: Option[Messages => OWrites[A]] = None // optional format for check your answers page.
+)(using val format: OFormat[A]) { // format used to serialize/deserialize A. Also used as default if checkYourAnswerFormat is None.
 
-  /*
-  // Not needed currently, but kept for reference. Used to serialize UserAnswers to Json for storage
   @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
-  def writeAsJson(value: UserAnswersItem): JsValue =
+  def writeUserAnswersItemAsJson(value: UserAnswersItem): JsValue =
     format.writes(value.asInstanceOf[A])
 
-  def readFromJson(json: JsValue): JsResult[UserAnswersItem] =
+  def readUserAnswersItemFromJson(json: JsValue): JsResult[UserAnswersItem] =
     format.reads(json)
-
-   */
 
   case GedcomPath
       extends UserAnswersKey[GedcomListForm](
@@ -32,7 +29,8 @@ enum UserAnswersKey[A <: UserAnswersItem](
   case NewDatabaseQuestion
       extends UserAnswersKey[TrueOrFalseForm](
         page = controllers.gedcom.routes.ImportGedcomController.showNewDatabaseQuestion,
-        requirement = ItemRequirements.Always()
+        requirement = ItemRequirements.Always(),
+        checkYourAnswerWrites = Some(messages => TrueOrFalseForm.cyaWrites(using messages))
       )(using Json.format[TrueOrFalseForm])
 
   case NewDatabase
@@ -48,17 +46,3 @@ enum UserAnswersKey[A <: UserAnswersItem](
       )(using Json.format[DatabaseForm])
 
 }
-
-/*
-// Not needed currently, but kept for reference. Used to serialize UserAnswers to Json for storage
-object UserAnswersKey {
-  implicit val userAnswersItemWrites: Writes[UserAnswersKey[?]] = Writes { item =>
-    JsString(s"$item")
-  }
-
-  implicit val userAnswersItemReads: Reads[UserAnswersKey[?]] = Reads {
-    case JsString(name) => JsSuccess(UserAnswersKey.valueOf(item))
-    case _ => JsError("String value expected")
-  }
-}
- */

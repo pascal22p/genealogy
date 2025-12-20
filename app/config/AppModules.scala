@@ -9,6 +9,6 @@ import play.api.inject.Module
 class AppModules extends Module {
   override def bindings(environment: Environment, configuration: Configuration): Seq[Binding[?]] =
     Seq(
-      bind[JourneyCacheRepository].to[InMemoryJourneyCacheRepository]
+      bind[JourneyCacheRepository].to[MariadbJourneyCacheRepository]
     )
 }

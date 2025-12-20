@@ -17,7 +17,7 @@
             rows = answers.flatMap { case (userAnswersKey, valuesMap) =>
                 valuesMap.map { case (key, value) =>
                     SummaryListRow(
-                        key = Key(Text(messages(s"$userAnswersKey.$key"))),
+                        key = Key(Text(messages(s"importGedcom.$userAnswersKey.$key"))),
                         value = Value(Text(value)),
                         classes = "govuk-summary-list__row--no-border govuk-summary-list__row--no-actions",
                         actions = Some(Actions(
@@ -32,7 +32,7 @@
                 }
             }.toSeq,
             card = Some(Card(
-                title = Some(CardTitle(content = Text("Check your answers"))),
+                title = Some(CardTitle(content = Text(messages("CheckYourAnswers")))),
                 actions = None
             )),
             classes = ""
