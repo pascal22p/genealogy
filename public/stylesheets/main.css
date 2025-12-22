@@ -636,3 +636,8 @@ screen and (min-width:40.0625em) and (-ms-high-contrast:active) {
   .govuk-breadcrumbs {
     margin-left: 1em;
   }
+
+.scroll-container {
+    max-height: 300px;
+    overflow-y: auto;
+}

@@ -2,9 +2,12 @@ package models.journeyCache
 
 import scala.annotation.tailrec
 
-object JourneyValidation {
+object UserAnswersExtensions {
 
   extension (answers: Map[UserAnswersKey[?], UserAnswersItem]) {
+    @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
+    def getItem[A <: UserAnswersItem](key: UserAnswersKey[A]): A = answers(key).asInstanceOf[A]
+
     def validateRecursive: List[UserAnswersKey[?]] =
       answers.keys.filterNot { key =>
         isValid(key)

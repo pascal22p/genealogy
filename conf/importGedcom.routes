@@ -11,5 +11,8 @@ POST    /ask-new-database                      controllers.gedcom.ImportGedcomCo
 GET     /database-details                      controllers.gedcom.ImportGedcomController.addNewDatabase
 POST    /database-details                      controllers.gedcom.ImportGedcomController.addNewDatabaseOnSubmit
 
+GET     /select-database                       controllers.gedcom.ImportGedcomController.gedcomDatabaseSelect
+POST    /select-database                       controllers.gedcom.ImportGedcomController.gedcomDatabaseSelectOnSubmit
+
 GET     /check-your-answers                    controllers.gedcom.ImportGedcomController.checkYourAnswersImportGedcom
 POST    /check-your-answers                    controllers.gedcom.ImportGedcomController.checkYourAnswersImportGedcomOnSubmit

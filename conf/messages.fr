@@ -291,3 +291,4 @@ importGedcom.GedcomPath.selectedFile = Fichier à importer
 importGedcom.NewDatabaseQuestion.trueOrFalse = Créer une nouvelle base de données
 importGedcom.NewDatabase.name = Nom de la nouvelle base de données
 importGedcom.NewDatabase.description = Description de la nouvelle base de données
+importGedcom.DatabaseSelect.selectedDatabase = Base de données où importer les données

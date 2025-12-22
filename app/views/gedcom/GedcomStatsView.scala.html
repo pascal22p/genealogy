@@ -3,13 +3,14 @@
 @import uk.gov.hmrc.govukfrontend.views.Implicits.*
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits.*
 @import uk.gov.hmrc.hmrcfrontend.views.Implicits.*
+@import models.gedcom.GedcomObject
 
 @this(
     main: Main,
     block: Block
 )
 
-@(warnings: List[String])(implicit request: AuthenticatedRequest[?], messages: Messages)
+@(warnings: List[String], sqls: List[String], gedcomObject: GedcomObject)(implicit request: AuthenticatedRequest[?], messages: Messages)
 
 @main(1, None) {
 
@@ -17,16 +18,38 @@
         Continue
     </a>
 
-    @block("Gedcom contents") {
-        <ul class="govuk-list">
+    @block(s"${gedcomObject.getIndividualsSummary.size} Individual(s) found") {
+        <ul class="govuk-list scroll-container">
+            @for(node <- gedcomObject.getIndividualsSummary) {
+                <li>
+                    @node
+                </li>
+            }
+        </ul>
+    }
+
+    @block(s"${gedcomObject.getFamiliesSummary.size} Familie(s) found") {
+        <ul class="govuk-list scroll-container">
+        @for(node <- gedcomObject.getFamiliesSummary) {
             <li>
-                Individuals
+                @node
             </li>
+        }
+        </ul>
+    }
+
+    @block(s"${sqls.size} sql queries generated") {
+        <ul class="govuk-list scroll-container">
+        @for(sql <- sqls) {
+            <li>
+                @sql
+            </li>
+        }
         </ul>
     }
 
     @block("Warnings") {
-        <ul class="govuk-list">
+        <ul class="govuk-list scroll-container">
             @for(warning <- warnings) {
                 <li>@warning</li>
             }

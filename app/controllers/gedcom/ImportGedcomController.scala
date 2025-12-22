@@ -11,25 +11,31 @@ import scala.jdk.CollectionConverters.IteratorHasAsScala
 
 import actions.AuthJourney
 import models.AuthenticatedRequest
+import models.GenealogyDatabase
 import play.api.data.Form
 import play.api.i18n.*
 import play.api.mvc.*
 import play.api.mvc.AnyContent
 import config.AppConfig
 import models.forms.extensions.FillFormExtension.filledWith
-import models.forms.DatabaseForm
+import models.forms.GedcomDatabaseForm
 import models.forms.GedcomListForm
+import models.forms.NewDatabaseForm
 import models.forms.TrueOrFalseForm
 import models.journeyCache.UserAnswersKey.*
+import queries.InsertSqlQueries
 import repositories.JourneyCacheRepository
 import services.gedcom.GedcomCommonParser
 import services.gedcom.GedcomImportService
+import services.GenealogyDatabaseService
 import utils.ReadFile
 import views.html.add.AddDatabase
 import views.html.gedcom.CheckYourAnswersView
+import views.html.gedcom.GedcomChooseDatabaseView
 import views.html.gedcom.GedcomListView
 import views.html.gedcom.GedcomStatsView
 import views.html.gedcom.NewDatabaseQuestionView
+import models.journeyCache.UserAnswersExtensions.getItem
 
 @Singleton
 class ImportGedcomController @Inject() (
@@ -37,12 +43,15 @@ class ImportGedcomController @Inject() (
     journeyCacheRepository: JourneyCacheRepository,
     appConfig: AppConfig,
     readFile: ReadFile,
+    genealogyDatabaseService: GenealogyDatabaseService,
     gedcomCommonParser: GedcomCommonParser,
     gedcomImportService: GedcomImportService,
+    insertSqlQueries: InsertSqlQueries,
     gedcomListView: GedcomListView,
     gedcomStatsView: GedcomStatsView,
     newDatabaseQuestionView: NewDatabaseQuestionView,
     addDatabaseView: AddDatabase,
+    gedcomChooseDatabaseView: GedcomChooseDatabaseView,
     checkYourAnswersView: CheckYourAnswersView,
     val controllerComponents: ControllerComponents
 )(implicit ec: ExecutionContext)
@@ -103,11 +112,15 @@ class ImportGedcomController @Inject() (
           val basePath = Paths.get(appConfig.uploadPath)
           val sanitise = s"./${basePath.resolve(gedcomListForm.selectedFile).normalize()}"
           if (sanitise.startsWith(s"$basePath") && Files.exists(Paths.get(sanitise))) {
-            val gedcomTxt = readFile.asString(sanitise)
-            val nodes     = gedcomCommonParser.getTree(gedcomTxt)
-            val sqls      = gedcomImportService.convertTree2SQL(nodes, 4)
+            val gedcomTxt    = readFile.asString(sanitise)
+            val gedcomObject = gedcomCommonParser.getTree(gedcomTxt)
+            val sqlsIor      = gedcomImportService.convertTree2SQL(gedcomObject.nodes, 0)
 
-            Ok(gedcomStatsView(sqls.swap.getOrElse(List.empty)))
+            val warnings = sqlsIor.left.getOrElse(List.empty)
+            val sqls     = sqlsIor.right.getOrElse(List.empty).zipWithIndex.map { (value, idx) =>
+              s"${idx + 1}. ${value.sql} === ${value.params}"
+            }
+            Ok(gedcomStatsView(warnings, sqls, gedcomObject))
           } else {
             InternalServerError("Gedcom file path should be valid")
           }
@@ -135,7 +148,7 @@ class ImportGedcomController @Inject() (
             if (dataForm.trueOrFalse) {
               Redirect(controllers.gedcom.routes.ImportGedcomController.addNewDatabase)
             } else {
-              Redirect(controllers.gedcom.routes.ImportGedcomController.checkYourAnswersImportGedcom)
+              Redirect(controllers.gedcom.routes.ImportGedcomController.gedcomDatabaseSelect)
             }
           }
       }
@@ -147,24 +160,52 @@ class ImportGedcomController @Inject() (
   def addNewDatabase: Action[AnyContent] = authJourney.authWithAdminRight.async {
     implicit request: AuthenticatedRequest[AnyContent] =>
       journeyCacheRepository.get(NewDatabase).map { defaults =>
-        val form = DatabaseForm.databaseForm.filledWith(defaults)
+        val form = NewDatabaseForm.databaseForm.filledWith(defaults)
         Ok(addDatabaseView(form, newDatabaseOnSubmitLink))
       }
   }
 
   def addNewDatabaseOnSubmit: Action[AnyContent] = authJourney.authWithAdminRight.async {
     implicit request: AuthenticatedRequest[AnyContent] =>
-      val errorFunction: Form[DatabaseForm] => Future[Result] = { (formWithErrors: Form[DatabaseForm]) =>
+      val errorFunction: Form[NewDatabaseForm] => Future[Result] = { (formWithErrors: Form[NewDatabaseForm]) =>
         Future.successful(BadRequest(addDatabaseView(formWithErrors, newDatabaseOnSubmitLink)))
       }
 
-      val successFunction: DatabaseForm => Future[Result] = { (dataForm: DatabaseForm) =>
+      val successFunction: NewDatabaseForm => Future[Result] = { (dataForm: NewDatabaseForm) =>
         for {
           _ <- journeyCacheRepository.upsert(NewDatabase, dataForm)
         } yield Redirect(controllers.gedcom.routes.ImportGedcomController.checkYourAnswersImportGedcom)
       }
 
-      val formValidationResult = DatabaseForm.databaseForm.bindFromRequest()
+      val formValidationResult = NewDatabaseForm.databaseForm.bindFromRequest()
+      formValidationResult.fold(errorFunction, successFunction)
+  }
+
+  def gedcomDatabaseSelect: Action[AnyContent] = authJourney.authWithAdminRight.async {
+    implicit request: AuthenticatedRequest[AnyContent] =>
+      journeyCacheRepository.get(DatabaseSelect).flatMap { defaults =>
+        genealogyDatabaseService.getGenealogyDatabases.map { dbs =>
+          val form = GedcomDatabaseForm.form.filledWith(defaults)
+          Ok(gedcomChooseDatabaseView(form, dbs))
+        }
+      }
+  }
+
+  def gedcomDatabaseSelectOnSubmit: Action[AnyContent] = authJourney.authWithAdminRight.async {
+    implicit request: AuthenticatedRequest[AnyContent] =>
+      val errorFunction: Form[GedcomDatabaseForm] => Future[Result] = { (formWithErrors: Form[GedcomDatabaseForm]) =>
+        genealogyDatabaseService.getGenealogyDatabases.map { dbs =>
+          BadRequest(gedcomChooseDatabaseView(formWithErrors, dbs))
+        }
+      }
+
+      val successFunction: GedcomDatabaseForm => Future[Result] = { (dataForm: GedcomDatabaseForm) =>
+        for {
+          _ <- journeyCacheRepository.upsert(DatabaseSelect, dataForm)
+        } yield Redirect(controllers.gedcom.routes.ImportGedcomController.checkYourAnswersImportGedcom)
+      }
+
+      val formValidationResult = GedcomDatabaseForm.form.bindFromRequest()
       formValidationResult.fold(errorFunction, successFunction)
   }
 
@@ -179,6 +220,42 @@ class ImportGedcomController @Inject() (
 
   def checkYourAnswersImportGedcomOnSubmit: Action[AnyContent] = authJourney.authWithAdminRight.async {
     implicit request: AuthenticatedRequest[AnyContent] =>
-      Future.successful(Ok("Import process would start now..."))
+      journeyCacheRepository.get.flatMap {
+        case None              => Future.successful(Redirect(controllers.gedcom.routes.ImportGedcomController.showGedcomList))
+        case Some(userAnswers) =>
+          val basePath  = Paths.get(appConfig.uploadPath)
+          val sanitise  = s"./${basePath.resolve(userAnswers.data.getItem(GedcomPath).selectedFile).normalize()}"
+          val gedcomTxt = readFile.asString(sanitise)
+
+          if (userAnswers.data.getItem(NewDatabaseQuestion).trueOrFalse) {
+            insertSqlQueries
+              .insertDatabase(
+                GenealogyDatabase(
+                  0,
+                  userAnswers.data.getItem(NewDatabase).name,
+                  userAnswers.data.getItem(NewDatabase).description,
+                  None
+                )
+              )
+              .foldF(throw new RuntimeException("Error while creating database")) { id =>
+                gedcomImportService.gedcom2sql(gedcomTxt, id).flatMap { _ =>
+                  journeyCacheRepository.clear.map { _ =>
+                    Redirect(controllers.routes.HomeController.onload())
+                  }
+                }
+              }
+          } else {
+            gedcomImportService
+              .gedcom2sql(
+                gedcomTxt,
+                userAnswers.data.getItem(DatabaseSelect).id
+              )
+              .flatMap { _ =>
+                journeyCacheRepository.clear.map { _ =>
+                  Redirect(controllers.routes.HomeController.onload())
+                }
+              }
+          }
+      }
   }
 }

@@ -6,7 +6,7 @@ import play.api.data.Form
 import play.api.data.Forms.mapping
 import play.api.data.Forms.text
 
-final case class DatabaseForm(
+final case class NewDatabaseForm(
     name: String,
     description: String
 ) extends UserAnswersItem {
@@ -21,10 +21,10 @@ final case class DatabaseForm(
 
 }
 
-object DatabaseForm {
+object NewDatabaseForm {
 
   def unapply(
-      u: DatabaseForm
+      u: NewDatabaseForm
   ): Some[(String, String)] = Some(
     (
       u.name,
@@ -32,10 +32,10 @@ object DatabaseForm {
     )
   )
 
-  val databaseForm: Form[DatabaseForm] = Form(
+  val databaseForm: Form[NewDatabaseForm] = Form(
     mapping(
       "name"        -> text,
       "description" -> text
-    )(DatabaseForm.apply)(DatabaseForm.unapply)
+    )(NewDatabaseForm.apply)(NewDatabaseForm.unapply)
   )
 }

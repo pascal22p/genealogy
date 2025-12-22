@@ -3,23 +3,21 @@
 @import uk.gov.hmrc.govukfrontend.views.Implicits.*
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits.*
 @import uk.gov.hmrc.hmrcfrontend.views.Implicits.*
-@import models.forms.GedcomListForm
-@import config.AppConfig
+@import models.forms.GedcomDatabaseForm
 
 @this(
     main: Main,
     block: Block,
-    appConfig: AppConfig,
     govukButton: GovukButton,
     govukRadios: GovukRadios,
     govukErrorSummary: GovukErrorSummary
 )
 
-@(form: Form[GedcomListForm], gedcomFiles: List[String])(implicit request: AuthenticatedRequest[?], messages: Messages)
+@(form: Form[GedcomDatabaseForm], databaseList: List[GenealogyDatabase])(implicit request: AuthenticatedRequest[?], messages: Messages)
 
 @main(1, None) {
 
-    @block("Select a Gedcom file") {
+    @block("Select a database to import the file into") {
 
         @if(form.hasErrors) {
             @govukErrorSummary(ErrorSummary(
@@ -33,23 +31,23 @@
             ))
         }
 
-        @helper.form(action = controllers.gedcom.routes.ImportGedcomController.gedcomListOnSubmit ) {
+        @helper.form(action = controllers.gedcom.routes.ImportGedcomController.gedcomDatabaseSelectOnSubmit ) {
             @helper.CSRF.formField
 
             @govukRadios(Radios(
                 fieldset = Some(Fieldset(
                     legend = Some(Legend(
-                        content = Text("Choose a file"),
+                        content = Text("Choose a database"),
                         classes = "govuk-fieldset__legend--m"
                     ))
                 )),
-                items = gedcomFiles.map { file =>
+                items = databaseList.map { db =>
                     RadioItem(
-                        content = Text(file.replace(appConfig.uploadPath, "")),
-                        value = Some(file.replace(appConfig.uploadPath, "")),
+                        content = Text(db.name),
+                        value = Some(s"${db.id}|${db.name}"),
                     )
-                }
-            ).withFormField(form("selectedFile")))
+                }.toSeq
+            ).withFormField(form("selectedDatabase")))
 
             @govukButton(Button(
                 content = Text("Continue")

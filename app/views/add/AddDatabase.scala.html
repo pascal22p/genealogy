@@ -1,4 +1,4 @@
-@import models.forms.DatabaseForm
+@import models.forms.NewDatabaseForm
 @import views.html.helper
 @import views.html.components.Block
 @import helper._
@@ -15,7 +15,7 @@
         govukErrorSummary: GovukErrorSummary
 )
 
-@(databaseForm: Form[DatabaseForm], onSubmit: Call)(implicit request: AuthenticatedRequest[?], messages: Messages)
+@(databaseForm: Form[NewDatabaseForm], onSubmit: Call)(implicit request: AuthenticatedRequest[?], messages: Messages)
 
 @main(1, None, title = messages("addDatabase.title")) {
 

@@ -28,8 +28,8 @@ class GedcomImportService @Inject() (
 ) {
 
   def gedcom2sql(gedcomString: String, dbId: Int): Future[Boolean] = Future {
-    val nodes   = gedcomCommonParser.getTree(gedcomString)
-    val sqlsIor = convertTree2SQL(nodes, dbId)
+    val gedcomObject = gedcomCommonParser.getTree(gedcomString)
+    val sqlsIor      = convertTree2SQL(gedcomObject.nodes, dbId)
 
     db.withTransaction { implicit conn =>
       sqlsIor

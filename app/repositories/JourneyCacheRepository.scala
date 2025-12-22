@@ -1,6 +1,7 @@
 package repositories
 
-import java.time.LocalDateTime
+import java.time.Duration
+import java.time.Instant
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -68,8 +69,8 @@ class MariadbJourneyCacheRepository @Inject() (journeyCacheQueries: JourneyCache
 
   override def get(implicit ec: ExecutionContext, request: AuthenticatedRequest[?]): Future[Option[UserAnswers]] =
     journeyCacheQueries.getUserAnswers(sessionId).flatMap {
-      case None                                                                                  => Future.successful(None)
-      case Some((_, _, lastUpdated)) if lastUpdated.isBefore(LocalDateTime.now.minusMinutes(30)) =>
+      case None                                                                                         => Future.successful(None)
+      case Some((_, _, lastUpdated)) if lastUpdated.isBefore(Instant.now.minus(Duration.ofMinutes(30))) =>
         Future.successful(None)
       case Some((_, data, _)) =>
         journeyCacheQueries.updateLastUpdated(sessionId).flatMap { _ =>

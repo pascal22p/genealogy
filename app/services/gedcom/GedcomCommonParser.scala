@@ -7,6 +7,7 @@ import scala.util.matching.Regex
 
 import cats.data.Ior
 import models.gedcom.GedcomNode
+import models.gedcom.GedcomObject
 
 @Singleton
 class GedcomCommonParser @Inject() () {
@@ -40,7 +41,13 @@ class GedcomCommonParser @Inject() () {
       .filter(_._2.nonEmpty)
   }
 
-  final def getTree(gedcomString: String, level: Int = 0, rootLineNumber: Int = 0): List[GedcomNode] = {
+  final def getTree(gedcomString: String): GedcomObject = GedcomObject(getListNodes(gedcomString))
+
+  private[gedcom] final def getListNodes(
+      gedcomString: String,
+      level: Int = 0,
+      rootLineNumber: Int = 0
+  ): List[GedcomNode] = {
     val blocks = getBlocks(gedcomString, level)
     blocks.map {
       case (lineNumber, block) =>
@@ -58,7 +65,7 @@ class GedcomCommonParser @Inject() () {
           case _ => throw new RuntimeException(s"Could not find tag in `$subBlockHeader`")
         }
         if (subBlockBody.nonEmpty) {
-          val subTree: List[GedcomNode] = getTree(subBlockBody, level + 1, lineNumber + 1)
+          val subTree: List[GedcomNode] = getListNodes(subBlockBody, level + 1, lineNumber + 1)
           GedcomNode(
             line = subBlockHeader,
             lineNumber = lineNumber + rootLineNumber,

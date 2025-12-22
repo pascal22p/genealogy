@@ -169,7 +169,7 @@
                 if(authenticatedRequest.localSession.sessionData.userData.fold(false)(_.isAdmin)) {
                     Some(ServiceNavigationItem(
                         content = Text("Admin"),
-                        href = controllers.admin.routes.ProblemsController.onload(dbId).url,
+                        href = controllers.admin.routes.AdminController.index.url,
                         active = false,
                         current = false,
                         classes = "",

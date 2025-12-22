@@ -1,6 +1,6 @@
 package queries
 
-import java.time.LocalDateTime
+import java.time.Instant
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -13,7 +13,7 @@ import play.api.db.Database
 @Singleton
 final class JourneyCacheQueries @Inject() (db: Database, databaseExecutionContext: DatabaseExecutionContext) {
 
-  def getUserAnswers(sessionId: String): Future[Option[(String, String, LocalDateTime)]] = Future {
+  def getUserAnswers(sessionId: String): Future[Option[(String, String, Instant)]] = Future {
     db.withConnection { implicit conn =>
       SQL("""SELECT sessionId, data, lastUpdated
             |FROM genea_user_answers
@@ -21,7 +21,7 @@ final class JourneyCacheQueries @Inject() (db: Database, databaseExecutionContex
         .on("sessionId" -> sessionId)
         .as(
           (SqlParser.str("sessionId") ~ SqlParser.str("data") ~ SqlParser
-            .get[LocalDateTime]("lastUpdated")(using anorm.Column.columnToLocalDateTime)).singleOpt
+            .get[Instant]("lastUpdated")(using anorm.Column.columnToInstant)).singleOpt
         )
         .map { case a ~ b ~ c => (a, b, c) }
     }
@@ -43,7 +43,7 @@ final class JourneyCacheQueries @Inject() (db: Database, databaseExecutionContex
         .on(
           "sessionId"   -> sessionId,
           "data"        -> data,
-          "lastUpdated" -> LocalDateTime.now
+          "lastUpdated" -> Instant.now
         )
         .executeUpdate()
     }
@@ -56,7 +56,7 @@ final class JourneyCacheQueries @Inject() (db: Database, databaseExecutionContex
             |WHERE sessionId = {sessionId}""".stripMargin)
         .on(
           "sessionId"   -> sessionId,
-          "lastUpdated" -> LocalDateTime.now
+          "lastUpdated" -> Instant.now
         )
         .executeUpdate()
     }

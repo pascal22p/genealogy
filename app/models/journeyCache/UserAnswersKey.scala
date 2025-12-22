@@ -1,7 +1,8 @@
 package models.journeyCache
 
-import models.forms.DatabaseForm
+import models.forms.GedcomDatabaseForm
 import models.forms.GedcomListForm
+import models.forms.NewDatabaseForm
 import models.forms.TrueOrFalseForm
 import play.api.i18n.Messages
 import play.api.libs.json.*
@@ -33,8 +34,21 @@ enum UserAnswersKey[A <: UserAnswersItem](
         checkYourAnswerWrites = Some(messages => TrueOrFalseForm.cyaWrites(using messages))
       )(using Json.format[TrueOrFalseForm])
 
+  case DatabaseSelect
+      extends UserAnswersKey[GedcomDatabaseForm](
+        page = controllers.gedcom.routes.ImportGedcomController.gedcomDatabaseSelect,
+        requirement = ItemRequirements.IfUserAnswersItemIs(
+          NewDatabaseQuestion,
+          {
+            case TrueOrFalseForm(false) => true
+            case _                      => false
+          }
+        ),
+        checkYourAnswerWrites = Some(messages => GedcomDatabaseForm.cyaWrites(using messages))
+      )(using Json.format[GedcomDatabaseForm])
+
   case NewDatabase
-      extends UserAnswersKey[DatabaseForm](
+      extends UserAnswersKey[NewDatabaseForm](
         page = controllers.gedcom.routes.ImportGedcomController.addNewDatabase,
         requirement = ItemRequirements.IfUserAnswersItemIs(
           NewDatabaseQuestion,
@@ -43,6 +57,6 @@ enum UserAnswersKey[A <: UserAnswersItem](
             case _                     => false
           }
         )
-      )(using Json.format[DatabaseForm])
+      )(using Json.format[NewDatabaseForm])
 
 }

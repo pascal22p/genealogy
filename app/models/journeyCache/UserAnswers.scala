@@ -1,6 +1,6 @@
 package models.journeyCache
 
-import models.journeyCache.JourneyValidation.validateRecursive
+import models.journeyCache.UserAnswersExtensions.validateRecursive
 import models.journeyCache.UserAnswersKey
 import play.api.i18n.Messages
 import play.api.libs.json.*
