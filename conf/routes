@@ -11,6 +11,7 @@
 ->      /admin                                 admin.Routes
 ->      /unlink                                unlink.Routes
 ->      /link                                  link.Routes
+->      /import-gedcom                         importGedcom.Routes
 
 
 GET     /                                         controllers.HomeController.onload()
@@ -42,8 +43,6 @@ GET     /medias/:baseId/:filename                 controllers.MediaController.se
 
 GET     /pdf/ascendance/:id                       controllers.PdfController.pdf(id: Int)
 GET     /svg/ascendance/:id                       controllers.SvgController.svg(id: Int)
-
-GET     /base/:baseId/problems                    controllers.ProblemsController.onload(baseId: Int)
 
 GET     /sitemap.xml                              controllers.SiteMapController.sitemapIndex
 GET     /sitemap/sitemap-individuals.xml          controllers.SiteMapController.sitemapIndividuals

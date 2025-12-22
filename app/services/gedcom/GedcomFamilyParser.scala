@@ -95,7 +95,7 @@ class GedcomFamilyParser @Inject() (
         .filterNot(child => allTagList.contains(child.name))
         .foldLeft(List.empty[String]) {
           case (result, node) =>
-            result ++ List(s"Line ${node.lineNumber}: `${node.line}` is not supported")
+            result ++ List(s"Line ${node.lineNumber}: `${node.line}` in family is not supported")
         }
     )
 

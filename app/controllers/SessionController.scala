@@ -41,7 +41,6 @@ class SessionController @Inject() (
 
   def loginOnSubmit: Action[AnyContent] = authAction.async { implicit authenticatedRequest =>
     val errorFunction: Form[UserDataForm] => Future[Result] = { (formWithErrors: Form[UserDataForm]) =>
-      println(s"Form errors: ${formWithErrors.errors}")
       Future.successful(BadRequest(loginView(formWithErrors)))
     }
 

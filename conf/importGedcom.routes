@@ -1,0 +1,18 @@
+GET     /                                      controllers.gedcom.ImportGedcomController.startJourney
+
+GET     /list                                  controllers.gedcom.ImportGedcomController.showGedcomList
+POST    /list                                  controllers.gedcom.ImportGedcomController.gedcomListOnSubmit
+
+GET     /gedcom-stats                          controllers.gedcom.ImportGedcomController.gedcomStats
+
+GET     /ask-new-database                      controllers.gedcom.ImportGedcomController.showNewDatabaseQuestion
+POST    /ask-new-database                      controllers.gedcom.ImportGedcomController.newDatabaseQuestionOnSubmit
+
+GET     /database-details                      controllers.gedcom.ImportGedcomController.addNewDatabase
+POST    /database-details                      controllers.gedcom.ImportGedcomController.addNewDatabaseOnSubmit
+
+GET     /select-database                       controllers.gedcom.ImportGedcomController.gedcomDatabaseSelect
+POST    /select-database                       controllers.gedcom.ImportGedcomController.gedcomDatabaseSelectOnSubmit
+
+GET     /check-your-answers                    controllers.gedcom.ImportGedcomController.checkYourAnswersImportGedcom
+POST    /check-your-answers                    controllers.gedcom.ImportGedcomController.checkYourAnswersImportGedcomOnSubmit

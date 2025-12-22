@@ -245,7 +245,7 @@ class GedcomIndividualParserServiceSpec extends BaseSpec {
       )
 
       val expected = Ior.Both(
-        List("Line 7: `2 FON not supported` is not supported"),
+        List("Line 7: `2 FON not supported` in name is not supported"),
         GedComPersonalNameStructure(
           "Firstname /Surname/",
           "prefix",
@@ -354,11 +354,9 @@ class GedcomIndividualParserServiceSpec extends BaseSpec {
 
       val expected = Ior.Both(
         List(
-          "Line 4: `2 PLAC Karlsruhe` is not supported",
-          "Line 7: `2 PLAC Munich,Germany` is not supported",
-          "Line 9: `2 PLAC Theatinerkirche,Munich,Germany` is not supported",
-          "Line 11: `1 FAMS @F232@` is not supported",
-          "Line 12: `1 FAMC @F226@` is not supported"
+          "Line 4: `2 PLAC Karlsruhe` in event is not supported",
+          "Line 7: `2 PLAC Munich,Germany` in event is not supported",
+          "Line 9: `2 PLAC Theatinerkirche,Munich,Germany` in event is not supported"
         ),
         GedcomIndiBlock(
           GedComPersonalNameStructure("Caroline of_Baden //", "", "given", "nickname", "", "", "surn"),
@@ -369,7 +367,9 @@ class GedcomIndividualParserServiceSpec extends BaseSpec {
             GedcomEventBlock("BIRT", "13 JUL 1776"),
             GedcomEventBlock("DEAT", "13 NOV 1841"),
             GedcomEventBlock("BURI", "")
-          )
+          ),
+          List(1),
+          List(0)
         )
       )
 

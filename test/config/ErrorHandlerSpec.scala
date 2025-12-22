@@ -1,5 +1,7 @@
 package config
 
+import java.io.File
+
 import models.Attrs
 import play.api.http.Status.BAD_REQUEST
 import play.api.http.Status.INTERNAL_SERVER_ERROR
@@ -7,10 +9,11 @@ import play.api.mvc.Request
 import play.api.test.FakeRequest
 import play.api.test.Helpers.defaultAwaitTimeout
 import play.api.test.Helpers.status
+import play.api.Environment
 import testUtils.BaseSpec
 
 class ErrorHandlerSpec extends BaseSpec {
-  val sut = new ErrorHandler
+  val sut = new ErrorHandler(new Environment(File("."), this.getClass.getClassLoader, play.api.Mode.Test))
 
   val request: Request[?] = FakeRequest()
     .addAttr(Attrs.RequestId, "requestID")
