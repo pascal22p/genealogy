@@ -1,10 +1,15 @@
 # https://www.playframework.com/documentation/latest/ScalaI18N
 
+genealogy = Genealogy
+
+Admin = Admin
 Address = Address
 Add = Add
 Age = Age
 Ascendants = Ascendants
 Cause = Cause
+Change = Change
+Continue = Continue
 Database = Database
 Date = Date
 Delete = Delete
@@ -23,7 +28,7 @@ Medias = Medias
 Menu = Menu
 Name = Name
 Partner = Partner
-person.details = Person details
+person.details = Details
 Place = Place
 resn = Privacy restriction
 sex = Sex
@@ -34,6 +39,9 @@ Tree = Tree
 Type = Type
 Unknown = Unknown
 View = View
+Yes = Yes
+No = No
+CheckYourAnswers = Check your answers
 
 service.unavailable = Service unavailable
 
@@ -234,3 +242,16 @@ mediaList.title = My family tree
 addDatabase.title = My family tree
 
 defaultTitle = My family tree
+
+gedcom.newDatabase.question.title = Where do you want the data to be imported?
+gedcom.newDatabase.question.yes = In a new database
+gedcom.newDatabase.question.no = In an existing database
+gedcom.newDatabase.question.hint = Choose if the data need to be imported in a new database to be created or an existing one
+
+importGedcom.checkYourAnswers.title = Import a Gedcom file
+importGedcom.GedcomPath.selectedFile = File to import
+importGedcom.NewDatabaseQuestion.trueOrFalse = Create a new database
+importGedcom.NewDatabase.name = Name of the new database
+importGedcom.NewDatabase.description = Description of the new database
+importGedcom.DatabaseSelect.selectedDatabase = Database where to import the data
+importGedcom.ClearDatabaseQuestion.trueOrFalse = Clear the database before import

@@ -19,7 +19,7 @@ class GedcomEventParser @Inject() (gedcomHashIdTable: GedcomHashIdTable) {
     val ignoredContent: List[String] = node.children
       .filterNot(child => child.name == "DATE")
       .map { node =>
-        s"Line ${node.lineNumber}: `${node.line}` is not supported"
+        s"Line ${node.lineNumber}: `${node.line}` in event is not supported"
       }
     Ior.Both(ignoredContent, GedcomEventBlock(eventTag, eventDate.getOrElse("")))
   }

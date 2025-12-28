@@ -6,6 +6,10 @@ DROP EVENT IF EXISTS `delete_sessions`;
 CREATE EVENT `delete_sessions` ON SCHEDULE EVERY 1 MINUTE STARTS '2024-07-15 14:50:12' ON COMPLETION NOT PRESERVE ENABLE DO DELETE FROM genea_sessions 
 WHERE UNIX_TIMESTAMP(timestamp) < UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL 1 HOUR));
 
+DROP EVENT IF EXISTS `delete_expired_user_answers`;
+CREATE EVENT `delete_expired_user_answers` ON SCHEDULE EVERY 10 MINUTE STARTS '2025-12-19 22:48:33' ON COMPLETION NOT PRESERVE ENABLE DO DELETE FROM genea_user_answers
+WHERE lastUpdated < NOW() - INTERVAL 45 MINUTE;
+
 DROP TABLE IF EXISTS `agregats_noms`;
 CREATE TABLE `agregats_noms` (
   `id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
@@ -323,6 +327,14 @@ CREATE TABLE `genea_submitters` (
   PRIMARY KEY (`sub_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Liste des auteurs - NON UTILISE';
 
+DROP TABLE IF EXISTS `genea_user_answers`;
+CREATE TABLE `genea_user_answers` (
+                                      `sessionId` varchar(36) NOT NULL,
+                                      `data` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`data`)),
+                                      `lastUpdated` datetime NOT NULL,
+                                      PRIMARY KEY (`sessionId`),
+                                      KEY `lastUpdated` (`lastUpdated`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 DROP TABLE IF EXISTS `gns_ADM1`;
 CREATE TABLE `gns_ADM1` (

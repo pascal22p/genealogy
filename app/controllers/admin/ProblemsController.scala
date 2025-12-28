@@ -1,4 +1,4 @@
-package controllers
+package controllers.admin
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -21,7 +21,7 @@ import queries.GetSqlQueries
 import services.EventService
 import services.FamilyService
 import services.PersonService
-import views.html.ProblemsView
+import views.html.admin.ProblemsView
 
 @Singleton
 class ProblemsController @Inject() (

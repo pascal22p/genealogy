@@ -95,7 +95,7 @@ class GedcomFamilyParser @Inject() (
         .filterNot(child => allTagList.contains(child.name))
         .foldLeft(List.empty[String]) {
           case (result, node) =>
-            result ++ List(s"Line ${node.lineNumber}: `${node.line}` is not supported")
+            result ++ List(s"Line ${node.lineNumber}: `${node.line}` in family is not supported")
         }
     )
 
@@ -111,7 +111,7 @@ class GedcomFamilyParser @Inject() (
         gedcomHashIdTable.getFamilyIdFromString(xref),
         wife.map(gedcomHashIdTable.getIndividualIdFromString),
         husb.map(gedcomHashIdTable.getIndividualIdFromString),
-        children.map(gedcomHashIdTable.getIndividualIdFromString),
+        children.toSet.map(gedcomHashIdTable.getIndividualIdFromString),
         events,
         resn
       )
@@ -133,5 +133,20 @@ class GedcomFamilyParser @Inject() (
         "familles_refn"      -> "",
         "familles_refn_type" -> ""
       )
+  }
+
+  def gedcomChildren2Sql(node: GedcomFamilyBlock): List[SimpleSql[Row]] = {
+    node.children.toList.map { child =>
+      SQL(
+        s"""INSERT INTO `rel_familles_indi` (`familles_id`, `indi_id`, `rela_type`, `rela_stat`)
+           |VALUES ({familles_id} + @startFamily, {indi_id} + @startIndi, {rela_type}, {rela_stat})""".stripMargin
+      )
+        .on(
+          "familles_id" -> node.id,
+          "indi_id"     -> child,
+          "rela_type"   -> "",
+          "rela_stat"   -> Option.empty[String]
+        )
+    }
   }
 }

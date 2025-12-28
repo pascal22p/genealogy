@@ -1,0 +1,58 @@
+@import views.html.components.Block
+@import helper._
+@import uk.gov.hmrc.govukfrontend.views.Implicits.*
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits.*
+@import uk.gov.hmrc.hmrcfrontend.views.Implicits.*
+@import models.gedcom.GedcomObject
+
+@this(
+    main: Main,
+    block: Block
+)
+
+@(warnings: List[String], gedcomObject: GedcomObject)(implicit request: AuthenticatedRequest[?], messages: Messages)
+
+@main(1, None, title = messages("importGedcom.checkYourAnswers.title")) {
+
+    <a href="@controllers.gedcom.routes.ImportGedcomController.showNewDatabaseQuestion.url" role="button" class="govuk-button" data-module="govuk-button">
+        Continue
+    </a>
+
+    @block(s"${gedcomObject.getIndividualsSummary.size} Individual(s) found") {
+        <ul class="govuk-list scroll-container">
+            @for(node <- gedcomObject.getIndividualsSummary) {
+                <li>
+                    @node
+                </li>
+            }
+        </ul>
+    }
+
+    @block(s"${gedcomObject.getIndividualsEvents.size} individual event(s) found") {
+        <ul class="govuk-list scroll-container">
+        @for(node <- gedcomObject.getIndividualsEvents) {
+            <li>
+            @node
+            </li>
+        }
+        </ul>
+    }
+
+    @block(s"${gedcomObject.getFamiliesSummary.size} Familie(s) found") {
+        <ul class="govuk-list scroll-container">
+        @for(node <- gedcomObject.getFamiliesSummary) {
+            <li>
+                @node
+            </li>
+        }
+        </ul>
+    }
+
+    @block("Warnings") {
+        <ul class="govuk-list scroll-container">
+            @for(warning <- warnings) {
+                <li>@warning</li>
+            }
+        </ul>
+    }
+}

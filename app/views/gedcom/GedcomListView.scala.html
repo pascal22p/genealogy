@@ -1,0 +1,53 @@
+@import views.html.components.Block
+@import helper._
+@import uk.gov.hmrc.govukfrontend.views.Implicits.*
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits.*
+@import uk.gov.hmrc.hmrcfrontend.views.Implicits.*
+@import models.forms.GedcomPathInputTextForm
+@import config.AppConfig
+
+@this(
+    main: Main,
+    block: Block,
+    appConfig: AppConfig,
+    govukButton: GovukButton,
+    govukRadios: GovukRadios,
+    govukErrorSummary: GovukErrorSummary
+)
+
+@(form: Form[GedcomPathInputTextForm], gedcomFiles: List[String])(implicit request: AuthenticatedRequest[?], messages: Messages)
+
+@main(1, None, title = messages("importGedcom.checkYourAnswers.title")) {
+
+    @block("Select a Gedcom file") {
+
+        @if(form.hasErrors) {
+            @govukErrorSummary(ErrorSummary(
+                errorList = form.errors.map { error =>
+                    ErrorLink(
+                        href = Some(s"#${error.key}"),
+                        content = Text(messages(error.message))
+                    )
+                },
+                title = Text("There is a problem")
+            ))
+        }
+
+        @helper.form(action = controllers.gedcom.routes.ImportGedcomController.gedcomListOnSubmit ) {
+            @helper.CSRF.formField
+
+            @govukRadios(Radios(
+                items = gedcomFiles.map { file =>
+                    RadioItem(
+                        content = Text(file.replace(appConfig.uploadPath, "")),
+                        value = Some(file.replace(appConfig.uploadPath, "")),
+                    )
+                }
+            ).withFormField(form("selectedFile")))
+
+            @govukButton(Button(
+                content = Text("Continue")
+            ))
+        }
+    }
+}

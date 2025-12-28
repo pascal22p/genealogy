@@ -72,15 +72,12 @@ class MessageKeysSpec extends PlaySpec {
       val defaultMessages     = messagesApi.messages(Lang("fr").code)
 
       allLangs.filterNot(lang => lang.code == "fr").foreach { lang =>
-        println("OOOOOO " + lang.code)
         val langMessages = messagesApi.messages(lang.code)
 
         // Keys missing in this language compared to default
         val missing = defaultMessages.keySet.diff(langMessages.keySet)
 
         // Extra keys in this language that are not in default
-        println("IIIIII " + langMessages.keySet)
-        println("PPPPPP " + allLangs + defaultMessages.keySet)
         val extra = langMessages.keySet.diff(defaultMessages.keySet)
 
         withClue(s"Missing messages for ${lang.code}: ${missing.mkString(", ")}") {

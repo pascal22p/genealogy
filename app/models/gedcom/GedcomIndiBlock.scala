@@ -7,5 +7,7 @@ final case class GedcomIndiBlock(
     resn: Option[ResnType],
     sex: String,
     id: Int,
-    events: List[GedcomEventBlock]
+    events: List[GedcomEventBlock],
+    famcLinks: Set[Int],
+    famsLinks: Set[Int]
 )

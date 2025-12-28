@@ -1,0 +1,51 @@
+@import views.html.components.Block
+@import helper._
+@import uk.gov.hmrc.govukfrontend.views.Implicits.*
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits.*
+@import uk.gov.hmrc.hmrcfrontend.views.Implicits.*
+@import models.forms.SelectExistingDatabaseForm
+
+@this(
+    main: Main,
+    block: Block,
+    govukButton: GovukButton,
+    govukRadios: GovukRadios,
+    govukErrorSummary: GovukErrorSummary
+)
+
+@(form: Form[SelectExistingDatabaseForm], databaseList: List[GenealogyDatabase])(implicit request: AuthenticatedRequest[?], messages: Messages)
+
+@main(1, None, title = messages("importGedcom.checkYourAnswers.title")) {
+
+    @block("Select a database to import the file into") {
+
+        @if(form.hasErrors) {
+            @govukErrorSummary(ErrorSummary(
+                errorList = form.errors.map { error =>
+                    ErrorLink(
+                        href = Some(s"#${error.key}"),
+                        content = Text(messages(error.message))
+                    )
+                },
+                title = Text("There is a problem")
+            ))
+        }
+
+        @helper.form(action = controllers.gedcom.routes.ImportGedcomController.gedcomDatabaseSelectOnSubmit ) {
+            @helper.CSRF.formField
+
+            @govukRadios(Radios(
+                items = databaseList.map { db =>
+                    RadioItem(
+                        content = Text(db.name),
+                        value = Some(s"${db.id}|${db.name}"),
+                    )
+                }.toSeq
+            ).withFormField(form("selectedDatabase")))
+
+            @govukButton(Button(
+                content = Text("Continue")
+            ))
+        }
+    }
+}

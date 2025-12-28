@@ -1,10 +1,15 @@
 # https://www.playframework.com/documentation/latest/ScalaI18N
 
+genealogy = Genealogie
+
 Address = Addresse
 Add = Ajouter
+Admin = Admin
 Age = Age
 Ascendants = Ascendants
 Cause = Cause
+Change = Changer
+Continue = Continuer
 Database = Base de données
 Date = Date
 Delete = Supprimer
@@ -23,7 +28,7 @@ Medias = Médias
 Menu = Menu
 Name = Nom
 Partner = Partenaire
-person.details = Détails de la personne
+person.details = Détails
 Place = Lieu
 resn = Restriction de confidentialité
 sex = Sexe
@@ -34,6 +39,9 @@ Tree = Arbre
 Type = Type
 Unknown = Inconnu
 View = Voir
+Yes = Oui
+No = Non
+CheckYourAnswers = Vérifiez vos réponses
 
 service.unavailable = Service indisponible
 
@@ -272,3 +280,16 @@ mediaList.title = Mon arbre généalogique
 addDatabase.title = Mon arbre généalogique
 
 defaultTitle = Mon arbre généalogique
+
+gedcom.newDatabase.question.title = Où souhaitez-vous que les données soient importées ?
+gedcom.newDatabase.question.yes = Dans une nouvelle base de donnés
+gedcom.newDatabase.question.no = Dans une base de données existante
+gedcom.newDatabase.question.hint = Choisissez si les données doivent être importées dans une nouvelle base de données à créer ou dans une base de données existante.
+
+importGedcom.checkYourAnswers.title = Importer un fichier Gedcom
+importGedcom.GedcomPath.selectedFile = Fichier à importer
+importGedcom.NewDatabaseQuestion.trueOrFalse = Créer une nouvelle base de données
+importGedcom.NewDatabase.name = Nom de la nouvelle base de données
+importGedcom.NewDatabase.description = Description de la nouvelle base de données
+importGedcom.DatabaseSelect.selectedDatabase = Base de données où importer les données
+importGedcom.ClearDatabaseQuestion.trueOrFalse = Vider la base de données avant l'importation

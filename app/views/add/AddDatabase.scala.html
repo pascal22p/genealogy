@@ -1,4 +1,4 @@
-@import models.forms.DatabaseForm
+@import models.forms.CreateNewDatabaseForm
 @import views.html.helper
 @import views.html.components.Block
 @import helper._
@@ -15,12 +15,12 @@
         govukErrorSummary: GovukErrorSummary
 )
 
-@(databaseForm: Form[DatabaseForm])(implicit request: AuthenticatedRequest[?], messages: Messages)
+@(databaseForm: Form[CreateNewDatabaseForm], onSubmit: Call)(implicit request: AuthenticatedRequest[?], messages: Messages)
 
 @main(1, None, title = messages("addDatabase.title")) {
 
 
-  @block("Add new database") {
+  @block("Add a new database") {
 
     @if(databaseForm.hasGlobalErrors) {
         @for(error <- databaseForm.globalErrors) {
@@ -32,7 +32,7 @@
         @govukErrorSummary(ErrorSummary().withFormErrorsAsHtml(databaseForm))
     }
     
-    @helper.form(action = controllers.add.routes.AddDatabaseController.onSubmit ) {
+    @helper.form(action = onSubmit ) {
         @helper.CSRF.formField
         @govukInput(
             Input(
@@ -52,7 +52,7 @@
         @govukButton(
             Button(
                 element = Some("button"),
-                content = Text(messages("Submit"))
+                content = Text(messages("Continue"))
             )
         )
     }

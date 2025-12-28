@@ -10,10 +10,12 @@ import javax.inject.Singleton
 
 import scala.util.Try
 
+import play.api.Logging
+
 @Singleton
 class GedcomDateLibrary @Inject() (
     republicanDate: RepublicanDate
-) {
+) extends Logging {
 
   def extractDate(gedcomDate: String): Option[LocalDate] = {
     val dateFormatter: DateTimeFormatter = new DateTimeFormatterBuilder()
@@ -47,7 +49,7 @@ class GedcomDateLibrary @Inject() (
           .map(Some(_))
           .getOrElse(None)
 
-        if localDate.isEmpty then println(s"Failed to parse date: `$trimmedGedcomDate` ($gedcomDate)")
+        if localDate.isEmpty then logger.warn(s"Failed to parse date: `$trimmedGedcomDate` ($gedcomDate)")
 
         localDate
       }
