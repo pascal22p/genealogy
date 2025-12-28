@@ -16,6 +16,8 @@ ThisBuild / scalafmtOnCompile := true
 Test / parallelExecution := true
 Test / Keys.fork := true
 Test / test := (Test / test).dependsOn(Compile / compile).value
+Test / unmanagedClasspath ++= (Compile / unmanagedClasspath).value
+Test / dependencyClasspath ++= (Compile / dependencyClasspath).value
 
 Universal / javaOptions ++= Seq(
   "-Dpidfile.path=/dev/null",
