@@ -368,8 +368,8 @@ class GedcomIndividualParserServiceSpec extends BaseSpec {
             GedcomEventBlock("DEAT", "13 NOV 1841"),
             GedcomEventBlock("BURI", "")
           ),
-          List(1),
-          List(0)
+          Set(1),
+          Set(0)
         )
       )
 

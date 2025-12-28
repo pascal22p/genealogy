@@ -75,7 +75,7 @@ class GedcomImportService @Inject() (
           listFamily.combine(family.map(i => List(i)))
       }
 
-    val familiesWithFamsFamcFromIndiIor = (for {
+    val familiesWithFamsFromIndiIor = (for {
       indis    <- indisIor
       families <- familiesIor.map(_.map(family => family.id -> family).toMap)
     } yield {
@@ -107,12 +107,12 @@ class GedcomImportService @Inject() (
               if (indi.sex == "F") {
                 familiesAccInner.updated(
                   famLink,
-                  GedcomFamilyBlock(famLink, Some(indi.id), None, List.empty, List.empty, None)
+                  GedcomFamilyBlock(famLink, Some(indi.id), None, Set.empty, List.empty, None)
                 )
               } else {
                 familiesAccInner.updated(
                   famLink,
-                  GedcomFamilyBlock(famLink, None, Some(indi.id), List.empty, List.empty, None)
+                  GedcomFamilyBlock(famLink, None, Some(indi.id), Set.empty, List.empty, None)
                 )
               }
           }
@@ -145,14 +145,36 @@ class GedcomImportService @Inject() (
               if (indi.sex == "F") {
                 familiesAccInner.updated(
                   famLink,
-                  GedcomFamilyBlock(famLink, Some(indi.id), None, List.empty, List.empty, None)
+                  GedcomFamilyBlock(famLink, Some(indi.id), None, Set.empty, List.empty, None)
                 )
               } else {
                 familiesAccInner.updated(
                   famLink,
-                  GedcomFamilyBlock(famLink, None, Some(indi.id), List.empty, List.empty, None)
+                  GedcomFamilyBlock(famLink, None, Some(indi.id), Set.empty, List.empty, None)
                 )
               }
+          }
+        }
+      }
+    }).map(_.values.toList)
+
+    val familiesWithFamsFamcFromIndiIor = (for {
+      indis                                 <- indisIor
+      families: Map[Int, GedcomFamilyBlock] <- familiesWithFamsFromIndiIor.map(
+        _.map(family => family.id -> family).toMap
+      )
+    } yield {
+      indis.foldLeft(families) { (familiesAcc, indi) =>
+        indi.famcLinks.foldLeft(familiesAcc) { (familiesAccInner, famLink) =>
+          familiesAccInner.get(famLink) match {
+            case Some(family) =>
+              val newFamily = family.copy(children = family.children + indi.id)
+              familiesAccInner.updated(famLink, newFamily)
+            case None =>
+              familiesAccInner.updated(
+                famLink,
+                GedcomFamilyBlock(famLink, None, None, Set(indi.id), List.empty, None)
+              )
           }
         }
       }
@@ -175,8 +197,14 @@ class GedcomImportService @Inject() (
         gedcomFamilyParser.gedcomFamilyBlock2Sql(family, base)
       }
 
+    val childrenSqls: List[SimpleSql[Row]] = familiesWithFamsFamcFromIndiIor.right
+      .getOrElse(List.empty)
+      .flatMap { family =>
+        gedcomFamilyParser.gedcomChildren2Sql(family)
+      }
+
     val familyEventsSql: List[SimpleSql[Row]] =
-      familiesWithFamsFamcFromIndiIor.right
+      familiesWithFamsFromIndiIor.right
         .getOrElse(List.empty)
         .flatMap(family => gedcomEventParser.gedcomFamilyEventBlock2Sql(family.events, base, family.id))
 
@@ -190,7 +218,7 @@ class GedcomImportService @Inject() (
     )
 
     val warnings =
-      indisIor.left.getOrElse(List.empty) ++ familiesWithFamsFamcFromIndiIor.left.getOrElse(
+      indisIor.left.getOrElse(List.empty) ++ familiesWithFamsFromIndiIor.left.getOrElse(
         List.empty
       ) ++ ignoredContent.left
         .getOrElse(
@@ -202,7 +230,7 @@ class GedcomImportService @Inject() (
 
     Ior.Both(
       warnings,
-      startTransaction ++ indiSqls ++ individualEventsSql ++ familySqls ++ familyEventsSql ++ commitTransaction
+      startTransaction ++ indiSqls ++ individualEventsSql ++ familySqls ++ childrenSqls ++ familyEventsSql ++ commitTransaction
     )
   }
 

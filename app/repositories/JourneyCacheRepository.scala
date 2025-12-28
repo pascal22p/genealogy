@@ -29,9 +29,9 @@ trait JourneyCacheRepository {
       key: UserAnswersKey[A]
   )(implicit ec: ExecutionContext, request: AuthenticatedRequest[?]): Future[Option[A]]
 
-  def upsert(
-      key: UserAnswersKey[?],
-      value: UserAnswersItem
+  def upsert[A <: UserAnswersItem](
+      key: UserAnswersKey[A],
+      value: A
   )(implicit ec: ExecutionContext, request: AuthenticatedRequest[?]): Future[UserAnswers]
 
   def clear(implicit ec: ExecutionContext, request: AuthenticatedRequest[?]): Future[Unit]
@@ -75,7 +75,7 @@ class MariadbJourneyCacheRepository @Inject() (journeyCacheQueries: JourneyCache
       case Some((_, data, _)) =>
         journeyCacheQueries.updateLastUpdated(sessionId).flatMap { _ =>
           Try(Json.parse(data).as[Map[UserAnswersKey[?], UserAnswersItem]](using userAnswersMapFormat)) match {
-            case Success(obj) => Future.successful(Some(UserAnswers(sessionId, obj)))
+            case Success(obj) => Future.successful(Some(UserAnswers(obj)))
             case Failure(ex)  =>
               journeyCacheQueries.deleteUserAnswers(sessionId).map { _ =>
                 throw ex
@@ -84,24 +84,33 @@ class MariadbJourneyCacheRepository @Inject() (journeyCacheQueries: JourneyCache
         }
     }
 
+  @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
   override def get[A <: UserAnswersItem](
       key: UserAnswersKey[A]
   )(implicit ec: ExecutionContext, request: AuthenticatedRequest[?]): Future[Option[A]] = {
     get.map {
-      case Some(userAnswers) => userAnswers.get(key)
+      case Some(userAnswers) => userAnswers.getOptionalItem(key)
       case _                 => None
     }
   }
 
-  override def upsert(
-      key: UserAnswersKey[?],
-      value: UserAnswersItem
+  override def upsert[A <: UserAnswersItem](
+      key: UserAnswersKey[A],
+      value: A
   )(implicit ec: ExecutionContext, request: AuthenticatedRequest[?]): Future[UserAnswers] = {
     get.flatMap { maybeUserAnswers =>
-      val updatedData = maybeUserAnswers.fold(Map.empty[UserAnswersKey[?], UserAnswersItem])(_.data + (key -> value))
+      val updatedUserAnswers = maybeUserAnswers.fold(
+        UserAnswers(Map(key -> value): Map[UserAnswersKey[?], UserAnswersItem])
+      )(
+        _.upsert(key, value)
+      )
+
       journeyCacheQueries
-        .upsertUserAnswers(sessionId, Json.toJson(updatedData)(using userAnswersMapFormat).toString)
-        .map(_ => UserAnswers(sessionId, updatedData))
+        .upsertUserAnswers(
+          sessionId,
+          Json.toJson(updatedUserAnswers.data)(using userAnswersMapFormat).toString
+        )
+        .map(_ => updatedUserAnswers)
     }
   }
 

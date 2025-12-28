@@ -3,7 +3,7 @@
 @import uk.gov.hmrc.govukfrontend.views.Implicits.*
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits.*
 @import uk.gov.hmrc.hmrcfrontend.views.Implicits.*
-@import models.forms.GedcomDatabaseForm
+@import models.forms.SelectExistingDatabaseForm
 
 @this(
     main: Main,
@@ -13,9 +13,9 @@
     govukErrorSummary: GovukErrorSummary
 )
 
-@(form: Form[GedcomDatabaseForm], databaseList: List[GenealogyDatabase])(implicit request: AuthenticatedRequest[?], messages: Messages)
+@(form: Form[SelectExistingDatabaseForm], databaseList: List[GenealogyDatabase])(implicit request: AuthenticatedRequest[?], messages: Messages)
 
-@main(1, None) {
+@main(1, None, title = messages("importGedcom.checkYourAnswers.title")) {
 
     @block("Select a database to import the file into") {
 
@@ -35,12 +35,6 @@
             @helper.CSRF.formField
 
             @govukRadios(Radios(
-                fieldset = Some(Fieldset(
-                    legend = Some(Legend(
-                        content = Text("Choose a database"),
-                        classes = "govuk-fieldset__legend--m"
-                    ))
-                )),
                 items = databaseList.map { db =>
                     RadioItem(
                         content = Text(db.name),

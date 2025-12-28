@@ -292,3 +292,4 @@ importGedcom.NewDatabaseQuestion.trueOrFalse = Créer une nouvelle base de donn�
 importGedcom.NewDatabase.name = Nom de la nouvelle base de données
 importGedcom.NewDatabase.description = Description de la nouvelle base de données
 importGedcom.DatabaseSelect.selectedDatabase = Base de données où importer les données
+importGedcom.ClearDatabaseQuestion.trueOrFalse = Vider la base de données avant l'importation

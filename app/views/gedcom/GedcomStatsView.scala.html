@@ -10,9 +10,9 @@
     block: Block
 )
 
-@(warnings: List[String], sqls: List[String], gedcomObject: GedcomObject)(implicit request: AuthenticatedRequest[?], messages: Messages)
+@(warnings: List[String], gedcomObject: GedcomObject)(implicit request: AuthenticatedRequest[?], messages: Messages)
 
-@main(1, None) {
+@main(1, None, title = messages("importGedcom.checkYourAnswers.title")) {
 
     <a href="@controllers.gedcom.routes.ImportGedcomController.showNewDatabaseQuestion.url" role="button" class="govuk-button" data-module="govuk-button">
         Continue
@@ -28,21 +28,21 @@
         </ul>
     }
 
-    @block(s"${gedcomObject.getFamiliesSummary.size} Familie(s) found") {
+    @block(s"${gedcomObject.getIndividualsEvents.size} individual event(s) found") {
         <ul class="govuk-list scroll-container">
-        @for(node <- gedcomObject.getFamiliesSummary) {
+        @for(node <- gedcomObject.getIndividualsEvents) {
             <li>
-                @node
+            @node
             </li>
         }
         </ul>
     }
 
-    @block(s"${sqls.size} sql queries generated") {
+    @block(s"${gedcomObject.getFamiliesSummary.size} Familie(s) found") {
         <ul class="govuk-list scroll-container">
-        @for(sql <- sqls) {
+        @for(node <- gedcomObject.getFamiliesSummary) {
             <li>
-                @sql
+                @node
             </li>
         }
         </ul>

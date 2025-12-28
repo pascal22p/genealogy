@@ -242,4 +242,36 @@ final class UpdateSqlQueries @Inject() (db: Database, databaseExecutionContext: 
 
   }(using databaseExecutionContext)
 
+  def emptyDatabase(id: Int): Future[Int] = Future {
+    db.withTransaction { implicit conn =>
+      SQL("""DELETE rie
+            |FROM rel_indi_events AS rie
+            |JOIN genea_individuals AS gi
+            |  ON gi.indi_id = rie.indi_id
+            |WHERE gi.base = {id}""".stripMargin).on("id" -> id).executeUpdate() +
+        SQL("""DELETE rae
+              |FROM rel_asso_events AS rae
+              |JOIN genea_individuals AS gi
+              |  ON gi.indi_id = rae.indi_id
+              |WHERE gi.base = {id}""".stripMargin).on("id" -> id).executeUpdate() +
+        SQL("""DELETE raf
+              |FROM rel_asso_familles AS raf
+              |JOIN genea_individuals AS gi
+              |  ON gi.indi_id = raf.indi_id
+              |WHERE gi.base = {id}""".stripMargin).on("id" -> id).executeUpdate() +
+        SQL("""DELETE FROM genea_address WHERE Base = {id}""".stripMargin).on("id" -> id).executeUpdate() +
+        SQL("""DELETE FROM genea_download WHERE Base = {id}""".stripMargin).on("id" -> id).executeUpdate() +
+        SQL("""DELETE FROM genea_multimedia WHERE Base = {id}""".stripMargin).on("id" -> id).executeUpdate() +
+        SQL("""DELETE FROM genea_notes WHERE Base = {id}""".stripMargin).on("id" -> id).executeUpdate() +
+        SQL("""DELETE FROM genea_place WHERE Base = {id}""".stripMargin).on("id" -> id).executeUpdate() +
+        SQL("""DELETE FROM genea_refn WHERE Base = {id}""".stripMargin).on("id" -> id).executeUpdate() +
+        SQL("""DELETE FROM genea_repository WHERE Base = {id}""".stripMargin).on("id" -> id).executeUpdate() +
+        SQL("""DELETE FROM genea_sour_citations WHERE Base = {id}""".stripMargin).on("id" -> id).executeUpdate() +
+        SQL("""DELETE FROM genea_sour_records WHERE Base = {id}""".stripMargin).on("id" -> id).executeUpdate() +
+        SQL("""DELETE FROM genea_events_details WHERE Base = {id}""".stripMargin).on("id" -> id).executeUpdate() +
+        SQL("""DELETE FROM genea_familles WHERE Base = {id}""".stripMargin).on("id" -> id).executeUpdate() +
+        SQL("""DELETE FROM genea_individuals WHERE Base = {id}""".stripMargin).on("id" -> id).executeUpdate()
+    }
+  }(using databaseExecutionContext)
+
 }

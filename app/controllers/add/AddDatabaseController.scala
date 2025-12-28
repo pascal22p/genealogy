@@ -6,7 +6,7 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
 import actions.AuthJourney
-import models.forms.NewDatabaseForm
+import models.forms.CreateNewDatabaseForm
 import models.AuthenticatedRequest
 import play.api.data.Form
 import play.api.i18n.*
@@ -31,16 +31,17 @@ class AddDatabaseController @Inject() (
 
   def showForm: Action[AnyContent] = authJourney.authWithAdminRight.async {
     implicit authenticatedRequest: AuthenticatedRequest[AnyContent] =>
-      val form = NewDatabaseForm.databaseForm
+      val form = CreateNewDatabaseForm.databaseForm
       Future.successful(Ok(addDatabaseView(form, onSubmitDestination)))
   }
 
   def onSubmit: Action[AnyContent] = authJourney.authWithAdminRight.async { implicit authenticatedRequest =>
-    val errorFunction: Form[NewDatabaseForm] => Future[Result] = { (formWithErrors: Form[NewDatabaseForm]) =>
-      Future.successful(BadRequest(addDatabaseView(formWithErrors, onSubmitDestination)))
+    val errorFunction: Form[CreateNewDatabaseForm] => Future[Result] = {
+      (formWithErrors: Form[CreateNewDatabaseForm]) =>
+        Future.successful(BadRequest(addDatabaseView(formWithErrors, onSubmitDestination)))
     }
 
-    val successFunction: NewDatabaseForm => Future[Result] = { (dataForm: NewDatabaseForm) =>
+    val successFunction: CreateNewDatabaseForm => Future[Result] = { (dataForm: CreateNewDatabaseForm) =>
       insertSqlQueries
         .insertDatabase(dataForm.toGenealogyDatabase)
         .fold(
@@ -50,7 +51,7 @@ class AddDatabaseController @Inject() (
         }
     }
 
-    val formValidationResult = NewDatabaseForm.databaseForm.bindFromRequest()
+    val formValidationResult = CreateNewDatabaseForm.databaseForm.bindFromRequest()
     formValidationResult.fold(errorFunction, successFunction)
   }
 

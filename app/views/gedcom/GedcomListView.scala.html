@@ -3,7 +3,7 @@
 @import uk.gov.hmrc.govukfrontend.views.Implicits.*
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits.*
 @import uk.gov.hmrc.hmrcfrontend.views.Implicits.*
-@import models.forms.GedcomListForm
+@import models.forms.GedcomPathInputTextForm
 @import config.AppConfig
 
 @this(
@@ -15,9 +15,9 @@
     govukErrorSummary: GovukErrorSummary
 )
 
-@(form: Form[GedcomListForm], gedcomFiles: List[String])(implicit request: AuthenticatedRequest[?], messages: Messages)
+@(form: Form[GedcomPathInputTextForm], gedcomFiles: List[String])(implicit request: AuthenticatedRequest[?], messages: Messages)
 
-@main(1, None) {
+@main(1, None, title = messages("importGedcom.checkYourAnswers.title")) {
 
     @block("Select a Gedcom file") {
 
@@ -37,12 +37,6 @@
             @helper.CSRF.formField
 
             @govukRadios(Radios(
-                fieldset = Some(Fieldset(
-                    legend = Some(Legend(
-                        content = Text("Choose a file"),
-                        classes = "govuk-fieldset__legend--m"
-                    ))
-                )),
                 items = gedcomFiles.map { file =>
                     RadioItem(
                         content = Text(file.replace(appConfig.uploadPath, "")),

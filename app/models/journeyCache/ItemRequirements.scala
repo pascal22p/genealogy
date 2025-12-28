@@ -1,5 +1,7 @@
 package models.journeyCache
 
+// Represents the requirements for an item in a user journey.
+// Said item can either be always required or conditionally required based on another item's value.
 sealed trait ItemRequirements
 
 object ItemRequirements {

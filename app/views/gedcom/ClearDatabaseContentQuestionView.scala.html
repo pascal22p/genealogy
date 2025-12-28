@@ -18,7 +18,7 @@
 @main(1, None, title = messages("importGedcom.checkYourAnswers.title")) {
 
 
-@block("Where do you want the data to be imported?") {
+@block("Clear the existing database") {
     @if(form.hasGlobalErrors) {
         @for(error <- form.globalErrors) {
            <span class="error-message">@error.format(messages)</span>
@@ -29,25 +29,25 @@
         @govukErrorSummary(ErrorSummary().withFormErrorsAsHtml(form))
     }
 
-    @helper.form(action = controllers.gedcom.routes.ImportGedcomController.newDatabaseQuestionOnSubmit ) {
+    @helper.form(action = controllers.gedcom.routes.ClearDatabaseQuestionController.clearDatabaseQuestionOnSubmit ) {
         @helper.CSRF.formField
 
         @govukRadios(Radios(
             fieldset = Some(Fieldset(
                 legend =
                     Some(Legend(
-                        content = Text(s"Choose if the data need to be imported in a new database to be created or an existing one"),
+                        content = Text(s"Choose if you want to delete the content of the database before importing the data"),
                         isPageHeading = true
                     ))
             )),
             hint = None,
             items = Seq(
                 RadioItem(
-                    content = Text("In a new database"),
+                    content = Text("Delete the existing data"),
                     value = Some("true")
                 ),
                 RadioItem(
-                    content = Text("In an existing database"),
+                    content = Text("Keep the existing data"),
                     value = Some("false")
                 )
             )

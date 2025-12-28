@@ -254,3 +254,4 @@ importGedcom.NewDatabaseQuestion.trueOrFalse = Create a new database
 importGedcom.NewDatabase.name = Name of the new database
 importGedcom.NewDatabase.description = Description of the new database
 importGedcom.DatabaseSelect.selectedDatabase = Database where to import the data
+importGedcom.ClearDatabaseQuestion.trueOrFalse = Clear the database before import

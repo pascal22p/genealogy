@@ -1,13 +1,13 @@
-package utils.gedcom
+package utils
 
 import java.io.BufferedInputStream
 import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Path
-import javax.inject.Inject
+import java.nio.file.Paths
 
-class CharsetUtil @Inject() () {
+object FileUtils {
 
   def detectGedcomCharset(path: Path): Charset = {
     val bufferSize = 4096
@@ -34,4 +34,8 @@ class CharsetUtil @Inject() () {
     charset.getOrElse(StandardCharsets.UTF_8)
   }
 
+  def ReadGedcomAsString(filePath: String): String = {
+    val charset = detectGedcomCharset(Paths.get(filePath))
+    Files.readString(Paths.get(filePath), charset)
+  }
 }

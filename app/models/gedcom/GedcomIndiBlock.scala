@@ -8,6 +8,6 @@ final case class GedcomIndiBlock(
     sex: String,
     id: Int,
     events: List[GedcomEventBlock],
-    famcLinks: List[Int],
-    famsLinks: List[Int]
+    famcLinks: Set[Int],
+    famsLinks: Set[Int]
 )

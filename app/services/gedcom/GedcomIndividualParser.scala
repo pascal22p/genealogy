@@ -93,7 +93,7 @@ class GedcomIndividualParser @Inject() (
           result.combine(gedcomEventParser.readEventBlock(node).map(List(_)))
       }
 
-    val famsLinksIor: Ior[List[String], List[Int]] = node.children
+    val famsLinksIor: Ior[List[String], Set[Int]] = node.children
       .filter(_.name == "FAMS")
       .map { node =>
         node.xref.fold(
@@ -101,15 +101,17 @@ class GedcomIndividualParser @Inject() (
         )(xref => Ior.right(gedcomHashIdTable.getFamilyIdFromString(xref)))
       }
       .sequence
+      .map(_.toSet)
 
-    val famcLinksIor: Ior[List[String], List[Int]] = node.children
+    val famcLinksIor: Ior[List[String], Set[Int]] = node.children
       .filter(_.name == "FAMC")
       .map { node =>
         node.xref.fold(
-          Ior.left(List(s"line ${node.lineNumber}: `${node.line}` FAMS in INDI is invalid xref is expected"))
+          Ior.left(List(s"line ${node.lineNumber}: `${node.line}` FAMC in INDI is invalid xref is expected"))
         )(xref => Ior.right(gedcomHashIdTable.getFamilyIdFromString(xref)))
       }
       .sequence
+      .map(_.toSet)
 
     val allTagList =
       List("RESN", "SEX", "NAME", "FAMS", "FAMC") ++ eventsIor.right.fold(List.empty[String])(_.map(_.tag))

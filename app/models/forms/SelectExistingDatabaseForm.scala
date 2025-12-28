@@ -10,10 +10,10 @@ import play.api.i18n.Messages
 import play.api.libs.json.Json
 import play.api.libs.json.OWrites
 
-final case class GedcomDatabaseForm(id: Int, title: String) extends UserAnswersItem
+final case class SelectExistingDatabaseForm(id: Int, title: String) extends UserAnswersItem
 
-object GedcomDatabaseForm {
-  def cyaWrites(using @unused messages: Messages): OWrites[GedcomDatabaseForm] =
+object SelectExistingDatabaseForm {
+  def cyaWrites(using @unused messages: Messages): OWrites[SelectExistingDatabaseForm] =
     OWrites { form =>
       Json.obj(
         "selectedDatabase" ->
@@ -22,17 +22,17 @@ object GedcomDatabaseForm {
     }
 
   def unapply(
-      u: GedcomDatabaseForm
+      u: SelectExistingDatabaseForm
   ): Some[(Int, String)] = Some(
     (u.id, u.title)
   )
 
-  val form: Form[GedcomDatabaseForm] = Form(
+  val form: Form[SelectExistingDatabaseForm] = Form(
     single(
-      "selectedDatabase" -> text.transform[GedcomDatabaseForm](
+      "selectedDatabase" -> text.transform[SelectExistingDatabaseForm](
         str => {
           val Array(id, title) = str.split("\\|", 2)
-          GedcomDatabaseForm(id.toInt, title)
+          SelectExistingDatabaseForm(id.toInt, title)
         },
         form => s"${form.id}|${form.title}"
       )

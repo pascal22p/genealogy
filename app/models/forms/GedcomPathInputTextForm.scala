@@ -8,11 +8,11 @@ import play.api.data.*
 import play.api.data.validation.*
 import play.api.data.Forms.*
 
-final case class GedcomListForm(selectedFile: String) extends UserAnswersItem
+final case class GedcomPathInputTextForm(selectedFile: String) extends UserAnswersItem
 
-object GedcomListForm {
+object GedcomPathInputTextForm {
   def unapply(
-      u: GedcomListForm
+      u: GedcomPathInputTextForm
   ): Some[String] = Some(
     u.selectedFile
   )
@@ -31,10 +31,10 @@ object GedcomListForm {
       }
     }
 
-  def form(basePath: String): Form[GedcomListForm] = Form(
+  def form(basePath: String): Form[GedcomPathInputTextForm] = Form(
     mapping(
       "selectedFile" -> nonEmptyText.verifying(validGedcomPath(basePath))
-    )(GedcomListForm.apply)(GedcomListForm.unapply)
+    )(GedcomPathInputTextForm.apply)(GedcomPathInputTextForm.unapply)
   )
 
 }
