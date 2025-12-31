@@ -23,7 +23,8 @@ trait MariadbHelper extends BaseSpec with BeforeAndAfterEach with LoggingWithReq
   implicit override lazy val app: Application = localGuiceApplicationBuilder()
     .configure(
       "database.name"  -> testDataBase,
-      "db.default.url" -> "jdbc:mariadb://localhost:3306"
+      "db.default.url" -> "jdbc:mariadb://localhost:3306",
+      "upload-path"    -> "test/resources/gedcom/"
     )
     .build()
 

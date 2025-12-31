@@ -12,7 +12,6 @@ import anorm.SqlStringInterpolation
 import anorm.Success
 import org.scalatest.AppendedClues.convertToClueful
 import testUtils.MariadbHelper
-import utils.FileUtils
 
 class GedcomImportServiceTortureSpec extends MariadbHelper {
 
@@ -20,7 +19,7 @@ class GedcomImportServiceTortureSpec extends MariadbHelper {
 
   private val gedcomBasePath: String = "test/resources/gedcom/"
 
-  val gedcomString: String = FileUtils.ReadGedcomAsString(gedcomBasePath + "TGC551LF.ged")
+  val gedcomPath: String = gedcomBasePath + "TGC551LF.ged"
 
   val expectedOutput: Map[String, String] = Map(
     "rel_familles_indi" -> """(indi_id = 15, familles_id = 1, rela_type = , rela_stat = None)
@@ -200,7 +199,7 @@ class GedcomImportServiceTortureSpec extends MariadbHelper {
               .executeInsert[Option[Int]](parser)
           }
         }
-        _      <- sut.gedcom2sql(gedcomString, 1)
+        _      <- sut.insertGedcomInDatabase(gedcomPath, 1)
         result <- Future {
           db.withConnection { implicit conn =>
             val tables =

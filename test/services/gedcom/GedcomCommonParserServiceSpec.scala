@@ -214,7 +214,7 @@ class GedcomCommonParserServiceSpec extends BaseSpec {
                     |1 NAME First2 /Name2/
                     |0 @I3@ INDI
                     |1 NAME First3 /Name3/
-                    |""".stripMargin
+                    |""".stripMargin.linesIterator
 
       val expected = List(
         (1, "0 HEAD"),
@@ -228,7 +228,7 @@ class GedcomCommonParserServiceSpec extends BaseSpec {
     }
 
     "parse a single line" in {
-      val input = "1 NAME First2 /Name2/"
+      val input = "1 NAME First2 /Name2/".linesIterator
 
       val expected = List((0, "1 NAME First2 /Name2/"))
 
@@ -237,7 +237,7 @@ class GedcomCommonParserServiceSpec extends BaseSpec {
     }
 
     "return an error if level is incorrect" in {
-      val input = "1 NAME First2 /Name2/"
+      val input = "1 NAME First2 /Name2/".linesIterator
 
       val exception = intercept[RuntimeException] {
         sut.getBlocks(input, 2)
@@ -257,7 +257,7 @@ class GedcomCommonParserServiceSpec extends BaseSpec {
           |1 NAME First2 /Name2/
           |0 @I3@ INDI
           |1 NAME First3 /Name3/
-          |""".stripMargin
+          |""".stripMargin.linesIterator
 
       val expected: List[GedcomNode] = List(
         GedcomNode(
@@ -334,7 +334,7 @@ class GedcomCommonParserServiceSpec extends BaseSpec {
 
     "works with a single line and no content" in {
       val input =
-        "1 BIRT"
+        "1 BIRT".linesIterator
 
       val expected: List[GedcomNode] = List(GedcomNode("BIRT", "1 BIRT", 0, 1, None, None, List()))
 

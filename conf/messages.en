@@ -249,9 +249,11 @@ gedcom.newDatabase.question.no = In an existing database
 gedcom.newDatabase.question.hint = Choose if the data need to be imported in a new database to be created or an existing one
 
 importGedcom.checkYourAnswers.title = Import a Gedcom file
-importGedcom.GedcomPath.selectedFile = File to import
-importGedcom.NewDatabaseQuestion.trueOrFalse = Create a new database
+importGedcom.ChooseGedcomFileQuestion.selectedFile = File to import
+importGedcom.CreateNewDatabaseQuestion.trueOrFalse = Create a new database
 importGedcom.NewDatabase.name = Name of the new database
 importGedcom.NewDatabase.description = Description of the new database
-importGedcom.DatabaseSelect.selectedDatabase = Database where to import the data
-importGedcom.ClearDatabaseQuestion.trueOrFalse = Clear the database before import
+importGedcom.SelectExistingDatabaseQuestion.selectedDatabase = Database where to import the data
+importGedcom.ClearExistingDatabaseQuestion.trueOrFalse = Clear the database before import
+
+importGedcom.choosePlaceElements.title = Map subdivisions from GEDCOM file to database fields

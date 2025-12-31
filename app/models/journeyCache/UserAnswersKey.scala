@@ -2,6 +2,7 @@ package models.journeyCache
 
 import models.forms.CreateNewDatabaseForm
 import models.forms.GedcomPathInputTextForm
+import models.forms.PlacesElementsForm
 import models.forms.SelectExistingDatabaseForm
 import models.forms.TrueOrFalseForm
 import play.api.i18n.Messages
@@ -27,6 +28,13 @@ enum UserAnswersKey[A <: UserAnswersItem](
         requirement = ItemRequirements.Always(),
         journeyId = JourneyId.ImportGedcom
       )(using Json.format[GedcomPathInputTextForm])
+
+  case PlacesElementsQuestion
+      extends UserAnswersKey[PlacesElementsForm](
+        page = controllers.gedcom.routes.GedcomPlaceParserController.chooseExtractPlaceElements,
+        requirement = ItemRequirements.Always(),
+        journeyId = JourneyId.ImportGedcom
+      )(using Json.format[PlacesElementsForm])
 
   case CreateNewDatabaseQuestion
       extends UserAnswersKey[TrueOrFalseForm](

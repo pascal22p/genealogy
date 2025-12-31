@@ -5,6 +5,9 @@ POST    /list                                  controllers.gedcom.ImportGedcomCo
 
 GET     /gedcom-stats                          controllers.gedcom.GedcomStatsController.gedcomStats
 
+GET     /gedcom-places                         controllers.gedcom.GedcomPlaceParserController.chooseExtractPlaceElements
+POST    /gedcom-places                         controllers.gedcom.GedcomPlaceParserController.chooseExtractPlaceElementsOnSubmit
+
 GET     /ask-new-database                      controllers.gedcom.ImportGedcomController.showNewDatabaseQuestion
 POST    /ask-new-database                      controllers.gedcom.ImportGedcomController.newDatabaseQuestionOnSubmit
 

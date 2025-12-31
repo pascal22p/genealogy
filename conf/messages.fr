@@ -287,9 +287,11 @@ gedcom.newDatabase.question.no = Dans une base de données existante
 gedcom.newDatabase.question.hint = Choisissez si les données doivent être importées dans une nouvelle base de données à créer ou dans une base de données existante.
 
 importGedcom.checkYourAnswers.title = Importer un fichier Gedcom
-importGedcom.GedcomPath.selectedFile = Fichier à importer
-importGedcom.NewDatabaseQuestion.trueOrFalse = Créer une nouvelle base de données
+importGedcom.ChooseGedcomFileQuestion.selectedFile = Fichier à importer
+importGedcom.CreateNewDatabaseQuestion.trueOrFalse = Créer une nouvelle base de données
 importGedcom.NewDatabase.name = Nom de la nouvelle base de données
 importGedcom.NewDatabase.description = Description de la nouvelle base de données
-importGedcom.DatabaseSelect.selectedDatabase = Base de données où importer les données
-importGedcom.ClearDatabaseQuestion.trueOrFalse = Vider la base de données avant l'importation
+importGedcom.SelectExistingDatabaseQuestion.selectedDatabase = Base de données où importer les données
+importGedcom.ClearExistingDatabaseQuestion.trueOrFalse = Vider la base de données avant l'importation
+
+importGedcom.choosePlaceElements.title = Associer les subdivisions du fichier GEDCOM aux champs de base de données

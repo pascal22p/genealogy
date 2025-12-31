@@ -8,6 +8,7 @@ import scala.util.matching.Regex
 import cats.data.Ior
 import models.gedcom.GedcomNode
 import models.gedcom.GedcomObject
+import utils.FileUtils
 
 @Singleton
 class GedcomCommonParser @Inject() () {
@@ -15,11 +16,8 @@ class GedcomCommonParser @Inject() () {
   private val tagAndXrefRegexp: Regex       = "^\\s*[0-9]+\\s+([_A-Za-z]+)\\s*(@([^@]+)@|)\\s*(.+|)".r
   private val level0TagAndXrefRegexp: Regex = "^\\s*0\\s+(@([^@]+)@|)\\s*([A-Za-z]+).*".r
 
-  def getBlocks(gedcomString: String, level: Int = 0): List[(Int, String)] = {
-    scala.io.Source
-      .fromString(gedcomString)
-      .getLines
-      .zipWithIndex
+  def getBlocks(gedcomString: Iterator[String], level: Int = 0): List[(Int, String)] = {
+    gedcomString.zipWithIndex
       .foldLeft(List.empty[(Int, String)]) {
         case (tree, (line, lineNumber)) =>
           line.trim match {
@@ -41,19 +39,44 @@ class GedcomCommonParser @Inject() () {
       .filter(_._2.nonEmpty)
   }
 
-  final def getTree(gedcomString: String): GedcomObject = GedcomObject(getListNodes(gedcomString))
+  def getSamplePlaces(gedcomPath: String, sampleSize: Int): Set[List[String]] = {
+    val placePattern   = "[ ]*[0-9]+[ ]*PLAC[ ]*(.*)".r
+    val gedcomIterator = FileUtils.readGedcomAsIterator(gedcomPath)
+    val uniquePlaces   = gedcomIterator
+      .collect {
+        case placePattern(place) => place.trim
+      }
+      .take(sampleSize)
+      .toSet
+
+    val splitLines = uniquePlaces.map(_.split(",").map(_.trim).toList)
+
+    val maxSize = splitLines.map(_.size).max
+
+    val paddedLines: Set[List[String]] = splitLines.map { parts =>
+      val padSize = maxSize - parts.size
+      List.fill(padSize)("") ++ parts
+    }
+
+    paddedLines
+  }
+
+  final def getTree(gedcomPath: String): GedcomObject = {
+    val gedcomIterator = FileUtils.readGedcomAsIterator(gedcomPath)
+    GedcomObject(getListNodes(gedcomIterator))
+  }
 
   private[gedcom] final def getListNodes(
-      gedcomString: String,
+      gedcomString: Iterator[String],
       level: Int = 0,
       rootLineNumber: Int = 0
   ): List[GedcomNode] = {
     val blocks = getBlocks(gedcomString, level)
     blocks.map {
       case (lineNumber, block) =>
-        val subBlock                 = scala.io.Source.fromString(block).getLines
+        val subBlock                 = block.linesIterator
         val subBlockHeader: String   = subBlock.nextOption().getOrElse("")
-        val subBlockBody             = subBlock.mkString("\n")
+        val subBlockBody             = subBlock
         val (xref, tagName, content) = subBlockHeader match {
           case level0TagAndXrefRegexp(_, xref, tagName)    => (Option(xref), tagName, None)
           case tagAndXrefRegexp(tagName, _, xref, content) =>
@@ -99,5 +122,4 @@ class GedcomCommonParser @Inject() () {
       case Some(content) => Ior.Right(Map(node.name -> content))
     }
   }
-
 }

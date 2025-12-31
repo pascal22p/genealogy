@@ -15,7 +15,6 @@ import play.api.mvc.*
 import repositories.JourneyCacheRepository
 import services.gedcom.GedcomCommonParser
 import services.gedcom.GedcomImportService
-import utils.FileUtils
 import views.html.gedcom.GedcomStatsView
 
 @Singleton
@@ -39,13 +38,10 @@ class GedcomStatsController @Inject() (
           val basePath = Paths.get(appConfig.uploadPath)
           val sanitise = s"./${basePath.resolve(gedcomListForm.selectedFile).normalize()}"
           if (sanitise.startsWith(s"$basePath") && Files.exists(Paths.get(sanitise))) {
-            val gedcomTxt    = FileUtils.ReadGedcomAsString(sanitise)
-            val gedcomObject = gedcomCommonParser.getTree(gedcomTxt)
-            val sqlsIor      = gedcomImportService.convertTree2SQL(gedcomObject.nodes, 0)
+            val gedcomObject = gedcomCommonParser.getTree(sanitise)
+            val warnings     = gedcomImportService.convertTree2SQLWarnings(gedcomObject.nodes)
 
-            val warnings = sqlsIor.left.getOrElse(List.empty)
-
-            Ok(gedcomStatsView(warnings, gedcomObject))
+            Ok(gedcomStatsView(gedcomObject, warnings.take(100)))
           } else {
             InternalServerError("Gedcom file path should be valid")
           }
