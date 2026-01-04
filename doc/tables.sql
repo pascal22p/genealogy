@@ -220,7 +220,7 @@ CREATE TABLE `genea_permissions` (
 DROP TABLE IF EXISTS `genea_place`;
 CREATE TABLE `genea_place` (
   `place_id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
-  `place_lieudit` varchar(50) DEFAULT NULL,
+  `place_lieudit` varchar(200) DEFAULT NULL,
   `place_ville` varchar(50) DEFAULT NULL,
   `place_cp` varchar(50) DEFAULT NULL,
   `place_insee` mediumint(8) unsigned DEFAULT NULL,
@@ -330,9 +330,10 @@ CREATE TABLE `genea_submitters` (
 DROP TABLE IF EXISTS `genea_user_answers`;
 CREATE TABLE `genea_user_answers` (
                                       `sessionId` varchar(36) NOT NULL,
+                                      `itemKey` varchar(128),
                                       `data` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`data`)),
                                       `lastUpdated` datetime NOT NULL,
-                                      PRIMARY KEY (`sessionId`),
+                                      PRIMARY KEY (`sessionId`, `itemKey`),
                                       KEY `lastUpdated` (`lastUpdated`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

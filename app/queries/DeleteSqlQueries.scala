@@ -14,6 +14,14 @@ final class DeleteSqlQueries @Inject() (db: Database, databaseExecutionContext: 
 
   def deletePersonDetails(personDetailsId: Int): Future[Int] = Future {
     db.withTransaction { implicit conn =>
+      SQL("""DELETE FROM rel_familles_indi
+            | WHERE rel_familles_indi.indi_id = {id}
+        """.stripMargin)
+        .on(
+          "id" -> personDetailsId
+        )
+        .executeUpdate()
+
       SQL("""DELETE FROM rel_indi_events
             | WHERE rel_indi_events.indi_id = {id}
         """.stripMargin)

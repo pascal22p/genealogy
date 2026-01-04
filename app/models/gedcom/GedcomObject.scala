@@ -1,6 +1,8 @@
 package models.gedcom
 
-import utils.Constants.individualsEvents
+import play.api.libs.json.Format
+import play.api.libs.json.Json
+import utils.Constants
 
 final case class GedcomObject(nodes: List[GedcomNode]) {
   def getHusb(id: String): Option[String] = {
@@ -22,15 +24,15 @@ final case class GedcomObject(nodes: List[GedcomNode]) {
   }
 
   def getIndividualsSummary: List[String] = {
-    nodes.filter(_.name == "INDI").map { indiNode =>
+    nodes.filter(_.name == "INDI").take(Constants.maxSampleSize).map { indiNode =>
       val name = indiNode.children.find(_.name == "NAME").flatMap(_.content)
       s"""${indiNode.lineNumber} / ${indiNode.xref.getOrElse("Unknown ID")}: ${name.getOrElse("")}"""
     }
   }
 
   def getIndividualsEvents: List[String] = {
-    nodes.filter(_.name == "INDI").flatMap { indiNode =>
-      indiNode.children.filter(node => individualsEvents.contains(node.name)).map { eventNode =>
+    nodes.filter(_.name == "INDI").take(Constants.maxSampleSize).flatMap { indiNode =>
+      indiNode.children.filter(node => Constants.individualsEvents.contains(node.name)).map { eventNode =>
         val date = eventNode.children.find(_.name == "DATE").flatMap(_.content).getOrElse("")
         s"""${eventNode.lineNumber} / ${indiNode.xref.getOrElse("Unknown ID")}: ${eventNode.content.getOrElse("")} ${eventNode.name} $date"""
       }
@@ -38,11 +40,15 @@ final case class GedcomObject(nodes: List[GedcomNode]) {
   }
 
   def getFamiliesSummary: List[String] = {
-    nodes.filter(_.name == "FAM").map { familyNode =>
+    nodes.filter(_.name == "FAM").take(Constants.maxSampleSize).map { familyNode =>
       val husb = familyNode.xref.flatMap(getHusb).fold("")(husb => s"Husband: $husb,")
       val wife = familyNode.xref.flatMap(getWife).fold("")(wife => s"Wife: $wife")
       s"""${familyNode.lineNumber} / ${familyNode.xref.getOrElse("Unknown ID")}. $husb $wife"""
     }
   }
 
+}
+
+object GedcomObject {
+  implicit val format: Format[GedcomObject] = Json.format[GedcomObject]
 }

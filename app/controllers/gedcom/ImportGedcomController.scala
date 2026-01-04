@@ -23,6 +23,7 @@ import models.forms.SelectExistingDatabaseForm
 import models.forms.TrueOrFalseForm
 import models.journeyCache.UserAnswersKey.*
 import repositories.JourneyCacheRepository
+import services.gedcom.GedcomHashIdTable
 import services.GenealogyDatabaseService
 import views.html.add.AddDatabase
 import views.html.gedcom.GedcomChooseDatabaseView
@@ -39,6 +40,7 @@ class ImportGedcomController @Inject() (
     newDatabaseQuestionView: NewDatabaseQuestionView,
     addDatabaseView: AddDatabase,
     gedcomChooseDatabaseView: GedcomChooseDatabaseView,
+    gedcomHashIdTable: GedcomHashIdTable,
     val controllerComponents: ControllerComponents
 )(implicit ec: ExecutionContext)
     extends BaseController
@@ -46,7 +48,7 @@ class ImportGedcomController @Inject() (
 
   private def listGedcomFiles: List[String] = {
     val folderPath = Paths.get(appConfig.uploadPath)
-    val matcher = FileSystems.getDefault.getPathMatcher("glob:{*.ged,**/*.ged}")
+    val matcher    = FileSystems.getDefault.getPathMatcher("glob:{*.ged,**/*.ged}")
 
     Files
       .walk(folderPath)
@@ -63,7 +65,10 @@ class ImportGedcomController @Inject() (
 
   def startJourney: Action[AnyContent] = authJourney.authWithAdminRight.async {
     implicit request: AuthenticatedRequest[AnyContent] =>
-      Future.successful(Redirect(controllers.gedcom.routes.ImportGedcomController.showGedcomList))
+      {
+        gedcomHashIdTable.clearAllData
+        Future.successful(Redirect(controllers.gedcom.routes.ImportGedcomController.showGedcomList))
+      }
   }
 
   def showGedcomList: Action[AnyContent] = authJourney.authWithAdminRight.async {
@@ -83,7 +88,7 @@ class ImportGedcomController @Inject() (
 
       val successFunction: GedcomPathInputTextForm => Future[Result] = { (dataForm: GedcomPathInputTextForm) =>
         journeyCacheRepository.upsert(ChooseGedcomFileQuestion, dataForm).map { _ =>
-          Redirect(controllers.gedcom.routes.GedcomStatsController.gedcomStats)
+          Redirect(controllers.gedcom.routes.ChoosePlaceSeparatorController.showForm)
         }
       }
 

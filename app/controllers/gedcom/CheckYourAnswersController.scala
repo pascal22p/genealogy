@@ -19,7 +19,6 @@ import queries.InsertSqlQueries
 import queries.UpdateSqlQueries
 import repositories.JourneyCacheRepository
 import services.gedcom.GedcomImportService
-import utils.FileUtils
 import views.html.gedcom.*
 
 @Singleton
@@ -58,7 +57,6 @@ class CheckYourAnswersController @Inject() (
           val basePath = Paths.get(appConfig.uploadPath)
           val sanitise =
             s"./${basePath.resolve(userAnswers.getItem(ChooseGedcomFileQuestion).selectedFile).normalize()}"
-          val gedcomTxt = FileUtils.ReadGedcomAsString(sanitise)
 
           def maybeCreateDatabase: OptionT[Future, Int] =
             if (userAnswers.getItem(CreateNewDatabaseQuestion).trueOrFalse) {
@@ -92,7 +90,7 @@ class CheckYourAnswersController @Inject() (
             dbId <- maybeCreateDatabase.value
             _    <- maybeClearDatabase
             targetDbId = dbId.getOrElse(userAnswers.getItem(SelectExistingDatabaseQuestion).id)
-            _ <- gedcomImportService.gedcom2sql(gedcomTxt, targetDbId)
+            _ <- gedcomImportService.insertGedcomInDatabase(sanitise, targetDbId)
             _ <- journeyCacheRepository.clear
           } yield {
             Redirect(controllers.routes.HomeController.onload())

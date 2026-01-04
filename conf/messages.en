@@ -249,9 +249,22 @@ gedcom.newDatabase.question.no = In an existing database
 gedcom.newDatabase.question.hint = Choose if the data need to be imported in a new database to be created or an existing one
 
 importGedcom.checkYourAnswers.title = Import a Gedcom file
-importGedcom.GedcomPath.selectedFile = File to import
-importGedcom.NewDatabaseQuestion.trueOrFalse = Create a new database
+importGedcom.ChooseGedcomFileQuestion.selectedFile = File to import
+importGedcom.CreateNewDatabaseQuestion.trueOrFalse = Create a new database
 importGedcom.NewDatabase.name = Name of the new database
 importGedcom.NewDatabase.description = Description of the new database
-importGedcom.DatabaseSelect.selectedDatabase = Database where to import the data
-importGedcom.ClearDatabaseQuestion.trueOrFalse = Clear the database before import
+importGedcom.SelectExistingDatabaseQuestion.selectedDatabase = Database where to import the data
+importGedcom.ClearExistingDatabaseQuestion.trueOrFalse = Clear the database before import
+importGedcom.PlacesElementsPaddingQuestion.padding = Where to add blanks for missing place elements
+importGedcom.PlacesElementsSeparatorQuestion.separator = Separator for place elements
+importGedcom.PlacesElementsQuestion.hierarchy = Place fields mapping
+importGedcom.PlacesElements.padding.right = On the right
+importGedcom.PlacesElements.padding.left = On the left
+importGedcom.place.field.City = Town/City
+importGedcom.place.field.Postcode = Postcode
+importGedcom.place.field.subdivision = Subdivision
+importGedcom.place.field.division = Division
+importGedcom.place.field.Country = Country
+importGedcom.place.field.Locality = Locality
+
+importGedcom.choosePlaceElements.title = Map subdivisions from GEDCOM file to database fields

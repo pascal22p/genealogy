@@ -244,11 +244,16 @@ final class UpdateSqlQueries @Inject() (db: Database, databaseExecutionContext: 
 
   def emptyDatabase(id: Int): Future[Int] = Future {
     db.withTransaction { implicit conn =>
-      SQL("""DELETE rie
-            |FROM rel_indi_events AS rie
+      SQL("""DELETE rfi
+            |FROM rel_familles_indi AS rfi
             |JOIN genea_individuals AS gi
-            |  ON gi.indi_id = rie.indi_id
+            |  ON gi.indi_id = rfi.indi_id
             |WHERE gi.base = {id}""".stripMargin).on("id" -> id).executeUpdate() +
+        SQL("""DELETE rie
+              |FROM rel_indi_events AS rie
+              |JOIN genea_individuals AS gi
+              |  ON gi.indi_id = rie.indi_id
+              |WHERE gi.base = {id}""".stripMargin).on("id" -> id).executeUpdate() +
         SQL("""DELETE rae
               |FROM rel_asso_events AS rae
               |JOIN genea_individuals AS gi

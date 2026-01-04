@@ -13,15 +13,26 @@ import models.gedcom.GedcomNode
 class GedcomEventParser @Inject() (gedcomHashIdTable: GedcomHashIdTable) {
 
   def readEventBlock(node: GedcomNode): Ior[List[String], GedcomEventBlock] = {
-    val eventTag  = node.name
-    val eventDate = node.children.find(_.name == "DATE").flatMap(_.content)
+    val eventTag   = node.name
+    val eventDate  = node.children.find(_.name == "DATE").flatMap(_.content)
+    val eventPlace = node.children.find(_.name == "PLAC").flatMap(_.content.filter(_.trim.nonEmpty).map(_.trim))
 
     val ignoredContent: List[String] = node.children
-      .filterNot(child => child.name == "DATE")
+      .filterNot(child => List("DATE", "PLAC").contains(child.name))
       .map { node =>
-        s"Line ${node.lineNumber}: `${node.line}` in event is not supported"
+        s"Line ${node.lineNumber}: `${node.line}` " +
+          s"in event is not supported"
       }
-    Ior.Both(ignoredContent, GedcomEventBlock(eventTag, eventDate.getOrElse("")))
+    val ignoredPlaceContent: List[String] = node.children.filter(_.name == "PLAC").flatMap { place =>
+      place.children.map { node =>
+        s"Line ${node.lineNumber}: `${node.line}` in place from event is not supported"
+      }
+    }
+
+    Ior.Both(
+      ignoredContent ++ ignoredPlaceContent,
+      GedcomEventBlock(eventTag, eventDate.getOrElse(""), eventPlace)
+    )
   }
 
   def gedcomIndividualEventBlock2Sql(
@@ -31,14 +42,15 @@ class GedcomEventParser @Inject() (gedcomHashIdTable: GedcomHashIdTable) {
   ): List[SimpleSql[Row]] = {
     listEvent.flatMap { event =>
       val eventId = gedcomHashIdTable.getEventId
+      val placeId = event.place.map(s => gedcomHashIdTable.getPlaceIdFromString(s.trim))
       List(
         SQL(
           "INSERT INTO `genea_events_details` (`events_details_id`, `place_id`, `addr_id`, `events_details_descriptor`, `events_details_gedcom_date`, `events_details_age`, `events_details_cause`, `jd_count`, `jd_precision`, `jd_calendar`, `events_details_famc`, `events_details_adop`, `base`) " +
-            "VALUES ({events_details_id} + @startEvent, {place_id}, {addr_id}, {events_details_descriptor}, {events_details_gedcom_date}, {events_details_age}, {events_details_cause}, {jd_count}, {jd_precision}, {jd_calendar}, {events_details_famc}, {events_details_adop}, {base})"
+            "VALUES ({events_details_id} + @startEvent, {place_id} + @startPlace, {addr_id}, {events_details_descriptor}, {events_details_gedcom_date}, {events_details_age}, {events_details_cause}, {jd_count}, {jd_precision}, {jd_calendar}, {events_details_famc}, {events_details_adop}, {base})"
         )
           .on(
             "events_details_id"          -> eventId,
-            "place_id"                   -> Option.empty[String],
+            "place_id"                   -> placeId,
             "addr_id"                    -> Option.empty[String],
             "events_details_descriptor"  -> "",
             "events_details_gedcom_date" -> event.date,

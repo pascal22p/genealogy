@@ -2,6 +2,8 @@ package utils
 
 object Constants {
 
+  val maxSampleSize = 100
+
   val individualsEvents = List(
     "BIRT",
     "CHR",
