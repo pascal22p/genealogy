@@ -9,6 +9,15 @@ class GedcomHashIdTable @Inject() () {
     scala.collection.mutable.Map.empty[String, Int]
   private val familyHashMap: scala.collection.mutable.Map[String, Int] =
     scala.collection.mutable.Map.empty[String, Int]
+  val placeHashMap: scala.collection.mutable.Map[String, Int] =
+    scala.collection.mutable.Map.empty[String, Int]
+
+  def clearAllData: Unit = {
+    individualHashMap.clear()
+    familyHashMap.clear()
+    placeHashMap.clear()
+    println(s"^^^^^^^^^ ${individualHashMap.size}, ${familyHashMap.size}, ${placeHashMap.size}")
+  }
 
   private def insertNewIndividualId(stringId: String): Int = {
     val nextId: Int = individualHashMap.values.maxOption.fold(0)(_ + 1)
@@ -30,9 +39,18 @@ class GedcomHashIdTable @Inject() () {
     familyHashMap.getOrElse(stringId, insertNewFamilyId(stringId))
   }
 
-  private var LastEventId: Option[Int] = None
+  private def insertNewPlaceId(stringId: String): Int = {
+    val nextId: Int = placeHashMap.values.maxOption.fold(0)(_ + 1)
+    placeHashMap += (stringId -> nextId)
+    nextId
+  }
 
-  def getEventId: Int = {
+  def getPlaceIdFromString(stringId: String): Int = {
+    placeHashMap.getOrElse(stringId, insertNewPlaceId(stringId))
+  }
+
+  private var LastEventId: Option[Int] = None
+  def getEventId: Int                  = {
     val nextId: Int = LastEventId.fold(0)(_ + 1)
     LastEventId = Some(nextId)
     nextId

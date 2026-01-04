@@ -1,0 +1,76 @@
+@import views.html.components.Block
+@import helper._
+@import uk.gov.hmrc.govukfrontend.views.Implicits.*
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits.*
+@import uk.gov.hmrc.hmrcfrontend.views.Implicits.*
+@import models.forms.PlacesElementsPaddingForm
+
+@this(
+        main: Main,
+        block: Block,
+        formWithCSRF: FormWithCSRF,
+        govukErrorSummary: GovukErrorSummary,
+        govukRadios: GovukRadios,
+        govukButton: GovukButton
+)
+
+@(placesElementsPaddingForm: Form[PlacesElementsPaddingForm], sample: Set[List[String]])(implicit request: AuthenticatedRequest[?], messages: Messages)
+
+@main(1, None, title = messages("importGedcom.checkYourAnswers.title")) {
+
+    @if(placesElementsPaddingForm.hasErrors) {
+        @govukErrorSummary(ErrorSummary(
+            errorList = placesElementsPaddingForm.errors.map { error =>
+                ErrorLink(
+                    href = Some(s"#${error.key}"),
+                    content = Text(messages(error.message))
+                )
+            },
+            title = Text("There is a problem")
+        ))
+    }
+
+    @block("Sample of place entries from your GEDCOM file") {
+        <div class="scroll-container">
+            <div class="scroll-container">
+                  <ul class="govuk-list govuk-list--bullet govuk-list--spaced">
+                    @for(row <- sample) {
+                      <li>@row.mkString(" | ")</li>
+                    }
+                  </ul>
+            </div>
+        </div>
+    }
+
+    @formWithCSRF(controllers.gedcom.routes.ChoosePlacePaddingController.showFormOnSubmit) {
+        @govukRadios(Radios(
+            fieldset = Some(Fieldset(
+                legend =
+                    Some(Legend(
+                        content = Text(s"Choose if you want to add padding on the left ot the right for missing elements in your GEDCOM place entries"),
+                        isPageHeading = true
+                    ))
+            )),
+            hint = None,
+            items = Seq(
+                RadioItem(
+                    content = Text("Add padding on the left"),
+                    value = Some("left")
+                ),
+                RadioItem(
+                    content = Text("Add padding on the right"),
+                    value = Some("right")
+                )
+            )
+        ).withFormField(placesElementsPaddingForm("padding")))
+
+        @govukButton(Button(
+            content = Text("Continue"),
+            name = Some("submit"),
+            href = None,
+            inputType = Some("submit")
+        ))
+    }
+
+}
+

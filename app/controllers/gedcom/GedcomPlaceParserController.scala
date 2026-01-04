@@ -38,15 +38,22 @@ class GedcomPlaceParserController @Inject() (
     implicit request: AuthenticatedRequest[AnyContent] =>
       for {
         maybeChooseGedcomFileQuestion <- journeyCacheRepository.get(ChooseGedcomFileQuestion)
+        maybePlaceSeparator           <- journeyCacheRepository.get(PlacesElementsSeparatorQuestion)
+        maybePlacePadding             <- journeyCacheRepository.get(PlacesElementsPaddingQuestion)
         maybePlacesElementsQuestion   <- journeyCacheRepository.get(PlacesElementsQuestion)
       } yield {
-        (maybeChooseGedcomFileQuestion, maybePlacesElementsQuestion) match {
-          case (Some(chooseGedcomFileQuestion), placesElementsQuestion) =>
+        (maybeChooseGedcomFileQuestion, maybePlacesElementsQuestion, maybePlaceSeparator, maybePlacePadding) match {
+          case (Some(chooseGedcomFileQuestion), placesElementsQuestion, Some(placeSeparator), Some(placePadding)) =>
             val basePath = Paths.get(appConfig.uploadPath)
             val sanitise = s"./${basePath.resolve(chooseGedcomFileQuestion.selectedFile).normalize()}"
             if (sanitise.startsWith(s"$basePath") && Files.exists(Paths.get(sanitise))) {
-              val placesSample = gedcomCommonParser.getSamplePlaces(sanitise, Constants.maxSampleSize * 10)
-              val form         = PlacesElementsForm.form.filledWith(placesElementsQuestion)
+              val placesSample = gedcomCommonParser.getSamplePlaces(
+                sanitise,
+                Constants.maxSampleSize * 10,
+                Some(placeSeparator.separator),
+                Some(placePadding.padding)
+              )
+              val form = PlacesElementsForm.form.filledWith(placesElementsQuestion)
 
               Ok(gedcomPlacesSampleView(placesSample, form))
             } else {
@@ -75,13 +82,11 @@ class GedcomPlaceParserController @Inject() (
       }
 
       val successFunction: PlacesElementsForm => Future[Result] = { (dataForm: PlacesElementsForm) =>
-        Future.successful(Ok(s"${dataForm.hierarchy}"))
-
-        /*journeyCacheRepository
+        journeyCacheRepository
           .upsert(PlacesElementsQuestion, dataForm)
           .map { _ =>
-            Redirect(controllers.gedcom.routes.CheckYourAnswersController.checkYourAnswersImportGedcom)
-          }*/
+            Redirect(controllers.gedcom.routes.ImportGedcomController.showNewDatabaseQuestion)
+          }
       }
 
       val formValidationResult = PlacesElementsForm.form.bindFromRequest()

@@ -39,26 +39,36 @@ class GedcomCommonParser @Inject() () {
       .filter(_._2.nonEmpty)
   }
 
-  def getSamplePlaces(gedcomPath: String, sampleSize: Int): Set[List[String]] = {
-    val placePattern   = "[ ]*[0-9]+[ ]*PLAC[ ]*(.*)".r
-    val gedcomIterator = FileUtils.readGedcomAsIterator(gedcomPath)
-    val uniquePlaces   = gedcomIterator
+  def getSamplePlaces(
+      gedcomPath: String,
+      sampleSize: Int,
+      separatorOption: Option[String] = None,
+      paddingOrderOption: Option[String] = None
+  ): Set[List[String]] = {
+    val placePattern              = "[ ]*[0-9]+[ ]*PLAC[ ]*(.*)".r
+    val gedcomIterator            = FileUtils.readGedcomAsIterator(gedcomPath)
+    val uniquePlaces: Set[String] = gedcomIterator
       .collect {
         case placePattern(place) => place.trim
       }
       .take(sampleSize)
       .toSet
 
-    val splitLines = uniquePlaces.map(_.split(",").map(_.trim).toList)
-
-    val maxSize = splitLines.map(_.size).max
-
-    val paddedLines: Set[List[String]] = splitLines.map { parts =>
-      val padSize = maxSize - parts.size
-      List.fill(padSize)("") ++ parts
-    }
-
-    paddedLines
+    (for {
+      separator    <- separatorOption
+      paddingOrder <- paddingOrderOption
+    } yield {
+      val splitLines = uniquePlaces.map(_.split(separator).map(_.trim).toList)
+      val maxSize    = splitLines.map(_.size).max
+      splitLines.map { parts =>
+        val padSize = maxSize - parts.size
+        if (paddingOrder == "left") {
+          List.fill(padSize)("") ++ parts
+        } else {
+          parts ++ List.fill(padSize)("")
+        }
+      }
+    }).getOrElse(uniquePlaces.map(List(_)))
   }
 
   final def getTree(gedcomPath: String): GedcomObject = {

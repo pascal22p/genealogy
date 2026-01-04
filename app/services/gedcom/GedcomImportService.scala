@@ -3,6 +3,7 @@ package services.gedcom
 import javax.inject.Inject
 import javax.inject.Singleton
 
+import scala.annotation.tailrec
 import scala.collection.concurrent.TrieMap
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.Await
@@ -15,6 +16,7 @@ import anorm.SimpleSql
 import config.AppConfig
 import models.gedcom.GedcomFamilyBlock
 import models.gedcom.GedcomNode
+import models.AuthenticatedRequest
 import models.DatabaseExecutionContext
 import play.api.db.Database
 
@@ -24,12 +26,28 @@ class GedcomImportService @Inject() (
     gedcomIndividualParser: GedcomIndividualParser,
     gedcomFamilyParser: GedcomFamilyParser,
     gedcomEventParser: GedcomEventParser,
+    gedcomPlaceParser: GedcomPlaceParser,
     config: AppConfig,
     db: Database,
     databaseExecutionContext: DatabaseExecutionContext
 )(implicit ec: ExecutionContext) {
 
-  def insertGedcomInDatabase(gedcomPath: String, dbId: Int): Future[Boolean] = {
+  def findAllPlaces(nodes: List[GedcomNode]): List[GedcomNode] = {
+    @tailrec
+    def loop(todo: List[GedcomNode], acc: List[GedcomNode]): List[GedcomNode] =
+      todo match {
+        case Nil          => acc.reverse
+        case head :: tail =>
+          val acc2 = if (head.name == "PLAC") head :: acc else acc
+          loop(head.children ++ tail, acc2)
+      }
+
+    loop(nodes, Nil)
+  }
+
+  def insertGedcomInDatabase(gedcomPath: String, dbId: Int)(
+      implicit request: AuthenticatedRequest[?]
+  ): Future[Boolean] = {
     val gedcomObject  = gedcomCommonParser.getTree(gedcomPath)
     val sqlStatements = convertTree2SQL(gedcomObject.nodes, dbId)
 
@@ -52,12 +70,17 @@ class GedcomImportService @Inject() (
     ).on(),
     SQL(
       s"SELECT `AUTO_INCREMENT` INTO @startFamily FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '${config.databaseName}' AND TABLE_NAME = 'genea_familles'"
+    ).on(),
+    SQL(
+      s"SELECT `AUTO_INCREMENT` INTO @startPlace FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '${config.databaseName}' AND TABLE_NAME = 'genea_place'"
     ).on()
   )
 
   val commitTransaction: Iterator[SimpleSql[Row]] = Iterator(SQL("COMMIT;").on())
 
-  def convertTree2SQL(nodes: List[GedcomNode], base: Int): Iterator[SimpleSql[Row]] = {
+  def convertTree2SQL(nodes: List[GedcomNode], base: Int)(
+      implicit request: AuthenticatedRequest[?]
+  ): Iterator[SimpleSql[Row]] = {
     val indis = nodes
       .filter(_.name == "INDI")
       .flatMap(node => gedcomIndividualParser.readIndiBlock(node).right)
@@ -121,8 +144,11 @@ class GedcomImportService @Inject() (
     val familyEventsSql = families.iterator.flatMap(family =>
       gedcomEventParser.gedcomFamilyEventBlock2Sql(family._2.events, base, family._2.id)
     )
+    val places       = findAllPlaces(nodes).flatMap(_.content)
+    val placesBlocks = gedcomPlaceParser.readPlaceBlocks(places)
+    val placesSqls   = gedcomPlaceParser.placeBlocks2Sql(placesBlocks, base).iterator
 
-    startTransaction ++ indiSqls ++ individualEventsSql ++ familySqls ++ childrenSqls ++ familyEventsSql ++ commitTransaction
+    startTransaction ++ placesSqls ++ indiSqls ++ individualEventsSql ++ familySqls ++ childrenSqls ++ familyEventsSql ++ commitTransaction
   }
 
   def convertTree2SQLWarnings(nodes: List[GedcomNode]): Iterator[String] = {

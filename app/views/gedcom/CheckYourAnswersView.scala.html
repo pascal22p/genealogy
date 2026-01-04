@@ -14,7 +14,7 @@
 
     @govukSummaryList(
         SummaryList(
-            rows = answers.flatMap { case (userAnswersKey, valuesMap) =>
+            rows = answers.toList.sortBy(_._1.index).flatMap { case (userAnswersKey, valuesMap) =>
                 valuesMap.map { case (key, value) =>
                     SummaryListRow(
                         key = Key(Text(messages(s"importGedcom.$userAnswersKey.$key"))),

@@ -5,8 +5,14 @@ POST    /list                                  controllers.gedcom.ImportGedcomCo
 
 GET     /gedcom-stats                          controllers.gedcom.GedcomStatsController.gedcomStats
 
-GET     /gedcom-places                         controllers.gedcom.GedcomPlaceParserController.chooseExtractPlaceElements
-POST    /gedcom-places                         controllers.gedcom.GedcomPlaceParserController.chooseExtractPlaceElementsOnSubmit
+GET     /gedcom-places-separator               controllers.gedcom.ChoosePlaceSeparatorController.showForm
+POST    /gedcom-places-separator               controllers.gedcom.ChoosePlaceSeparatorController.showFormOnSubmit
+
+GET     /gedcom-places-padding                 controllers.gedcom.ChoosePlacePaddingController.showForm
+POST    /gedcom-places-padding                 controllers.gedcom.ChoosePlacePaddingController.showFormOnSubmit
+
+GET     /gedcom-places-extract                 controllers.gedcom.GedcomPlaceParserController.chooseExtractPlaceElements
+POST    /gedcom-places-extract                 controllers.gedcom.GedcomPlaceParserController.chooseExtractPlaceElementsOnSubmit
 
 GET     /ask-new-database                      controllers.gedcom.ImportGedcomController.showNewDatabaseQuestion
 POST    /ask-new-database                      controllers.gedcom.ImportGedcomController.newDatabaseQuestionOnSubmit

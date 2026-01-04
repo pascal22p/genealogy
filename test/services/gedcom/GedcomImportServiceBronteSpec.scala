@@ -1,5 +1,7 @@
 package services.gedcom
 
+import java.time.LocalDateTime
+
 import scala.concurrent.Future
 
 import anorm.ResultSetParser
@@ -10,12 +12,35 @@ import anorm.SqlParser
 import anorm.SqlParser.int
 import anorm.SqlStringInterpolation
 import anorm.Success
+import models.forms.PlacesElementsForm
+import models.forms.PlacesElementsPaddingForm
+import models.forms.PlacesElementsSeparatorForm
+import models.gedcom.PlaceSubdivisionMapping
+import models.journeyCache.UserAnswersKey.PlacesElementsPaddingQuestion
+import models.journeyCache.UserAnswersKey.PlacesElementsQuestion
+import models.journeyCache.UserAnswersKey.PlacesElementsSeparatorQuestion
+import models.AuthenticatedRequest
+import models.Session
+import models.SessionData
+import models.UserData
+import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentMatchers.eq as eqTo
+import org.mockito.Mockito.when
 import org.scalatest.AppendedClues.convertToClueful
+import play.api.mvc.AnyContentAsEmpty
+import play.api.test.FakeRequest
 import testUtils.MariadbHelper
 
 class GedcomImportServiceBronteSpec extends MariadbHelper {
 
   lazy val sut: GedcomImportService = app.injector.instanceOf[GedcomImportService]
+
+  val authenticatedRequest: AuthenticatedRequest[AnyContentAsEmpty.type] =
+    AuthenticatedRequest(
+      FakeRequest(),
+      Session("", SessionData(Some(UserData(0, "", "", false, false))), LocalDateTime.now),
+      None
+    )
 
   val expectedOutput: Map[String, String] = Map(
     "rel_familles_indi" -> """(indi_id = 3, familles_id = 1, rela_type = , rela_stat = None)
@@ -51,22 +76,22 @@ class GedcomImportServiceBronteSpec extends MariadbHelper {
                            |(indi_id = 13, events_tag = DEAT, events_attestation = None, events_details_id = 22, timestamp = xxxx-xx-xx xx:xx:xx)
                            |(indi_id = 14, events_tag = BIRT, events_attestation = None, events_details_id = 23, timestamp = xxxx-xx-xx xx:xx:xx)
                            |(indi_id = 14, events_tag = DEAT, events_attestation = None, events_details_id = 24, timestamp = xxxx-xx-xx xx:xx:xx)""".stripMargin,
-    "genea_events_details" -> """(place_id = None, jd_precision = None, events_details_cause = , events_details_famc = None, events_details_gedcom_date = 17 MAR 1777, events_details_descriptor = , events_details_id = 1, jd_calendar = None, events_details_adop = None, base = 1, events_details_timestamp = xxxx-xx-xx xx:xx:xx, addr_id = None, jd_count = None, events_details_age = )
-                                |(place_id = None, jd_precision = None, events_details_cause = , events_details_famc = None, events_details_gedcom_date = 7 JUN 1861, events_details_descriptor = , events_details_id = 2, jd_calendar = None, events_details_adop = None, base = 1, events_details_timestamp = xxxx-xx-xx xx:xx:xx, addr_id = None, jd_count = None, events_details_age = )
-                                |(place_id = None, jd_precision = None, events_details_cause = , events_details_famc = None, events_details_gedcom_date = 15 APR 1783, events_details_descriptor = , events_details_id = 3, jd_calendar = None, events_details_adop = None, base = 1, events_details_timestamp = xxxx-xx-xx xx:xx:xx, addr_id = None, jd_count = None, events_details_age = )
+    "genea_events_details" -> """(place_id = Some(4), jd_precision = None, events_details_cause = , events_details_famc = None, events_details_gedcom_date = 17 MAR 1777, events_details_descriptor = , events_details_id = 1, jd_calendar = None, events_details_adop = None, base = 1, events_details_timestamp = xxxx-xx-xx xx:xx:xx, addr_id = None, jd_count = None, events_details_age = )
+                                |(place_id = Some(1), jd_precision = None, events_details_cause = , events_details_famc = None, events_details_gedcom_date = 7 JUN 1861, events_details_descriptor = , events_details_id = 2, jd_calendar = None, events_details_adop = None, base = 1, events_details_timestamp = xxxx-xx-xx xx:xx:xx, addr_id = None, jd_count = None, events_details_age = )
+                                |(place_id = Some(6), jd_precision = None, events_details_cause = , events_details_famc = None, events_details_gedcom_date = 15 APR 1783, events_details_descriptor = , events_details_id = 3, jd_calendar = None, events_details_adop = None, base = 1, events_details_timestamp = xxxx-xx-xx xx:xx:xx, addr_id = None, jd_count = None, events_details_age = )
                                 |(place_id = None, jd_precision = None, events_details_cause = , events_details_famc = None, events_details_gedcom_date = 15 SEP 1821, events_details_descriptor = , events_details_id = 4, jd_calendar = None, events_details_adop = None, base = 1, events_details_timestamp = xxxx-xx-xx xx:xx:xx, addr_id = None, jd_count = None, events_details_age = )
-                                |(place_id = None, jd_precision = None, events_details_cause = , events_details_famc = None, events_details_gedcom_date = 23 APR 1814, events_details_descriptor = , events_details_id = 5, jd_calendar = None, events_details_adop = None, base = 1, events_details_timestamp = xxxx-xx-xx xx:xx:xx, addr_id = None, jd_count = None, events_details_age = )
-                                |(place_id = None, jd_precision = None, events_details_cause = , events_details_famc = None, events_details_gedcom_date = 6 MAY 1825, events_details_descriptor = , events_details_id = 6, jd_calendar = None, events_details_adop = None, base = 1, events_details_timestamp = xxxx-xx-xx xx:xx:xx, addr_id = None, jd_count = None, events_details_age = )
+                                |(place_id = Some(3), jd_precision = None, events_details_cause = , events_details_famc = None, events_details_gedcom_date = 23 APR 1814, events_details_descriptor = , events_details_id = 5, jd_calendar = None, events_details_adop = None, base = 1, events_details_timestamp = xxxx-xx-xx xx:xx:xx, addr_id = None, jd_count = None, events_details_age = )
+                                |(place_id = Some(7), jd_precision = None, events_details_cause = , events_details_famc = None, events_details_gedcom_date = 6 MAY 1825, events_details_descriptor = , events_details_id = 6, jd_calendar = None, events_details_adop = None, base = 1, events_details_timestamp = xxxx-xx-xx xx:xx:xx, addr_id = None, jd_count = None, events_details_age = )
                                 |(place_id = None, jd_precision = None, events_details_cause = , events_details_famc = None, events_details_gedcom_date = 8 FEB 1815, events_details_descriptor = , events_details_id = 7, jd_calendar = None, events_details_adop = None, base = 1, events_details_timestamp = xxxx-xx-xx xx:xx:xx, addr_id = None, jd_count = None, events_details_age = )
-                                |(place_id = None, jd_precision = None, events_details_cause = , events_details_famc = None, events_details_gedcom_date = 15 JUN 1825, events_details_descriptor = , events_details_id = 8, jd_calendar = None, events_details_adop = None, base = 1, events_details_timestamp = xxxx-xx-xx xx:xx:xx, addr_id = None, jd_count = None, events_details_age = )
-                                |(place_id = None, jd_precision = None, events_details_cause = , events_details_famc = None, events_details_gedcom_date = 21 APR 1816, events_details_descriptor = , events_details_id = 9, jd_calendar = None, events_details_adop = None, base = 1, events_details_timestamp = xxxx-xx-xx xx:xx:xx, addr_id = None, jd_count = None, events_details_age = )
-                                |(place_id = None, jd_precision = None, events_details_cause = , events_details_famc = None, events_details_gedcom_date = 31 MAR 1855, events_details_descriptor = , events_details_id = 10, jd_calendar = None, events_details_adop = None, base = 1, events_details_timestamp = xxxx-xx-xx xx:xx:xx, addr_id = None, jd_count = None, events_details_age = )
-                                |(place_id = None, jd_precision = None, events_details_cause = , events_details_famc = None, events_details_gedcom_date = 26 JUN 1817, events_details_descriptor = , events_details_id = 11, jd_calendar = None, events_details_adop = None, base = 1, events_details_timestamp = xxxx-xx-xx xx:xx:xx, addr_id = None, jd_count = None, events_details_age = )
-                                |(place_id = None, jd_precision = None, events_details_cause = , events_details_famc = None, events_details_gedcom_date = 24 SEP 1848, events_details_descriptor = , events_details_id = 12, jd_calendar = None, events_details_adop = None, base = 1, events_details_timestamp = xxxx-xx-xx xx:xx:xx, addr_id = None, jd_count = None, events_details_age = )
-                                |(place_id = None, jd_precision = None, events_details_cause = , events_details_famc = None, events_details_gedcom_date = 30 JUL 1818, events_details_descriptor = , events_details_id = 13, jd_calendar = None, events_details_adop = None, base = 1, events_details_timestamp = xxxx-xx-xx xx:xx:xx, addr_id = None, jd_count = None, events_details_age = )
-                                |(place_id = None, jd_precision = None, events_details_cause = , events_details_famc = None, events_details_gedcom_date = 19 DEC 1848, events_details_descriptor = , events_details_id = 14, jd_calendar = None, events_details_adop = None, base = 1, events_details_timestamp = xxxx-xx-xx xx:xx:xx, addr_id = None, jd_count = None, events_details_age = )
-                                |(place_id = None, jd_precision = None, events_details_cause = , events_details_famc = None, events_details_gedcom_date = 17 JAN 1820, events_details_descriptor = , events_details_id = 15, jd_calendar = None, events_details_adop = None, base = 1, events_details_timestamp = xxxx-xx-xx xx:xx:xx, addr_id = None, jd_count = None, events_details_age = )
-                                |(place_id = None, jd_precision = None, events_details_cause = , events_details_famc = None, events_details_gedcom_date = 28 MAY 1849, events_details_descriptor = , events_details_id = 16, jd_calendar = None, events_details_adop = None, base = 1, events_details_timestamp = xxxx-xx-xx xx:xx:xx, addr_id = None, jd_count = None, events_details_age = )
+                                |(place_id = Some(7), jd_precision = None, events_details_cause = , events_details_famc = None, events_details_gedcom_date = 15 JUN 1825, events_details_descriptor = , events_details_id = 8, jd_calendar = None, events_details_adop = None, base = 1, events_details_timestamp = xxxx-xx-xx xx:xx:xx, addr_id = None, jd_count = None, events_details_age = )
+                                |(place_id = Some(2), jd_precision = None, events_details_cause = , events_details_famc = None, events_details_gedcom_date = 21 APR 1816, events_details_descriptor = , events_details_id = 9, jd_calendar = None, events_details_adop = None, base = 1, events_details_timestamp = xxxx-xx-xx xx:xx:xx, addr_id = None, jd_count = None, events_details_age = )
+                                |(place_id = Some(7), jd_precision = None, events_details_cause = , events_details_famc = None, events_details_gedcom_date = 31 MAR 1855, events_details_descriptor = , events_details_id = 10, jd_calendar = None, events_details_adop = None, base = 1, events_details_timestamp = xxxx-xx-xx xx:xx:xx, addr_id = None, jd_count = None, events_details_age = )
+                                |(place_id = Some(2), jd_precision = None, events_details_cause = , events_details_famc = None, events_details_gedcom_date = 26 JUN 1817, events_details_descriptor = , events_details_id = 11, jd_calendar = None, events_details_adop = None, base = 1, events_details_timestamp = xxxx-xx-xx xx:xx:xx, addr_id = None, jd_count = None, events_details_age = )
+                                |(place_id = Some(7), jd_precision = None, events_details_cause = , events_details_famc = None, events_details_gedcom_date = 24 SEP 1848, events_details_descriptor = , events_details_id = 12, jd_calendar = None, events_details_adop = None, base = 1, events_details_timestamp = xxxx-xx-xx xx:xx:xx, addr_id = None, jd_count = None, events_details_age = )
+                                |(place_id = Some(2), jd_precision = None, events_details_cause = , events_details_famc = None, events_details_gedcom_date = 30 JUL 1818, events_details_descriptor = , events_details_id = 13, jd_calendar = None, events_details_adop = None, base = 1, events_details_timestamp = xxxx-xx-xx xx:xx:xx, addr_id = None, jd_count = None, events_details_age = )
+                                |(place_id = Some(7), jd_precision = None, events_details_cause = , events_details_famc = None, events_details_gedcom_date = 19 DEC 1848, events_details_descriptor = , events_details_id = 14, jd_calendar = None, events_details_adop = None, base = 1, events_details_timestamp = xxxx-xx-xx xx:xx:xx, addr_id = None, jd_count = None, events_details_age = )
+                                |(place_id = Some(2), jd_precision = None, events_details_cause = , events_details_famc = None, events_details_gedcom_date = 17 JAN 1820, events_details_descriptor = , events_details_id = 15, jd_calendar = None, events_details_adop = None, base = 1, events_details_timestamp = xxxx-xx-xx xx:xx:xx, addr_id = None, jd_count = None, events_details_age = )
+                                |(place_id = Some(5), jd_precision = None, events_details_cause = , events_details_famc = None, events_details_gedcom_date = 28 MAY 1849, events_details_descriptor = , events_details_id = 16, jd_calendar = None, events_details_adop = None, base = 1, events_details_timestamp = xxxx-xx-xx xx:xx:xx, addr_id = None, jd_count = None, events_details_age = )
                                 |(place_id = None, jd_precision = None, events_details_cause = , events_details_famc = None, events_details_gedcom_date = 1755, events_details_descriptor = , events_details_id = 17, jd_calendar = None, events_details_adop = None, base = 1, events_details_timestamp = xxxx-xx-xx xx:xx:xx, addr_id = None, jd_count = None, events_details_age = )
                                 |(place_id = None, jd_precision = None, events_details_cause = , events_details_famc = None, events_details_gedcom_date = abt 1808, events_details_descriptor = , events_details_id = 18, jd_calendar = None, events_details_adop = None, base = 1, events_details_timestamp = xxxx-xx-xx xx:xx:xx, addr_id = None, jd_count = None, events_details_age = )
                                 |(place_id = None, jd_precision = None, events_details_cause = , events_details_famc = None, events_details_gedcom_date = APR 1744, events_details_descriptor = , events_details_id = 19, jd_calendar = None, events_details_adop = None, base = 1, events_details_timestamp = xxxx-xx-xx xx:xx:xx, addr_id = None, jd_count = None, events_details_age = )
@@ -93,11 +118,32 @@ class GedcomImportServiceBronteSpec extends MariadbHelper {
                           |(familles_resn = None, familles_husb = Some(11), familles_refn = , familles_refn_type = , familles_wife = Some(10), base = Some(1), familles_timestamp = xxxx-xx-xx xx:xx:xx, familles_id = 2)
                           |(familles_resn = None, familles_husb = Some(13), familles_refn = , familles_refn_type = , familles_wife = Some(12), base = Some(1), familles_timestamp = xxxx-xx-xx xx:xx:xx, familles_id = 3)
                           |(familles_resn = None, familles_husb = Some(9), familles_refn = , familles_refn_type = , familles_wife = Some(5), base = Some(1), familles_timestamp = xxxx-xx-xx xx:xx:xx, familles_id = 4)""".stripMargin,
+    "genea_place" -> """(place_longitude = None, place_pays = None, place_cp = None, place_region = None, place_lieudit = Some(Haworth), place_insee = None, place_departement = None, place_latitude = None, base = Some(1), place_id = 1, place_ville = Some(Yorks.))
+                       |(place_longitude = None, place_pays = None, place_cp = None, place_region = None, place_lieudit = Some(Thornton), place_insee = None, place_departement = None, place_latitude = None, base = Some(1), place_id = 2, place_ville = Some(Nr. Bradford))
+                       |(place_longitude = None, place_pays = None, place_cp = None, place_region = None, place_lieudit = Some(Clough House), place_insee = None, place_departement = None, place_latitude = None, base = Some(1), place_id = 3, place_ville = Some(High Town))
+                       |(place_longitude = None, place_pays = None, place_cp = None, place_region = None, place_lieudit = Some(County Down), place_insee = None, place_departement = None, place_latitude = None, base = Some(1), place_id = 4, place_ville = Some(Ireland))
+                       |(place_longitude = None, place_pays = None, place_cp = None, place_region = None, place_lieudit = Some(), place_insee = None, place_departement = None, place_latitude = None, base = Some(1), place_id = 5, place_ville = Some(Scarborough))
+                       |(place_longitude = None, place_pays = None, place_cp = None, place_region = None, place_lieudit = Some(Penzance), place_insee = None, place_departement = None, place_latitude = None, base = Some(1), place_id = 6, place_ville = Some(Cornwall))
+                       |(place_longitude = None, place_pays = None, place_cp = None, place_region = None, place_lieudit = Some(), place_insee = None, place_departement = None, place_latitude = None, base = Some(1), place_id = 7, place_ville = Some(Howarth))""".stripMargin,
     "genea_infos" -> """(ged_corp = , nom = test, descriptif = , subm = None, entetes = , medias = None, id = 1)"""
   )
 
   "gedcom2sql" must {
     "work with bronte.ged" in {
+      when(mockJourneyCacheRepository.get(eqTo(PlacesElementsSeparatorQuestion))(using any(), any())).thenReturn(
+        Future.successful(Some(PlacesElementsSeparatorForm(",")))
+      )
+      when(mockJourneyCacheRepository.get(eqTo(PlacesElementsPaddingQuestion))(using any(), any())).thenReturn(
+        Future.successful(Some(PlacesElementsPaddingForm("left")))
+      )
+      when(mockJourneyCacheRepository.get(eqTo(PlacesElementsQuestion))(using any(), any())).thenReturn(
+        Future.successful(
+          Some(
+            PlacesElementsForm(List(PlaceSubdivisionMapping.Locality.toString, PlaceSubdivisionMapping.City.toString))
+          )
+        )
+      )
+
       val parser: ResultSetParser[Option[Int]] = {
         int("insert_id").singleOpt
       }
@@ -118,7 +164,7 @@ class GedcomImportServiceBronteSpec extends MariadbHelper {
               .executeInsert[Option[Int]](parser)
           }
         }
-        _      <- sut.insertGedcomInDatabase("test/resources/gedcom/bronte.ged", 1)
+        _      <- sut.insertGedcomInDatabase("test/resources/gedcom/bronte.ged", 1)(using authenticatedRequest)
         result <- Future {
           db.withConnection { implicit conn =>
             val tables =
