@@ -28,6 +28,7 @@ import services.GenealogyDatabaseService
 import views.html.add.AddDatabase
 import views.html.gedcom.GedcomChooseDatabaseView
 import views.html.gedcom.GedcomListView
+import views.html.gedcom.GedcomProgressView
 import views.html.gedcom.NewDatabaseQuestionView
 
 @Singleton
@@ -40,6 +41,7 @@ class ImportGedcomController @Inject() (
     newDatabaseQuestionView: NewDatabaseQuestionView,
     addDatabaseView: AddDatabase,
     gedcomChooseDatabaseView: GedcomChooseDatabaseView,
+    gedcomProgressView: GedcomProgressView,
     gedcomHashIdTable: GedcomHashIdTable,
     val controllerComponents: ControllerComponents
 )(implicit ec: ExecutionContext)
@@ -66,7 +68,6 @@ class ImportGedcomController @Inject() (
   def startJourney: Action[AnyContent] = authJourney.authWithAdminRight.async {
     implicit request: AuthenticatedRequest[AnyContent] =>
       {
-        gedcomHashIdTable.clearAllData
         Future.successful(Redirect(controllers.gedcom.routes.ImportGedcomController.showGedcomList))
       }
   }
@@ -178,5 +179,10 @@ class ImportGedcomController @Inject() (
 
       val formValidationResult = SelectExistingDatabaseForm.form.bindFromRequest()
       formValidationResult.fold(errorFunction, successFunction)
+  }
+
+  def showStatus(jobId: String): Action[AnyContent] = authJourney.authWithAdminRight.async {
+    implicit request: AuthenticatedRequest[AnyContent] =>
+      Future.successful(Ok(gedcomProgressView(gedcomHashIdTable.getJobStatus(jobId).reverse)))
   }
 }

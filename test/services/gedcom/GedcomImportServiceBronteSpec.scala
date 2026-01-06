@@ -164,7 +164,7 @@ class GedcomImportServiceBronteSpec extends MariadbHelper {
               .executeInsert[Option[Int]](parser)
           }
         }
-        _      <- sut.insertGedcomInDatabase("test/resources/gedcom/bronte.ged", 1)(using authenticatedRequest)
+        _      <- sut.insertGedcomInDatabase("test/resources/gedcom/bronte.ged", 1, "jobId")(using authenticatedRequest)
         result <- Future {
           db.withConnection { implicit conn =>
             val tables =

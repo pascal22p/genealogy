@@ -6,9 +6,8 @@ import scala.concurrent.duration.DurationInt
 import scala.concurrent.Await
 import scala.concurrent.ExecutionContext
 
-import anorm.Row
-import anorm.SQL
-import anorm.SimpleSql
+import anorm.BatchSql
+import anorm.NamedParameter
 import models.gedcom.PlaceSubdivisionMapping
 import models.gedcom.PlaceSubdivisionMapping.*
 import models.journeyCache.UserAnswersKey.*
@@ -24,7 +23,8 @@ class GedcomPlaceParser @Inject() (
 
   @SuppressWarnings(Array("org.wartremover.warts.EnumValueOf"))
   def readPlaceBlocks(
-      places: List[String]
+      places: List[String],
+      jobId: String
   )(implicit request: AuthenticatedRequest[?]): Map[Int, Map[PlaceSubdivisionMapping, String]] = {
     Await.result(
       for {
@@ -49,7 +49,7 @@ class GedcomPlaceParser @Inject() (
             val fieldsToIndices = fieldsMapping.hierarchy.zipWithIndex.groupMap(_._1)(_._2)
             paddedSplitLines.map {
               case (line, parts) =>
-                val id = gedcomHashIdTable.getPlaceIdFromString(line)
+                val id = gedcomHashIdTable.getPlaceIdFromString(jobId, line)
                 (
                   id,
                   fieldsToIndices.map {
@@ -70,26 +70,30 @@ class GedcomPlaceParser @Inject() (
     )
   }
 
-  def placeBlocks2Sql(places: Map[Int, Map[PlaceSubdivisionMapping, String]], base: Int): Iterator[SimpleSql[Row]] = {
-    places.iterator.map {
+  def placeBlocks2Sql(places: Map[Int, Map[PlaceSubdivisionMapping, String]], base: Int): Iterator[BatchSql] = {
+    val sqlStatement =
+      s"""INSERT INTO `genea_place` (`place_id`, `place_lieudit`, `place_ville`, `place_cp`, `place_insee`, `place_departement`, `place_region`, `place_pays`, `place_longitude`, `place_latitude`, `base`)
+         |VALUES ({place_id} + @startPlace, {locality}, {town}, {postcode}, {insee}, {subdivision}, {division}, {country}, {longitude}, {latitude}, {base});""".stripMargin
+
+    val parametersGroups = places.iterator.map {
       case (id, data) =>
-        SQL(
-          s"""INSERT INTO `genea_place` (`place_id`, `place_lieudit`, `place_ville`, `place_cp`, `place_insee`, `place_departement`, `place_region`, `place_pays`, `place_longitude`, `place_latitude`, `base`)
-             |VALUES ({place_id} + @startPlace, {locality}, {town}, {postcode}, {insee}, {subdivision}, {division}, {country}, {longitude}, {latitude}, {base});""".stripMargin
+        Seq[NamedParameter](
+          "place_id"    -> id,
+          "base"        -> base,
+          "locality"    -> data.get(Locality),
+          "town"        -> data.get(City),
+          "postcode"    -> data.get(Postcode),
+          "insee"       -> data.get(Insee).flatMap(_.toIntOption),
+          "subdivision" -> data.get(Subdivision),
+          "division"    -> data.get(Division),
+          "country"     -> data.get(Country),
+          "longitude"   -> data.get(Longitude).flatMap(_.toFloatOption),
+          "latitude"    -> data.get(Latitude).flatMap(_.toFloatOption)
         )
-          .on(
-            "place_id"    -> id,
-            "base"        -> base,
-            "locality"    -> data.get(Locality),
-            "town"        -> data.get(City),
-            "postcode"    -> data.get(Postcode),
-            "insee"       -> data.get(Insee).flatMap(_.toIntOption),
-            "subdivision" -> data.get(Subdivision),
-            "division"    -> data.get(Division),
-            "country"     -> data.get(Country),
-            "longitude"   -> data.get(Longitude).flatMap(_.toFloatOption),
-            "latitude"    -> data.get(Latitude).flatMap(_.toFloatOption)
-          )
+    }
+
+    parametersGroups.grouped(100).map { parameters =>
+      BatchSql(sqlStatement, parameters.head, parameters.tail*)
     }
   }
 }

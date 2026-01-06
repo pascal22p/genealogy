@@ -1,18 +1,19 @@
 GET     /                                      controllers.gedcom.ImportGedcomController.startJourney
 
-GET     /list                                  controllers.gedcom.ImportGedcomController.showGedcomList
-POST    /list                                  controllers.gedcom.ImportGedcomController.gedcomListOnSubmit
+GET     /show-file-list                        controllers.gedcom.ImportGedcomController.showGedcomList
+POST    /show-file-list                        controllers.gedcom.ImportGedcomController.gedcomListOnSubmit
 
-GET     /gedcom-stats                          controllers.gedcom.GedcomStatsController.gedcomStats
+GET     /show-warnings                         controllers.gedcom.GedcomWarningsController.showWarnings
+POST    /show-warnings                         controllers.gedcom.GedcomWarningsController.showWarningsOnSubmit
 
-GET     /gedcom-places-separator               controllers.gedcom.ChoosePlaceSeparatorController.showForm
-POST    /gedcom-places-separator               controllers.gedcom.ChoosePlaceSeparatorController.showFormOnSubmit
+GET     /places-separator                      controllers.gedcom.ChoosePlaceSeparatorController.showForm
+POST    /places-separator                      controllers.gedcom.ChoosePlaceSeparatorController.showFormOnSubmit
 
-GET     /gedcom-places-padding                 controllers.gedcom.ChoosePlacePaddingController.showForm
-POST    /gedcom-places-padding                 controllers.gedcom.ChoosePlacePaddingController.showFormOnSubmit
+GET     /places-padding                        controllers.gedcom.ChoosePlacePaddingController.showForm
+POST    /places-padding                        controllers.gedcom.ChoosePlacePaddingController.showFormOnSubmit
 
-GET     /gedcom-places-extract                 controllers.gedcom.GedcomPlaceParserController.chooseExtractPlaceElements
-POST    /gedcom-places-extract                 controllers.gedcom.GedcomPlaceParserController.chooseExtractPlaceElementsOnSubmit
+GET     /places-extract                        controllers.gedcom.GedcomPlaceParserController.chooseExtractPlaceElements
+POST    /places-extract                        controllers.gedcom.GedcomPlaceParserController.chooseExtractPlaceElementsOnSubmit
 
 GET     /ask-new-database                      controllers.gedcom.ImportGedcomController.showNewDatabaseQuestion
 POST    /ask-new-database                      controllers.gedcom.ImportGedcomController.newDatabaseQuestionOnSubmit
@@ -28,3 +29,7 @@ POST    /clear-existing-database               controllers.gedcom.ClearDatabaseQ
 
 GET     /check-your-answers                    controllers.gedcom.CheckYourAnswersController.checkYourAnswersImportGedcom
 POST    /check-your-answers                    controllers.gedcom.CheckYourAnswersController.checkYourAnswersImportGedcomOnSubmit
+
+GET     /execute-import                        controllers.gedcom.CheckYourAnswersController.doGedcomImport
+
+GET     /status/:jobId                         controllers.gedcom.ImportGedcomController.showStatus(jobId)

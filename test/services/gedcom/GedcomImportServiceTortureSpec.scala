@@ -237,7 +237,7 @@ class GedcomImportServiceTortureSpec extends MariadbHelper {
               .executeInsert[Option[Int]](parser)
           }
         }
-        _      <- sut.insertGedcomInDatabase(gedcomPath, 1)(using authenticatedRequest)
+        _      <- sut.insertGedcomInDatabase(gedcomPath, 1, "jobId")(using authenticatedRequest)
         result <- Future {
           db.withConnection { implicit conn =>
             val tables =

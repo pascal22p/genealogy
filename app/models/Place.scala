@@ -65,12 +65,12 @@ object Place {
   val mysqlParser: RowParser[Place] =
     (get[Int]("place_id") ~
       get[Option[String]]("place_lieudit") ~
-      get[String]("place_ville") ~
-      get[String]("place_cp") ~
+      get[Option[String]]("place_ville") ~
+      get[Option[String]]("place_cp") ~
       get[Option[Int]]("place_insee") ~
       get[Option[String]]("place_departement") ~
-      get[String]("place_region") ~
-      get[String]("place_pays") ~
+      get[Option[String]]("place_region") ~
+      get[Option[String]]("place_pays") ~
       get[Option[Double]]("place_longitude") ~
       get[Option[Double]]("place_latitude") ~
       get[Int]("base")).map {
@@ -78,12 +78,12 @@ object Place {
         Place(
           id,
           lieuDit.getOrElse(""),
-          city,
-          postCode,
+          city.getOrElse(""),
+          postCode.getOrElse(""),
           inseeNumber,
           county.getOrElse(""),
-          region,
-          country,
+          region.getOrElse(""),
+          country.getOrElse(""),
           longitude,
           latitude,
           base

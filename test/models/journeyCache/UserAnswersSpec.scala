@@ -80,7 +80,7 @@ class UserAnswersSpec extends BaseSpec {
       "redirect when a required item is missing" in {
         val ua = UserAnswers(Map.empty)
 
-        ua.validated(journey) mustBe Left(Call("GET", "/list"))
+        ua.validated(journey) mustBe Left(Call("GET", "/show-file-list"))
       }
 
       "keep required items and removed optional ones when valid" in {

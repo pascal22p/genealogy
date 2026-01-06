@@ -10,6 +10,7 @@ import scala.concurrent.Await
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
+import anorm.BatchSql
 import anorm.Row
 import anorm.SQL
 import anorm.SimpleSql
@@ -27,6 +28,7 @@ class GedcomImportService @Inject() (
     gedcomFamilyParser: GedcomFamilyParser,
     gedcomEventParser: GedcomEventParser,
     gedcomPlaceParser: GedcomPlaceParser,
+    gedcomHashIdTable: GedcomHashIdTable,
     config: AppConfig,
     db: Database,
     databaseExecutionContext: DatabaseExecutionContext
@@ -45,15 +47,30 @@ class GedcomImportService @Inject() (
     loop(nodes, Nil)
   }
 
-  def insertGedcomInDatabase(gedcomPath: String, dbId: Int)(
+  def insertGedcomInDatabase(gedcomPath: String, dbId: Int, jobId: String)(
       implicit request: AuthenticatedRequest[?]
   ): Future[Boolean] = {
-    val gedcomObject  = gedcomCommonParser.getTree(gedcomPath)
-    val sqlStatements = convertTree2SQL(gedcomObject.nodes, dbId)
+    val gedcomObject = gedcomCommonParser.getTree(gedcomPath)
+    gedcomHashIdTable.updateJobStatus(jobId, "File parsed")
+    val sqlStatements = convertTree2SQL(gedcomObject.nodes, dbId, jobId)
 
     Future {
+      gedcomHashIdTable.updateJobStatus(jobId, "Writing database in progress")
       db.withTransaction { implicit conn =>
-        sqlStatements.map(_.execute()).reduce(_ && _)
+        startTransaction.map(_.execute()).toSeq.reduce(_ && _)
+
+        sqlStatements.zipWithIndex.foldLeft(0) {
+          case (result, (sql, idx)) =>
+            if (idx <= 10000 && idx % 1000 == 0) {
+              gedcomHashIdTable.updateJobStatus(jobId, s"$idx sql statements executed"): Unit
+            }
+            if (idx > 10000 && idx % 10000 == 0) {
+              gedcomHashIdTable.updateJobStatus(jobId, s"$idx sql statements executed"): Unit
+            }
+            sql.execute().sum + result
+        }
+
+        commitTransaction.map(_.execute()).toSeq.reduce(_ && _)
       }
     }(using databaseExecutionContext)
   }
@@ -78,17 +95,17 @@ class GedcomImportService @Inject() (
 
   val commitTransaction: Iterator[SimpleSql[Row]] = Iterator(SQL("COMMIT;").on())
 
-  def convertTree2SQL(nodes: List[GedcomNode], base: Int)(
+  def convertTree2SQL(nodes: List[GedcomNode], base: Int, jobId: String)(
       implicit request: AuthenticatedRequest[?]
-  ): Iterator[SimpleSql[Row]] = {
+  ): Iterator[BatchSql] = {
     val indis = nodes
       .filter(_.name == "INDI")
-      .flatMap(node => gedcomIndividualParser.readIndiBlock(node).right)
+      .flatMap(node => gedcomIndividualParser.readIndiBlock(node, jobId).right)
 
     val families: TrieMap[Int, GedcomFamilyBlock] = TrieMap.from(
       nodes
         .filter(_.name == "FAM")
-        .flatMap(node => gedcomFamilyParser.readFamilyBlock(node).right.map(fam => fam.id -> fam))
+        .flatMap(node => gedcomFamilyParser.readFamilyBlock(node, jobId).right.map(fam => fam.id -> fam))
     )
 
     Await.result(
@@ -136,29 +153,32 @@ class GedcomImportService @Inject() (
       2.minutes
     )
 
-    val indiSqls            = indis.iterator.map(indi => gedcomIndividualParser.gedcomIndiBlock2Sql(indi, base))
-    val individualEventsSql =
-      indis.iterator.flatMap(indi => gedcomEventParser.gedcomIndividualEventBlock2Sql(indi.events, base, indi.id))
-    val familySqls      = families.iterator.map(family => gedcomFamilyParser.gedcomFamilyBlock2Sql(family._2, base))
-    val childrenSqls    = families.iterator.flatMap(family => gedcomFamilyParser.gedcomChildren2Sql(family._2))
-    val familyEventsSql = families.iterator.flatMap(family =>
-      gedcomEventParser.gedcomFamilyEventBlock2Sql(family._2.events, base, family._2.id)
-    )
-    val places       = findAllPlaces(nodes).flatMap(_.content)
-    val placesBlocks = gedcomPlaceParser.readPlaceBlocks(places)
-    val placesSqls   = gedcomPlaceParser.placeBlocks2Sql(placesBlocks, base).iterator
+    val indiSqls =
+      indis.iterator.grouped(100).flatMap { indis =>
+        Iterator.single(gedcomIndividualParser.gedcomIndiBlock2Sql(indis, base)) ++
+          gedcomEventParser.gedcomIndividualEventBlock2Sql(indis, base, jobId)
+      }
+    val familySqls =
+      families.values.iterator.grouped(100).flatMap { families =>
+        Iterator.single(gedcomFamilyParser.gedcomFamilyBlock2Sql(families, base)) ++
+          Iterator.single(gedcomFamilyParser.gedcomChildren2Sql(families)) ++
+          gedcomEventParser.gedcomFamilyEventBlock2Sql(families, base, jobId)
+      }
+    val places                         = findAllPlaces(nodes).flatMap(_.content)
+    val placesBlocks                   = gedcomPlaceParser.readPlaceBlocks(places, jobId)
+    val placesSqls: Iterator[BatchSql] = gedcomPlaceParser.placeBlocks2Sql(placesBlocks, base).iterator
 
-    startTransaction ++ placesSqls ++ indiSqls ++ individualEventsSql ++ familySqls ++ childrenSqls ++ familyEventsSql ++ commitTransaction
+    placesSqls ++ indiSqls ++ familySqls
   }
 
-  def convertTree2SQLWarnings(nodes: List[GedcomNode]): Iterator[String] = {
+  def convertTree2SQLWarnings(nodes: List[GedcomNode], jobId: String): Iterator[String] = {
     val indisWarnings: Iterator[String] = nodes.iterator
       .filter(_.name == "INDI")
-      .flatMap(node => gedcomIndividualParser.readIndiBlock(node).left.getOrElse(List.empty))
+      .flatMap(node => gedcomIndividualParser.readIndiBlock(node, jobId).left.getOrElse(List.empty))
 
     val familiesWarnings: Iterator[String] = nodes.iterator
       .filter(_.name == "FAM")
-      .flatMap(node => gedcomFamilyParser.readFamilyBlock(node).left.getOrElse(List.empty))
+      .flatMap(node => gedcomFamilyParser.readFamilyBlock(node, jobId).left.getOrElse(List.empty))
 
     val ignoredContent: Iterator[String] = nodes.iterator
       .filterNot(node => List("INDI", "FAM").contains(node.name))

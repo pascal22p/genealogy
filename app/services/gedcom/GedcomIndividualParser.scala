@@ -2,9 +2,8 @@ package services.gedcom
 
 import javax.inject.Inject
 
-import anorm.Row
-import anorm.SQL
-import anorm.SimpleSql
+import anorm.BatchSql
+import anorm.NamedParameter
 import cats.data.Ior
 import cats.implicits.toTraverseOps
 import com.google.inject.Singleton
@@ -23,7 +22,7 @@ class GedcomIndividualParser @Inject() (
     gedcomEventParser: GedcomEventParser
 ) {
 
-  def readIndiBlock(node: GedcomNode): Ior[List[String], GedcomIndiBlock] = {
+  def readIndiBlock(node: GedcomNode, jobId: String): Ior[List[String], GedcomIndiBlock] = {
     /*
     @XREF:INDI@ INDI {1:1}
         +1 RESN <RESTRICTION_NOTICE> {0:1} p.60
@@ -98,7 +97,7 @@ class GedcomIndividualParser @Inject() (
       .map { node =>
         node.xref.fold(
           Ior.left(List(s"line ${node.lineNumber}: `${node.line}` FAMS in INDI is invalid xref is expected"))
-        )(xref => Ior.right(gedcomHashIdTable.getFamilyIdFromString(xref)))
+        )(xref => Ior.right(gedcomHashIdTable.getFamilyIdFromString(jobId, xref)))
       }
       .sequence
       .map(_.toSet)
@@ -108,7 +107,7 @@ class GedcomIndividualParser @Inject() (
       .map { node =>
         node.xref.fold(
           Ior.left(List(s"line ${node.lineNumber}: `${node.line}` FAMC in INDI is invalid xref is expected"))
-        )(xref => Ior.right(gedcomHashIdTable.getFamilyIdFromString(xref)))
+        )(xref => Ior.right(gedcomHashIdTable.getFamilyIdFromString(jobId, xref)))
       }
       .sequence
       .map(_.toSet)
@@ -139,7 +138,7 @@ class GedcomIndividualParser @Inject() (
         name,
         resn.getOrElse("RESN", None),
         sex.getOrElse("SEX", ""),
-        gedcomHashIdTable.getIndividualIdFromString(xref),
+        gedcomHashIdTable.getIndividualIdFromString(jobId, xref),
         events,
         famcLinks,
         famsLinks
@@ -204,18 +203,19 @@ class GedcomIndividualParser @Inject() (
     }
   }
 
-  def gedcomIndiBlock2Sql(node: GedcomIndiBlock, base: Int): SimpleSql[Row] = {
-    val nameRegex            = "([^/]*)/([^/]*)/(.*)".r
-    val (firstname, surname) = node.nameStructure.name match {
-      case nameRegex(firstname, surname, other) => (firstname, surname + " " + other)
-      case _                                    => ("", "")
-    }
-
-    SQL(
+  def gedcomIndiBlock2Sql(nodes: Seq[GedcomIndiBlock], base: Int): BatchSql = {
+    val sqlStatement =
       s"""INSERT INTO genea_individuals (indi_id, base, indi_nom, indi_prenom, indi_sexe, indi_npfx, indi_givn, indi_nick, indi_spfx, indi_nsfx, indi_resn) VALUES
          | ({indi_id} + @startIndi, {base}, {surname}, {firstname}, {indi_sex}, {indi_npfx}, {indi_givn}, {indi_nick}, {indi_spfx}, {indi_nsfx}, {indi_resn})""".stripMargin
-    )
-      .on(
+
+    val parameters: Seq[Seq[NamedParameter]] = nodes.map { node =>
+      val nameRegex            = "([^/]*)/([^/]*)/(.*)".r
+      val (firstname, surname) = node.nameStructure.name match {
+        case nameRegex(firstname, surname, other) => (firstname, surname + " " + other)
+        case _                                    => ("", "")
+      }
+
+      Seq[NamedParameter](
         "indi_id"   -> node.id,
         "base"      -> base,
         "surname"   -> surname,
@@ -228,5 +228,8 @@ class GedcomIndividualParser @Inject() (
         "indi_nsfx" -> node.nameStructure.nsfx,
         "indi_resn" -> node.resn.map(resn => s"$resn")
       )
+    }
+
+    BatchSql(sqlStatement, parameters.head, parameters.tail*)
   }
 }

@@ -358,7 +358,7 @@ class GedcomIndividualParserServiceSpec extends BaseSpec {
         )
       )
 
-      val result = sut.readIndiBlock(input)
+      val result = sut.readIndiBlock(input, "jobId")
       result mustBe expected
     }
   }
