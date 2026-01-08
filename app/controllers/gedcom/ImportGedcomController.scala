@@ -46,7 +46,7 @@ class ImportGedcomController @Inject() (
 
   private def listGedcomFiles: List[String] = {
     val folderPath = Paths.get(appConfig.uploadPath)
-    val matcher = FileSystems.getDefault.getPathMatcher("glob:{*.ged,**/*.ged}")
+    val matcher    = FileSystems.getDefault.getPathMatcher("glob:{*.ged,**/*.ged}")
 
     Files
       .walk(folderPath)
