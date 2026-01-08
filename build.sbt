@@ -80,7 +80,6 @@ lazy val dockerBuildxSettings = Seq(
   ).value
 )
 
-
 lazy val scoverageSettings = {
   import scoverage.ScoverageKeys
   Seq(
@@ -96,7 +95,9 @@ lazy val genealogy = (project in file("."))
   .enablePlugins(PlayScala)
   .enablePlugins(JavaAppPackaging)
   .enablePlugins(SbtWeb)
+  .enablePlugins(JavaAgent)
   .settings(
+    javaAgents += "io.pyroscope" % "agent" % "2.1.2",
     PlayKeys.playDefaultPort := 9123,
     libraryDependencies ++= LibDependencies.all,
     scoverageSettings,
@@ -115,7 +116,7 @@ lazy val genealogy = (project in file("."))
     TwirlKeys.templateImports ++= Seq(
       "uk.gov.hmrc.govukfrontend.views.html.components._"
     ),
-    semanticdbEnabled := true,
+    semanticdbEnabled := false,
     scalacOptions ++= Seq(
       "-no-indent",
       "-deprecation",
