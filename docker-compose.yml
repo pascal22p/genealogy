@@ -9,7 +9,13 @@ services:
       DB_URL: ${DB_URL}
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
+      PYROSCOPE_AGENT_ENABLED: false
+      PYROSCOPE_APPLICATION_NAME: ${PYROSCOPE_NAME}
+      PYROSCOPE_SERVER_ADDRESS: ${PYROSCOPE_SERVER_ADDRESS}
+      PYROSCOPE_BASIC_AUTH_USER: ${PYROSCOPE_BASIC_AUTH_USER}
+      PYROSCOPE_BASIC_AUTH_PASSWORD: ${PYROSCOPE_BASIC_AUTH_PASSWORD}
       MEDIA_PATH: /tmp/Medias/
+      UPLOAD_PATH: /tmp/Upload/
       EXTERNAL_ASSETS_PATH: /tmp/external-assets
       PLAY_FILTERS_HOSTS: genealogy.example.com
       PROTOCOL: https://
@@ -17,6 +23,7 @@ services:
       - "127.0.0.1:9123:9123"
     volumes:
       - ./Medias/:/tmp/Medias/
+      - ./Upload/:/tmp/Upload
       - ./Assets/:/tmp/external-assets
     logging:
       options:
