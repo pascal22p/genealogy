@@ -257,7 +257,7 @@ class GedcomIndividualParserServiceSpec extends BaseSpec {
         )
       )
 
-      val result: Ior[List[String], GedComPersonalNameStructure] = sut.readPersonalNameStructure(input)
+      val result: Ior[Seq[String], GedComPersonalNameStructure] = sut.readPersonalNameStructure(input)
       result mustBe expected
     }
   }

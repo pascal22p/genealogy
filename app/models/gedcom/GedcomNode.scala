@@ -10,7 +10,7 @@ final case class GedcomNode(
     level: Int,
     xref: Option[String],
     content: Option[String],
-    children: List[GedcomNode]
+    children: Seq[GedcomNode]
 )
 
 object GedcomNode {

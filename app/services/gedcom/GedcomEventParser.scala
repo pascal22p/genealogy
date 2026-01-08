@@ -13,18 +13,18 @@ import models.gedcom.GedcomNode
 @Singleton
 class GedcomEventParser @Inject() (gedcomHashIdTable: GedcomHashIdTable) {
 
-  def readEventBlock(node: GedcomNode): Ior[List[String], GedcomEventBlock] = {
+  def readEventBlock(node: GedcomNode): Ior[Seq[String], GedcomEventBlock] = {
     val eventTag   = node.name
     val eventDate  = node.children.find(_.name == "DATE").flatMap(_.content)
     val eventPlace = node.children.find(_.name == "PLAC").flatMap(_.content.filter(_.trim.nonEmpty).map(_.trim))
 
-    val ignoredContent: List[String] = node.children
-      .filterNot(child => List("DATE", "PLAC").contains(child.name))
+    val ignoredContent: Seq[String] = node.children
+      .filterNot(child => Seq("DATE", "PLAC").contains(child.name))
       .map { node =>
         s"Line ${node.lineNumber}: `${node.line}` " +
           s"in event is not supported"
       }
-    val ignoredPlaceContent: List[String] = node.children.filter(_.name == "PLAC").flatMap { place =>
+    val ignoredPlaceContent: Seq[String] = node.children.filter(_.name == "PLAC").flatMap { place =>
       place.children.map { node =>
         s"Line ${node.lineNumber}: `${node.line}` in place from event is not supported"
       }

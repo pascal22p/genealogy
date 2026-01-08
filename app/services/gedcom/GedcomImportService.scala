@@ -34,13 +34,13 @@ class GedcomImportService @Inject() (
     databaseExecutionContext: DatabaseExecutionContext
 )(implicit ec: ExecutionContext) {
 
-  def findAllPlaces(nodes: List[GedcomNode]): List[GedcomNode] = {
+  def findAllPlaces(nodes: Seq[GedcomNode]): Seq[GedcomNode] = {
     @tailrec
-    def loop(todo: List[GedcomNode], acc: List[GedcomNode]): List[GedcomNode] =
+    def loop(todo: Seq[GedcomNode], acc: Seq[GedcomNode]): Seq[GedcomNode] =
       todo match {
-        case Nil          => acc.reverse
-        case head :: tail =>
-          val acc2 = if (head.name == "PLAC") head :: acc else acc
+        case Nil                  => acc.reverse
+        case Seq(head, tail @ _*) =>
+          val acc2 = if (head.name == "PLAC") head +: acc else acc
           loop(head.children ++ tail, acc2)
       }
 
@@ -95,7 +95,7 @@ class GedcomImportService @Inject() (
 
   val commitTransaction: Iterator[SimpleSql[Row]] = Iterator(SQL("COMMIT;").on())
 
-  def convertTree2SQL(nodes: List[GedcomNode], base: Int, jobId: String)(
+  def convertTree2SQL(nodes: Seq[GedcomNode], base: Int, jobId: String)(
       implicit request: AuthenticatedRequest[?]
   ): Iterator[BatchSql] = {
     val indis = nodes
@@ -171,7 +171,7 @@ class GedcomImportService @Inject() (
     placesSqls ++ indiSqls ++ familySqls
   }
 
-  def convertTree2SQLWarnings(nodes: List[GedcomNode], jobId: String): Iterator[String] = {
+  def convertTree2SQLWarnings(nodes: Seq[GedcomNode], jobId: String): Iterator[String] = {
     val indisWarnings: Iterator[String] = nodes.iterator
       .filter(_.name == "INDI")
       .flatMap(node => gedcomIndividualParser.readIndiBlock(node, jobId).left.getOrElse(List.empty))

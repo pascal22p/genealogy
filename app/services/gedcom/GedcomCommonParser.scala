@@ -12,31 +12,42 @@ import utils.FileUtils
 
 @Singleton
 class GedcomCommonParser @Inject() () {
-  private val lineRegexp: Regex             = "^([0-9]+)\\s+.*".r
+  // private val lineRegexp: Regex             = "^([0-9]+)\\s+.*".r
   private val tagAndXrefRegexp: Regex       = "^\\s*[0-9]+\\s+([_A-Za-z]+)\\s*(@([^@]+)@|)\\s*(.+|)".r
   private val level0TagAndXrefRegexp: Regex = "^\\s*0\\s+(@([^@]+)@|)\\s*([A-Za-z]+).*".r
 
-  def getBlocks(gedcomString: Iterator[String], level: Int = 0): List[(Int, String)] = {
-    gedcomString.zipWithIndex
-      .foldLeft(List.empty[(Int, String)]) {
-        case (tree, (line, lineNumber)) =>
-          line.trim match {
-
-            case lineRegexp(id) if id.toInt < level =>
-              throw new RuntimeException("found content at lower level")
-            case lineRegexp(id) if id.toInt == level =>
-              (lineNumber, line.trim) :: tree
-            case lineRegexp(_) =>
-              val (oldLineNumber, newLines) = tree.headOption.fold((0, "")) { (oldLineNumber, block) =>
-                (oldLineNumber, block + "\n" + line.trim)
-              }
-              (oldLineNumber, newLines) :: tree.drop(1)
-            case _ =>
-              tree
-          }
+  @SuppressWarnings(Array("org.wartremover.warts.While"))
+  def getBlocks(gedcomString: Iterator[String], level: Int = 0): Iterator[(Int, Vector[String])] = {
+    Iterator.unfold(gedcomString.zipWithIndex.buffered) { it =>
+      while (it.hasNext && it.head._1.trim.isEmpty) {
+        it.next()
+        ()
       }
-      .reverse
-      .filter(_._2.nonEmpty)
+
+      if (!it.hasNext) {
+        None
+      } else {
+        val (line, lineNo) = it.next()
+
+        if (!line.trim.startsWith(s"$level"))
+          throw new RuntimeException(
+            s"Expected block start level $level at line $lineNo, found: $line"
+          )
+
+        val b = Vector.newBuilder[String]
+        b += line.trim
+
+        while (
+          it.hasNext &&
+          it.head._1.trim.nonEmpty &&
+          !it.head._1.trim.startsWith(s"$level")
+        ) {
+          b += it.next()._1.trim
+        }
+
+        Some(((lineNo, b.result()), it))
+      }
+    }
   }
 
   def getSamplePlaces(
@@ -73,21 +84,18 @@ class GedcomCommonParser @Inject() () {
 
   final def getTree(gedcomPath: String): GedcomObject = {
     val gedcomIterator = FileUtils.readGedcomAsIterator(gedcomPath)
-    GedcomObject(getListNodes(gedcomIterator))
+    GedcomObject(getListNodes(gedcomIterator).toSeq)
   }
 
   private[gedcom] final def getListNodes(
       gedcomString: Iterator[String],
       level: Int = 0,
       rootLineNumber: Int = 0
-  ): List[GedcomNode] = {
-    val blocks = getBlocks(gedcomString, level)
-    blocks.map {
+  ): Iterator[GedcomNode] = {
+    getBlocks(gedcomString, level).map {
       case (lineNumber, block) =>
-        val subBlock                 = block.linesIterator
-        val subBlockHeader: String   = subBlock.nextOption().getOrElse("")
-        val subBlockBody             = subBlock
-        val (xref, tagName, content) = subBlockHeader match {
+        val head                     = block.head
+        val (xref, tagName, content) = head match {
           case level0TagAndXrefRegexp(_, xref, tagName)    => (Option(xref), tagName, None)
           case tagAndXrefRegexp(tagName, _, xref, content) =>
             val newOption = Option(content) match {
@@ -95,12 +103,12 @@ class GedcomCommonParser @Inject() () {
               case o                    => o
             }
             (Option(xref), tagName, newOption)
-          case _ => throw new RuntimeException(s"Could not find tag in `$subBlockHeader`")
+          case _ => throw new RuntimeException(s"Could not find tag in `$head`")
         }
-        if (subBlockBody.nonEmpty) {
-          val subTree: List[GedcomNode] = getListNodes(subBlockBody, level + 1, lineNumber + 1)
+        if (block.tail.nonEmpty) {
+          val subTree: Seq[GedcomNode] = getListNodes(block.tail.iterator, level + 1, lineNumber + 1).toSeq
           GedcomNode(
-            line = subBlockHeader,
+            line = head,
             lineNumber = lineNumber + rootLineNumber,
             name = tagName,
             level = level,
@@ -110,13 +118,13 @@ class GedcomCommonParser @Inject() () {
           )
         } else {
           GedcomNode(
-            line = subBlockHeader,
+            line = head,
             lineNumber = lineNumber + rootLineNumber,
             name = tagName,
             level = level,
             xref = xref,
             content = content,
-            children = List.empty[GedcomNode]
+            children = Seq.empty[GedcomNode]
           )
         }
     }

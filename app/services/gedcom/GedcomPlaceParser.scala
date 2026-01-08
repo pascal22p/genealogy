@@ -23,7 +23,7 @@ class GedcomPlaceParser @Inject() (
 
   @SuppressWarnings(Array("org.wartremover.warts.EnumValueOf"))
   def readPlaceBlocks(
-      places: List[String],
+      places: Seq[String],
       jobId: String
   )(implicit request: AuthenticatedRequest[?]): Map[Int, Map[PlaceSubdivisionMapping, String]] = {
     Await.result(

@@ -19,7 +19,7 @@ class GedcomFamilyParser @Inject() (
     gedcomEventParser: GedcomEventParser
 ) {
 
-  def readFamilyBlock(node: GedcomNode, jobId: String): Ior[List[String], GedcomFamilyBlock] = {
+  def readFamilyBlock(node: GedcomNode, jobId: String): Ior[Seq[String], GedcomFamilyBlock] = {
     /*
     n @<XREF:FAM>@ FAM
       +1 RESN <RESTRICTION_NOTICE>
@@ -50,17 +50,17 @@ class GedcomFamilyParser @Inject() (
         throw new RuntimeException(s"line ${node.lineNumber}: `${node.line}` tag name is invalid FAM is expected")
     }
 
-    val resnIor: Ior[List[String], Option[ResnType.ResnType]] =
+    val resnIor: Ior[Seq[String], Option[ResnType.ResnType]] =
       node.children
         .find(_.name == "RESN")
-        .fold(Ior.right(None): Ior[List[String], Option[ResnType.ResnType]]) { node =>
+        .fold(Ior.right(None): Ior[Seq[String], Option[ResnType.ResnType]]) { node =>
           gedcomCommonParser.readTagContent(node).map(resn => resn.get("RESN").flatMap(ResnType.fromString))
         }
 
-    val husbIor: Ior[List[String], Option[String]] =
-      node.children.find(_.name == "HUSB").fold(Ior.Right(None): Ior[List[String], Option[String]]) { node =>
+    val husbIor: Ior[Seq[String], Option[String]] =
+      node.children.find(_.name == "HUSB").fold(Ior.Right(None): Ior[Seq[String], Option[String]]) { node =>
         node.xref.fold(
-          Ior.left(List(s"line ${node.lineNumber}: `${node.line}` HUSB is invalid xref is expected"))
+          Ior.left(Seq(s"line ${node.lineNumber}: `${node.line}` HUSB is invalid xref is expected"))
         )(node => Ior.Right(Some(node)))
       }
     val wifeIor: Ior[List[String], Option[String]] =
@@ -78,18 +78,18 @@ class GedcomFamilyParser @Inject() (
           children.combine(child)
       }
 
-    val eventsIor: Ior[List[String], List[GedcomEventBlock]] = node.children
+    val eventsIor: Ior[Seq[String], Seq[GedcomEventBlock]] = node.children
       .filter { child =>
         Constants.familyEvents.contains(child.name)
       }
-      .foldLeft(Ior.Right(List.empty): Ior[List[String], List[GedcomEventBlock]]) {
+      .foldLeft(Ior.Right(Seq.empty): Ior[Seq[String], Seq[GedcomEventBlock]]) {
         case (result, node) =>
-          result.combine(gedcomEventParser.readEventBlock(node).map(List(_)))
+          result.combine(gedcomEventParser.readEventBlock(node).map(Seq(_)))
       }
 
     val allTagList = List("RESN", "HUSB", "WIFE", "CHIL") ++ eventsIor.right.fold(List.empty[String])(_.map(_.tag))
 
-    val ignoredContent: Ior[List[String], Map[String, String]] = Ior.Left(
+    val ignoredContent: Ior[Seq[String], Map[String, String]] = Ior.Left(
       node.children
         .filterNot(child => allTagList.contains(child.name))
         .foldLeft(List.empty[String]) {

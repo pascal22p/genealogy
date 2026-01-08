@@ -22,7 +22,7 @@ class GedcomIndividualParser @Inject() (
     gedcomEventParser: GedcomEventParser
 ) {
 
-  def readIndiBlock(node: GedcomNode, jobId: String): Ior[List[String], GedcomIndiBlock] = {
+  def readIndiBlock(node: GedcomNode, jobId: String): Ior[Seq[String], GedcomIndiBlock] = {
     /*
     @XREF:INDI@ INDI {1:1}
         +1 RESN <RESTRICTION_NOTICE> {0:1} p.60
@@ -60,13 +60,13 @@ class GedcomIndividualParser @Inject() (
         throw new RuntimeException(s"line ${node.lineNumber}: `${node.line}` tag name is invalid INDI is expected")
     }
 
-    val nameStructure: Ior[List[String], GedComPersonalNameStructure] =
-      node.children.find(_.name == "NAME").fold(Ior.Left(List(s"Line ${node.lineNumber}: no NAME tag in block"))) {
+    val nameStructure: Ior[Seq[String], GedComPersonalNameStructure] =
+      node.children.find(_.name == "NAME").fold(Ior.Left(Seq(s"Line ${node.lineNumber}: no NAME tag in block"))) {
         node =>
           readPersonalNameStructure(node)
       }
 
-    val resnIor: Ior[List[String], Map[String, Option[ResnType]]] =
+    val resnIor: Ior[Seq[String], Map[String, Option[ResnType]]] =
       node.children
         .find(_.name == "RESN")
         .fold(Ior.Right(Map.empty)) { node =>
@@ -78,35 +78,35 @@ class GedcomIndividualParser @Inject() (
           }
         }
 
-    val sexIor: Ior[List[String], Map[String, String]] =
+    val sexIor: Ior[Seq[String], Map[String, String]] =
       node.children.find(_.name == "SEX").fold(Ior.Right(Map.empty)) { node =>
         gedcomCommonParser.readTagContent(node)
       }
 
-    val eventsIor: Ior[List[String], List[GedcomEventBlock]] = node.children
+    val eventsIor: Ior[Seq[String], List[GedcomEventBlock]] = node.children
       .filter { child =>
         Constants.individualsEvents.contains(child.name)
       }
-      .foldLeft(Ior.Right(List.empty): Ior[List[String], List[GedcomEventBlock]]) {
+      .foldLeft(Ior.Right(List.empty): Ior[Seq[String], List[GedcomEventBlock]]) {
         case (result, node) =>
           result.combine(gedcomEventParser.readEventBlock(node).map(List(_)))
       }
 
-    val famsLinksIor: Ior[List[String], Set[Int]] = node.children
+    val famsLinksIor: Ior[Seq[String], Set[Int]] = node.children
       .filter(_.name == "FAMS")
       .map { node =>
         node.xref.fold(
-          Ior.left(List(s"line ${node.lineNumber}: `${node.line}` FAMS in INDI is invalid xref is expected"))
+          Ior.left(Seq(s"line ${node.lineNumber}: `${node.line}` FAMS in INDI is invalid xref is expected"))
         )(xref => Ior.right(gedcomHashIdTable.getFamilyIdFromString(jobId, xref)))
       }
       .sequence
       .map(_.toSet)
 
-    val famcLinksIor: Ior[List[String], Set[Int]] = node.children
+    val famcLinksIor: Ior[Seq[String], Set[Int]] = node.children
       .filter(_.name == "FAMC")
       .map { node =>
         node.xref.fold(
-          Ior.left(List(s"line ${node.lineNumber}: `${node.line}` FAMC in INDI is invalid xref is expected"))
+          Ior.left(Seq(s"line ${node.lineNumber}: `${node.line}` FAMC in INDI is invalid xref is expected"))
         )(xref => Ior.right(gedcomHashIdTable.getFamilyIdFromString(jobId, xref)))
       }
       .sequence
@@ -115,12 +115,12 @@ class GedcomIndividualParser @Inject() (
     val allTagList =
       List("RESN", "SEX", "NAME", "FAMS", "FAMC") ++ eventsIor.right.fold(List.empty[String])(_.map(_.tag))
 
-    val ignoredContent: Ior[List[String], Map[String, String]] = node.children
+    val ignoredContent: Ior[Seq[String], Map[String, String]] = node.children
       .filterNot(child => allTagList.contains(child.name))
       .map { node =>
-        Ior.Left(List(s"Line ${node.lineNumber}: `${node.line}` in individual is not supported"))
+        Ior.Left(Seq(s"Line ${node.lineNumber}: `${node.line}` in individual is not supported"))
       }
-      .foldLeft(Ior.Right(Map.empty): Ior[List[String], Map[String, String]]) {
+      .foldLeft(Ior.Right(Map.empty): Ior[Seq[String], Map[String, String]]) {
         case (result, element) =>
           result.combine(element)
       }
@@ -149,7 +149,7 @@ class GedcomIndividualParser @Inject() (
 
   def readPersonalNameStructure(
       node: GedcomNode
-  ): Ior[List[String], GedComPersonalNameStructure] = {
+  ): Ior[Seq[String], GedComPersonalNameStructure] = {
     /*
     1 NAME Firstname /Surname/ //only one supported
     2 TYPE <NAME_TYPE> // Not supported
@@ -170,21 +170,21 @@ class GedcomIndividualParser @Inject() (
     } else {
       val nameIor: Ior[List[String], Map[String, String]] = gedcomCommonParser.readTagContent(node)
 
-      val tagsContent: List[Ior[List[String], Map[String, String]]] = tagList.map { tag =>
+      val tagsContent: Seq[Ior[List[String], Map[String, String]]] = tagList.map { tag =>
         node.children.find(_.name == tag).fold(Ior.Right(Map.empty: Map[String, String])) { node =>
           gedcomCommonParser.readTagContent(node)
         }
       }
 
-      val ignoredContent: List[Ior[List[String], Map[String, String]]] = node.children
+      val ignoredContent: Seq[Ior[Seq[String], Map[String, String]]] = node.children
         .filterNot(child => tagList.contains(child.name))
         .map { node =>
-          Ior.Left(List(s"Line ${node.lineNumber}: `${node.line}` in name is not supported"))
+          Ior.Left(Seq(s"Line ${node.lineNumber}: `${node.line}` in name is not supported"))
         }
 
-      val mergedContent: Ior[List[String], Map[String, String]] =
+      val mergedContent: Ior[Seq[String], Map[String, String]] =
         (List(nameIor) ++ tagsContent ++ ignoredContent)
-          .foldLeft(Ior.Right(Map.empty): Ior[List[String], Map[String, String]]) {
+          .foldLeft(Ior.Right(Map.empty): Ior[Seq[String], Map[String, String]]) {
             case (result, element) =>
               result.combine(element)
           }
