@@ -3,16 +3,21 @@ package services.gedcom
 import javax.inject.Inject
 import javax.inject.Singleton
 
+import scala.annotation.tailrec
+import scala.collection.concurrent.TrieMap
+import scala.concurrent.duration.DurationInt
+import scala.concurrent.Await
+import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
+import anorm.BatchSql
 import anorm.Row
 import anorm.SQL
 import anorm.SimpleSql
-import cats.data.Ior
 import config.AppConfig
 import models.gedcom.GedcomFamilyBlock
-import models.gedcom.GedcomIndiBlock
 import models.gedcom.GedcomNode
+import models.AuthenticatedRequest
 import models.DatabaseExecutionContext
 import play.api.db.Database
 
@@ -22,26 +27,55 @@ class GedcomImportService @Inject() (
     gedcomIndividualParser: GedcomIndividualParser,
     gedcomFamilyParser: GedcomFamilyParser,
     gedcomEventParser: GedcomEventParser,
+    gedcomPlaceParser: GedcomPlaceParser,
+    gedcomHashIdTable: GedcomHashIdTable,
     config: AppConfig,
     db: Database,
     databaseExecutionContext: DatabaseExecutionContext
-) {
+)(implicit ec: ExecutionContext) {
 
-  def gedcom2sql(gedcomString: String, dbId: Int): Future[Boolean] = Future {
-    val gedcomObject = gedcomCommonParser.getTree(gedcomString)
-    val sqlsIor      = convertTree2SQL(gedcomObject.nodes, dbId)
+  def findAllPlaces(nodes: Seq[GedcomNode]): Seq[GedcomNode] = {
+    @tailrec
+    def loop(todo: Seq[GedcomNode], acc: Seq[GedcomNode]): Seq[GedcomNode] =
+      todo match {
+        case Nil                  => acc.reverse
+        case Seq(head, tail @ _*) =>
+          val acc2 = if (head.name == "PLAC") head +: acc else acc
+          loop(head.children ++ tail, acc2)
+      }
 
-    db.withTransaction { implicit conn =>
-      sqlsIor
-        .getOrElse(List.empty)
-        .map { sql =>
-          sql.execute()
+    loop(nodes, Nil)
+  }
+
+  def insertGedcomInDatabase(gedcomPath: String, dbId: Int, jobId: String)(
+      implicit request: AuthenticatedRequest[?]
+  ): Future[Boolean] = {
+    val gedcomObject = gedcomCommonParser.getTree(gedcomPath)
+    gedcomHashIdTable.updateJobStatus(jobId, "File parsed")
+    val sqlStatements = convertTree2SQL(gedcomObject.nodes, dbId, jobId)
+
+    Future {
+      gedcomHashIdTable.updateJobStatus(jobId, "Writing database in progress")
+      db.withTransaction { implicit conn =>
+        startTransaction.map(_.execute()).toSeq.reduce(_ && _)
+
+        sqlStatements.zipWithIndex.foldLeft(0) {
+          case (result, (sql, idx)) =>
+            if (idx <= 10000 && idx % 1000 == 0) {
+              gedcomHashIdTable.updateJobStatus(jobId, s"$idx sql statements executed"): Unit
+            }
+            if (idx > 10000 && idx % 10000 == 0) {
+              gedcomHashIdTable.updateJobStatus(jobId, s"$idx sql statements executed"): Unit
+            }
+            sql.execute().sum + result
         }
-        .reduce(_ && _)
-    }
-  }(using databaseExecutionContext)
 
-  val startTransaction: List[SimpleSql[Row]] = List(
+        commitTransaction.map(_.execute()).toSeq.reduce(_ && _)
+      }
+    }(using databaseExecutionContext)
+  }
+
+  val startTransaction: Iterator[SimpleSql[Row]] = Iterator(
     SQL("SET FOREIGN_KEY_CHECKS=1").on(),
     SQL("START TRANSACTION").on(),
     SQL("select * from genea_individuals WHERE indi_id > 0 LOCK IN SHARE MODE").on(),
@@ -53,185 +87,106 @@ class GedcomImportService @Inject() (
     ).on(),
     SQL(
       s"SELECT `AUTO_INCREMENT` INTO @startFamily FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '${config.databaseName}' AND TABLE_NAME = 'genea_familles'"
+    ).on(),
+    SQL(
+      s"SELECT `AUTO_INCREMENT` INTO @startPlace FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '${config.databaseName}' AND TABLE_NAME = 'genea_place'"
     ).on()
   )
 
-  val commitTransaction: List[SimpleSql[Row]] = List(SQL("COMMIT;").on())
+  val commitTransaction: Iterator[SimpleSql[Row]] = Iterator(SQL("COMMIT;").on())
 
-  def convertTree2SQL(nodes: List[GedcomNode], base: Int): Ior[List[String], List[SimpleSql[Row]]] = {
-    val indisIor: Ior[List[String], List[GedcomIndiBlock]] = nodes
+  def convertTree2SQL(nodes: Seq[GedcomNode], base: Int, jobId: String)(
+      implicit request: AuthenticatedRequest[?]
+  ): Iterator[BatchSql] = {
+    val indis = nodes
       .filter(_.name == "INDI")
-      .map(gedcomIndividualParser.readIndiBlock)
-      .foldLeft(Ior.Right(List.empty): Ior[List[String], List[GedcomIndiBlock]]) {
-        case (listIndividuals, individual) =>
-          listIndividuals.combine(individual.map(i => List(i)))
-      }
+      .flatMap(node => gedcomIndividualParser.readIndiBlock(node, jobId).right)
 
-    val familiesIor: Ior[List[String], List[GedcomFamilyBlock]] = nodes
-      .filter(_.name == "FAM")
-      .map(gedcomFamilyParser.readFamilyBlock)
-      .foldLeft(Ior.Right(List.empty): Ior[List[String], List[GedcomFamilyBlock]]) {
-        case (listFamily, family) =>
-          listFamily.combine(family.map(i => List(i)))
-      }
-
-    val familiesWithFamsFromIndiIor = (for {
-      indis    <- indisIor
-      families <- familiesIor.map(_.map(family => family.id -> family).toMap)
-    } yield {
-      indis.foldLeft(families) { (familiesAcc, indi) =>
-        val withFams = indi.famsLinks.foldLeft(familiesAcc) { (familiesAccInner, famLink) =>
-          familiesAccInner.get(famLink) match {
-            case Some(family) =>
-              val newFamily = (family.husb, family.wife, indi.sex) match {
-                case (Some(husbId), _, _) if husbId == indi.id                                 => family
-                case (_, Some(wifeId), _) if wifeId == indi.id                                 => family
-                case (Some(husbId), Some(wifeId), _) if wifeId != indi.id && husbId != indi.id =>
-                  throw new RuntimeException(
-                    s"Family ${family.id} already has both husband and wife defined, cannot add indi ${indi.id} as either"
-                  )
-                case (None, _, "M")        => family.copy(husb = Some(indi.id))
-                case (Some(_), None, "M")  => family.copy(wife = Some(indi.id))
-                case (_, None, "F")        => family.copy(wife = Some(indi.id))
-                case (None, Some(_), "F")  => family.copy(husb = Some(indi.id))
-                case (None, _, _)          => family.copy(husb = Some(indi.id))
-                case (_, None, _)          => family.copy(wife = Some(indi.id))
-                case (Some(_), Some(_), _) =>
-                  throw new RuntimeException(
-                    s"Family ${family.id} already has both husband and wife defined, cannot add indi ${indi.id} as either"
-                  )
-              }
-              familiesAccInner.updated(famLink, newFamily)
-
-            case None =>
-              if (indi.sex == "F") {
-                familiesAccInner.updated(
-                  famLink,
-                  GedcomFamilyBlock(famLink, Some(indi.id), None, Set.empty, List.empty, None)
-                )
-              } else {
-                familiesAccInner.updated(
-                  famLink,
-                  GedcomFamilyBlock(famLink, None, Some(indi.id), Set.empty, List.empty, None)
-                )
-              }
-          }
-        }
-
-        indi.famsLinks.foldLeft(withFams) { (familiesAccInner, famLink) =>
-          familiesAccInner.get(famLink) match {
-            case Some(family) =>
-              val newFamily = (family.husb, family.wife, indi.sex) match {
-                case (Some(husbId), _, _) if husbId == indi.id                                 => family
-                case (_, Some(wifeId), _) if wifeId == indi.id                                 => family
-                case (Some(husbId), Some(wifeId), _) if wifeId != indi.id && husbId != indi.id =>
-                  throw new RuntimeException(
-                    s"Family ${family.id} already has both husband and wife defined, cannot add indi ${indi.id} as either"
-                  )
-                case (None, _, "M")        => family.copy(husb = Some(indi.id))
-                case (Some(_), None, "M")  => family.copy(wife = Some(indi.id))
-                case (_, None, "F")        => family.copy(wife = Some(indi.id))
-                case (None, Some(_), "F")  => family.copy(husb = Some(indi.id))
-                case (None, _, _)          => family.copy(husb = Some(indi.id))
-                case (_, None, _)          => family.copy(wife = Some(indi.id))
-                case (Some(_), Some(_), _) =>
-                  throw new RuntimeException(
-                    s"Family ${family.id} already has both husband and wife defined, cannot add indi ${indi.id} as either"
-                  )
-              }
-              familiesAccInner.updated(famLink, newFamily)
-
-            case None =>
-              if (indi.sex == "F") {
-                familiesAccInner.updated(
-                  famLink,
-                  GedcomFamilyBlock(famLink, Some(indi.id), None, Set.empty, List.empty, None)
-                )
-              } else {
-                familiesAccInner.updated(
-                  famLink,
-                  GedcomFamilyBlock(famLink, None, Some(indi.id), Set.empty, List.empty, None)
-                )
-              }
-          }
-        }
-      }
-    }).map(_.values.toList)
-
-    val familiesWithFamsFamcFromIndiIor = (for {
-      indis                                 <- indisIor
-      families: Map[Int, GedcomFamilyBlock] <- familiesWithFamsFromIndiIor.map(
-        _.map(family => family.id -> family).toMap
-      )
-    } yield {
-      indis.foldLeft(families) { (familiesAcc, indi) =>
-        indi.famcLinks.foldLeft(familiesAcc) { (familiesAccInner, famLink) =>
-          familiesAccInner.get(famLink) match {
-            case Some(family) =>
-              val newFamily = family.copy(children = family.children + indi.id)
-              familiesAccInner.updated(famLink, newFamily)
-            case None =>
-              familiesAccInner.updated(
-                famLink,
-                GedcomFamilyBlock(famLink, None, None, Set(indi.id), List.empty, None)
-              )
-          }
-        }
-      }
-    }).map(_.values.toList)
-
-    val indiSqls: List[SimpleSql[Row]] = indisIor.right
-      .getOrElse(List.empty)
-      .map { indi =>
-        gedcomIndividualParser.gedcomIndiBlock2Sql(indi, base)
-      }
-
-    val individualEventsSql: List[SimpleSql[Row]] =
-      indisIor.right
-        .getOrElse(List.empty)
-        .flatMap(indi => gedcomEventParser.gedcomIndividualEventBlock2Sql(indi.events, base, indi.id))
-
-    val familySqls: List[SimpleSql[Row]] = familiesWithFamsFamcFromIndiIor.right
-      .getOrElse(List.empty)
-      .map { family =>
-        gedcomFamilyParser.gedcomFamilyBlock2Sql(family, base)
-      }
-
-    val childrenSqls: List[SimpleSql[Row]] = familiesWithFamsFamcFromIndiIor.right
-      .getOrElse(List.empty)
-      .flatMap { family =>
-        gedcomFamilyParser.gedcomChildren2Sql(family)
-      }
-
-    val familyEventsSql: List[SimpleSql[Row]] =
-      familiesWithFamsFromIndiIor.right
-        .getOrElse(List.empty)
-        .flatMap(family => gedcomEventParser.gedcomFamilyEventBlock2Sql(family.events, base, family.id))
-
-    val ignoredContent: Ior[List[String], Map[String, String]] = Ior.Left(
+    val families: TrieMap[Int, GedcomFamilyBlock] = TrieMap.from(
       nodes
-        .filterNot(node => List("INDI", "FAM").contains(node.name))
-        .foldLeft(List.empty[String]) {
-          case (result, node) =>
-            result ++ List(s"Line ${node.lineNumber}: `${node.line}` in root is not supported")
+        .filter(_.name == "FAM")
+        .flatMap(node => gedcomFamilyParser.readFamilyBlock(node, jobId).right.map(fam => fam.id -> fam))
+    )
+
+    Await.result(
+      Future.traverse(indis) { indi =>
+        Future {
+          indi.famsLinks.foreach { famLink =>
+            families.updateWith(famLink) {
+              case Some(family) =>
+                (family.husb, family.wife, indi.sex) match {
+                  case (Some(husbId), _, _) if husbId == indi.id                                 => Some(family)
+                  case (_, Some(wifeId), _) if wifeId == indi.id                                 => Some(family)
+                  case (Some(husbId), Some(wifeId), _) if wifeId != indi.id && husbId != indi.id =>
+                    throw new RuntimeException(
+                      s"Family ${family.id} already has both husband and wife defined, cannot add indi ${indi.id} as either"
+                    )
+                  case (None, _, "M")        => Some(family.copy(husb = Some(indi.id)))
+                  case (Some(_), None, "M")  => Some(family.copy(wife = Some(indi.id)))
+                  case (_, None, "F")        => Some(family.copy(wife = Some(indi.id)))
+                  case (None, Some(_), "F")  => Some(family.copy(husb = Some(indi.id)))
+                  case (None, _, _)          => Some(family.copy(husb = Some(indi.id)))
+                  case (_, None, _)          => Some(family.copy(wife = Some(indi.id)))
+                  case (Some(_), Some(_), _) =>
+                    throw new RuntimeException(
+                      s"Family ${family.id} already has both husband and wife defined, cannot add indi ${indi.id} as either"
+                    )
+                }
+
+              case None =>
+                if (indi.sex == "F") {
+                  Some(GedcomFamilyBlock(famLink, Some(indi.id), None, Set.empty, List.empty, None))
+                } else {
+                  Some(GedcomFamilyBlock(famLink, None, Some(indi.id), Set.empty, List.empty, None))
+                }
+            }
+          }
+
+          indi.famcLinks.foreach { famLink =>
+            families.updateWith(famLink) {
+              case Some(family) => Some(family.copy(children = family.children + indi.id))
+              case None         => Some(GedcomFamilyBlock(famLink, None, None, Set(indi.id), List.empty, None))
+            }
+          }
         }
+      },
+      2.minutes
     )
 
-    val warnings =
-      indisIor.left.getOrElse(List.empty) ++ familiesWithFamsFromIndiIor.left.getOrElse(
-        List.empty
-      ) ++ ignoredContent.left
-        .getOrElse(
-          List.empty
-        )
-    warnings.foreach { warning =>
-      println(warning)
-    }
+    val indiSqls =
+      indis.iterator.grouped(100).flatMap { indis =>
+        Iterator.single(gedcomIndividualParser.gedcomIndiBlock2Sql(indis, base)) ++
+          gedcomEventParser.gedcomIndividualEventBlock2Sql(indis, base, jobId)
+      }
+    val familySqls =
+      families.values.iterator.grouped(100).flatMap { families =>
+        Iterator.single(gedcomFamilyParser.gedcomFamilyBlock2Sql(families, base)) ++
+          Iterator.single(gedcomFamilyParser.gedcomChildren2Sql(families)) ++
+          gedcomEventParser.gedcomFamilyEventBlock2Sql(families, base, jobId)
+      }
+    val places                         = findAllPlaces(nodes).flatMap(_.content)
+    val placesBlocks                   = gedcomPlaceParser.readPlaceBlocks(places, jobId)
+    val placesSqls: Iterator[BatchSql] = gedcomPlaceParser.placeBlocks2Sql(placesBlocks, base).iterator
 
-    Ior.Both(
-      warnings,
-      startTransaction ++ indiSqls ++ individualEventsSql ++ familySqls ++ childrenSqls ++ familyEventsSql ++ commitTransaction
-    )
+    placesSqls ++ indiSqls ++ familySqls
+  }
+
+  def convertTree2SQLWarnings(nodes: Seq[GedcomNode], jobId: String): Iterator[String] = {
+    val indisWarnings: Iterator[String] = nodes.iterator
+      .filter(_.name == "INDI")
+      .flatMap(node => gedcomIndividualParser.readIndiBlock(node, jobId).left.getOrElse(List.empty))
+
+    val familiesWarnings: Iterator[String] = nodes.iterator
+      .filter(_.name == "FAM")
+      .flatMap(node => gedcomFamilyParser.readFamilyBlock(node, jobId).left.getOrElse(List.empty))
+
+    val ignoredContent: Iterator[String] = nodes.iterator
+      .filterNot(node => List("INDI", "FAM").contains(node.name))
+      .map { node =>
+        s"Line ${node.lineNumber}: `${node.line}` in root is not supported"
+      }
+
+    indisWarnings ++ familiesWarnings ++ ignoredContent
   }
 
 }

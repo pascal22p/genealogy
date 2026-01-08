@@ -1,0 +1,72 @@
+@import views.html.components.Block
+@import helper._
+@import uk.gov.hmrc.govukfrontend.views.Implicits.*
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits.*
+@import uk.gov.hmrc.hmrcfrontend.views.Implicits.*
+@import models.gedcom.GedcomObject
+@import models.forms.TrueOrFalseForm
+
+@this(
+    main: Main,
+    block: Block,
+    govukWarningText: GovukWarningText,
+    govukInsetText: GovukInsetText,
+    govukRadios: GovukRadios,
+    govukButton: GovukButton
+)
+
+@(warnings: Seq[String], form: Form[TrueOrFalseForm])(implicit request: AuthenticatedRequest[?], messages: Messages)
+
+@main(1, None, title = messages("importGedcom.checkYourAnswers.title")) {
+
+    @govukWarningText(WarningText(
+        iconFallbackText = Some("Warning"),
+        content = Text("There are problems found with the supplied Gedcom.")
+    ))
+
+    @block(s"Warnings have been found") {
+        <ul class="govuk-list scroll-container">
+            @for(warning <- warnings) {
+                <li>@warning</li>
+            }
+        </ul>
+    }
+
+    @if(warnings.size == 500) {
+        @govukInsetText(InsetText(
+            content = Text("The list of warnings has been truncated. You can can continue with the import but some elements will be missing.")
+        ))
+    }
+
+    @helper.form(action = controllers.gedcom.routes.GedcomWarningsController.showWarningsOnSubmit ) {
+        @helper.CSRF.formField
+
+        @govukRadios(Radios(
+            fieldset = Some(Fieldset(
+                legend =
+                    Some(Legend(
+                        content = Text(s"Choose if you want to continue with the import of the Gedcom file"),
+                        isPageHeading = true
+                    ))
+            )),
+            hint = None,
+            items = Seq(
+                RadioItem(
+                    content = Text("Yes"),
+                    value = Some("true")
+                ),
+                RadioItem(
+                    content = Text("No"),
+                    value = Some("false")
+                )
+            )
+        ).withFormField(form("trueOrFalse")))
+
+        @govukButton(Button(
+            content = Text("Continue"),
+            name = Some("submit"),
+            href = None,
+            inputType = Some("submit")
+        ))
+    }
+}

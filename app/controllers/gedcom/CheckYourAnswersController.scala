@@ -1,10 +1,12 @@
 package controllers.gedcom
 
 import java.nio.file.Paths
+import java.util.UUID
 import javax.inject.*
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
+import scala.util.control.NonFatal
 
 import actions.AuthJourney
 import cats.data.OptionT
@@ -18,8 +20,8 @@ import play.api.mvc.*
 import queries.InsertSqlQueries
 import queries.UpdateSqlQueries
 import repositories.JourneyCacheRepository
+import services.gedcom.GedcomHashIdTable
 import services.gedcom.GedcomImportService
-import utils.FileUtils
 import views.html.gedcom.*
 
 @Singleton
@@ -28,6 +30,7 @@ class CheckYourAnswersController @Inject() (
     journeyCacheRepository: JourneyCacheRepository,
     appConfig: AppConfig,
     gedcomImportService: GedcomImportService,
+    gedcomHashIdTable: GedcomHashIdTable,
     insertSqlQueries: InsertSqlQueries,
     updateSqlQueries: UpdateSqlQueries,
     checkYourAnswersView: CheckYourAnswersView,
@@ -52,13 +55,17 @@ class CheckYourAnswersController @Inject() (
 
   def checkYourAnswersImportGedcomOnSubmit: Action[AnyContent] = authJourney.authWithAdminRight.async {
     implicit request: AuthenticatedRequest[AnyContent] =>
+      Future.successful(Redirect(controllers.gedcom.routes.GedcomWarningsController.showWarnings))
+  }
+
+  def doGedcomImport: Action[AnyContent] = authJourney.authWithAdminRight
+    .async { implicit request: AuthenticatedRequest[AnyContent] =>
       journeyCacheRepository.get.flatMap {
         case None              => Future.successful(Redirect(controllers.gedcom.routes.ImportGedcomController.showGedcomList))
         case Some(userAnswers) =>
           val basePath = Paths.get(appConfig.uploadPath)
           val sanitise =
             s"./${basePath.resolve(userAnswers.getItem(ChooseGedcomFileQuestion).selectedFile).normalize()}"
-          val gedcomTxt = FileUtils.ReadGedcomAsString(sanitise)
 
           def maybeCreateDatabase: OptionT[Future, Int] =
             if (userAnswers.getItem(CreateNewDatabaseQuestion).trueOrFalse) {
@@ -88,16 +95,23 @@ class CheckYourAnswersController @Inject() (
               Future.successful(0)
             }
 
-          val gg: Future[Result] = for {
+          val jobId = UUID.randomUUID().toString
+          gedcomHashIdTable.updateJobStatus(jobId: String, "Start")
+          (for {
             dbId <- maybeCreateDatabase.value
             _    <- maybeClearDatabase
             targetDbId = dbId.getOrElse(userAnswers.getItem(SelectExistingDatabaseQuestion).id)
-            _ <- gedcomImportService.gedcom2sql(gedcomTxt, targetDbId)
+            _ <- gedcomImportService.insertGedcomInDatabase(sanitise, targetDbId, jobId)
             _ <- journeyCacheRepository.clear
           } yield {
-            Redirect(controllers.routes.HomeController.onload())
+            gedcomHashIdTable.updateJobStatus(jobId, s"Import done")
+            Redirect(controllers.gedcom.routes.ImportGedcomController.showStatus(jobId))
+          }).recover {
+            case NonFatal(error) =>
+              gedcomHashIdTable.updateJobStatus(jobId, error.getMessage)
+              throw error
           }
-          gg
+          Future.successful(Redirect(controllers.gedcom.routes.ImportGedcomController.showStatus(jobId)))
       }
-  }
+    }
 }

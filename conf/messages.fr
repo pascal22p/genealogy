@@ -287,9 +287,22 @@ gedcom.newDatabase.question.no = Dans une base de données existante
 gedcom.newDatabase.question.hint = Choisissez si les données doivent être importées dans une nouvelle base de données à créer ou dans une base de données existante.
 
 importGedcom.checkYourAnswers.title = Importer un fichier Gedcom
-importGedcom.GedcomPath.selectedFile = Fichier à importer
-importGedcom.NewDatabaseQuestion.trueOrFalse = Créer une nouvelle base de données
+importGedcom.ChooseGedcomFileQuestion.selectedFile = Fichier à importer
+importGedcom.CreateNewDatabaseQuestion.trueOrFalse = Créer une nouvelle base de données
 importGedcom.NewDatabase.name = Nom de la nouvelle base de données
 importGedcom.NewDatabase.description = Description de la nouvelle base de données
-importGedcom.DatabaseSelect.selectedDatabase = Base de données où importer les données
-importGedcom.ClearDatabaseQuestion.trueOrFalse = Vider la base de données avant l'importation
+importGedcom.SelectExistingDatabaseQuestion.selectedDatabase = Base de données où importer les données
+importGedcom.ClearExistingDatabaseQuestion.trueOrFalse = Vider la base de données avant l'importation
+importGedcom.PlacesElementsPaddingQuestion.padding = Ou ajouter les éléments de lieu manquants
+importGedcom.PlacesElementsSeparatorQuestion.separator = Séparateur pour les éléments de lieu
+importGedcom.PlacesElementsQuestion.hierarchy = Association des éléments de lieu
+importGedcom.PlacesElements.padding.right = À droite
+importGedcom.PlacesElements.padding.left = A gauche
+importGedcom.place.field.City = Ville
+importGedcom.place.field.Postcode = Code postal
+importGedcom.place.field.subdivision = Subdivision
+importGedcom.place.field.division = Division
+importGedcom.place.field.Country = Pays
+importGedcom.place.field.Locality = Localité
+
+importGedcom.choosePlaceElements.title = Associer les subdivisions du fichier GEDCOM aux champs de base de données

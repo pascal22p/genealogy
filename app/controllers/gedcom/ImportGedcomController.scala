@@ -23,10 +23,12 @@ import models.forms.SelectExistingDatabaseForm
 import models.forms.TrueOrFalseForm
 import models.journeyCache.UserAnswersKey.*
 import repositories.JourneyCacheRepository
+import services.gedcom.GedcomHashIdTable
 import services.GenealogyDatabaseService
 import views.html.add.AddDatabase
 import views.html.gedcom.GedcomChooseDatabaseView
 import views.html.gedcom.GedcomListView
+import views.html.gedcom.GedcomProgressView
 import views.html.gedcom.NewDatabaseQuestionView
 
 @Singleton
@@ -39,6 +41,8 @@ class ImportGedcomController @Inject() (
     newDatabaseQuestionView: NewDatabaseQuestionView,
     addDatabaseView: AddDatabase,
     gedcomChooseDatabaseView: GedcomChooseDatabaseView,
+    gedcomProgressView: GedcomProgressView,
+    gedcomHashIdTable: GedcomHashIdTable,
     val controllerComponents: ControllerComponents
 )(implicit ec: ExecutionContext)
     extends BaseController
@@ -63,7 +67,9 @@ class ImportGedcomController @Inject() (
 
   def startJourney: Action[AnyContent] = authJourney.authWithAdminRight.async {
     implicit request: AuthenticatedRequest[AnyContent] =>
-      Future.successful(Redirect(controllers.gedcom.routes.ImportGedcomController.showGedcomList))
+      {
+        Future.successful(Redirect(controllers.gedcom.routes.ImportGedcomController.showGedcomList))
+      }
   }
 
   def showGedcomList: Action[AnyContent] = authJourney.authWithAdminRight.async {
@@ -83,7 +89,7 @@ class ImportGedcomController @Inject() (
 
       val successFunction: GedcomPathInputTextForm => Future[Result] = { (dataForm: GedcomPathInputTextForm) =>
         journeyCacheRepository.upsert(ChooseGedcomFileQuestion, dataForm).map { _ =>
-          Redirect(controllers.gedcom.routes.GedcomStatsController.gedcomStats)
+          Redirect(controllers.gedcom.routes.ChoosePlaceSeparatorController.showForm)
         }
       }
 
@@ -173,5 +179,10 @@ class ImportGedcomController @Inject() (
 
       val formValidationResult = SelectExistingDatabaseForm.form.bindFromRequest()
       formValidationResult.fold(errorFunction, successFunction)
+  }
+
+  def showStatus(jobId: String): Action[AnyContent] = authJourney.authWithAdminRight.async {
+    implicit request: AuthenticatedRequest[AnyContent] =>
+      Future.successful(Ok(gedcomProgressView(gedcomHashIdTable.getJobStatus(jobId).reverse)))
   }
 }

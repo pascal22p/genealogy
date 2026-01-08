@@ -13,17 +13,25 @@ import play.api.db.Database
 import play.api.mvc.Request
 import play.api.test.FakeRequest
 import play.api.Application
+import repositories.JourneyCacheRepository
+import play.api.inject.bind
+import org.mockito.Mockito.reset
 
 trait MariadbHelper extends BaseSpec with BeforeAndAfterEach with LoggingWithRequest {
-  lazy val db: Database                  = app.injector.instanceOf[Database]
-  implicit lazy val ec: ExecutionContext = app.injector.instanceOf[ExecutionContext]
+  lazy val db: Database                                  = app.injector.instanceOf[Database]
+  implicit lazy val ec: ExecutionContext                 = app.injector.instanceOf[ExecutionContext]
+  val mockJourneyCacheRepository: JourneyCacheRepository = mock[JourneyCacheRepository]
 
   val testDataBase: String = "genealogie-test"
 
   implicit override lazy val app: Application = localGuiceApplicationBuilder()
     .configure(
       "database.name"  -> testDataBase,
-      "db.default.url" -> "jdbc:mariadb://localhost:3306"
+      "db.default.url" -> "jdbc:mariadb://localhost:3306",
+      "upload-path"    -> "test/resources/gedcom/"
+    )
+    .overrides(
+      bind[JourneyCacheRepository].toInstance(mockJourneyCacheRepository)
     )
     .build()
 
@@ -60,6 +68,7 @@ trait MariadbHelper extends BaseSpec with BeforeAndAfterEach with LoggingWithReq
 
   override def beforeEach(): Unit = {
     super.beforeEach()
+    reset(mockJourneyCacheRepository)
     createTables(using FakeRequest()).map(_ => ()).futureValue
   }
 

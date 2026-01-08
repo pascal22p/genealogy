@@ -7,6 +7,6 @@ final case class GedcomFamilyBlock(
     wife: Option[Int],
     husb: Option[Int],
     children: Set[Int],
-    events: List[GedcomEventBlock],
+    events: Seq[GedcomEventBlock],
     resn: Option[ResnType]
 )

@@ -1,5 +1,8 @@
 package models.gedcom
 
+import play.api.libs.json.Format
+import play.api.libs.json.Json
+
 final case class GedcomNode(
     name: String,
     line: String,
@@ -7,5 +10,9 @@ final case class GedcomNode(
     level: Int,
     xref: Option[String],
     content: Option[String],
-    children: List[GedcomNode]
+    children: Seq[GedcomNode]
 )
+
+object GedcomNode {
+  implicit val format: Format[GedcomNode] = Json.format[GedcomNode]
+}

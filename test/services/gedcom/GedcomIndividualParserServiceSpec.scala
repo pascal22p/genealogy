@@ -257,7 +257,7 @@ class GedcomIndividualParserServiceSpec extends BaseSpec {
         )
       )
 
-      val result: Ior[List[String], GedComPersonalNameStructure] = sut.readPersonalNameStructure(input)
+      val result: Ior[Seq[String], GedComPersonalNameStructure] = sut.readPersonalNameStructure(input)
       result mustBe expected
     }
   }
@@ -277,7 +277,6 @@ class GedcomIndividualParserServiceSpec extends BaseSpec {
            |2 DATE 13 NOV 1841
            |2 PLAC Munich,Germany
            |1 BURI
-           |2 PLAC Theatinerkirche,Munich,Germany
            |1 FAMS @F232@
            |1 FAMC @F226@
            |""".stripMargin
@@ -335,17 +334,7 @@ class GedcomIndividualParserServiceSpec extends BaseSpec {
             1,
             None,
             None,
-            List(
-              GedcomNode(
-                "PLAC",
-                "2 PLAC Theatinerkirche,Munich,Germany",
-                9,
-                2,
-                None,
-                Some("Theatinerkirche,Munich,Germany"),
-                List()
-              )
-            )
+            List()
           ),
           GedcomNode("FAMS", "1 FAMS @F232@", 11, 1, Some("F232"), None, List()),
           GedcomNode("FAMC", "1 FAMC @F226@", 12, 1, Some("F226"), None, List())
@@ -353,27 +342,23 @@ class GedcomIndividualParserServiceSpec extends BaseSpec {
       )
 
       val expected = Ior.Both(
-        List(
-          "Line 4: `2 PLAC Karlsruhe` in event is not supported",
-          "Line 7: `2 PLAC Munich,Germany` in event is not supported",
-          "Line 9: `2 PLAC Theatinerkirche,Munich,Germany` in event is not supported"
-        ),
+        List(),
         GedcomIndiBlock(
           GedComPersonalNameStructure("Caroline of_Baden //", "", "given", "nickname", "", "", "surn"),
           None,
           "F",
           0,
           List(
-            GedcomEventBlock("BIRT", "13 JUL 1776"),
-            GedcomEventBlock("DEAT", "13 NOV 1841"),
-            GedcomEventBlock("BURI", "")
+            GedcomEventBlock("BIRT", "13 JUL 1776", Some("Karlsruhe")),
+            GedcomEventBlock("DEAT", "13 NOV 1841", Some("Munich,Germany")),
+            GedcomEventBlock("BURI", "", None)
           ),
           Set(1),
           Set(0)
         )
       )
 
-      val result = sut.readIndiBlock(input)
+      val result = sut.readIndiBlock(input, "jobId")
       result mustBe expected
     }
   }

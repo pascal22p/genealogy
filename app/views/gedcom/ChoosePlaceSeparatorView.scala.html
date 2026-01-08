@@ -1,0 +1,60 @@
+@import views.html.components.Block
+@import helper._
+@import uk.gov.hmrc.govukfrontend.views.Implicits.*
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits.*
+@import uk.gov.hmrc.hmrcfrontend.views.Implicits.*
+@import models.forms.PlacesElementsSeparatorForm
+
+@this(
+        main: Main,
+        block: Block,
+        formWithCSRF: FormWithCSRF,
+        govukErrorSummary: GovukErrorSummary,
+        govukInput: GovukInput,
+        govukButton: GovukButton
+)
+
+@(placesElementsSeparatorForm: Form[PlacesElementsSeparatorForm], sample: Set[List[String]])(implicit request: AuthenticatedRequest[?], messages: Messages)
+
+@main(1, None, title = messages("importGedcom.checkYourAnswers.title")) {
+
+    @if(placesElementsSeparatorForm.hasErrors) {
+        @govukErrorSummary(ErrorSummary(
+            errorList = placesElementsSeparatorForm.errors.map { error =>
+                ErrorLink(
+                    href = Some(s"#${error.key}"),
+                    content = Text(messages(error.message))
+                )
+            },
+            title = Text("There is a problem")
+        ))
+    }
+
+    @block("Sample of place entries from your GEDCOM file") {
+        <div class="scroll-container">
+            <div class="scroll-container">
+                  <ul class="govuk-list govuk-list--bullet govuk-list--spaced">
+                    @for(row <- sample) {
+                      <li>@row.mkString(" | ")</li>
+                    }
+                  </ul>
+            </div>
+        </div>
+    }
+
+    @formWithCSRF(controllers.gedcom.routes.ChoosePlaceSeparatorController.showFormOnSubmit) {
+        @govukInput(Input(
+          label = Label(content = Text("Enter the separator used in your GEDCOM place entries to separate different place elements")),
+          pattern = Some("""^.{1}$"""),
+        ).withFormField(placesElementsSeparatorForm("separator")))
+
+        @govukButton(Button(
+            content = Text("Continue"),
+            name = Some("submit"),
+            href = None,
+            inputType = Some("submit")
+        ))
+    }
+
+}
+

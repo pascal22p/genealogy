@@ -641,3 +641,7 @@ screen and (min-width:40.0625em) and (-ms-high-contrast:active) {
     max-height: 300px;
     overflow-y: auto;
 }
+
+.no-min-width {
+    min-width: 0;
+}
