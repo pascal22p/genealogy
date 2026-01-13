@@ -9,7 +9,7 @@ object LibDependencies {
     "org.playframework.anorm" %% "anorm"               % "2.8.1",
     "org.typelevel"           %% "cats-core"           % "2.13.0",
     "org.mindrot"             %  "jbcrypt"             % "0.4",
-    "uk.gov.hmrc"             %% "play-frontend-hmrc-play-30" % "12.26.0",
+    "uk.gov.hmrc"             %% "play-frontend-hmrc-play-30" % "12.27.0",
     "org.apache.xmlgraphics"  % "fop"                  % "2.11"
   )
 
