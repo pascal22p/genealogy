@@ -24,7 +24,6 @@ class DatabaseFixes @Inject() (
     authJourney: AuthJourney,
     getSqlQueries: GetSqlQueries,
     updateSqlQueries: UpdateSqlQueries,
-    gedcomDateLibrary: GedcomDateLibrary,
     val controllerComponents: ControllerComponents
 )(
     implicit ec: ExecutionContext
@@ -34,7 +33,7 @@ class DatabaseFixes @Inject() (
   def calculateDaysForDates: Action[AnyContent] = authJourney.authWithAdminRight.async { implicit request =>
     val result: Future[List[Option[Int]]] = getSqlQueries.getAllEvents.flatMap { events =>
       events.traverse { event =>
-        val localDate = gedcomDateLibrary.extractDate(event.events_details_gedcom_date)
+        val localDate = GedcomDateLibrary.extractDate(event.events_details_gedcom_date)
 
         localDate match {
           case Some(date) =>

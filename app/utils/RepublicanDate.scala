@@ -1,15 +1,12 @@
 package utils
 
 import java.time.LocalDate
-import javax.inject.Inject
-import javax.inject.Singleton
 
 import scala.util.Failure
 import scala.util.Success
 import scala.util.Try
 
-@Singleton
-class RepublicanDate @Inject() () {
+object RepublicanDate {
 
   private def frenchMonthsToGregorianYear123567(year: Int): Map[String, (String, Int, Int)] = Map(
     "VEND" -> ("SEP", 22, 1791 + year),
@@ -135,8 +132,8 @@ class RepublicanDate @Inject() () {
   }
 
   def parseRepublicanStringToGregorianDate(date: String): Option[LocalDate] = {
-    parseRepublicanDate(date).map {
+    parseRepublicanDate(date).flatMap {
       case (day, month, year) => fromRepublicanToGregorian(day, month, year)
-    }.flatten
+    }
   }
 }

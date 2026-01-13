@@ -28,7 +28,10 @@ import models.SourCitationType.UnknownSourCitation
 import play.api.db.Database
 
 @Singleton
-final class GetSqlQueries @Inject() (db: Database, databaseExecutionContext: DatabaseExecutionContext) {
+final class GetSqlQueries @Inject() (
+    db: Database,
+    databaseExecutionContext: DatabaseExecutionContext
+) {
 
   def getPersonDetails(id: Int): Future[List[PersonDetails]] = Future {
     db.withConnection { implicit conn =>
@@ -284,18 +287,128 @@ final class GetSqlQueries @Inject() (db: Database, databaseExecutionContext: Dat
           if (userData.seePrivacy) "" else excludePrivate
         }
         SQL(
-          s"""SELECT MIN(jd_count) AS min_jd_count, MAX(jd_count) AS max_jd_count, indi_nom, COUNT(DISTINCT genea_individuals.indi_id) AS unique_count
-             | FROM genea_individuals
-             | LEFT JOIN rel_indi_events ON genea_individuals.indi_id = rel_indi_events.indi_id
-             | LEFT JOIN genea_events_details ON genea_events_details.events_details_id = rel_indi_events.events_details_id
-             | WHERE genea_individuals.base = {id} $isExcluded
-             | GROUP BY genea_individuals.indi_nom
-             | ORDER BY genea_individuals.indi_nom""".stripMargin
+          s"""SELECT
+             |    i.indi_nom,
+             |    COUNT(*) AS unique_count,
+             |    MIN(e.min_jd) AS min_jd_count,
+             |    MAX(e.max_jd) AS max_jd_count
+             |FROM genea_individuals i
+             |LEFT JOIN (
+             |    SELECT
+             |        rie.indi_id,
+             |        MIN(d.jd_count) AS min_jd,
+             |        MAX(d.jd_count) AS max_jd
+             |    FROM rel_indi_events rie
+             |    JOIN genea_events_details d
+             |      ON d.events_details_id = rie.events_details_id
+             |    GROUP BY rie.indi_id
+             |) e ON e.indi_id = i.indi_id
+             |WHERE i.base = {id}
+             |  $isExcluded
+             |GROUP BY i.indi_nom
+             |ORDER BY i.indi_nom;
+             |""".stripMargin
         )
           .on("id" -> id)
           .as(mysqlParser.*)
       }
     }(using databaseExecutionContext)
+
+  def getFirstNamesList(
+      dbId: Int,
+      name: String,
+      pageSize: Int,
+      cursor: Option[(String, Int, Int, Int)] = None,
+      reverse: Boolean = false
+  )(
+      implicit authenticatedRequest: AuthenticatedRequest[?]
+  ): Future[Seq[FirstnameWithBirthDeath]] = Future {
+    val compareTo = if (reverse) { "<" }
+    else { ">" }
+    val order = if (reverse) { "DESC" }
+    else { "ASC" }
+
+    val excludePrivate = "AND indi_resn IS NULL"
+    val isExcluded     = authenticatedRequest.localSession.sessionData.userData.fold(excludePrivate) { userData =>
+      if (userData.seePrivacy) "" else excludePrivate
+    }
+    val cursorPagination =
+      cursor.fold("")(_ =>
+        s"""
+           |  AND (
+           |     t.indi_prenom $compareTo {prenom}
+           |  OR (t.indi_prenom = {prenom} AND COALESCE(birth_date_jd, 0) $compareTo {birthJd})
+           |  OR (t.indi_prenom = {prenom} AND COALESCE(birth_date_jd, 0) = {birthJd} AND COALESCE(death_date_jd, 0) $compareTo {deathJd})
+           |  OR (t.indi_prenom = {prenom} AND COALESCE(birth_date_jd, 0) = {birthJd}
+           |      AND COALESCE(death_date_jd, 0) = {deathJd} AND t.indi_id $compareTo {id})
+           |  )""".stripMargin
+      )
+
+    val parameters = Seq[NamedParameter](
+      "id"       -> dbId,
+      "name"     -> name,
+      "pageSize" -> pageSize
+    ) ++
+      cursor.fold(Seq.empty) {
+        case (prenom, id, birthJd, deathJd) =>
+          Seq[NamedParameter](
+            "prenom"  -> prenom,
+            "lastId"  -> id,
+            "birthJd" -> birthJd,
+            "deathJd" -> deathJd
+          )
+      }
+
+    db.withConnection { implicit conn =>
+      SQL(
+        s"""SELECT *
+           |FROM (
+           |    SELECT
+           |        i.indi_id,
+           |        i.indi_prenom,
+           |
+           |        MIN(CASE
+           |              WHEN rie.events_tag IN ('BIRT', 'CHR', 'BAPM')
+           |              THEN d.events_details_gedcom_date
+           |            END) AS birth_date,
+           |
+           |        MIN(CASE
+           |              WHEN rie.events_tag IN ('BIRT', 'CHR', 'BAPM')
+           |              THEN d.jd_count
+           |            END) AS birth_date_jd,
+           |
+           |        MIN(CASE
+           |              WHEN rie.events_tag IN ('DEAT', 'BURI', 'CREM')
+           |              THEN d.events_details_gedcom_date
+           |            END) AS death_date,
+           |
+           |        MIN(CASE
+           |              WHEN rie.events_tag IN ('DEAT', 'BURI', 'CREM')
+           |              THEN d.jd_count
+           |            END) AS death_date_jd
+           |
+           |    FROM genea_individuals i
+           |    LEFT JOIN rel_indi_events rie ON rie.indi_id = i.indi_id
+           |    LEFT JOIN genea_events_details d ON d.events_details_id = rie.events_details_id
+           |    WHERE i.base = {id}
+           |      AND i.indi_nom = {name}
+           |      $isExcluded
+           |    GROUP BY i.indi_id, i.indi_prenom
+           |) t
+           |WHERE 1 = 1
+           |  $cursorPagination
+           |ORDER BY
+           |  t.indi_prenom $order,
+           |  COALESCE(t.birth_date_jd, 0) $order,
+           |  COALESCE(t.death_date_jd, 0) $order,
+           |  t.indi_id $order
+           |LIMIT {pageSize}
+           |""".stripMargin
+      )
+        .on(parameters*)
+        .as(FirstnameWithBirthDeath.mysqlParser.*)
+    }
+  }(using databaseExecutionContext)
 
   def getAllPersonDetails(dbId: Int, name: Option[String] = None)(
       implicit authenticatedRequest: AuthenticatedRequest[?]

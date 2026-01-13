@@ -1,27 +1,33 @@
 @import config.AppConfig
+@import models.queryData.FirstnameWithBirthDeath
+@import utils.GedcomDateLibrary
+@import views.html.components.PaginationComponent
+@import models.FirstnamesListPagination
 
 @this(
         main: Main,
+        paginationComponent: PaginationComponent,
         govukSummaryList: GovukSummaryList
 )(
-  implicit val appConfig: AppConfig
+  implicit appConfig: AppConfig
 )
 
-@(names: List[Person], dbId: Int, title: String)(implicit request: AuthenticatedRequest[?], messages: Messages)
+@(dbId: Int, surname: String, title: String, firstnamesListPagination: FirstnamesListPagination)(implicit request: AuthenticatedRequest[?], messages: Messages)
 
 @main(dbId, None, title) {
 
+    @paginationComponent(dbId, surname, firstnamesListPagination)
     @govukSummaryList(
         SummaryList(
-            rows = names.map { name =>
+            rows = firstnamesListPagination.firstnames.map { name =>
                 SummaryListRow(
-                    key = Key(Text(name.details.firstname.toString)),
-                    value = Value(Text(name.events.birthAndDeathDate().toString)),
+                    key = Key(Text(name.firstname)),
+                    value = Value(Text(GedcomDateLibrary.birthAndDeathDate(name.birth, name.death))),
                     classes = "govuk-summary-list__row--no-border",
                     actions = Some(Actions(
                         items = Seq(
                             ActionItem(
-                                href = controllers.routes.IndividualController.showPerson(dbId, name.details.id).url,
+                                href = controllers.routes.IndividualController.showPerson(dbId, name.id).url,
                                 content = Text(messages("View"))
                             )
                         )
@@ -45,5 +51,6 @@
             attributes = Map.empty
         )
     )
+    @paginationComponent(dbId, surname, firstnamesListPagination)
 
 }
