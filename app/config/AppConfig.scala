@@ -19,4 +19,6 @@ class AppConfig @Inject() (configuration: Configuration) {
   val redactedMask: String = "*******"
 
   val commitHash: String = sys.props.getOrElse("git.commit.hash", "unknown")
+
+  val pageSize = 20
 }

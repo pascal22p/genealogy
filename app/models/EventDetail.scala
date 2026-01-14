@@ -7,7 +7,7 @@ import models.forms.EventDetailForm
 import models.queryData.EventDetailQueryData
 import models.EventType.EventType
 import play.api.i18n.Messages
-import utils.CalendarConstants
+import utils.GedcomDateLibrary
 
 final case class EventDetail(
     base: Int,
@@ -32,33 +32,13 @@ final case class EventDetail(
     privacyRestriction: Option[ResnType.ResnType],
     sourCitations: List[SourCitation] = List.empty
 ) {
+
   def formatDate(shortMonth: Boolean = false)(
       implicit messages: Messages,
       authenticatedRequest: AuthenticatedRequest[?],
       appConfig: AppConfig
-  ): String = {
-    val dateRegex               = ".*([0-9]{4}).*".r
-    val isAllowedToSee: Boolean = authenticatedRequest.localSession.sessionData.userData.fold(false)(_.seePrivacy)
-    val shortMonthMessage       =
-      if (shortMonth) { ".short" }
-      else { "" }
-
-    val maxYear = dateRegex.findAllMatchIn(events_details_gedcom_date).toList.map(_.group(1).toInt).maxOption
-    maxYear match {
-      case Some(year) if year > 1900 && !isAllowedToSee => appConfig.redactedMask
-      case _                                            =>
-        val dateWithoutCal = CalendarConstants.calendarTypes.foldLeft(events_details_gedcom_date) {
-          case (formattedDate, replace) =>
-            replace._1.replaceAllIn(formattedDate, messages(replace._2))
-        }
-        CalendarConstants.allKeywords
-          .foldLeft(dateWithoutCal) {
-            case (formattedDate, replace) =>
-              replace._1.replaceAllIn(formattedDate, messages(replace._2 + shortMonthMessage))
-          }
-          .trim
-    }
-  }
+  ): String =
+    GedcomDateLibrary.formatDate(events_details_gedcom_date, shortMonth).getOrElse("")
 
   def toForm: EventDetailForm =
     EventDetailForm(

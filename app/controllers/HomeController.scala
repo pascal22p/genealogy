@@ -7,12 +7,14 @@ import scala.concurrent.ExecutionContext
 
 import actions.AuthAction
 import cats.data.OptionT
+import cats.implicits.*
 import models.AuthenticatedRequest
 import play.api.i18n.I18nSupport
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.BaseController
 import play.api.mvc.ControllerComponents
+import services.FirstnamesListService
 import services.GenealogyDatabaseService
 import views.html.FirstnamesList
 import views.html.Index
@@ -22,6 +24,7 @@ import views.html.SurnamesList
 class HomeController @Inject() (
     authAction: AuthAction,
     genealogyDatabaseService: GenealogyDatabaseService,
+    firstnamesListService: FirstnamesListService,
     indexView: Index,
     surnamesView: SurnamesList,
     firstnamesView: FirstnamesList,
@@ -49,8 +52,26 @@ class HomeController @Inject() (
 
   def showFirstnames(id: Int, name: String): Action[AnyContent] = authAction.async {
     implicit request: AuthenticatedRequest[AnyContent] =>
-      genealogyDatabaseService.getFirstnamesList(id, name).map { names =>
-        Ok(firstnamesView(names, id, s"Surname $name"))
+      val cursor = request.request.queryString
+        .get("cursor")
+        .flatMap { s =>
+          s.headOption.flatMap { cursorString =>
+            cursorString.reverse.split("#", 4).map(_.reverse).toList.reverse match {
+              case (name :: id :: birthJd :: deathJd :: _) => Some((name, id.toInt, birthJd.toInt, deathJd.toInt))
+              case _                                       => None
+            }
+          }
+        }
+
+      firstnamesListService.getFirstNamesListWithAnchors(id, name, cursor).map { firstnamesListPagination =>
+        Ok(
+          firstnamesView(
+            id,
+            name,
+            s"Surname $name",
+            firstnamesListPagination
+          )
+        )
       }
   }
 }

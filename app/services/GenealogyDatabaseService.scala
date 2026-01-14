@@ -21,8 +21,7 @@ import utils.GedcomDateLibrary
 @Singleton
 class GenealogyDatabaseService @Inject() (
     mariadbQueries: GetSqlQueries,
-    eventService: EventService,
-    gedcomDateLibrary: GedcomDateLibrary
+    eventService: EventService
 )(
     implicit ec: ExecutionContext
 ) {
@@ -37,8 +36,8 @@ class GenealogyDatabaseService @Inject() (
           SurnameElement(
             name,
             count,
-            minJdCount.map(gedcomDateLibrary.dayCountToGregorianDate(_).getYear()),
-            maxJdCount.map(gedcomDateLibrary.dayCountToGregorianDate(_).getYear())
+            minJdCount.map(GedcomDateLibrary.dayCountToGregorianDate(_).getYear()),
+            maxJdCount.map(GedcomDateLibrary.dayCountToGregorianDate(_).getYear())
           )
       }
     }

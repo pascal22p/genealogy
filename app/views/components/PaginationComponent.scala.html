@@ -1,0 +1,41 @@
+@import models.Cursor
+@import models.FirstnamesListPagination
+
+@this(govukPagination : GovukPagination)
+
+@(dbId: Int, surname: String, pagination: FirstnamesListPagination)(implicit messages: Messages)
+
+@if(pagination.previous.nonEmpty || pagination.next.nonEmpty) {
+    <div class="pagination-wrapper">
+    @govukPagination(Pagination(
+        items = Some(
+            (pagination.previous.map { c =>
+                Some(PaginationItem(
+                    href = s"${routes.HomeController.showFirstnames(dbId, surname)}?cursor=${c.anchor}",
+                    number = Some(c.label)
+                ))
+            } ++ Seq(pagination.current.map(c =>
+                PaginationItem(
+                    href = s"${routes.HomeController.showFirstnames(dbId, surname)}?cursor=${c.anchor}",
+                    number = Some(c.label),
+                    current = Some(true)
+                )
+            )) ++ pagination.next.map { c =>
+                Some(PaginationItem(
+                    href = s"${routes.HomeController.showFirstnames(dbId, surname)}?cursor=${c.anchor}",
+                    number = Some(c.label)
+                ))
+            }).flatten),
+        previous = pagination.first.map { c =>
+            PaginationLink(
+                href = s"${routes.HomeController.showFirstnames(dbId, surname)}?cursor=${c.anchor}"
+            )
+        },
+        next = pagination.last.map { c =>
+            PaginationLink(
+                href = s"${routes.HomeController.showFirstnames(dbId, surname)}?cursor=${c.anchor}"
+            )
+        }
+    ))
+    </div>
+}
