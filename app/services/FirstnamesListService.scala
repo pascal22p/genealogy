@@ -14,13 +14,18 @@ import models.FirstnamesListPagination
 import play.api.i18n.Messages
 import queries.GetSqlQueries
 import utils.GedcomDateLibrary
+import cats.implicits.*
 
 @Singleton
 class FirstnamesListService @Inject() (
     getSqlQueries: GetSqlQueries,
     appConfig: AppConfig
 )(implicit ec: ExecutionContext) {
-  private val PAGE_NUMBER = 6
+  // number of pages to look ahead/behind plus the current page
+  // plus an extra page to know if there are more records or not after/before this set of pages
+  // should be an even number.
+  private val PAGE_NUMBER = 8
+  private val sidePage    = (PAGE_NUMBER - 1 - 1) / 2
 
   def getFirstNamesListWithAnchors(
       dbId: Int,
@@ -41,20 +46,26 @@ class FirstnamesListService @Inject() (
       }
     }
 
+    // if cursor is missing, it is the first page so no previous pages
+    val maybePreviousNames = cursor
+      .traverse { _ =>
+        getSqlQueries.getFirstNamesList(
+          dbId,
+          name,
+          appConfig.pageSize * (PAGE_NUMBER + 1),
+          cursor,
+          reverse = true
+        )
+      }
+      .map(_.getOrElse(Seq.empty))
+
     for {
-      currentNames <- getSqlQueries.getFirstNamesList(dbId, name, appConfig.pageSize * PAGE_NUMBER, cursor)
-      currentPosition = currentNames.headOption.map(name => (name.firstname, name.id, name.birthJd, name.deathJd))
-      previousNames <- getSqlQueries.getFirstNamesList(
-        dbId,
-        name,
-        appConfig.pageSize * (PAGE_NUMBER + 1),
-        currentPosition,
-        reverse = true
-      )
+      currentNames  <- getSqlQueries.getFirstNamesList(dbId, name, appConfig.pageSize * PAGE_NUMBER, cursor)
+      previousNames <- maybePreviousNames
     } yield {
       val previousCursorsRaw = previousNames // multiple pages
         .grouped(appConfig.pageSize) // group by individual page
-        .map(_.lastOption.map(makeCursor)) // get last cursor for each page
+        .map(_.lastOption.map(makeCursor)) // get last cursor for each page (the order is reversed)
         .toSeq
         .flatten
         .reverse
@@ -67,8 +78,8 @@ class FirstnamesListService @Inject() (
         .drop(1) // first element is current page
 
       val currentCursor   = currentNames.headOption.map(makeCursor)
-      val previousCursors = previousCursorsRaw.takeRight(3 + (3 - nextCursorsRaw.size).max(0))
-      val nextCursors     = nextCursorsRaw.take(3 + (3 - previousCursorsRaw.size).max(0))
+      val previousCursors = previousCursorsRaw.takeRight(sidePage + (sidePage - nextCursorsRaw.size).max(0))
+      val nextCursors     = nextCursorsRaw.take(sidePage + (sidePage - previousCursorsRaw.size).max(0))
 
       val (first, previous) = if (previousCursors.lengthIs == previousCursorsRaw.length) {
         (None, previousCursors)
@@ -76,7 +87,6 @@ class FirstnamesListService @Inject() (
         (previousCursors.headOption, previousCursors.drop(1))
       }
 
-      println(s"${nextCursorsRaw.map(_.index)} / ${nextCursors.map(_.index)}")
       val (last, next) = if (nextCursors.lengthIs < nextCursorsRaw.length) {
         (nextCursors.takeRight(1).headOption, nextCursors.dropRight(1))
       } else {

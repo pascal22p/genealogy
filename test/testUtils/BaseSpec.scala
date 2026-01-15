@@ -12,6 +12,7 @@ import models.ResnType
 import models.Sex
 import org.scalatest.concurrent.IntegrationPatience
 import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import org.scalatestplus.play.PlaySpec
@@ -25,7 +26,8 @@ trait BaseSpec
     with ScalaFutures
     with Injecting
     with IntegrationPatience
-    with MockitoSugar {
+    with MockitoSugar
+    with BeforeAndAfterEach {
   protected def localGuiceApplicationBuilder(): GuiceApplicationBuilder =
     GuiceApplicationBuilder()
 
