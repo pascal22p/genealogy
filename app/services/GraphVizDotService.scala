@@ -29,6 +29,7 @@ class GraphVizDotService @Inject() (
     dotMainView(tree, origin).body
   }
 
+  @SuppressWarnings(Array("org.wartremover.warts.StringPlusAny"))
   def generateImageTree(dotString: String, fileType: String): Array[Byte] = {
     val dotProcess = Process(s"dot -T$fileType")
     val stdout     = new ByteArrayOutputStream()
