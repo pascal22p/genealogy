@@ -46,7 +46,7 @@ jobs:
       run: sbt test
       # Optional: This step uploads information to the GitHub dependency graph and unblocking Dependabot alerts for the repository
     - name: Upload dependency graph
-      uses: scalacenter/sbt-dependency-submission@0dc2189e4447f9494e97042d3cb01b89f4b0bce8
+      uses: scalacenter/sbt-dependency-submission@49ca55b87774ad27542a25e20b4ecd2072985401
 
     - name: Log in to Docker Hub
       uses: docker/login-action@v3
