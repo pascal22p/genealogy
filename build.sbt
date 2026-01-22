@@ -118,6 +118,9 @@ lazy val genealogy = (project in file("."))
     ),
     semanticdbEnabled := false,
     scalacOptions ++= Seq(
+      "-g:lines",
+      "-g:vars",
+      "-g:source",
       "-no-indent",
       "-deprecation",
       "-feature",
