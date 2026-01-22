@@ -18,7 +18,8 @@ Test / Keys.fork := true
 
 Universal / javaOptions ++= Seq(
   "-Dpidfile.path=/dev/null",
-  s"-Dgit.commit.hash=v${version.value}-snapshot-$shortCommitHash"
+  s"-Dgit.commit.hash=v${version.value}-snapshot-$shortCommitHash",
+  "-XX:+PreserveFramePointer"
 )
 
 packageName := "genealogy"
@@ -118,9 +119,6 @@ lazy val genealogy = (project in file("."))
     ),
     semanticdbEnabled := false,
     scalacOptions ++= Seq(
-      "-g:lines",
-      "-g:vars",
-      "-g:source",
       "-no-indent",
       "-deprecation",
       "-feature",
