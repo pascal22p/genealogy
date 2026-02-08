@@ -14,8 +14,8 @@ final case class Family(
     children: List[Child] = List.empty,
     events: Events
 ) {
-  def formatPartnerName(personId: Int): String = {
-    val partner = if (parent1.exists(_.details.id == personId)) parent2 else parent1
+  def formatPartnerName: String = {
+    val partner = parent1.orElse(parent2)
     partner.map(p => s"${p.details.firstname} ${p.details.surname}").getOrElse("Unknown")
   }
 }

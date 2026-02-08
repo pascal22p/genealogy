@@ -4,6 +4,7 @@ import models.journeyCache.UserAnswersItem
 import play.api.data.Form
 import play.api.data.Forms.boolean
 import play.api.data.Forms.mapping
+import play.api.data.Forms.optional
 import play.api.i18n.Messages
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
@@ -23,7 +24,9 @@ object TrueOrFalseForm {
 
   val trueOrFalseForm: Form[TrueOrFalseForm] = Form(
     mapping(
-      "trueOrFalse" -> boolean
+      "trueOrFalse" -> optional(boolean)
+        .verifying("error.required", _.isDefined)
+        .transform[Boolean](_.getOrElse(false), Some(_))
     )(TrueOrFalseForm.apply)(TrueOrFalseForm.unapply)
   )
 

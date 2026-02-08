@@ -23,6 +23,12 @@ class PersonDetailsService @Inject() (
   def getPersonDetails(id: Int): Future[Option[PersonDetails]] =
     mariadbQueries.getPersonDetails(id).map(_.headOption)
 
+  def getLatestPersonDetails(dbId: Int, maxNumber: Int): Future[List[PersonDetails]] =
+    mariadbQueries.getLatestPersonDetails(dbId, maxNumber)
+
+  def searchPersonDetails(dbId: Int, words: Seq[String]): Future[List[PersonDetails]] =
+    mariadbQueries.searchIndividuals(dbId, words)
+
   def getParents(id: Int): Future[List[Parents]] = {
     mariadbQueries.getFamiliesFromIndividualId(id).flatMap { families =>
       families.map { familyQueryData =>

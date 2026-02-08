@@ -7,6 +7,7 @@ import play.api.i18n.Messages
 import play.api.libs.json.*
 import play.api.mvc.Call
 import cats.implicits.*
+import models.journeyCache.ItemRequirements.Hidden
 
 final case class UserAnswers(
     data: Map[UserAnswersKey[?], UserAnswersItem]
@@ -47,13 +48,16 @@ final case class UserAnswers(
   // Extract individual items from a case class recursively into a flat map of key-value pairs
   // So that each value is displayed separately on the Check Your Answers page
   // This behaviour can be overridden for specific keys by providing a custom OWrites via checkYourAnswerWrites
-  def flattenByKey(journeyId: JourneyId)(using messages: Messages): Map[UserAnswersKey[?], Map[String, String]] = {
-    data.filter(_._1.journeyId == journeyId).map {
-      case (key, value) =>
-        val flattened = flattenItem(key, value)
-        key -> flattened
+  def flattenByKey(journeyId: JourneyId)(using Messages): Map[UserAnswersKey[?], Map[String, String]] =
+    data.collect {
+      case (key, value)
+          if key.journeyId == journeyId &&
+            (key.requirement match {
+              case Hidden() => false // exclude Hidden
+              case _        => true  // keep others
+            }) =>
+        key -> flattenItem(key, value)
     }
-  }
 
   @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
   private def flattenItem[A <: UserAnswersItem](
@@ -97,6 +101,9 @@ final case class UserAnswers(
       )
     } else {
       key.requirement match {
+        case ItemRequirements.Hidden() =>
+          true
+
         case ItemRequirements.Always() =>
           true
 

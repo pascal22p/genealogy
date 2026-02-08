@@ -28,6 +28,7 @@ govukErrorSummary: GovukErrorSummary
     }
     val children = s" (${family.children.size} children)"
 
+    println(":::::: " + partner1 + partner2 + children)
     partner1 + partner2 + children
 }
 
@@ -46,7 +47,7 @@ govukErrorSummary: GovukErrorSummary
         @govukErrorSummary(ErrorSummary().withFormErrorsAsHtml(familyForm))
     }
 
-    @helper.form(action = controllers.add.routes.AddPersonToFamily.submitExistingFamilyForm(dbId, person.details.id) ) {
+    @helper.form(action = controllers.add.routes.AddFamilyAsPartner.submitExistingFamilyForm(dbId, person.details.id) ) {
         @helper.CSRF.formField
         @govukSelect(
             Select(

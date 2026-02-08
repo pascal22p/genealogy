@@ -197,7 +197,8 @@ final class UpdateSqlQueries @Inject() (db: Database, databaseExecutionContext: 
         val setPartner = (family.parent1, family.parent2) match {
           case (Some(parent1), _) if parent1 == partnerId => "familles_husb = NULL"
           case (_, Some(parent2)) if parent2 == partnerId => "familles_wife = NULL"
-          case (a, b)                                     => throw new RuntimeException(s"Combination $a, $b invalid to update partner in family")
+          case (Some(a), Some(b))                         => throw new RuntimeException(s"Could not find partner $partnerId in $a, $b family")
+          case _                                          => throw new RuntimeException("This should have been unreachable")
         }
 
         SQL(s"""UPDATE genea_familles
@@ -225,7 +226,11 @@ final class UpdateSqlQueries @Inject() (db: Database, databaseExecutionContext: 
           case (None, Some(id)) if id != partnerId => "familles_husb = {partnerId}"
           case (Some(id), None) if id != partnerId => "familles_wife = {partnerId}"
           case (None, None)                        => "familles_husb = {partnerId}"
-          case (a, b)                              => throw new RuntimeException(s"Combination $a, $b invalid to update partner in family")
+          case (Some(a), Some(b))                  =>
+            throw new RuntimeException(
+              s"The family is already complete with $a, $b invalid to update partner in family"
+            )
+          case _ => throw new RuntimeException("This should have been unreachable")
         }
 
         SQL(s"""UPDATE genea_familles

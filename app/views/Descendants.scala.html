@@ -20,7 +20,7 @@
         """<ul class="govuk-list govuk-!-margin-top-0 govuk-!-margin-bottom-0" style="padding-left:40px">""" +
                 person.families.map { family =>
                     if (!person.details.privacyRestriction.contains(PrivacyResn) || isAllowedToSee) {
-                        val first = person.findPartner(family.id).fold(""){ partner =>
+                        val first = person.findSelf(family.id).fold(""){ partner =>
                             "<li style=\"margin:0;padding:0\">x " + nameLink(dbId, partner) + "</li>"
                         }
                         val last = family.children.reverse.headOption

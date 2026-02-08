@@ -1,5 +1,7 @@
 @import models.journeyCache.UserAnswersKey
 @import uk.gov.hmrc.govukfrontend.views.html.components.SummaryListRow
+@import play.api.mvc.Call
+@import models.journeyCache.JourneyId
 
 @this(
     main: Main,
@@ -7,17 +9,17 @@
     formWithCSRF: FormWithCSRF
 )
 
-@(answers: Map[UserAnswersKey[?], Map[String, String]])(implicit messages: Messages, request: AuthenticatedRequest[?])
+@(answers: Map[UserAnswersKey[?], Map[String, String]], messagePrefix: JourneyId, postCall: Call)(implicit messages: Messages, request: AuthenticatedRequest[?])
 
 
-@main(1, None, title = messages("importGedcom.checkYourAnswers.title")) {
+@main(1, None, title = messages(s"$messagePrefix.checkYourAnswers.title")) {
 
     @govukSummaryList(
         SummaryList(
             rows = answers.toList.sortBy(_._1.index).flatMap { case (userAnswersKey, valuesMap) =>
                 valuesMap.map { case (key, value) =>
                     SummaryListRow(
-                        key = Key(Text(messages(s"importGedcom.$userAnswersKey.$key"))),
+                        key = Key(Text(messages(s"$messagePrefix.$userAnswersKey.$key"))),
                         value = Value(Text(value)),
                         classes = "govuk-summary-list__row--no-border govuk-summary-list__row--no-actions",
                         actions = Some(Actions(
@@ -30,7 +32,7 @@
                         ))
                     )
                 }
-            }.toSeq,
+            },
             card = Some(Card(
                 title = Some(CardTitle(content = Text(messages("CheckYourAnswers")))),
                 actions = None
@@ -39,7 +41,7 @@
         )
     )
 
-    @formWithCSRF(controllers.gedcom.routes.CheckYourAnswersController.checkYourAnswersImportGedcomOnSubmit) {
+    @formWithCSRF(postCall) {
         <button class="govuk-button" type="submit">
             Confirm and continue
         </button>

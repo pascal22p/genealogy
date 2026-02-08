@@ -1,0 +1,37 @@
+@import models.journeyCache.UserAnswersKey
+@import uk.gov.hmrc.govukfrontend.views.html.components.SummaryListRow
+@import play.api.mvc.Call
+@import models.journeyCache.JourneyId
+@import config.AppConfig
+@import views.html.components.Block
+
+@this(
+    main: Main,
+        block: Block,
+    formWithCSRF: FormWithCSRF
+)
+
+@(person: Person, family: Family)(implicit messages: Messages, request: AuthenticatedRequest[?], appConfig: AppConfig)
+
+
+@main(1, None, title = messages(s"AddIndividualToFamily.checkYourAnswers.title")) {
+
+    @block("Check your answer") {
+        <p class="govuk-body govuk-list--bullet">Add the person @person.shortName (@person.events.birthAndDeathDate()) as a partner of @{
+            family.formatPartnerName
+        } with children:</p>
+    <ul class="govuk-list">
+        @for(child <- family.children) {
+            <li>@{
+                child.person.shortName
+            } (@child.person.events.birthAndDeathDate())</li>
+        }
+    </ul>
+
+        @formWithCSRF(controllers.add.routes.AddPersonAsPartnerController.checkYourAnswersOnSubmit) {
+            <button class="govuk-button" type="submit">
+                Confirm and continue
+            </button>
+        }
+    }
+}

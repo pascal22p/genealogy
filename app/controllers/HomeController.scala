@@ -57,8 +57,8 @@ class HomeController @Inject() (
         .flatMap { s =>
           s.headOption.flatMap { cursorString =>
             cursorString.reverse.split("#", 4).map(_.reverse).toList.reverse match {
-              case (name :: id :: birthJd :: deathJd :: _) => Some((name, id.toInt, birthJd.toInt, deathJd.toInt))
-              case _                                       => None
+              case name :: id :: birthJd :: deathJd :: _ => Some((name, id.toInt, birthJd.toInt, deathJd.toInt))
+              case _                                     => None
             }
           }
         }

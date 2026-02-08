@@ -264,10 +264,10 @@ add.event.date.hint = Date de l'événement au format Gedcom
 add.event.age.description = Âge de l'individu le jour de l'événement
 add.event.cause.description = Utilisé dans des cas spéciaux pour enregistrer les raisons qui ont précipité un événement
 
-add.existing.family.title = Ajouter {} à une famille existante
+add.existing.family.title = Ajouter {0} à une famille existante
 add.existing.family.button = Ajouter à la famille
 
-add.family.title = Ajouter {} à une nouvelle famille
+add.family.title = Ajouter {0} à une nouvelle famille
 add.family.database.hint = Base de données où l'événement est stocké
 add.family.person1.description = Partenaire 1
 add.family.person2.description = Partenaire 2

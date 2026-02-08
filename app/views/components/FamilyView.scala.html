@@ -8,44 +8,46 @@
     personSummaryListRow: PersonSummaryListRow,
     govukSummaryList: GovukSummaryList)
 
-@(dbId: Int, family: Family, partnerOption: Option[Person])(implicit authenticatedRequest: AuthenticatedRequest[?], messages: Messages)
+@(dbId: Int, family: Family, excludeOption: Option[Person])(implicit authenticatedRequest: AuthenticatedRequest[?], messages: Messages)
 
-@for(partner <- partnerOption) {
-    @govukSummaryList(
-        SummaryList(
-            rows = Seq(
-              personSummaryListRow.personSummaryListRow(dbId, partner, "wertyu")
-            ),
-            card = Some(Card(
-                title = Some(CardTitle(content = Text("Partner"))),
-                actions = None,
-                classes = "govuk-!-margin-4",
-                attributes = Map.empty
-            )),
-            classes = "",
-            attributes = Map.empty
-        )
-    )
+@actionFamily = @{
+    val condition = family.parent1.isEmpty || family.parent2.isEmpty
+
+    if(condition) {
+        Some(Actions(
+            items = Seq(
+                ActionItem(
+                    href = controllers.add.routes.AddPersonAsPartnerController.startAddIndividualToFamily(dbId, family.id).url,
+                    content = Text("Add")
+                ),
+            )
+        ))
+    } else {
+        None
+    }
 }
 
-@if(partnerOption.isEmpty && (family.parent1.nonEmpty || family.parent2.nonEmpty)) {
   @govukSummaryList(
     SummaryList(
       rows = Seq(
-        family.parent1.map( partner => personSummaryListRow.personSummaryListRow(
-            dbId,
-            partner,
-            controllers.unlink.routes.UnlinkPartnerController.unlinkPartnerConfirmation(dbId, partner.details.id, family.id).url)
-        ),
-        family.parent2.map( partner => personSummaryListRow.personSummaryListRow(
-            dbId,
-            partner,
-            controllers.unlink.routes.UnlinkPartnerController.unlinkPartnerConfirmation(dbId, partner.details.id, family.id).url)
-        )
+          family.parent1
+          .filterNot(partner => excludeOption.exists(_.details.id == partner.details.id))
+          .map(partner => personSummaryListRow.personSummaryListRow(
+              dbId,
+              partner,
+              controllers.unlink.routes.UnlinkPartnerController.unlinkPartnerConfirmation(dbId, partner.details.id, family.id).url
+          )),
+          family.parent2
+          .filterNot(partner => excludeOption.exists(_.details.id == partner.details.id))
+          .map(partner => personSummaryListRow.personSummaryListRow(
+              dbId,
+              partner,
+              controllers.unlink.routes.UnlinkPartnerController.unlinkPartnerConfirmation(dbId, partner.details.id, family.id).url
+          ))
       ).flatten,
       card = Some(Card(
-        title = Some(CardTitle(content = Text("Partners"))),
-        actions = None,
+        title = Some(CardTitle(content = Text("Partner"))),
+        actions = actionFamily,
         classes = "govuk-!-margin-4",
         attributes = Map.empty
       )),
@@ -53,8 +55,6 @@
       attributes = Map.empty
     )
   )
-}
-
 
 @familyEvents(dbId, family.events)
 
@@ -72,7 +72,7 @@
                     ActionItem(
                         href = controllers.link.routes.LinkChildToFamilyController.showForm(dbId, family.id).url,
                         content = Text("Add")
-                    )
+                    ),
                 )
             )),
             classes = "govuk-!-margin-4",

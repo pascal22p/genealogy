@@ -29,7 +29,7 @@
         @govukErrorSummary(ErrorSummary().withFormErrorsAsHtml(form))
     }
 
-    @helper.form(action = controllers.add.routes.AddPersonToFamily.submitInterstitial(dbId, person.details.id) ) {
+    @helper.form(action = controllers.add.routes.AddFamilyAsPartner.submitInterstitial(dbId, person.details.id) ) {
         @helper.CSRF.formField
 
         @govukRadios(Radios(

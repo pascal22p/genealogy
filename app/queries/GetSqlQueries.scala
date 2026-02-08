@@ -43,6 +43,42 @@ final class GetSqlQueries @Inject() (
     }
   }(using databaseExecutionContext)
 
+  def getLatestPersonDetails(dbId: Int, maxNumber: Int): Future[List[PersonDetails]] = Future {
+    db.withConnection { implicit conn =>
+      SQL("""SELECT *
+            |FROM genea_individuals
+            |WHERE base = {base}
+            |ORDER BY indi_timestamp DESC
+            |LIMIT {max}""".stripMargin)
+        .on("base" -> dbId, "max" -> maxNumber)
+        .as[List[PersonDetails]](PersonDetails.mysqlParser.*)
+    }
+  }(using databaseExecutionContext)
+  def searchIndividuals(dbId: Int, words: Seq[String]): Future[List[PersonDetails]] = Future {
+    db.withConnection { implicit conn =>
+      val wordConditions =
+        words.indices.map(i => s"(indi_nom LIKE {word$i} OR indi_prenom LIKE {word$i})").mkString(" AND ")
+      val query =
+        s"""SELECT *
+           |FROM genea_individuals
+           |WHERE base = {base}
+           |AND ($wordConditions)
+           |ORDER BY indi_nom, indi_prenom
+           |LIMIT 50""".stripMargin
+
+      val parameters = Seq[NamedParameter]("base" -> dbId) ++ words.zipWithIndex.map {
+        case (word, i) => NamedParameter(s"word$i", s"%$word%")
+      }
+
+      println(query)
+      println(parameters)
+
+      SQL(query)
+        .on(parameters*)
+        .as[List[PersonDetails]](PersonDetails.mysqlParser.*)
+    }
+  }(using databaseExecutionContext)
+
   def getEvents(id: Int, eventType: EventType): Future[List[EventDetailQueryData]] = Future {
     db.withConnection { implicit conn =>
       val where = eventType match {
