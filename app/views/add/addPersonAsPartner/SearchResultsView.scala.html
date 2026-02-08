@@ -1,0 +1,73 @@
+@import views.html.helper
+@import views.html.components.Block
+@import models.forms.IntegerForm
+@import config.AppConfig
+@import helper._
+@import uk.gov.hmrc.govukfrontend.views.Implicits.*
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits.*
+@import uk.gov.hmrc.hmrcfrontend.views.Implicits.*
+
+@this(
+  main: Main,
+  block: Block,
+  govukRadios: GovukRadios,
+  govukButton: GovukButton,
+  govukErrorSummary: GovukErrorSummary
+)
+
+@(dbId: Int,
+  people: Seq[Person],
+  form: Form[IntegerForm]
+)(implicit authenticatedRequest: AuthenticatedRequest[?], messages: Messages, appConfig: AppConfig)
+
+@main(
+  dbId = dbId,
+  personOption = None,
+  title = "Search results",
+  breadcrumbs = None
+) {
+
+  @if(form.hasErrors) {
+    @govukErrorSummary(
+      ErrorSummary(
+        errorList = form.errors.map { error =>
+          ErrorLink(
+            href = Some(s"#${error.key}"),
+            content = Text(messages(error.message))
+          )
+        },
+        title = Text("There is a problem")
+      )
+    )
+  }
+
+  @block("Select individual from search results") {
+      @helper.form(action = controllers.add.routes.AddPersonAsPartnerController.selectSearchResultsOnSubmit) {
+
+        @helper.CSRF.formField
+
+        @govukRadios(
+          Radios(
+            items = people.map { person =>
+              RadioItem(
+                value = Some(s"${person.details.id}|${person.details.firstname} ${person.details.surname} (${person.events.birthAndDeathDate().body})"),
+                content = Text(
+                  s"${person.details.firstname} ${person.details.surname} (${person.events.birthAndDeathDate().body})"
+                )
+              )
+            },
+            errorMessage = form.error("integerWithLabel").map { error =>
+              ErrorMessage(content = Text(messages(error.message)))
+            }
+          ).withFormField(form("integerWithLabel"))
+        )
+
+        @govukButton(
+          Button(
+            element = Some("button"),
+            content = Text(messages("Continue"))
+          )
+        )
+      }
+  }
+}

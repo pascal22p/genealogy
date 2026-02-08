@@ -41,6 +41,7 @@ Unknown = Unknown
 View = View
 Yes = Yes
 No = No
+Search = Search
 CheckYourAnswers = Check your answers
 
 service.unavailable = Service unavailable
@@ -226,10 +227,10 @@ add.event.date.hint = Date of the event in the format Gedcom
 add.event.age.description = Age of the individual on the day of the event
 add.event.cause.description = Used in special cases to record the reasons which precipitated an event
 
-add.existing.family.title = Add {} to a en existing family
+add.existing.family.title = Add {0} to a en existing family
 add.existing.family.button = Add to family
 
-add.family.title = Add {} to a new family
+add.family.title = Add {0} to a new family
 add.family.database.hint = The database where the event is stored
 add.family.person1.description = Partner 1
 add.family.person2.description = Partner 2
@@ -268,3 +269,5 @@ importGedcom.place.field.Country = Country
 importGedcom.place.field.Locality = Locality
 
 importGedcom.choosePlaceElements.title = Map subdivisions from GEDCOM file to database fields
+
+AddIndividualToFamily.checkYourAnswers.title = Add a Partner to a family

@@ -1,0 +1,64 @@
+@import views.html.helper
+@import views.html.components.Block
+@import models.forms.StringForm
+@import config.AppConfig
+@import helper._
+@import uk.gov.hmrc.govukfrontend.views.Implicits.*
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits.*
+@import uk.gov.hmrc.hmrcfrontend.views.Implicits.*
+
+@this(
+  main: Main,
+  block: Block,
+  govukInput: GovukInput,
+  govukButton: GovukButton,
+  govukErrorSummary: GovukErrorSummary
+)
+
+@(dbId: Int,
+  form: Form[StringForm]
+)(implicit authenticatedRequest: AuthenticatedRequest[?], messages: Messages)
+
+@main(
+  dbId = dbId,
+  personOption = None,
+  title = "Search individual",
+  breadcrumbs = None
+) {
+
+  @if(form.hasErrors) {
+    @govukErrorSummary(
+      ErrorSummary(
+        errorList = form.errors.map { error =>
+          ErrorLink(
+            href = Some(s"#${error.key}"),
+            content = Text(messages(error.message))
+          )
+        },
+        title = Text("There is a problem")
+      )
+    )
+  }
+
+  @block("Search individual") {
+      @helper.form(action = controllers.add.routes.AddPersonAsPartnerController.searchIndividualOnSubmit) {
+
+        @helper.CSRF.formField
+
+        @govukInput(
+          Input(
+            label = Label(
+              content = Text("Search by name")
+            )
+          ).withFormField(form("value"))
+        )
+
+        @govukButton(
+          Button(
+            element = Some("button"),
+            content = Text(messages("Search"))
+          )
+        )
+      }
+  }
+}

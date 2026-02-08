@@ -33,7 +33,7 @@ import views.html.add.AddExistingFamilyView
 import views.html.add.AddFamilyView
 import views.html.add.ShowAddPersonToFamiliyInterstitialView
 
-class AddPersonToFamily @Inject() (
+class AddFamilyAsPartner @Inject() (
     authJourney: AuthJourney,
     personService: PersonService,
     eventService: EventService,
@@ -71,9 +71,11 @@ class AddPersonToFamily @Inject() (
 
       val successFunction: TrueOrFalseForm => Future[Result] = { (dataForm: TrueOrFalseForm) =>
         if (dataForm.trueOrFalse) {
-          Future.successful(Redirect(controllers.add.routes.AddPersonToFamily.showNewFamilyForm(baseId, personId)))
+          Future.successful(Redirect(controllers.add.routes.AddFamilyAsPartner.showNewFamilyForm(baseId, personId)))
         } else {
-          Future.successful(Redirect(controllers.add.routes.AddPersonToFamily.showExistingFamilyForm(baseId, personId)))
+          Future.successful(
+            Redirect(controllers.add.routes.AddFamilyAsPartner.showExistingFamilyForm(baseId, personId))
+          )
         }
       }
 

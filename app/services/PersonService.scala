@@ -64,4 +64,38 @@ class PersonService @Inject() (
     }
   }
 
+  def getLatestPersons(
+      dbId: Int,
+      maxNumber: Int
+  ): Future[Seq[Person]] = {
+    personDetailsService.getLatestPersonDetails(dbId, maxNumber).flatMap { personDetails =>
+      personDetails.traverse { person =>
+        eventService.getIndividualEvents(person.id, true).map { events =>
+          Person(
+            person,
+            Events(events, Some(person.id), IndividualEvent),
+            Attributes(List.empty, Some(person.id), IndividualEvent)
+          )
+        }
+      }
+    }
+  }
+
+  def searchPersons(
+      dbId: Int,
+      words: Seq[String]
+  ): Future[Seq[Person]] = {
+    personDetailsService.searchPersonDetails(dbId, words).flatMap { personDetails =>
+      personDetails.traverse { person =>
+        eventService.getIndividualEvents(person.id, true).map { events =>
+          Person(
+            person,
+            Events(events, Some(person.id), IndividualEvent),
+            Attributes(List.empty, Some(person.id), IndividualEvent)
+          )
+        }
+      }
+    }
+  }
+
 }

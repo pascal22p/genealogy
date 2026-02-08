@@ -16,11 +16,22 @@ POST    /database                                            controllers.add.Add
 GET     /base/:baseId/:sourCitationType/:id/sour-citation    controllers.add.AddSourCitationController.showForm(baseId: Int, id: Int, sourCitationType: SourCitationType)
 POST    /base/:baseId/:sourCitationType/:id/sour-citation    controllers.add.AddSourCitationController.onSubmit(baseId: Int, id: Int, sourCitationType: SourCitationType)
 
-GET     /base/:baseId/person/:personId/Family                controllers.add.AddPersonToFamily.showInterstitial(baseId: Int, personId: Int)
-POST    /base/:baseId/person/:personId/Family                controllers.add.AddPersonToFamily.submitInterstitial(baseId: Int, personId: Int)
+GET     /base/:baseId/person/:personId/add-to-family                controllers.add.AddFamilyAsPartner.showInterstitial(baseId: Int, personId: Int)
+POST    /base/:baseId/person/:personId/add-to-family                controllers.add.AddFamilyAsPartner.submitInterstitial(baseId: Int, personId: Int)
 
-GET     /base/:baseId/new-family                             controllers.add.AddPersonToFamily.showNewFamilyForm(baseId: Int, personId: Int)
-POST    /base/:baseId/new-family                             controllers.add.AddPersonToFamily.submitNewFamilyForm(baseId: Int, personId: Int)
+GET     /base/:baseId/person/:personId/add-to-new-family                             controllers.add.AddFamilyAsPartner.showNewFamilyForm(baseId: Int, personId: Int)
+POST    /base/:baseId/person/:personId/add-to-new-family                             controllers.add.AddFamilyAsPartner.submitNewFamilyForm(baseId: Int, personId: Int)
 
-GET     /base/:baseId/existing-family                        controllers.add.AddPersonToFamily.showExistingFamilyForm(baseId: Int, personId: Int)
-POST    /base/:baseId/existing-family                        controllers.add.AddPersonToFamily.submitExistingFamilyForm(baseId: Int, personId: Int)
+GET     /base/:baseId/person/:personId/add-to-existing-family                        controllers.add.AddFamilyAsPartner.showExistingFamilyForm(baseId: Int, personId: Int)
+POST    /base/:baseId/person/:personId/add-to-existing-family                        controllers.add.AddFamilyAsPartner.submitExistingFamilyForm(baseId: Int, personId: Int)
+
+GET     /base/:baseId/family/:id/individual-to-family/start  controllers.add.AddPersonAsPartnerController.startAddIndividualToFamily(baseId: Int, id: Int)
+
+GET     /individual-to-family/select-latest-individual       controllers.add.AddPersonAsPartnerController.selectLatestIndividual
+POST    /individual-to-family/select-latest-individual       controllers.add.AddPersonAsPartnerController.selectLatestIndividualOnSubmit
+
+GET     /individual-to-family/search-individual              controllers.add.AddPersonAsPartnerController.searchIndividual
+POST    /individual-to-family/search-individual              controllers.add.AddPersonAsPartnerController.searchIndividualOnSubmit
+POST    /individual-to-family/select-search-results          controllers.add.AddPersonAsPartnerController.selectSearchResultsOnSubmit
+GET     /individual-to-family/check-your-answers             controllers.add.AddPersonAsPartnerController.checkYourAnswers
+POST    /individual-to-family/check-your-answers             controllers.add.AddPersonAsPartnerController.checkYourAnswersOnSubmit

@@ -48,7 +48,14 @@ class CheckYourAnswersController @Inject() (
             .validated(ImportGedcom)
             .fold(
               call => Redirect(call),
-              userAnswers => Ok(checkYourAnswersView(userAnswers.flattenByKey(ImportGedcom)))
+              userAnswers =>
+                Ok(
+                  checkYourAnswersView(
+                    userAnswers.flattenByKey(ImportGedcom),
+                    ImportGedcom,
+                    controllers.gedcom.routes.CheckYourAnswersController.checkYourAnswersImportGedcomOnSubmit
+                  )
+                )
             )
       }
   }

@@ -19,6 +19,7 @@ enum UserAnswersKey[A <: UserAnswersItem](
   def readUserAnswersItemFromJson(json: JsValue): JsResult[UserAnswersItem] =
     format.reads(json)
 
+  // Import gedcom
   case ChooseGedcomFileQuestion
       extends UserAnswersKey[GedcomPathInputTextForm](
         page = controllers.gedcom.routes.ImportGedcomController.showGedcomList,
@@ -105,5 +106,50 @@ enum UserAnswersKey[A <: UserAnswersItem](
         journeyId = JourneyId.ImportGedcom,
         index = 8,
       )(using Json.format[CreateNewDatabaseForm])
+  // End import gedcom
+
+  // Add individual to family
+  case SelectLatestIndividualForNewFamilyQuestion
+      extends UserAnswersKey[IntegerForm](
+        page = controllers.add.routes.AddPersonAsPartnerController.selectLatestIndividual,
+        requirement = ItemRequirements.Always(),
+        journeyId = JourneyId.AddIndividualToFamily,
+        index = 0,
+        checkYourAnswerWrites = Some(messages => IntegerForm.cyaWrites(using messages))
+      )(using Json.format[IntegerForm])
+
+  case SearchIndividualForNewFamilyQuestion
+      extends UserAnswersKey[StringForm](
+        page = controllers.add.routes.AddPersonAsPartnerController.searchIndividual,
+        requirement = ItemRequirements.Hidden(),
+        journeyId = JourneyId.AddIndividualToFamily,
+        index = 1,
+      )(using Json.format[StringForm])
+
+  case SelectIndividualFromSearch
+      extends UserAnswersKey[IntegerForm](
+        page = controllers.add.routes.AddPersonAsPartnerController.searchIndividual,
+        requirement = ItemRequirements.Always(),
+        journeyId = JourneyId.AddIndividualToFamily,
+        index = 2,
+        checkYourAnswerWrites = Some(messages => IntegerForm.cyaWrites(using messages))
+      )(using Json.format[IntegerForm])
+
+  case SelectedDatabaseHidden
+      extends UserAnswersKey[IntegerForm](
+        page = controllers.add.routes.AddPersonAsPartnerController.selectLatestIndividual,
+        requirement = ItemRequirements.Hidden(),
+        journeyId = JourneyId.AddIndividualToFamily,
+        index = 0,
+      )(using Json.format[IntegerForm])
+
+  case SelectedFamilyIdHidden
+      extends UserAnswersKey[IntegerForm](
+        page = controllers.add.routes.AddPersonAsPartnerController.selectLatestIndividual,
+        requirement = ItemRequirements.Hidden(),
+        journeyId = JourneyId.AddIndividualToFamily,
+        index = 0,
+      )(using Json.format[IntegerForm])
+  // End add individual to family
 
 }
