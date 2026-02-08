@@ -11,9 +11,7 @@
 @(dbId: Int, family: Family, excludeOption: Option[Person])(implicit authenticatedRequest: AuthenticatedRequest[?], messages: Messages)
 
 @actionFamily = @{
-    val condition = family.parent1.isEmpty || family.parent2.isEmpty
-
-    if(condition) {
+    if(family.parent1.isEmpty || family.parent2.isEmpty) {
         Some(Actions(
             items = Seq(
                 ActionItem(
