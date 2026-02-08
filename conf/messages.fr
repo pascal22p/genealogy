@@ -41,6 +41,7 @@ Unknown = Inconnu
 View = Voir
 Yes = Oui
 No = Non
+Search = Chercher
 CheckYourAnswers = Vérifiez vos réponses
 
 service.unavailable = Service indisponible
@@ -306,3 +307,5 @@ importGedcom.place.field.Country = Pays
 importGedcom.place.field.Locality = Localité
 
 importGedcom.choosePlaceElements.title = Associer les subdivisions du fichier GEDCOM aux champs de base de données
+
+AddIndividualToFamily.checkYourAnswers.title = Ajouter un partenaire a une famille
