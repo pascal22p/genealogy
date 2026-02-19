@@ -1,0 +1,25 @@
+@import models.Person
+@import config.AppConfig
+@import uk.gov.hmrc.govukfrontend.views.html.components._
+@import views.html.components.SubNavigation
+
+@this(
+  main: Main,
+  subNavigation: SubNavigation
+)
+
+@(flatTree: List[(Int, List[Person])], dbId: Int)(implicit request: AuthenticatedRequest[?], messages: Messages)
+
+@main(dbId, s"Ascendance of ${flatTree.headOption.flatMap(_._2.headOption).fold("Unknown")(_.details.shortName)}") {
+
+  @for(person <- flatTree.headOption.flatMap(_._2.headOption)) {
+    @subNavigation("Ascendants tree", dbId, person.details.id)
+  }
+  @for(person <- flatTree.headOption.flatMap(_._2.headOption)) {
+    <p class="govuk-body"><a class="govuk-link" href="@controllers.routes.PdfController.pdf(person.details.id).url">@messages("ascendants.download.pdf")</a></p>
+    <object type="image/svg+xml" id="tree" name="tree" data="@controllers.routes.SvgController.svg(person.details.id).url" width="100%" >
+      <img src="@controllers.routes.SvgController.svg(person.details.id).url" alt="Tree" width="100%">
+    </object>
+
+  }
+}

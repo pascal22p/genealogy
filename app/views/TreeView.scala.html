@@ -1,9 +1,10 @@
-@import views.html.components.Block
+@import views.html.components.{Block, SubNavigation}
 @import models.Person
 
 @this(
         main: Main,
-        block: Block
+        block: Block,
+        subNavigation: SubNavigation
 )
 
 @(dbId: Int, person: Person, depth: Int)(implicit request: AuthenticatedRequest[?], messages: Messages)
@@ -20,8 +21,9 @@
   )
 }
 
-@main(dbId, Some(person), person.name, Some(breadcrumbs)) {
+@main(dbId, person.name, Some(breadcrumbs)) {
 
+@subNavigation("Tree", dbId, person.details.id)
 @block("Tree view", Some(Actions(
   items = Seq(
     ActionItem(

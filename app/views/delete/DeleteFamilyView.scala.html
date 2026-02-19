@@ -11,7 +11,7 @@
 
 @(dbId: Int, family: Family)(implicit request: AuthenticatedRequest[?], messages: Messages)
 
-@main(1, None) {
+@main(1) {
 
   @familyView(dbId, family, None)
 

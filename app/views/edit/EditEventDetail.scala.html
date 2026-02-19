@@ -16,7 +16,7 @@
 
 @(dbId: Int, eventDetailsForm: Form[EventDetailForm], allPlaces: List[Place], event: EventDetail)(implicit request: AuthenticatedRequest[?], messages: Messages)
 
-@main(1, None) {
+@main(1) {
 
 <div style="padding-left:10em;"><a class="govuk-link" href="@controllers.routes.EventController.showEvent(dbId, event.events_details_id)">Return to Event</a></div>
 

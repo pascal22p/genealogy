@@ -1,0 +1,35 @@
+
+@this()
+
+@(currentPage: String, dbId: Int, personId: Int)(implicit messages: Messages)
+
+
+<nav class="moj-sub-navigation" aria-label="Sub navigation">
+    <ul class="moj-sub-navigation__list">
+        <li class="moj-sub-navigation__item">
+            <a class="moj-sub-navigation__link" @if(currentPage == "Details"){aria-current="page"} href="@controllers.routes.IndividualController.showPerson(dbId, personId).url">
+            @messages("Details")
+            </a>
+        </li>
+        <li class="moj-sub-navigation__item">
+            <a class="moj-sub-navigation__link" @if(currentPage == "Tree"){aria-current="page"} href="@controllers.routes.TreeController.showTree(dbId, personId).url">
+            @messages("Tree")
+            </a>
+        </li>
+        <li class="moj-sub-navigation__item">
+            <a class="moj-sub-navigation__link" @if(currentPage == "Descendants"){aria-current="page"} href="@controllers.routes.DescendanceController.showDescendant(dbId, personId).url">
+            @messages("Descendants")
+            </a>
+        </li>
+        <li class="moj-sub-navigation__item">
+            <a class="moj-sub-navigation__link" @if(currentPage == "Ascendants list"){aria-current="page"} href="@controllers.routes.AscendanceController.showAscendantList(dbId, personId).url">
+            @messages("Ascendants.list")
+            </a>
+        </li>
+        <li class="moj-sub-navigation__item">
+            <a class="moj-sub-navigation__link" @if(currentPage == "Ascendants tree"){aria-current="page"} href="@controllers.routes.AscendanceController.showAscendantTree(dbId, personId).url">
+            @messages("Ascendants.tree")
+            </a>
+        </li>
+    </ul>
+</nav>

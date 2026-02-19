@@ -15,7 +15,7 @@
 
 @(dbId: Int, sourCitationForm: Form[SourCitationForm], sourCitation: SourCitation, sourRecords: List[SourRecord])(implicit request: AuthenticatedRequest[?], messages: Messages)
 
-@main(dbId, None) {
+@main(dbId) {
 
     @sourCitation.sourceType match {
         case _: SourCitationType.EventSourCitation.type => {

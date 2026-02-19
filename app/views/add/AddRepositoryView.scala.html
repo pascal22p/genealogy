@@ -1,0 +1,85 @@
+@import models.forms.CreateNewDatabaseForm
+@import views.html.helper
+@import views.html.components.Block
+@import helper._
+@import uk.gov.hmrc.govukfrontend.views.Implicits.*
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits.*
+@import uk.gov.hmrc.hmrcfrontend.views.Implicits.*
+@import models.forms.RepositoryForm
+@import models.queryData.AddressQueryData
+@import models.GenealogyDatabase
+@import models.queryData.AddressQueryData
+
+
+@this(
+        main: Main,
+        block: Block,
+        govukInput: GovukInput,
+        govukSelect: GovukSelect,
+        govukButton: GovukButton,
+        govukErrorSummary: GovukErrorSummary
+)
+
+@(repositoryForm: Form[RepositoryForm], db: GenealogyDatabase, addresses: List[AddressQueryData])(implicit request: AuthenticatedRequest[?], messages: Messages)
+
+@main(db.id, title = messages("add.index.title", db.name)) {
+
+
+    @block("Add new repository") {
+
+        @if(repositoryForm.hasGlobalErrors) {
+            @for(error <- repositoryForm.globalErrors) {
+                <span class="error-message">@error.format(messages)</span>
+            }
+        }
+
+        @if(repositoryForm.errors.nonEmpty) {
+            @govukErrorSummary(ErrorSummary().withFormErrorsAsHtml(repositoryForm))
+        }
+
+        @helper.form(action = controllers.add.routes.AddRepositoryController.onSubmit(db.id) ) {
+            @helper.CSRF.formField
+
+            @govukInput(
+                Input(
+                    label = Label(
+                        content = Text("Repository name")
+                    ),
+                    hint = Some(
+                        Hint(content = Text("Official name of the archive repository"))
+                    ),
+                    classes = "govuk-!-width-one-half"
+                ).withFormField(repositoryForm("repoName"))
+            )
+
+            @govukInput(
+                Input(
+                    label = Label(
+                        content = Text("Repository RIN")
+                    ),
+                    hint = Some(
+                        Hint(content = Text("Identifier used in archival references"))
+                    ),
+                    classes = "govuk-!-width-one-half"
+                ).withFormField(repositoryForm("repoRin"))
+            )
+
+            @govukSelect(
+                Select(
+                    items = List(SelectItem(value = Some(""), text = "------------")) ++
+                            addresses.map(a => SelectItem(value = Some(a.id.toString), text = a.oneLiner)),
+                    hint = Some(
+                        Hint(content = Text("Optional address"))
+                    ),
+                    classes = "govuk-!-width-one-half"
+                ).withFormField(repositoryForm("addrId"))
+            )
+
+            @govukButton(
+                Button(
+                    content = Text("Save repository")
+                )
+            )
+        }
+    }
+}

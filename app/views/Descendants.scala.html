@@ -1,5 +1,5 @@
 @import models.Person
-@import views.html.components.{Block, NameLink}
+@import views.html.components.{Block, NameLink, SubNavigation}
 @import config.AppConfig
 @import models.ResnType.PrivacyResn
 
@@ -7,7 +7,8 @@
     main: Main,
     block: Block,
     nameLink: NameLink,
-    appConfig: AppConfig
+    appConfig: AppConfig,
+    subNavigation: SubNavigation
 )
 
 @(person: Person, dbId: Int)(implicit request: AuthenticatedRequest[?], messages: Messages)
@@ -43,8 +44,9 @@
     }
 }
 
-@main(dbId, Some(person), messages("descendants.title", person.name)) {
+@main(dbId, messages("descendants.title", person.name)) {
 
+    @subNavigation("Descendants", dbId, person.details.id)
     @block("Descendants") {
   <ul class="govuk-list"><li style="margin:0;padding:0">
       @aDescendant(person)

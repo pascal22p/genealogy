@@ -16,7 +16,7 @@
 
 @(placesElementsSeparatorForm: Form[PlacesElementsSeparatorForm], sample: Set[List[String]])(implicit request: AuthenticatedRequest[?], messages: Messages)
 
-@main(1, None, title = messages("importGedcom.checkYourAnswers.title")) {
+@main(1, title = messages("importGedcom.checkYourAnswers.title")) {
 
     @if(placesElementsSeparatorForm.hasErrors) {
         @govukErrorSummary(ErrorSummary(

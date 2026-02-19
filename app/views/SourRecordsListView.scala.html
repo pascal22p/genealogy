@@ -1,0 +1,67 @@
+@import models.SessionData
+@import views.html.components.LastModified
+@import models.queryData.RepositoryQueryData
+@import models.queryData.AddressQueryData
+@import models.SourCitationType.UnknownSourCitation
+
+@this(
+        main: Main,
+        govukSummaryList: GovukSummaryList
+)
+
+@(dbId: Int, sources: List[SourRecord])(implicit request: AuthenticatedRequest[?], messages: Messages)
+
+@sourceContent(source: SourRecord) = {
+  <ul class="govuk-list">
+    <li>Auth: @source.auth</li>
+    <li>Publ: @source.publ</li>
+    <li>Agnc: @source.agnc</li>
+    <li>Repo id: @source.repoId</li>
+    <li>Caln: @source.repoCaln</li>
+  </ul>
+}
+
+@main(dbId, title = messages("mediaList.title")) {
+
+  @govukSummaryList(
+    SummaryList(
+      rows = sources.map { source =>
+        SummaryListRow(
+          key = Key(Text(source.title)),
+          value = Value(HtmlContent(sourceContent(source))),
+          classes = "",
+          actions = Some(Actions(
+            items = Seq(ActionItem(
+                href = "#",
+                content = Text(messages("Delete"))
+              ),
+              ActionItem(
+                href = controllers.routes.SourRecordsController.showSourCitationsFromRecord(dbId, source.id).url,
+                content = Text(messages("View"))
+              ),
+              ActionItem(
+                href = controllers.edit.routes.EditSourRecordController.showForm(dbId, source.id, UnknownSourCitation, 1).url,
+                content = Text(messages("Edit"))
+              ))
+          ))
+        )
+      },
+      card = Some(Card(
+        title = Some(CardTitle(content = Text("List of Source records"))),
+        actions = Some(
+          Actions(
+            items = Seq(
+              ActionItem(
+                href = "#",
+                content = Text(messages("Add"))
+              )
+            )
+          )),
+        classes = "govuk-!-margin-4",
+        attributes = Map.empty
+      )),
+      classes = "",
+      attributes = Map.empty
+    )
+  )
+}

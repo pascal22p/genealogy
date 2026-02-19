@@ -274,6 +274,8 @@ add.family.person1.description = Partenaire 1
 add.family.person2.description = Partenaire 2
 add.family.button = Créer une nouvelle famille
 
+add.index.title = Base de données {0}
+
 index.title = Mon arbre généalogique
 
 mediaList.title = Mon arbre généalogique

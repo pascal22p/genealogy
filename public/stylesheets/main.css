@@ -746,3 +746,88 @@ screen and (min-width:40.0625em) and (-ms-high-contrast:active) {
         .pagination-wrapper {
             text-align: center;
         }
+
+        /* =========================================================
+           MOJ SUB-NAVIGATION – THEMED OVERRIDE
+           Replaces govuk-tabs cleanly (server-side navigation)
+           ========================================================= */
+
+        .moj-sub-navigation {
+            margin-top: 30px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid var(--govuk-colour-grey-3);
+        }
+
+        .moj-sub-navigation__list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            gap: 12px;
+        }
+
+        /* Individual item */
+        .moj-sub-navigation__item {
+            margin: 0;
+        }
+
+        /* Base link styling */
+        .moj-sub-navigation__link {
+            font-family: 'Inter', Arial, sans-serif;
+            font-size: 19px;
+            line-height: 1.3;
+            font-weight: 400;
+
+            display: inline-block;
+            padding: 12px 20px;
+
+            text-decoration: none;
+            color: var(--govuk-colour-blue);
+            background-color: var(--govuk-colour-grey-1);
+
+            border: 1px solid var(--govuk-colour-grey-3);
+            border-bottom: none;
+        }
+
+        /* Hover */
+        .moj-sub-navigation__link:hover {
+            background-color: var(--govuk-colour-grey-2);
+            color: var(--govuk-colour-dark-blue);
+        }
+
+        /* Active (current page) */
+        .moj-sub-navigation__link[aria-current="page"] {
+            background-color: var(--govuk-colour-white);
+            color: var(--govuk-colour-black);
+            font-weight: 600;
+
+            border-color: var(--govuk-colour-grey-3);
+            border-bottom: 2px solid var(--govuk-colour-white);
+
+            position: relative;
+            top: 2px; /* visually joins to content below */
+        }
+
+        /* Focus (keyboard users) */
+        .moj-sub-navigation__link:focus {
+            outline: 3px solid var(--govuk-colour-yellow);
+            outline-offset: 0;
+            background-color: var(--govuk-colour-white);
+            color: var(--govuk-colour-black);
+        }
+
+        /* Mobile stacking */
+        @media (max-width: 40em) {
+            .moj-sub-navigation__list {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .moj-sub-navigation__link {
+                border-bottom: 1px solid var(--govuk-colour-grey-3);
+            }
+
+            .moj-sub-navigation__link[aria-current="page"] {
+                top: 0;
+            }
+        }

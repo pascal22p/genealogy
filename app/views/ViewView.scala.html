@@ -1,0 +1,27 @@
+@import models.GenealogyDatabase
+@import views.html.helper
+@import views.html.components.Block
+@import helper._
+@import uk.gov.hmrc.govukfrontend.views.Implicits.*
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits.*
+@import uk.gov.hmrc.hmrcfrontend.views.Implicits.*
+
+
+@this(
+        main: Main,
+        block: Block
+)
+
+@(db: GenealogyDatabase)(implicit request: AuthenticatedRequest[?], messages: Messages)
+
+@main(db.id, title = messages("add.index.title", db.name)) {
+
+
+    @block(messages("View")) {
+        <ul class="govuk-list">
+            <li><a class="govuk-link" href="@controllers.routes.RepositoryListController.showRepositories(db.id).url">View repositories</a></li>
+            <li><a class="govuk-link" href="@controllers.routes.MediaListController.showMedias(db.id).url">View Medias</a></li>
+            <li><a class="govuk-link" href="@controllers.routes.SourRecordsController.index(db.id).url">View source records</a></li>
+        </ul>
+    }
+}

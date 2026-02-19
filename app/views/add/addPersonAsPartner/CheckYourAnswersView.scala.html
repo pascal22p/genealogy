@@ -14,7 +14,7 @@
 @(person: Person, family: Family)(implicit messages: Messages, request: AuthenticatedRequest[?], appConfig: AppConfig)
 
 
-@main(1, None, title = messages(s"AddIndividualToFamily.checkYourAnswers.title")) {
+@main(1, title = messages(s"AddIndividualToFamily.checkYourAnswers.title")) {
 
     @block("Check your answer") {
         <p class="govuk-body govuk-list--bullet">Add the person @person.shortName (@person.events.birthAndDeathDate()) as a partner of @{

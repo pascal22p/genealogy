@@ -19,7 +19,7 @@
 
 @(dbId: Int, allPersons: List[Person], family: Family, linkForm: Form[LinkForm])(implicit request: AuthenticatedRequest[?], messages: Messages)
 
-@main(dbId, None) {
+@main(dbId) {
 
 
   @block("Add new child to family") {

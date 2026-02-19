@@ -559,6 +559,15 @@ final class GetSqlQueries @Inject() (
     }
   }(using databaseExecutionContext)
 
+  def getSourCitationsFromRecord(recordId: Int): Future[List[SourCitationQueryData]] = Future {
+    db.withConnection { implicit conn =>
+      SQL("""SELECT * FROM genea_sour_citations AS sources WHERE
+            |sour_records_id = {recordId}""".stripMargin)
+        .on("recordId" -> recordId)
+        .as[List[SourCitationQueryData]](SourCitationQueryData.mysqlParserCitationOnly.*)
+    }
+  }(using databaseExecutionContext)
+
   def getMedia(baseId: Int, id: Int): OptionT[Future, Media] = OptionT(Future {
     db.withConnection { implicit conn =>
       SQL("""SELECT *
@@ -582,6 +591,29 @@ final class GetSqlQueries @Inject() (
             |""".stripMargin)
         .on("baseId" -> baseId)
         .as[List[EventDetailQueryData]](EventDetailQueryData.mysqlParserEventDetailOnly.*)
+    }
+  }(using databaseExecutionContext)
+
+  def getAddresses(baseId: Int): Future[List[AddressQueryData]] = Future {
+    db.withConnection { implicit conn =>
+      SQL("""SELECT *
+            |FROM genea_address
+            |WHERE base = {baseId}
+            |""".stripMargin)
+        .on("baseId" -> baseId)
+        .as[List[AddressQueryData]](AddressQueryData.mysqlParserAddress.*)
+    }
+  }(using databaseExecutionContext)
+
+  def getRepositories(baseId: Int): Future[List[RepositoryQueryData]] = Future {
+    db.withConnection { implicit conn =>
+      SQL("""SELECT *
+            |FROM genea_repository
+            |LEFT JOIN genea_address ON genea_address.addr_id = genea_repository.addr_id
+            |WHERE genea_repository.base = {baseId}
+            |""".stripMargin)
+        .on("baseId" -> baseId)
+        .as[List[RepositoryQueryData]](RepositoryQueryData.mysqlParserRepository.*)
     }
   }(using databaseExecutionContext)
 

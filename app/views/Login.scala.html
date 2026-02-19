@@ -11,7 +11,7 @@
 
 @(userForm: Form[UserDataForm])(implicit request: AuthenticatedRequest[?], messages: Messages)
 
-@main(1, None, messages("login.into.account")) {
+@main(1, messages("login.into.account")) {
 
         @if(userForm.hasGlobalErrors) {
             @for(error <- userForm.globalErrors) {

@@ -1,0 +1,59 @@
+@import models.SessionData
+@import views.html.components.LastModified
+@import models.queryData.RepositoryQueryData
+@import models.queryData.AddressQueryData
+
+@this(
+        main: Main,
+        govukSummaryList: GovukSummaryList
+)
+
+@(dbId: Int, repos: List[RepositoryQueryData])(implicit request: AuthenticatedRequest[?], messages: Messages)
+
+@addressContent(address: AddressQueryData) = {
+  <ul class="govuk-list">
+    <li>@{address.address}</li>
+    <li>@{address.city} @{address.postcode}</li>
+    <li>@{address.country}</li>
+    <li>@{address.phone1}</li>
+    <li><a href="@{address.website1}" class="govuk-link">@{address.website1}</a></li>
+  </ul>
+}
+
+@main(1, title = messages("mediaList.title")) {
+
+  @govukSummaryList(
+    SummaryList(
+      rows = repos.map { repo =>
+        SummaryListRow(
+          key = Key(Text(repo.name)),
+          value = Value(repo.address.fold(HtmlContent(""))(a => HtmlContent(addressContent(a)))),
+          classes = "",
+          actions = Some(Actions(
+            items = Seq(ActionItem(
+                href = "#",
+                content = Text(messages("Delete"))
+              )
+          ))
+        ))
+      },
+      card = Some(Card(
+        title = Some(CardTitle(content = Text("List of repositories"))),
+        actions = Some(
+          Actions(
+            items = Seq(
+              ActionItem(
+                href = controllers.add.routes.AddRepositoryController.showForm(dbId).url,
+                content = Text(messages("Add"))
+              )
+            )
+          )),
+        classes = "govuk-!-margin-4",
+        attributes = Map.empty
+      )),
+      classes = "",
+      attributes = Map.empty
+    )
+  )
+
+}

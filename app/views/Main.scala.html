@@ -14,7 +14,7 @@
 )
 
 
-@(dbId: Int, personOption: Option[Person], title: String = "", breadcrumbs: Option[Breadcrumbs] = None)(contentBlock: Html)(implicit authenticatedRequest: AuthenticatedRequest[?], messages: Messages)
+@(dbId: Int, title: String = "", breadcrumbs: Option[Breadcrumbs] = None)(contentBlock: Html)(implicit authenticatedRequest: AuthenticatedRequest[?], messages: Messages)
 
 @timeoutDialog = {  
     @hmrcTimeoutDialog(TimeoutDialog(
@@ -100,7 +100,7 @@
             <div class="govuk-grid-column-full">
                 <div class="govuk-width-container">
                 <div class="govuk-grid-column-one-half" style=" padding-left:0">
-                    Parois.net - @messages("genealogy")
+                    <a class="govuk-link--no-underline govuk-link--no-visited-state" style="color:white" href="/">Parois.net - @messages("genealogy")</a>
                 </div>
                 <div class="govuk-grid-column-one-half" style="display: flex; justify-content: flex-end;padding-right:0">
                     <a class="govuk-link hmrc-sign-out-nav__link govuk-!-text-align-right" href="@loginOrlogoutUrl">
@@ -126,45 +126,25 @@
                     classes = "",
                     attributes = Map.empty
                 )),
-                personOption.map { person =>
-                    ServiceNavigationItem(
-                        content = Text(messages("person.details")),
-                        href = controllers.routes.IndividualController.showPerson(dbId, person.details.id).url,
-                        active = false,
-                        current = false,
-                        classes = "",
-                        attributes = Map.empty
-                    )
-                },
-                personOption.map { person =>
-                    ServiceNavigationItem(
-                        content = Text(messages("Tree")),
-                        href = controllers.routes.TreeController.showTree(dbId, person.details.id).url,
-                        active = false,
-                        current = false,
-                        classes = "",
-                        attributes = Map.empty
-                    )
-                },
-                personOption.map { person =>
-                  ServiceNavigationItem(
-                    content = Text(messages("Descendants")),
-                    href = controllers.routes.DescendanceController.showDescendant(dbId, person.details.id).url,
+                Some(ServiceNavigationItem(
+                    content = Text("View"),
+                    href = controllers.routes.ViewController.index(dbId).url,
                     active = false,
                     current = false,
                     classes = "",
                     attributes = Map.empty
-                  )
-                },
-                personOption.map { person =>
-                  ServiceNavigationItem(
-                    content = Text(messages("Ascendants")),
-                    href = controllers.routes.AscendanceController.showAscendant(dbId, person.details.id).url,
-                    active = false,
-                    current = false,
-                    classes = "",
-                    attributes = Map.empty
-                  )
+                )),
+                if(authenticatedRequest.localSession.sessionData.userData.fold(false)(_.isAdmin)) {
+                    Some(ServiceNavigationItem(
+                        content = Text("Add"),
+                        href = controllers.add.routes.AddController.index(dbId).url,
+                        active = false,
+                        current = false,
+                        classes = "",
+                        attributes = Map.empty
+                    ))
+                } else {
+                    None
                 },
                 if(authenticatedRequest.localSession.sessionData.userData.fold(false)(_.isAdmin)) {
                     Some(ServiceNavigationItem(
