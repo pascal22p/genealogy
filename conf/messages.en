@@ -7,6 +7,8 @@ Address = Address
 Add = Add
 Age = Age
 Ascendants = Ascendants
+Ascendants.tree = Ascendants tree
+Ascendants.list = Ascendants list
 Cause = Cause
 Change = Change
 Continue = Continue
@@ -235,6 +237,8 @@ add.family.database.hint = The database where the event is stored
 add.family.person1.description = Partner 1
 add.family.person2.description = Partner 2
 add.family.button = Create new family
+
+add.index.title = Database {0}
 
 index.title = My family tree
 

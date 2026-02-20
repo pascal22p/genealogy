@@ -20,7 +20,7 @@ govukErrorSummary: GovukErrorSummary
 
 @(dbId: Int, allPersons: List[Person], person: Person, familyForm: Form[FamilyForm])(implicit request: AuthenticatedRequest[?], messages: Messages)
 
-@main(dbId, None) {
+@main(dbId) {
 
 
 @block(messages("add.family.title", person.details.shortName)) {

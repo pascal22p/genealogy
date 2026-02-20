@@ -14,7 +14,7 @@
 
 @(dbId: Int, surname: String, title: String, firstnamesListPagination: FirstnamesListPagination)(implicit request: AuthenticatedRequest[?], messages: Messages)
 
-@main(dbId, None, title) {
+@main(dbId, title) {
 
     @paginationComponent(dbId, surname, firstnamesListPagination)
     @govukSummaryList(

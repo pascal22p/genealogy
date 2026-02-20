@@ -7,6 +7,8 @@ Add = Ajouter
 Admin = Admin
 Age = Age
 Ascendants = Ascendants
+Ascendants.tree = Arbre ascendant
+Ascendants.list = Liste d'ascendance
 Cause = Cause
 Change = Changer
 Continue = Continuer
@@ -273,6 +275,8 @@ add.family.database.hint = Base de données où l'événement est stocké
 add.family.person1.description = Partenaire 1
 add.family.person2.description = Partenaire 2
 add.family.button = Créer une nouvelle famille
+
+add.index.title = Base de données {0}
 
 index.title = Mon arbre généalogique
 

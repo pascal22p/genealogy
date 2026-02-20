@@ -131,7 +131,7 @@ class SiteMapController @Inject() (
           .traverse { database =>
             getSqlQueries.getAllPersonDetails(database.id, None).map { individuals =>
               individuals.map { individual =>
-                controllers.routes.AscendanceController.showAscendant(database.id, individual.id).url
+                controllers.routes.AscendanceController.showAscendantList(database.id, individual.id).url
               }
             }
           }

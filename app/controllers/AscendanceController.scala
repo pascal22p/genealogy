@@ -15,7 +15,8 @@ import play.api.mvc.*
 import services.AscendanceService
 import services.SessionService
 import utils.TreeUtils
-import views.html.Ascendants
+import views.html.AscendantsList
+import views.html.AscendantsTree
 
 @Singleton
 class AscendanceController @Inject() (
@@ -23,14 +24,15 @@ class AscendanceController @Inject() (
     ascendanceService: AscendanceService,
     sessionService: SessionService,
     treeUtils: TreeUtils,
-    ascendants: Ascendants,
+    ascendantsList: AscendantsList,
+    ascendantsTree: AscendantsTree,
     val controllerComponents: ControllerComponents
 )(
     implicit ec: ExecutionContext
 ) extends BaseController
     with I18nSupport {
 
-  def showAscendant(@unused baseId: Int, id: Int): Action[AnyContent] = authAction.async {
+  def showAscendantList(@unused baseId: Int, id: Int): Action[AnyContent] = authAction.async {
     implicit authenticatedRequest: AuthenticatedRequest[AnyContent] =>
       ascendanceService.getAscendant(id, 0).map {
         case None       => NotFound("Nothing here")
@@ -38,7 +40,20 @@ class AscendanceController @Inject() (
           sessionService.insertPersonInHistory(tree.copy(parents = List.empty[Parents]))
           val flattenTree = Map(0 -> List(tree.copy(parents = List.empty[Parents]))) ++ treeUtils.flattenTree(tree)
           val deduplicate = treeUtils.deduplicate(flattenTree)
-          Ok(ascendants(deduplicate.toList.sortBy(_._1), 1))
+          Ok(ascendantsList(deduplicate.toList.sortBy(_._1), 1))
       }
   }
+
+  def showAscendantTree(@unused baseId: Int, id: Int): Action[AnyContent] = authAction.async {
+    implicit authenticatedRequest: AuthenticatedRequest[AnyContent] =>
+      ascendanceService.getAscendant(id, 0).map {
+        case None       => NotFound("Nothing here")
+        case Some(tree) =>
+          sessionService.insertPersonInHistory(tree.copy(parents = List.empty[Parents]))
+          val flattenTree = Map(0 -> List(tree.copy(parents = List.empty[Parents]))) ++ treeUtils.flattenTree(tree)
+          val deduplicate = treeUtils.deduplicate(flattenTree)
+          Ok(ascendantsTree(deduplicate.toList.sortBy(_._1), 1))
+      }
+  }
+
 }

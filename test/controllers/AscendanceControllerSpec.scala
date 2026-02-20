@@ -97,7 +97,7 @@ class AscendanceControllerSpec extends BaseSpec {
         Future.successful(Some(personA))
       )
 
-      val result      = sut.showAscendant(1, 1).apply(FakeRequest())
+      val result      = sut.showAscendantList(1, 1).apply(FakeRequest())
       val html        = Jsoup.parse(contentAsString(result))
       val generation0 = html.getElementById("generation-0").html()
       val generation1 = html.getElementById("generation-1").html()
@@ -186,7 +186,7 @@ class AscendanceControllerSpec extends BaseSpec {
         Future.successful(Some(personA))
       )
 
-      val result      = sut.showAscendant(1, 1).apply(FakeRequest())
+      val result      = sut.showAscendantList(1, 1).apply(FakeRequest())
       val html        = Jsoup.parse(contentAsString(result))
       val generation0 = html.getElementById("generation-0").html()
       val generation1 = html.getElementById("generation-1").html()

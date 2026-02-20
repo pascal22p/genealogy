@@ -18,7 +18,7 @@
   @family.parent2.map(_.details.surname).getOrElse(messages("Unknown"))
 }
 
-@main(dbId, None, title(family).toString) {
+@main(dbId, title(family).toString) {
 
   @familyView(dbId, family, None)
   

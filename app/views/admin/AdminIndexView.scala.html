@@ -6,7 +6,7 @@
 
 @()(implicit request: AuthenticatedRequest[?], messages: Messages)
 
-@main(1, None, messages("Admin")) {
+@main(1, messages("Admin")) {
 <ul class="govuk-list">
   <li>
     <a class="govuk-link" href="@controllers.admin.routes.ProblemsController.onload(1).url">Problems</a>

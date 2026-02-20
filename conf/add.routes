@@ -1,5 +1,10 @@
+GET     /base/:baseId                                        controllers.add.AddController.index(baseId: Int)
+
 GET     /base/:baseId/media                                  controllers.add.AddMediaController.showForm(baseId: Int)
 POST    /base/:baseId/media                                  controllers.add.AddMediaController.upload(baseId: Int)
+
+GET     /base/:baseId/repository                             controllers.add.AddRepositoryController.showForm(baseId: Int)
+POST    /base/:baseId/repository                             controllers.add.AddRepositoryController.onSubmit(baseId: Int)
 
 GET     /base/:baseId/person-details                         controllers.add.AddPersonDetailsController.showForm(baseId: Int)
 POST    /base/:baseId/person-details                         controllers.add.AddPersonDetailsController.onSubmit(baseId: Int)

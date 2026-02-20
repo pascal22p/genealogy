@@ -14,7 +14,7 @@
   implicit val appConfig: AppConfig
 )
 
-@(event: EventDetail, dbId: Int, person: Option[Person])(implicit request: AuthenticatedRequest[?], messages: Messages)
+@(event: EventDetail, dbId: Int)(implicit request: AuthenticatedRequest[?], messages: Messages)
 
 
 @breadcrumbs = @{
@@ -38,7 +38,6 @@ Breadcrumbs(
 
 @main(
   dbId,
-  person,
   s"Event details for ${event.description.getOrElse(messages("Unknown"))}",
   Some(breadcrumbs)
 ) {

@@ -8,7 +8,7 @@
 @(dbs: List[GenealogyDatabase])(implicit request: AuthenticatedRequest[?], messages: Messages)
 
 
-@main(1, None, title = messages("index.title")) {
+@main(1, title = messages("index.title")) {
 
     @govukSummaryList(
         SummaryList(

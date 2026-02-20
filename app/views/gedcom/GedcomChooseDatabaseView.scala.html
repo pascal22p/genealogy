@@ -15,7 +15,7 @@
 
 @(form: Form[SelectExistingDatabaseForm], databaseList: List[GenealogyDatabase])(implicit request: AuthenticatedRequest[?], messages: Messages)
 
-@main(1, None, title = messages("importGedcom.checkYourAnswers.title")) {
+@main(1, title = messages("importGedcom.checkYourAnswers.title")) {
 
     @block("Select a database to import the file into") {
 

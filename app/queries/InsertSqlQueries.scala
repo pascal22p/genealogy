@@ -261,4 +261,26 @@ final class InsertSqlQueries @Inject() (db: Database, databaseExecutionContext: 
     }
   }(using databaseExecutionContext))
 
+  def insertRepository(repo: RepositoryQueryData): OptionT[Future, Int] = OptionT(Future {
+    val parser: ResultSetParser[Option[Int]] = {
+      int("insert_id").singleOpt
+    }
+
+    db.withConnection { implicit conn =>
+      SQL(
+        """INSERT INTO genea_repository
+          | (`base`, `repo_name`, `repo_rin`, `addr_id`)
+          | VALUES ({base}, {repo_name}, {repo_rin}, {addr_id})
+          """.stripMargin
+      )
+        .on(
+          "base"      -> repo.base,
+          "repo_name" -> repo.name,
+          "repo_rin"  -> repo.rin,
+          "addr_id"   -> repo.address.map(_.id)
+        )
+        .executeInsert[Option[Int]](parser)
+    }
+  }(using databaseExecutionContext))
+
 }

@@ -15,7 +15,7 @@
 
 @(dbId: Int, person: Person, form: Form[TrueOrFalseForm])(implicit request: AuthenticatedRequest[?], messages: Messages, appConfig: AppConfig)
 
-@main(1, None) {
+@main(1) {
 
 
 @block(s"Add ${person.details.shortName} (${person.events.birthAndDeathDate()}) to a family") {

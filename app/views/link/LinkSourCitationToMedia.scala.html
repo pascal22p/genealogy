@@ -30,7 +30,7 @@
   .map(p => SelectItem(value = Some(p.id.toString), text = keyContent(p)))
 }
 
-@main(dbId, None) {
+@main(dbId) {
 
   @block("Link media to source citation") {
     @if(linkForm.hasGlobalErrors) {

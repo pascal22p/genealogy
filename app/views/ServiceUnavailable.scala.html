@@ -7,7 +7,7 @@
 @(content: String)(implicit request: AuthenticatedRequest[?], messages: Messages)
 
 
-@main(1, None, messages("service.unavailable")) {
+@main(1, messages("service.unavailable")) {
 
   @content
 

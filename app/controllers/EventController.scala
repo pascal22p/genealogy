@@ -39,7 +39,7 @@ class EventController @Inject() (
 
             if (!event.privacyRestriction.contains(PrivacyResn) || isAllowedToSee) {
               person.flatten.map(sessionService.insertPersonInHistory)
-              Ok(eventView(event, baseId, person.flatten))
+              Ok(eventView(event, baseId))
             } else {
               Forbidden("Not allowed")
             }

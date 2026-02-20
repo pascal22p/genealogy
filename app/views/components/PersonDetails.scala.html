@@ -1,9 +1,15 @@
-@this(lastModified: LastModified, govukSummaryList: GovukSummaryList)
+@import views.html.components.SubNavigation
+
+@this(
+        lastModified: LastModified,
+        govukSummaryList: GovukSummaryList,
+        subNavigation: SubNavigation)
 
 @(dbId: Int, person: Person)(implicit messages: Messages)
 
     @lastModified(person.details.timestamp)
 
+    @subNavigation("Details", dbId, person.details.id)
     @govukSummaryList(
         SummaryList(
             rows = Seq(
