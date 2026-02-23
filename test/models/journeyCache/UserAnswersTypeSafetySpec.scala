@@ -8,9 +8,7 @@ import testUtils.BaseSpec
 
 class UserAnswersTypeSafetySpec extends BaseSpec {
 
-  "upsert rejects wrong type" in {
-    // this does not work in a github action runner environment
-
+  "upsert rejects wrong type using scala.compileTime" in {
     val errors: List[Error] = typeCheckErrors("""
         import models.forms.{GedcomListForm, CreateNewDatabaseForm}
         import models.journeyCache.UserAnswersKey.ChooseGedcomFileQuestion
@@ -27,7 +25,7 @@ class UserAnswersTypeSafetySpec extends BaseSpec {
     }
   }
 
-  "upsert rejects wrong type bis" in {
+  "upsert rejects wrong type using scalatest" in {
     """
         import models.forms.{GedcomListForm, CreateNewDatabaseForm}
         import models.journeyCache.UserAnswersKey.ChooseGedcomFileQuestion
