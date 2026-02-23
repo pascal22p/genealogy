@@ -29,13 +29,13 @@ class UserAnswersTypeSafetySpec extends BaseSpec {
 
   "upsert rejects wrong type bis" in {
     """
-          import models.forms.{GedcomListForm, NewDatabaseForm}
-          import models.journeyCache.UserAnswersKey.GedcomPath
+          import models.forms.{GedcomListForm, CreateNewDatabaseForm}
+          import models.journeyCache.UserAnswersKey.ChooseGedcomFileQuestion
           import repositories.MariadbJourneyCacheRepository
           import models.journeyCache.{UserAnswersItem, UserAnswersKey}
 
           val repo: MariadbJourneyCacheRepository = ???
-          repo.upsert(GedcomPath, NewDatabaseForm("", ""))(???, ???)
+          repo.upsert(ChooseGedcomFileQuestion, CreateNewDatabaseForm("", ""))(???, ???)
         """ shouldNot compile
   }
 }
