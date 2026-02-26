@@ -8,7 +8,6 @@ import scala.concurrent.Future
 
 import actions.AuthAction
 import models.forms.UserDataForm
-import models.SessionData
 import play.api.data.Form
 import play.api.http.HeaderNames
 import play.api.i18n.I18nSupport

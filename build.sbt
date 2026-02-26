@@ -10,7 +10,7 @@ enablePlugins(GitPlugin)
 
 ThisBuild / version := "0.3.0"
 ThisBuild / organization := "parois.net"
-ThisBuild / scalaVersion := "3.7.4"
+ThisBuild / scalaVersion := "3.8.2"
 ThisBuild / scalafmtOnCompile := true
 
 Test / parallelExecution := true
@@ -128,7 +128,7 @@ lazy val genealogy = (project in file("."))
       "-Xkind-projector",
       "-Wvalue-discard",
       "-Wunused:all",
-      "-Xfatal-warnings",
+      "-Werror",
       //"-Yexplicit-nulls",
       "-Wsafe-init",
       "-Wconf:msg=unused import&src=html/.*:s",
