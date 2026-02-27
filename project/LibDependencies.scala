@@ -6,7 +6,7 @@ object LibDependencies {
     guice,
     jdbc,
     "org.mariadb.jdbc"        %  "mariadb-java-client" % "3.5.7",
-    "org.playframework.anorm" %% "anorm"               % "2.9.0",
+    "org.playframework.anorm" %% "anorm"               % "2.9.1",
     "org.typelevel"           %% "cats-core"           % "2.13.0",
     "org.mindrot"             %  "jbcrypt"             % "0.4",
     "uk.gov.hmrc"             %% "play-frontend-hmrc-play-30" % "12.32.0",
