@@ -7,8 +7,8 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
 import cats.data.OptionT
+import com.password4j.Password
 import models.UserData
-import org.mindrot.jbcrypt.BCrypt
 import queries.GetSqlQueries
 
 @Singleton
@@ -18,12 +18,9 @@ class LoginService @Inject() (mariadbQueries: GetSqlQueries)(
   def getUserData(username: String, password: String): OptionT[Future, UserData] = {
     mariadbQueries.getUserData(username).transform {
       case Some(result) =>
-        val fixedPassword = result.hashedPassword.replace("$2y$", "$2a$")
-        if (BCrypt.checkpw(password, fixedPassword)) {
-          Some(result)
-        } else {
-          None
-        }
+        val verified =
+          Password.check(password, result.hashedPassword).withBcrypt()
+        if (verified) Some(result) else None
       case _ => None
     }
   }
