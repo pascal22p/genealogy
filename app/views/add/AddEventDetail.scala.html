@@ -18,7 +18,9 @@
         govukErrorSummary: GovukErrorSummary
 )
 
-@(dbId: Int, eventDetailForm: Form[EventDetailForm], ownerId: Int, allPlaces: List[Place], eventType: EventType)(implicit request: AuthenticatedRequest[?], messages: Messages)
+@(database: Option[GenealogyDatabase], eventDetailForm: Form[EventDetailForm], ownerId: Int, allPlaces: List[Place], eventType: EventType)(implicit request: AuthenticatedRequest[?], messages: Messages)
+
+@dbId = @{ database.fold(0)(_.id) }
 
 @postLink = @{
     eventType match {
@@ -29,7 +31,7 @@
     }
 }
 
-@main(1) {
+@main(database) {
 
 
   @block(messages("add.event.title")) {

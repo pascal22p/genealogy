@@ -15,14 +15,13 @@
   govukErrorSummary: GovukErrorSummary
 )
 
-@(dbId: Int,
+@(database: Option[GenealogyDatabase],
   people: Seq[Person],
   form: Form[IntegerForm]
 )(implicit authenticatedRequest: AuthenticatedRequest[?], messages: Messages, appConfig: AppConfig)
 
 @main(
-  dbId = dbId,
-  title = "Add individual to the family",
+  database = database,
   breadcrumbs = None
 ) {
 

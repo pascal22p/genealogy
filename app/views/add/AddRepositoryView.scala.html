@@ -20,9 +20,11 @@
         govukErrorSummary: GovukErrorSummary
 )
 
-@(repositoryForm: Form[RepositoryForm], db: GenealogyDatabase, addresses: List[AddressQueryData])(implicit request: AuthenticatedRequest[?], messages: Messages)
+@(repositoryForm: Form[RepositoryForm], database: Option[GenealogyDatabase], addresses: List[AddressQueryData])(implicit request: AuthenticatedRequest[?], messages: Messages)
 
-@main(db.id, title = messages("add.index.title", db.name)) {
+@dbId = @{ database.fold(0)(_.id) }
+
+@main(database) {
 
 
     @block("Add new repository") {
@@ -37,7 +39,7 @@
             @govukErrorSummary(ErrorSummary().withFormErrorsAsHtml(repositoryForm))
         }
 
-        @helper.form(action = controllers.add.routes.AddRepositoryController.onSubmit(db.id) ) {
+        @helper.form(action = controllers.add.routes.AddRepositoryController.onSubmit(dbId) ) {
             @helper.CSRF.formField
 
             @govukInput(

@@ -9,7 +9,9 @@
   implicit val appConfig: AppConfig
 )
 
-@(person: Person, families: List[Family], parents: List[Parents], dbId: Int)(implicit request: AuthenticatedRequest[?], messages: Messages)
+@(person: Person, families: List[Family], parents: List[Parents], database: Option[GenealogyDatabase])(implicit request: AuthenticatedRequest[?], messages: Messages)
+
+@dbId = @{ database.fold(0)(_.id) }
 
 @for(family <- families) {
     <p>Family id: @{family.id}</p>
@@ -19,7 +21,7 @@
 <p>Parents name: @{parent.formatParentsNames}</p>
 }
 
-@main(dbId) {
+@main(database) {
 
   @govukSummaryList(
     SummaryList(

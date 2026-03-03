@@ -2,6 +2,9 @@
 
 genealogy = Genealogie
 
+h1.title.withDb = Base de données {0}
+h1.title = Mon arbre généalogique
+
 Address = Addresse
 Add = Ajouter
 Admin = Admin
@@ -313,3 +316,5 @@ importGedcom.place.field.Locality = Localité
 importGedcom.choosePlaceElements.title = Associer les subdivisions du fichier GEDCOM aux champs de base de données
 
 AddIndividualToFamily.checkYourAnswers.title = Ajouter un partenaire a une famille
+
+firstnamesPage.caption = Nom {0}

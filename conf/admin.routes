@@ -1,5 +1,8 @@
 GET     /                                   controllers.admin.AdminController.index
 
+GET     /database        controllers.admin.AddDatabaseController.showForm
+POST    /database        controllers.admin.AddDatabaseController.onSubmit
+
 GET     /calculate-day-counts               controllers.admin.DatabaseFixes.calculateDaysForDates
 
 GET     /base/:baseId/problems              controllers.admin.ProblemsController.onload(baseId: Int)

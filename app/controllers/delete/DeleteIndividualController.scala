@@ -5,6 +5,7 @@ import javax.inject.*
 import scala.concurrent.ExecutionContext
 
 import actions.AuthJourney
+import cats.data.OptionT
 import cats.implicits.*
 import models.AuthenticatedRequest
 import models.ResnType.PrivacyResn
@@ -12,6 +13,7 @@ import play.api.i18n.*
 import play.api.mvc.*
 import queries.DeleteSqlQueries
 import services.FamilyService
+import services.GenealogyDatabaseService
 import services.PersonDetailsService
 import services.PersonService
 import views.html.delete.DeleteIndividual
@@ -22,6 +24,7 @@ class DeleteIndividualController @Inject() (
     personService: PersonService,
     familyService: FamilyService,
     personDetailsService: PersonDetailsService,
+    genealogyDatabaseService: GenealogyDatabaseService,
     deleteIndividualView: DeleteIndividual,
     deleteSqlQueries: DeleteSqlQueries,
     val controllerComponents: ControllerComponents
@@ -32,22 +35,21 @@ class DeleteIndividualController @Inject() (
 
   def deletePersonConfirmation(baseId: Int, id: Int): Action[AnyContent] = authJourney.authWithAdminRight.async {
     implicit authenticatedRequest: AuthenticatedRequest[AnyContent] =>
-      for {
-        familiesIdPartners <- familyService.getFamilyIdsFromPartnerId(id)
-        families           <- familiesIdPartners.traverse(id => familyService.getFamilyDetails(id).value)
-        parents            <- personDetailsService.getParents(id)
-        personOption       <- personService.getPerson(id)
+      (for {
+        database           <- OptionT(genealogyDatabaseService.getGenealogyDatabase(baseId))
+        familiesIdPartners <- OptionT.liftF(familyService.getFamilyIdsFromPartnerId(id))
+        families           <- OptionT.liftF(familiesIdPartners.traverse(id => familyService.getFamilyDetails(id).value))
+        parents            <- OptionT.liftF(personDetailsService.getParents(id))
+        person             <- OptionT(personService.getPerson(id))
       } yield {
-        personOption.fold(NotFound("Nothing here")) { person =>
-          val isAllowedToSee = authenticatedRequest.localSession.sessionData.userData.fold(false)(_.seePrivacy)
+        val isAllowedToSee = authenticatedRequest.localSession.sessionData.userData.fold(false)(_.seePrivacy)
 
-          if (!person.details.privacyRestriction.contains(PrivacyResn) || isAllowedToSee) {
-            Ok(deleteIndividualView(person, families.flatten, parents, baseId))
-          } else {
-            Forbidden("Not allowed")
-          }
+        if (!person.details.privacyRestriction.contains(PrivacyResn) || isAllowedToSee) {
+          Ok(deleteIndividualView(person, families.flatten, parents, Some(database)))
+        } else {
+          Forbidden("Not allowed")
         }
-      }
+      }).getOrElse(NotFound("Database or person not found"))
   }
 
   def deletePersonAction(baseId: Int, id: Int): Action[AnyContent] = authJourney.authWithAdminRight.async {

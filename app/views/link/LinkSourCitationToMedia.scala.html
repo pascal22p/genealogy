@@ -14,7 +14,9 @@
         formWithCSRF: FormWithCSRF
 )
 
-@(dbId: Int, sourCitationId: Int, linkForm: Form[LinkForm], allMedias: List[Media])(implicit request: AuthenticatedRequest[?], messages: Messages)
+@(database: Option[GenealogyDatabase], sourCitationId: Int, linkForm: Form[LinkForm], allMedias: List[Media])(implicit request: AuthenticatedRequest[?], messages: Messages)
+
+@dbId = @{ database.fold(0)(_.id) }
 
 @keyContent(media: Media): String = @{
   if(media.title.isEmpty) {
@@ -30,7 +32,7 @@
   .map(p => SelectItem(value = Some(p.id.toString), text = keyContent(p)))
 }
 
-@main(dbId) {
+@main(database) {
 
   @block("Link media to source citation") {
     @if(linkForm.hasGlobalErrors) {

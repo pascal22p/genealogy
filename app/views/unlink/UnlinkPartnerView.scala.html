@@ -14,11 +14,11 @@
   formWithCSRF: FormWithCSRF
 )(implicit appConfig: AppConfig)
 
-@(partner: Person, family: Family, dbId: Int)(implicit request: AuthenticatedRequest[?], messages: Messages)
+@(partner: Person, family: Family, database: Option[GenealogyDatabase])(implicit request: AuthenticatedRequest[?], messages: Messages)
 
+@dbId = @{ database.fold(0)(_.id) }
 
-
-@main(dbId) {
+@main(database) {
 
   @block("Unlink child from family") {
     <p class="govuk-body">Unlink @partner.details.shortName (@partner.events.birthAndDeathDate()) from the family

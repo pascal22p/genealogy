@@ -12,6 +12,7 @@ import play.api.data.Form
 import play.api.i18n.*
 import play.api.mvc.*
 import queries.InsertSqlQueries
+import services.GenealogyDatabaseService
 import views.html.add.AddPersonDetails
 import views.html.ServiceUnavailable
 
@@ -19,6 +20,7 @@ import views.html.ServiceUnavailable
 class AddPersonDetailsController @Inject() (
     authJourney: AuthJourney,
     insertSqlQueries: InsertSqlQueries,
+    genealogyDatabaseService: GenealogyDatabaseService,
     addPersonDetails: AddPersonDetails,
     serviceUnavailableView: ServiceUnavailable,
     val controllerComponents: ControllerComponents
@@ -32,13 +34,17 @@ class AddPersonDetailsController @Inject() (
       val filled =
         PersonDetailsForm(baseId, -1, "", "", "", "", "", "", "", "", None)
       val form = PersonDetailsForm.personDetailsForm.fill(filled)
-      Future.successful(Ok(addPersonDetails(baseId, form)))
+      genealogyDatabaseService.getGenealogyDatabase(baseId).map { database =>
+        Ok(addPersonDetails(database, form))
+      }
   }
 
   def onSubmit(baseId: Int): Action[AnyContent] = authJourney.authWithAdminRight.async {
     implicit authenticatedRequest =>
       val errorFunction: Form[PersonDetailsForm] => Future[Result] = { (formWithErrors: Form[PersonDetailsForm]) =>
-        Future.successful(BadRequest(addPersonDetails(baseId, formWithErrors)))
+        genealogyDatabaseService.getGenealogyDatabase(baseId).map { database =>
+          BadRequest(addPersonDetails(database, formWithErrors))
+        }
       }
 
       val successFunction: PersonDetailsForm => Future[Result] = { (dataForm: PersonDetailsForm) =>

@@ -6,6 +6,7 @@ import scala.concurrent.ExecutionContext
 
 import actions.AuthJourney
 import models.AuthenticatedRequest
+import cats.data.OptionT
 import play.api.i18n.*
 import play.api.mvc.*
 import services.GenealogyDatabaseService
@@ -23,11 +24,11 @@ class AddController @Inject() (
 
   def index(dbId: Int): Action[AnyContent] = authJourney.authWithAdminRight.async {
     implicit authenticatedRequest: AuthenticatedRequest[AnyContent] =>
-      genealogyDatabaseService.getGenealogyDatabases.map { dbs =>
-        dbs.find(_.id == dbId).fold(NotFound(s"db id $dbId cannot be found")) { db =>
-          Ok(addView(db))
-        }
-      }
+      (for {
+        database <- OptionT(genealogyDatabaseService.getGenealogyDatabase(dbId))
+      } yield {
+        Ok(addView(Some(database)))
+      }).getOrElse(NotFound(s"db id $dbId cannot be found"))
   }
 
 }

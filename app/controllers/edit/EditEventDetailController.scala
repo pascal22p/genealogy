@@ -24,6 +24,7 @@ import play.api.mvc.Result
 import queries.GetSqlQueries
 import queries.UpdateSqlQueries
 import services.EventService
+import services.GenealogyDatabaseService
 import services.PersonService
 import services.SessionService
 import views.html.edit.EditEventDetail
@@ -35,6 +36,7 @@ class EditEventDetailController @Inject() (
     eventService: EventService,
     personService: PersonService,
     sessionService: SessionService,
+    genealogyDatabaseService: GenealogyDatabaseService,
     getSqlQueries: GetSqlQueries,
     updateSqlQueries: UpdateSqlQueries,
     editEventDetail: EditEventDetail,
@@ -48,14 +50,18 @@ class EditEventDetailController @Inject() (
   def showForm(baseId: Int, id: Int): Action[AnyContent] = authJourney.authWithAdminRight.async { implicit request =>
     handleEvent(id) { (event, _, allPlace) =>
       val form = EventDetailForm.eventDetailForm.fill(event.toForm)
-      Future.successful(Ok(editEventDetail(baseId, form, allPlace, event)))
+      genealogyDatabaseService.getGenealogyDatabase(baseId).map { database =>
+        Ok(editEventDetail(database, form, allPlace, event))
+      }
     }
   }
 
   def onSubmit(baseId: Int, id: Int): Action[AnyContent] = authJourney.authWithAdminRight.async { implicit request =>
     def errorFunction: Form[EventDetailForm] => Future[Result] = { (formWithErrors: Form[EventDetailForm]) =>
       handleEvent(id) { (event, _, allPlace) =>
-        Future.successful(BadRequest(editEventDetail(baseId, formWithErrors, allPlace, event)))
+        genealogyDatabaseService.getGenealogyDatabase(baseId).map { database =>
+          BadRequest(editEventDetail(database, formWithErrors, allPlace, event))
+        }
       }
     }
 

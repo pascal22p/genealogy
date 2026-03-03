@@ -7,8 +7,9 @@
         subNavigation: SubNavigation
 )
 
-@(dbId: Int, person: Person, depth: Int)(implicit request: AuthenticatedRequest[?], messages: Messages)
+@(database: Option[GenealogyDatabase], person: Person, depth: Int)(implicit request: AuthenticatedRequest[?], messages: Messages)
 
+@dbId = @{ database.fold(0)(_.id) }
 
 @breadcrumbs = @{
   Breadcrumbs(
@@ -21,7 +22,7 @@
   )
 }
 
-@main(dbId, person.name, Some(breadcrumbs)) {
+@main(database, breadcrumbs = Some(breadcrumbs), caption = Some(person.name)) {
 
 @subNavigation("Tree", dbId, person.details.id)
 @block("Tree view", Some(Actions(

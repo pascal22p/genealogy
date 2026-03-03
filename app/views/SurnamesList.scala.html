@@ -6,20 +6,22 @@
         govukSummaryList: GovukSummaryList
 )
 
-@(surnames: List[SurnameElement], database: GenealogyDatabase)(implicit request: AuthenticatedRequest[?], messages: Messages)
+@(surnames: List[SurnameElement], database: Option[GenealogyDatabase])(implicit request: AuthenticatedRequest[?], messages: Messages)
+
+@dbId = @{ database.fold(0)(_.id) }
 
 @nameText(name: SurnameElement) = @{
     val plural = if(name.count > 1) "s" else ""
     (name.startYear, name.endYear) match {
         case (None, None) => messages("surnames.individuals", name._2, plural)
-        case (Some(startYear), Some(endYear)) if startYear == endYear => messages("surnames.individual.in.year", name.count, plural, startYear)
-        case (Some(startYear), Some(endYear)) => messages("surnames.individuals.between", name.count, plural, startYear, endYear)
-        case (Some(startYear), None) => messages("surnames.individuals.from", name.count, plural, startYear)
-        case (None, Some(endYear)) => messages("surnames.individuals.until", name.count, plural, endYear)
+        case (Some(startYear), Some(endYear)) if startYear == endYear => messages("surnames.individual.in.year", name.count, plural, startYear.toString)
+        case (Some(startYear), Some(endYear)) => messages("surnames.individuals.between", name.count, plural, startYear.toString, endYear.toString)
+        case (Some(startYear), None) => messages("surnames.individuals.from", name.count, plural, startYear.toString)
+        case (None, Some(endYear)) => messages("surnames.individuals.until", name.count, plural, endYear.toString)
     }
 }
 
-@main(database.id, s"Surnames from database “${database.name}”") {
+@main(database) {
 
 
     @govukSummaryList(
@@ -32,7 +34,7 @@
                     actions = Some(Actions(
                         items = Seq(
                             ActionItem(
-                                href = controllers.routes.HomeController.showFirstnames(database.id, name._1).url,
+                                href = controllers.routes.HomeController.showFirstnames(dbId, name._1).url,
                                 content = Text("View")
                             )
                         )
@@ -44,7 +46,7 @@
                 actions = Some(Actions(
                     items = Seq(
                         ActionItem(
-                            href = controllers.add.routes.AddPersonDetailsController.showForm(database.id).url,
+                            href = controllers.add.routes.AddPersonDetailsController.showForm(dbId).url,
                             content = Text("Add")
                         )
                     )

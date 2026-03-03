@@ -10,10 +10,11 @@
   oneSourCitation: OneSourCitation
 )
 
-@(dbId: Int, modelSourCitation: ModelSourCitation)(implicit request: AuthenticatedRequest[?], messages: Messages)
+@(database: Option[GenealogyDatabase], modelSourCitation: ModelSourCitation)(implicit request: AuthenticatedRequest[?], messages: Messages)
 
+@dbId = @{ database.fold(0)(_.id) }
 
-@main(dbId, title = messages("sourCitation.title")) {
+@main(database) {
 
   @(modelSourCitation.sourceType, modelSourCitation.ownerId)  match {
     case (_: EventSourCitation.type, Some(id)) => { <a href="@routes.EventController.showEvent(dbId, id)">@messages("sourCitation.see.event")</a> }

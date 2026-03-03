@@ -17,7 +17,7 @@
 
 @(form: Form[GedcomPathInputTextForm], gedcomFiles: List[String])(implicit request: AuthenticatedRequest[?], messages: Messages)
 
-@main(1, title = messages("importGedcom.checkYourAnswers.title")) {
+@main(None) {
 
     @block("Select a Gedcom file") {
 

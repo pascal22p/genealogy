@@ -6,9 +6,10 @@ import scala.concurrent.ExecutionContext
 
 import actions.AuthAction
 import models.AuthenticatedRequest
-import models.Person
+import cats.data.OptionT
 import play.api.i18n.*
 import play.api.mvc.*
+import services.GenealogyDatabaseService
 import services.PersonService
 import services.SessionService
 import views.html.Individual
@@ -19,6 +20,7 @@ class IndividualController @Inject() (
     personService: PersonService,
     sessionService: SessionService,
     individualView: Individual,
+    genealogyDatabaseService: GenealogyDatabaseService,
     val controllerComponents: ControllerComponents
 )(
     implicit ec: ExecutionContext
@@ -27,17 +29,18 @@ class IndividualController @Inject() (
 
   def showPerson(baseId: Int, id: Int): Action[AnyContent] = authAction.async {
     implicit authenticatedRequest: AuthenticatedRequest[AnyContent] =>
-      personService.getPerson(id).map { (personOption: Option[Person]) =>
-        personOption.fold(NotFound("Nothing here")) { person =>
-          val isAllowedToSee = authenticatedRequest.localSession.sessionData.userData.fold(false)(_.seePrivacy)
+      (for {
+        database <- OptionT(genealogyDatabaseService.getGenealogyDatabase(baseId))
+        person   <- OptionT(personService.getPerson(id))
+      } yield {
+        val isAllowedToSee = authenticatedRequest.localSession.sessionData.userData.fold(false)(_.seePrivacy)
 
-          if (person.details.privacyRestriction.isEmpty || isAllowedToSee) {
-            sessionService.insertPersonInHistory(person)
-            Ok(individualView(person, baseId))
-          } else {
-            Forbidden("Not allowed")
-          }
+        if (person.details.privacyRestriction.isEmpty || isAllowedToSee) {
+          sessionService.insertPersonInHistory(person)
+          Ok(individualView(person, Some(database)))
+        } else {
+          Forbidden("Not allowed")
         }
-      }
+      }).getOrElse(NotFound("database or person not found"))
   }
 }

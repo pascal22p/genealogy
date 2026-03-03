@@ -14,9 +14,11 @@
         formWithCSRF: FormWithCSRF
 )
 
-@(dbId: Int, eventDetailsForm: Form[EventDetailForm], allPlaces: List[Place], event: EventDetail)(implicit request: AuthenticatedRequest[?], messages: Messages)
+@(database: Option[GenealogyDatabase], eventDetailsForm: Form[EventDetailForm], allPlaces: List[Place], event: EventDetail)(implicit request: AuthenticatedRequest[?], messages: Messages)
 
-@main(1) {
+@dbId = @{ database.fold(0)(_.id) }
+
+@main(database) {
 
 <div style="padding-left:10em;"><a class="govuk-link" href="@controllers.routes.EventController.showEvent(dbId, event.events_details_id)">Return to Event</a></div>
 

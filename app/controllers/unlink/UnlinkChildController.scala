@@ -12,6 +12,7 @@ import play.api.i18n.*
 import play.api.mvc.*
 import queries.DeleteSqlQueries
 import services.FamilyService
+import services.GenealogyDatabaseService
 import services.PersonService
 import views.html.unlink.UnlinkChildView
 
@@ -20,6 +21,7 @@ class UnlinkChildController @Inject() (
     authJourney: AuthJourney,
     personService: PersonService,
     familyService: FamilyService,
+    genealogyDatabaseService: GenealogyDatabaseService,
     deleteSqlQueries: DeleteSqlQueries,
     unlinkChildView: UnlinkChildView,
     val controllerComponents: ControllerComponents
@@ -31,17 +33,18 @@ class UnlinkChildController @Inject() (
   def unlinkChildConfirmation(baseId: Int, childId: Int, familyId: Int): Action[AnyContent] =
     authJourney.authWithAdminRight.async { implicit authenticatedRequest: AuthenticatedRequest[AnyContent] =>
       (for {
-        family <- familyService.getFamilyDetails(familyId)
-        child  <- OptionT(personService.getPerson(childId))
+        database <- OptionT(genealogyDatabaseService.getGenealogyDatabase(baseId))
+        family   <- familyService.getFamilyDetails(familyId)
+        child    <- OptionT(personService.getPerson(childId))
       } yield {
         val isAllowedToSee = authenticatedRequest.localSession.sessionData.userData.fold(false)(_.seePrivacy)
 
         if (!child.details.privacyRestriction.contains(PrivacyResn) || isAllowedToSee) {
-          Ok(unlinkChildView(child, family, baseId))
+          Ok(unlinkChildView(child, family, Some(database)))
         } else {
           Forbidden("Not allowed")
         }
-      }).getOrElse(NotImplemented("Not implemented"))
+      }).getOrElse(NotFound("Database, family or child not found"))
     }
 
   def unlinkChildAction(baseId: Int, childId: Int, familyId: Int): Action[AnyContent] =

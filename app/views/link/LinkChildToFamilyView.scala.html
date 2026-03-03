@@ -17,9 +17,11 @@
         govukErrorSummary: GovukErrorSummary
 )(implicit appConfig: AppConfig)
 
-@(dbId: Int, allPersons: List[Person], family: Family, linkForm: Form[LinkForm])(implicit request: AuthenticatedRequest[?], messages: Messages)
+@(database: Option[GenealogyDatabase], allPersons: List[Person], family: Family, linkForm: Form[LinkForm])(implicit request: AuthenticatedRequest[?], messages: Messages)
 
-@main(dbId) {
+@dbId = @{ database.fold(0)(_.id) }
+
+@main(database) {
 
 
   @block("Add new child to family") {

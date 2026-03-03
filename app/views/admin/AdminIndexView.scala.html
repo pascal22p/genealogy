@@ -1,18 +1,25 @@
 @import uk.gov.hmrc.govukfrontend.views.Implicits.*
+@import views.html.components.Block
 
 @this(
         main: Main,
+        block: Block
 )
 
 @()(implicit request: AuthenticatedRequest[?], messages: Messages)
 
-@main(1, messages("Admin")) {
-<ul class="govuk-list">
-  <li>
-    <a class="govuk-link" href="@controllers.admin.routes.ProblemsController.onload(1).url">Problems</a>
-  </li>
-  <li>
-    <a class="govuk-link" href="@controllers.gedcom.routes.ImportGedcomController.startJourney.url">Import gedcom</a>
-  </li>
-</ul>
+@main(None) {
+  @block(messages("Admin")) {
+    <ul class="govuk-list">
+      <li><a class="govuk-link" href="@controllers.admin.routes.AddDatabaseController.showForm.url">
+        Add a new database</a></li>
+      <li>
+        <a class="govuk-link" href="@controllers.admin.routes.ProblemsController.onload(1).url">Problems</a>
+      </li>
+      <li>
+        <a class="govuk-link" href="@controllers.gedcom.routes.ImportGedcomController.startJourney.url">
+          Import gedcom</a>
+      </li>
+    </ul>
+  }
 }

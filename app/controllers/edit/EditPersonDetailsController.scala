@@ -14,6 +14,7 @@ import play.api.data.Form
 import play.api.i18n.*
 import play.api.mvc.*
 import queries.UpdateSqlQueries
+import services.GenealogyDatabaseService
 import services.PersonService
 import services.SessionService
 import views.html.edit.EditPersonDetails
@@ -24,6 +25,7 @@ class EditPersonDetailsController @Inject() (
     authJourney: AuthJourney,
     personService: PersonService,
     sessionService: SessionService,
+    genealogyDatabaseService: GenealogyDatabaseService,
     updateSqlQueries: UpdateSqlQueries,
     editPersonDetails: EditPersonDetails,
     serviceUnavailableView: ServiceUnavailable,
@@ -35,16 +37,18 @@ class EditPersonDetailsController @Inject() (
 
   def showForm(baseId: Int, id: Int): Action[AnyContent] = authJourney.authWithAdminRight.async {
     implicit authenticatedRequest: AuthenticatedRequest[AnyContent] =>
-      personService.getPerson(id).map { (personOption: Option[Person]) =>
-        personOption.fold(NotFound("Nothing here")) { person =>
+      personService.getPerson(id).flatMap { (personOption: Option[Person]) =>
+        personOption.fold(Future.successful(NotFound("Nothing here"))) { person =>
           val isAllowedToSee = authenticatedRequest.localSession.sessionData.userData.fold(false)(_.seePrivacy)
 
           if (!person.details.privacyRestriction.contains(PrivacyResn) || isAllowedToSee) {
             sessionService.insertPersonInHistory(person)
             val form = PersonDetailsForm.personDetailsForm.fill(person.details.toForm)
-            Ok(editPersonDetails(baseId, form))
+            genealogyDatabaseService.getGenealogyDatabase(baseId).map { database =>
+              Ok(editPersonDetails(database, form))
+            }
           } else {
-            Forbidden("Not allowed")
+            Future.successful(Forbidden("Not allowed"))
           }
         }
       }
@@ -56,7 +60,9 @@ class EditPersonDetailsController @Inject() (
         // This is the bad case, where the form had validation errors.
         // Let's show the user the form again, with the errors highlighted.
         // Note how we pass the form with errors to the template.
-        Future.successful(BadRequest(editPersonDetails(baseId, formWithErrors)))
+        genealogyDatabaseService.getGenealogyDatabase(baseId).map { database =>
+          BadRequest(editPersonDetails(database, formWithErrors))
+        }
       }
 
       val successFunction: PersonDetailsForm => Future[Result] = { (dataForm: PersonDetailsForm) =>

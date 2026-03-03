@@ -32,10 +32,8 @@ class SessionController @Inject() (
 ) extends BaseController
     with I18nSupport {
 
-  def loginOnLoad: Action[AnyContent] = authAction.async { implicit authenticatedRequest =>
-    val returnUrl =
-      authenticatedRequest.request.getQueryString("returnUrl").getOrElse(controllers.routes.HomeController.onload().url)
-    Future.successful(Ok(loginView(UserDataForm.userForm.fill(UserDataForm("", "", returnUrl)))))
+  def loginOnLoad(redirectUrl: String): Action[AnyContent] = authAction.async { implicit authenticatedRequest =>
+    Future.successful(Ok(loginView(UserDataForm.userForm.fill(UserDataForm("", "", redirectUrl)))))
   }
 
   def loginOnSubmit: Action[AnyContent] = authAction.async { implicit authenticatedRequest =>
@@ -46,9 +44,9 @@ class SessionController @Inject() (
     val successFunction: UserDataForm => Future[Result] = { (userDataForm: UserDataForm) =>
       loginService
         .getUserData(userDataForm.username, userDataForm.password)
-        .foldF(Future.successful(Redirect(routes.SessionController.loginOnLoad()))) { result =>
+        .foldF(Future.successful(Redirect(routes.SessionController.loginOnLoad(userDataForm.redirectUrl)))) { result =>
           val returnUrl = new java.net.URI(
-            Option(userDataForm.returnUrl).filter(_.trim.nonEmpty).getOrElse(routes.HomeController.onload().url)
+            Option(userDataForm.redirectUrl).filter(_.trim.nonEmpty).getOrElse(routes.HomeController.onload().url)
           ).getPath
           val newLocalSession = authenticatedRequest.localSession
             .copy(sessionData = authenticatedRequest.localSession.sessionData.copy(userData = Some(result)))

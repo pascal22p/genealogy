@@ -18,9 +18,11 @@ govukButton: GovukButton,
 govukErrorSummary: GovukErrorSummary
 )(implicit appConfig: AppConfig)
 
-@(dbId: Int, allPersons: List[Person], person: Person, familyForm: Form[FamilyForm])(implicit request: AuthenticatedRequest[?], messages: Messages)
+@(database: Option[GenealogyDatabase], allPersons: List[Person], person: Person, familyForm: Form[FamilyForm])(implicit request: AuthenticatedRequest[?], messages: Messages)
 
-@main(dbId) {
+@dbId = @{ database.fold(0)(_.id) }
+
+@main(database) {
 
 
 @block(messages("add.family.title", person.details.shortName)) {

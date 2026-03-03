@@ -8,9 +8,25 @@
   subNavigation: SubNavigation
 )
 
-@(flatTree: List[(Int, List[Person])], dbId: Int)(implicit request: AuthenticatedRequest[?], messages: Messages)
+@(flatTree: List[(Int, List[Person])], database: Option[GenealogyDatabase])(implicit request: AuthenticatedRequest[?], messages: Messages)
 
-@main(dbId, s"Ascendance of ${flatTree.headOption.flatMap(_._2.headOption).fold("Unknown")(_.details.shortName)}") {
+@dbId = @{
+  database.map(_.id).getOrElse(0)
+}
+
+@breadcrumbs = @{
+  val personId = flatTree.headOption.flatMap(_._2.headOption).fold(0)(_.details.id)
+  Breadcrumbs(
+    items = Seq(
+      BreadcrumbsItem(
+        content = Text(flatTree.headOption.flatMap(_._2.headOption).fold("Unknown")(_.details.shortName)),
+        href = Some(controllers.routes.IndividualController.showPerson(dbId, personId).url)
+      )
+    )
+  )
+}
+
+@main(database, breadcrumbs = Some(breadcrumbs), caption = Some(flatTree.headOption.flatMap(_._2.headOption).fold("Unknown")(_.details.shortName))) {
 
   @for(person <- flatTree.headOption.flatMap(_._2.headOption)) {
     @subNavigation("Ascendants tree", dbId, person.details.id)

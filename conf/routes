@@ -38,7 +38,7 @@ GET     /base/:baseId/tree/:id                    controllers.TreeController.sho
 
 GET     /language/:lang                           controllers.LanguageController.switchToLanguage(lang: String)
 
-GET     /login                                    controllers.SessionController.loginOnLoad()
+GET     /login                                    controllers.SessionController.loginOnLoad(redirectUrl: String)
 POST    /login                                    controllers.SessionController.loginOnSubmit()
 GET     /logout                                   controllers.SessionController.logoutOnLoad()
 

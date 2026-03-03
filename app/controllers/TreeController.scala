@@ -15,9 +15,11 @@ import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.BaseController
 import play.api.mvc.ControllerComponents
+import services.GenealogyDatabaseService
 import services.GraphVizDotService
 import services.PersonService
 import models.Tree
+import cats.data.OptionT
 import services.TreeService
 import views.html.TreeView
 
@@ -28,6 +30,7 @@ class TreeController @Inject() (
     personService: PersonService,
     graphVizDotService: GraphVizDotService,
     treeView: TreeView,
+    genealogyDatabaseService: GenealogyDatabaseService,
     val controllerComponents: ControllerComponents
 )(
     implicit ec: ExecutionContext,
@@ -40,15 +43,16 @@ class TreeController @Inject() (
     implicit request: AuthenticatedRequest[AnyContent] =>
       val isAllowedToSee = request.localSession.sessionData.userData.fold(false)(_.seePrivacy)
 
-      personService.getPerson(id, true, true, true).map { maybePerson =>
-        maybePerson.fold(NotFound("Person cannot be found")) { person =>
-          if (person.details.privacyRestriction.isEmpty || isAllowedToSee) {
-            Ok(treeView(baseId, person, 1))
-          } else {
-            Forbidden("Not allowed to see this person")
-          }
+      (for {
+        database <- OptionT(genealogyDatabaseService.getGenealogyDatabase(baseId))
+        person   <- OptionT(personService.getPerson(id, true, true, true))
+      } yield {
+        if (person.details.privacyRestriction.isEmpty || isAllowedToSee) {
+          Ok(treeView(Some(database), person, 1))
+        } else {
+          Forbidden("Not allowed to see this person")
         }
-      }
+      }).getOrElse(NotFound("database or person not found"))
   }
 
   def showSvg(@unused baseId: Int, id: Int, depth: Int): Action[AnyContent] = authAction.async {

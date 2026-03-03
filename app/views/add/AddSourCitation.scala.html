@@ -18,9 +18,11 @@
         govukErrorSummary: GovukErrorSummary
 )
 
-@(sourCitationForm: Form[SourCitationForm], baseId: Int, ownerId: Int, ownerType: SourCitationType, sourRecords: List[SourRecord])(implicit request: AuthenticatedRequest[?], messages: Messages)
+@(sourCitationForm: Form[SourCitationForm], database: Option[GenealogyDatabase], ownerId: Int, ownerType: SourCitationType, sourRecords: List[SourRecord])(implicit request: AuthenticatedRequest[?], messages: Messages)
 
-@main(1) {
+@dbId = @{ database.fold(0)(_.id) }
+
+@main(database) {
 
 
   @block("Add new Source citation") {
@@ -35,7 +37,7 @@
         @govukErrorSummary(ErrorSummary().withFormErrorsAsHtml(sourCitationForm))
     }
     
-    @helper.form(action = controllers.add.routes.AddSourCitationController.onSubmit(baseId, ownerId, ownerType) ) {
+    @helper.form(action = controllers.add.routes.AddSourCitationController.onSubmit(dbId, ownerId, ownerType) ) {
         @helper.CSRF.formField
         @govukInput(
             Input(

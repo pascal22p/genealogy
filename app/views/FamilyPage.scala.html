@@ -10,15 +10,19 @@
   familyView: FamilyView
 )
 
-@(dbId: Int, family: Family)(implicit request: AuthenticatedRequest[?], messages: Messages)
+@(database: Option[GenealogyDatabase], family: Family)(implicit request: AuthenticatedRequest[?], messages: Messages)
+
+@dbId = @{
+  database.map(_.id).getOrElse(0)
+}
 
 @title(family: Family) = {
   Family
-  @family.parent1.map(_.details.surname).getOrElse(messages("Unknown")) —
-  @family.parent2.map(_.details.surname).getOrElse(messages("Unknown"))
+@family.parent1.map(_.details.surname).getOrElse(messages("Unknown")) —
+@family.parent2.map(_.details.surname).getOrElse(messages("Unknown"))
 }
 
-@main(dbId, title(family).toString) {
+@main(database, caption = Some(title(family).toString)) {
 
   @familyView(dbId, family, None)
   

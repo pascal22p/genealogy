@@ -27,6 +27,9 @@ class GenealogyDatabaseService @Inject() (
 ) {
   def getGenealogyDatabases: Future[List[GenealogyDatabase]] = mariadbQueries.getGenealogyDatabases
 
+  def getGenealogyDatabase(dbId: Int): Future[Option[GenealogyDatabase]] =
+    mariadbQueries.getGenealogyDatabases.map(_.find(_.id == dbId))
+
   def getSurnamesList(id: Int)(
       implicit authenticatedRequest: AuthenticatedRequest[?]
   ): Future[List[SurnameElement]] =

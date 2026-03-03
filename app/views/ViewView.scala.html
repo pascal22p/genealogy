@@ -14,7 +14,7 @@
 
 @(db: GenealogyDatabase)(implicit request: AuthenticatedRequest[?], messages: Messages)
 
-@main(db.id, title = messages("add.index.title", db.name)) {
+@main(Some(db)) {
 
 
     @block(messages("View")) {

@@ -18,6 +18,7 @@ import play.api.mvc.BaseController
 import play.api.mvc.ControllerComponents
 import play.api.mvc.Result
 import queries.UpdateSqlQueries
+import services.GenealogyDatabaseService
 import services.SourCitationService
 import views.html.edit.EditSourCitation
 import views.html.ServiceUnavailable
@@ -27,6 +28,7 @@ class EditSourCitationController @Inject() (
     authJourney: AuthJourney,
     sourCitationService: SourCitationService,
     updateSqlQueries: UpdateSqlQueries,
+    genealogyDatabaseService: GenealogyDatabaseService,
     sourCitationView: EditSourCitation,
     serviceUnavailableView: ServiceUnavailable,
     val controllerComponents: ControllerComponents
@@ -46,8 +48,11 @@ class EditSourCitationController @Inject() (
   def showForm(baseId: Int, id: Int) = authJourney.authWithAdminRight.async { implicit request =>
     handleSourCitation(baseId, id) { sourCitation =>
       val form = SourCitationForm.sourCitationForm.fill(sourCitation.toForm)
-      sourCitationService.getSourRecords(baseId).map { sourRecords =>
-        Ok(sourCitationView(baseId, form, sourCitation, sourRecords))
+      for {
+        database    <- genealogyDatabaseService.getGenealogyDatabase(baseId)
+        sourRecords <- sourCitationService.getSourRecords(baseId)
+      } yield {
+        Ok(sourCitationView(database, form, sourCitation, sourRecords))
       }
     }
   }
@@ -55,8 +60,11 @@ class EditSourCitationController @Inject() (
   def onSubmit(baseId: Int, id: Int) = authJourney.authWithAdminRight.async { implicit request =>
     def errorFunction(formWithErrors: Form[SourCitationForm]): Future[Result] = {
       handleSourCitation(baseId, id) { sourCitation =>
-        sourCitationService.getSourRecords(baseId).map { sourRecords =>
-          BadRequest(sourCitationView(baseId, formWithErrors, sourCitation, sourRecords))
+        for {
+          database    <- genealogyDatabaseService.getGenealogyDatabase(baseId)
+          sourRecords <- sourCitationService.getSourRecords(baseId)
+        } yield {
+          BadRequest(sourCitationView(database, formWithErrors, sourCitation, sourRecords))
         }
       }
     }

@@ -12,9 +12,11 @@
   implicit appConfig: AppConfig
 )
 
-@(dbId: Int, surname: String, title: String, firstnamesListPagination: FirstnamesListPagination)(implicit request: AuthenticatedRequest[?], messages: Messages)
+@(database: Option[GenealogyDatabase], surname: String, firstnamesListPagination: FirstnamesListPagination)(implicit request: AuthenticatedRequest[?], messages: Messages)
 
-@main(dbId, title) {
+@dbId = @{ database.fold(0)(_.id) }
+
+@main(database, caption = Some(messages("firstnamesPage.caption", surname))) {
 
     @paginationComponent(dbId, surname, firstnamesListPagination)
     @govukSummaryList(

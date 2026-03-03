@@ -14,6 +14,7 @@ import play.api.i18n.*
 import play.api.mvc.*
 import queries.GetSqlQueries
 import queries.InsertSqlQueries
+import services.GenealogyDatabaseService
 import views.html.add.AddEventDetail
 import views.html.ServiceUnavailable
 
@@ -23,6 +24,7 @@ class AddIndividualEventDetailController @Inject() (
     insertSqlQueries: InsertSqlQueries,
     addEventDetailsView: AddEventDetail,
     serviceUnavailableView: ServiceUnavailable,
+    genealogyDatabaseService: GenealogyDatabaseService,
     getSqlQueries: GetSqlQueries,
     val controllerComponents: ControllerComponents
 )(
@@ -34,16 +36,22 @@ class AddIndividualEventDetailController @Inject() (
     implicit authenticatedRequest: AuthenticatedRequest[AnyContent] =>
       val filled = EventDetailForm(baseId, None, None, "", "", "", "", "")
       val form   = EventDetailForm.eventDetailForm.fill(filled)
-      getSqlQueries.getAllPlaces.map { allPlace =>
-        Ok(addEventDetailsView(baseId, form, personId, allPlace, IndividualEvent))
+      for {
+        database <- genealogyDatabaseService.getGenealogyDatabase(baseId)
+        allPlace <- getSqlQueries.getAllPlaces
+      } yield {
+        Ok(addEventDetailsView(database, form, personId, allPlace, IndividualEvent))
       }
   }
 
   def onSubmit(baseId: Int, personId: Int): Action[AnyContent] = authJourney.authWithAdminRight.async {
     implicit authenticatedRequest =>
       val errorFunction: Form[EventDetailForm] => Future[Result] = { (formWithErrors: Form[EventDetailForm]) =>
-        getSqlQueries.getAllPlaces.map { allPlace =>
-          BadRequest(addEventDetailsView(baseId, formWithErrors, personId, allPlace, IndividualEvent))
+        for {
+          database <- genealogyDatabaseService.getGenealogyDatabase(baseId)
+          allPlace <- getSqlQueries.getAllPlaces
+        } yield {
+          BadRequest(addEventDetailsView(database, formWithErrors, personId, allPlace, IndividualEvent))
         }
       }
 

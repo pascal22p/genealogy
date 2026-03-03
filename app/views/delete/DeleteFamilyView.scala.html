@@ -9,9 +9,11 @@
         govukButton: GovukButton
 )
 
-@(dbId: Int, family: Family)(implicit request: AuthenticatedRequest[?], messages: Messages)
+@(database: Option[GenealogyDatabase], family: Family)(implicit request: AuthenticatedRequest[?], messages: Messages)
 
-@main(1) {
+@dbId = @{ database.fold(0)(_.id) }
+
+@main(database) {
 
   @familyView(dbId, family, None)
 

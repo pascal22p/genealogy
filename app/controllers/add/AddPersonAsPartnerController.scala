@@ -78,11 +78,14 @@ class AddPersonAsPartnerController @Inject() (
 
   def selectLatestIndividual: Action[AnyContent] = authJourney.authWithAdminRight.async {
     implicit authenticatedRequest: AuthenticatedRequest[AnyContent] =>
-      journeyCacheRepository.get(SelectLatestIndividualForNewFamilyQuestion).flatMap { defaults =>
+      for {
+        maybeDbId <- journeyCacheRepository.get(SelectedDatabaseHidden)
+        database  <- genealogyDatabaseService.getGenealogyDatabase(maybeDbId.map(_.number).getOrElse(-1))
+        defaults  <- journeyCacheRepository.get(SelectLatestIndividualForNewFamilyQuestion)
+        indis     <- personService.getLatestPersons(1, 10)
+      } yield {
         val form = IntegerForm.integerFormWithLabel.filledWith(defaults)
-        personService.getLatestPersons(1, 10).map { indis =>
-          Ok(lastIndividualView(1, indis, form)(using implicitly, implicitly, appConfig))
-        }
+        Ok(lastIndividualView(database, indis, form)(using implicitly, implicitly, appConfig))
       }
   }
 
@@ -92,8 +95,12 @@ class AddPersonAsPartnerController @Inject() (
         .bindFromRequest()
         .fold(
           formWithErrors => {
-            personService.getLatestPersons(1, 10).map { indis =>
-              BadRequest(lastIndividualView(1, indis, formWithErrors)(using implicitly, implicitly, appConfig))
+            for {
+              maybeDbId <- journeyCacheRepository.get(SelectedDatabaseHidden)
+              database  <- genealogyDatabaseService.getGenealogyDatabase(maybeDbId.map(_.number).getOrElse(-1))
+              indis     <- personService.getLatestPersons(1, 10)
+            } yield {
+              BadRequest(lastIndividualView(database, indis, formWithErrors)(using implicitly, implicitly, appConfig))
             }
           },
           formData => {
@@ -111,11 +118,12 @@ class AddPersonAsPartnerController @Inject() (
   def searchIndividual: Action[AnyContent] = authJourney.authWithAdminRight.async {
     implicit authenticatedRequest: AuthenticatedRequest[AnyContent] =>
       for {
-        dbId     <- journeyCacheRepository.get(SelectedDatabaseHidden).map(_.map(_.number).getOrElse(0))
-        defaults <- journeyCacheRepository.get(SearchIndividualForNewFamilyQuestion)
+        maybeDbId <- journeyCacheRepository.get(SelectedDatabaseHidden)
+        database  <- genealogyDatabaseService.getGenealogyDatabase(maybeDbId.map(_.number).getOrElse(-1))
+        defaults  <- journeyCacheRepository.get(SearchIndividualForNewFamilyQuestion)
       } yield {
         val form = StringForm.stringForm.filledWith(defaults)
-        Ok(searchIndividualView(dbId, form)(using implicitly, implicitly))
+        Ok(searchIndividualView(database, form)(using implicitly, implicitly))
       }
   }
 
@@ -128,19 +136,20 @@ class AddPersonAsPartnerController @Inject() (
             .bindFromRequest()
             .fold(
               formWithErrors => {
-                Future.successful(
-                  BadRequest(searchIndividualView(dbIdForm.number, formWithErrors)(using implicitly, implicitly))
-                )
+                genealogyDatabaseService.getGenealogyDatabase(dbIdForm.number).map { database =>
+                  BadRequest(searchIndividualView(database, formWithErrors)(using implicitly, implicitly))
+                }
               },
               formData => {
                 for {
-                  _       <- journeyCacheRepository.upsert(SearchIndividualForNewFamilyQuestion, formData)
-                  default <- journeyCacheRepository.get(SelectIndividualFromSearch)
-                  people  <- personService.searchPersons(dbIdForm.number, formData.value.split("\\s+").toSeq)
+                  _        <- journeyCacheRepository.upsert(SearchIndividualForNewFamilyQuestion, formData)
+                  database <- genealogyDatabaseService.getGenealogyDatabase(dbIdForm.number)
+                  default  <- journeyCacheRepository.get(SelectIndividualFromSearch)
+                  people   <- personService.searchPersons(dbIdForm.number, formData.value.split("\\s+").toSeq)
                 } yield {
                   val form = IntegerForm.integerFormWithLabel.filledWith(default)
                   Ok(
-                    searchResultsView(dbIdForm.number, people, form)(
+                    searchResultsView(database, people, form)(
                       using implicitly,
                       implicitly,
                       appConfig
@@ -164,15 +173,17 @@ class AddPersonAsPartnerController @Inject() (
               .bindFromRequest()
               .fold(
                 formWithErrors => {
-                  personService.searchPersons(dbIdForm.number, searchItemsForm.value.split("\\s+").toSeq).map {
-                    people =>
-                      BadRequest(
-                        searchResultsView(dbIdForm.number, people, formWithErrors)(
-                          using implicitly,
-                          implicitly,
-                          appConfig
-                        )
+                  for {
+                    database <- genealogyDatabaseService.getGenealogyDatabase(dbIdForm.number)
+                    people   <- personService.searchPersons(dbIdForm.number, searchItemsForm.value.split("\\s+").toSeq)
+                  } yield {
+                    BadRequest(
+                      searchResultsView(database, people, formWithErrors)(
+                        using implicitly,
+                        implicitly,
+                        appConfig
                       )
+                    )
                   }
                 },
                 formData => {
@@ -192,6 +203,8 @@ class AddPersonAsPartnerController @Inject() (
         maybeLatestIndividualSelected <- journeyCacheRepository.get(SelectLatestIndividualForNewFamilyQuestion)
         maybeIndividualFromSearch     <- journeyCacheRepository.get(SelectIndividualFromSearch)
         maybeFamilyId                 <- journeyCacheRepository.get(SelectedFamilyIdHidden)
+        maybeDatabaseId               <- journeyCacheRepository.get(SelectedDatabaseHidden)
+        database                      <- genealogyDatabaseService.getGenealogyDatabase(maybeDatabaseId.map(_.number).getOrElse(-1))
         maybeFamily                   <- maybeFamilyId
           .traverse(id => familyService.getFamilyDetails(id.number, true).value)
           .map(_.flatten)
@@ -202,7 +215,7 @@ class AddPersonAsPartnerController @Inject() (
       } yield {
         (maybeFamily, maybePerson) match {
           case (Some(family), Some(person)) =>
-            Ok(checkYourAnswersView(person, family)(using implicitly, implicitly, appConfig))
+            Ok(checkYourAnswersView(database, person, family)(using implicitly, implicitly, appConfig))
           case _ => BadRequest("Values missing in cache")
         }
       }

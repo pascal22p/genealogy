@@ -9,7 +9,7 @@
 @(database: GenealogyDatabase)(implicit request: AuthenticatedRequest[?], messages: Messages)
 
 
-@main(1) {
+@main(Some(database)) {
 
   @govukSummaryList(
     SummaryList(

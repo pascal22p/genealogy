@@ -9,7 +9,9 @@
         govukSummaryList: GovukSummaryList
 )
 
-@(dbId: Int, sourRecord: SourRecord, citations: List[SourCitationQueryData])(implicit request: AuthenticatedRequest[?], messages: Messages)
+@(database: Option[GenealogyDatabase], sourRecord: SourRecord, citations: List[SourCitationQueryData])(implicit request: AuthenticatedRequest[?], messages: Messages)
+
+@dbId = @{ database.fold(0)(_.id) }
 
 @citationContent(source: SourCitationQueryData) = {
   <ul class="govuk-list">
@@ -21,7 +23,7 @@
   </ul>
 }
 
-@main(dbId, title = messages("mediaList.title")) {
+@main(database) {
 
   @block("Source Record") {
     <ul class="govuk-list">

@@ -12,12 +12,10 @@ import play.api.i18n.MessagesApi
 import play.api.mvc.ActionFilter
 import play.api.mvc.ControllerComponents
 import play.api.mvc.Result
-import play.api.mvc.Results.Forbidden
-import views.html.ServiceUnavailable
+import play.api.mvc.Results.Redirect
 
 @Singleton
 class AdminFilter @Inject() (
-    serviceUnavailableView: ServiceUnavailable,
     cc: ControllerComponents
 ) extends ActionFilter[AuthenticatedRequest]
     with I18nSupport {
@@ -26,14 +24,12 @@ class AdminFilter @Inject() (
 
   // scalastyle:off cyclomatic.complexity
   override def filter[A](request: AuthenticatedRequest[A]): Future[Option[Result]] = {
-    implicit val implicitRequest: AuthenticatedRequest[A] = request
-
     val isAdmin: Boolean = request.localSession.sessionData.userData.exists(_.isAdmin)
 
     if (isAdmin) {
       Future.successful(None)
     } else {
-      Future.successful(Some(Forbidden(serviceUnavailableView("Not allowed"))))
+      Future.successful(Some(Redirect(controllers.routes.SessionController.loginOnLoad(request.uri))))
     }
   }
 

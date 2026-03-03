@@ -25,7 +25,7 @@ import models.journeyCache.UserAnswersKey.*
 import repositories.JourneyCacheRepository
 import services.gedcom.GedcomHashIdTable
 import services.GenealogyDatabaseService
-import views.html.add.AddDatabase
+import views.html.admin.AddDatabase
 import views.html.gedcom.GedcomChooseDatabaseView
 import views.html.gedcom.GedcomListView
 import views.html.gedcom.GedcomProgressView

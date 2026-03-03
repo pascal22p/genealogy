@@ -32,12 +32,12 @@ class AddRepositoryController @Inject() (
   def showForm(dbId: Int): Action[AnyContent] = authJourney.authWithAdminRight.async {
     implicit authenticatedRequest: AuthenticatedRequest[AnyContent] =>
       for {
-        maybeDb   <- genealogyDatabaseService.getGenealogyDatabases.map(_.find(_.id == dbId))
+        maybeDb   <- genealogyDatabaseService.getGenealogyDatabase(dbId)
         addresses <- getSqlQueries.getAddresses(dbId)
       } yield {
         maybeDb.fold(NotFound(s"Database $dbId not found")) { db =>
           val form = RepositoryForm.repositoryForm
-          Ok(addRepositoryView(form, db, addresses))
+          Ok(addRepositoryView(form, Some(db), addresses))
         }
       }
   }
@@ -45,11 +45,11 @@ class AddRepositoryController @Inject() (
   def onSubmit(dbId: Int): Action[AnyContent] = authJourney.authWithAdminRight.async { implicit authenticatedRequest =>
     val errorFunction: Form[RepositoryForm] => Future[Result] = { (formWithErrors: Form[RepositoryForm]) =>
       for {
-        maybeDb   <- genealogyDatabaseService.getGenealogyDatabases.map(_.find(_.id == dbId))
+        maybeDb   <- genealogyDatabaseService.getGenealogyDatabase(dbId)
         addresses <- getSqlQueries.getAddresses(dbId)
       } yield {
         maybeDb.fold(NotFound(s"Database $dbId not found")) { db =>
-          Ok(addRepositoryView(formWithErrors, db, addresses))
+          Ok(addRepositoryView(formWithErrors, Some(db), addresses))
         }
       }
     }
