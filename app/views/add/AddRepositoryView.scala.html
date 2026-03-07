@@ -68,10 +68,10 @@
 
             @govukSelect(
                 Select(
-                    items = List(SelectItem(value = Some(""), text = "------------")) ++
+                    items = List(SelectItem(value = Some(""), text = "")) ++
                             addresses.map(a => SelectItem(value = Some(a.id.toString), text = a.oneLiner)),
-                    hint = Some(
-                        Hint(content = Text("Optional address"))
+                    label = Label(
+                        content = Text("Address of the repository (optional)")
                     ),
                     classes = "govuk-!-width-one-half"
                 ).withFormField(repositoryForm("addrId"))

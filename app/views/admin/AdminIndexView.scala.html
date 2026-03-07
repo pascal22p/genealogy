@@ -6,9 +6,9 @@
         block: Block
 )
 
-@()(implicit request: AuthenticatedRequest[?], messages: Messages)
+@(database: Option[GenealogyDatabase])(implicit request: AuthenticatedRequest[?], messages: Messages)
 
-@main(None) {
+@main(database) {
   @block(messages("Admin")) {
     <ul class="govuk-list">
       <li><a class="govuk-link" href="@controllers.admin.routes.AddDatabaseController.showForm.url">

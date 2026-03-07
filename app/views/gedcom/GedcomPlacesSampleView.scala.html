@@ -9,6 +9,7 @@
 
 @this(
         main: Main,
+        block: Block,
         formWithCSRF: FormWithCSRF,
         govukErrorSummary: GovukErrorSummary,
         govukTable: GovukTable,
@@ -30,33 +31,34 @@
 }
 
 @main(None) {
+  @block(messages("importGedcom.checkYourAnswers.title")) {
 
-    @if(placesElementsForm.hasErrors) {
-        @govukErrorSummary(ErrorSummary(
-            errorList = placesElementsForm.errors.map { error =>
-                ErrorLink(
-                    href = Some(s"#${error.key}"),
-                    content = Text(messages(error.message))
-                )
-            },
-            title = Text("There is a problem")
-        ))
-    }
-
-    @formWithCSRF(controllers.gedcom.routes.GedcomPlaceParserController.chooseExtractPlaceElementsOnSubmit) {
-        <div class="scroll-container">
-          @govukTable(Table(
-            rows = placesSample.toSeq.map(rows => rows.map(cell => TableRow(content = Text(cell)))),
-            head = Some((0 until placesSample.headOption.map(_.size).getOrElse(0)).map(c => HeadCell(content = HtmlContent(selectPlaceElement(c)))))
+      @if(placesElementsForm.hasErrors) {
+          @govukErrorSummary(ErrorSummary(
+              errorList = placesElementsForm.errors.map { error =>
+                  ErrorLink(
+                      href = Some(s"#${error.key}"),
+                      content = Text(messages(error.message))
+                  )
+              },
+              title = Text("There is a problem")
           ))
-        </div>
+      }
 
-        @govukButton(Button(
-            content = Text("Submit"),
-            name = Some("submit"),
-            href = None,
-            inputType = Some("submit")))
-    }
+      @formWithCSRF(controllers.gedcom.routes.GedcomPlaceParserController.chooseExtractPlaceElementsOnSubmit) {
+          <div class="scroll-container govuk-!-margin-bottom-2">
+          @govukTable(Table(
+              rows = placesSample.toSeq.map(rows => rows.map(cell => TableRow(content = Text(cell)))),
+              head = Some((0 until placesSample.headOption.map(_.size).getOrElse(0)).map(c => HeadCell(content = HtmlContent(selectPlaceElement(c)))))
+          ))
+          </div>
 
+          @govukButton(Button(
+              content = Text("Submit"),
+              name = Some("submit"),
+              href = None,
+              inputType = Some("submit")))
+      }
+  }
 }
 

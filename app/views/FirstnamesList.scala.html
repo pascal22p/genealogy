@@ -16,7 +16,17 @@
 
 @dbId = @{ database.fold(0)(_.id) }
 
-@main(database, caption = Some(messages("firstnamesPage.caption", surname))) {
+@main(
+    database,
+    caption = Some(messages("firstnamesPage.caption", surname)),
+    breadcrumbs =
+        Some(Breadcrumbs(items = Seq(
+            BreadcrumbsItem(
+              content = Text(s"Surname $surname"),
+              href = Some(controllers.routes.HomeController.showSurnames(dbId).url)
+            )
+        )))
+    ) {
 
     @paginationComponent(dbId, surname, firstnamesListPagination)
     @govukSummaryList(

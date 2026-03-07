@@ -57,7 +57,7 @@ class AddPersonAsPartnerControllerSpec extends BaseSpec {
 
   val authJourney: AuthJourney = new AuthJourney {
     override val authWithAdminRight: ActionBuilder[AuthenticatedRequest, AnyContent] =
-      fakeAuthAction.andThen(new actions.AdminFilter(mock[views.html.ServiceUnavailable], stubControllerComponents()))
+      fakeAuthAction.andThen(new actions.AdminFilter(stubControllerComponents()))
   }
 
   protected override def localGuiceApplicationBuilder(): GuiceApplicationBuilder =
@@ -81,8 +81,8 @@ class AddPersonAsPartnerControllerSpec extends BaseSpec {
 
   "startAddIndividualToFamily" must {
     "upsert database and family IDs and redirect to selectLatestIndividual" in {
-      when(mockGenealogyDatabaseService.getGenealogyDatabases).thenReturn(
-        Future.successful(Seq(models.GenealogyDatabase(1, "Name", "Path", None)))
+      when(mockGenealogyDatabaseService.getGenealogyDatabase(any())).thenReturn(
+        Future.successful(Some(models.GenealogyDatabase(1, "Name", "Path", None)))
       )
       when(mockFamilyService.getFamilyDetails(any(), any())).thenReturn(
         cats.data.OptionT.some[Future](
@@ -123,7 +123,12 @@ class AddPersonAsPartnerControllerSpec extends BaseSpec {
     "render the view with latest persons and form" in {
       when(mockJourneyCacheRepository.get(eqTo(SelectLatestIndividualForNewFamilyQuestion))(using any(), any()))
         .thenReturn(Future.successful(None))
+      when(mockJourneyCacheRepository.get(eqTo(SelectedDatabaseHidden))(using any(), any()))
+        .thenReturn(Future.successful(Some(IntegerForm(1, ""))))
       when(mockPersonService.getLatestPersons(any(), any())).thenReturn(Future.successful(Seq(person1)))
+      when(mockGenealogyDatabaseService.getGenealogyDatabase(any())).thenReturn(
+        Future.successful(Some(models.GenealogyDatabase(1, "Name", "Path", None)))
+      )
 
       val result = sut.selectLatestIndividual.apply(FakeRequest().withCSRFToken)
 
@@ -139,6 +144,9 @@ class AddPersonAsPartnerControllerSpec extends BaseSpec {
         mockJourneyCacheRepository.upsert(eqTo(SelectLatestIndividualForNewFamilyQuestion), any())(using any(), any())
       )
         .thenReturn(Future.successful(UserAnswers(Map.empty)))
+      when(mockGenealogyDatabaseService.getGenealogyDatabase(any())).thenReturn(
+        Future.successful(Some(models.GenealogyDatabase(1, "Name", "Path", None)))
+      )
 
       val request =
         FakeRequest(POST, controllers.add.routes.AddPersonAsPartnerController.selectLatestIndividualOnSubmit.url)
@@ -156,6 +164,9 @@ class AddPersonAsPartnerControllerSpec extends BaseSpec {
         mockJourneyCacheRepository.upsert(eqTo(SelectLatestIndividualForNewFamilyQuestion), any())(using any(), any())
       )
         .thenReturn(Future.successful(UserAnswers(Map.empty)))
+      when(mockGenealogyDatabaseService.getGenealogyDatabase(any())).thenReturn(
+        Future.successful(Some(models.GenealogyDatabase(1, "Name", "Path", None)))
+      )
 
       val request =
         FakeRequest(POST, controllers.add.routes.AddPersonAsPartnerController.selectLatestIndividualOnSubmit.url)
@@ -174,6 +185,9 @@ class AddPersonAsPartnerControllerSpec extends BaseSpec {
 
     "return BadRequest when form is invalid" in {
       when(mockPersonService.getLatestPersons(any(), any())).thenReturn(Future.successful(Seq(person1)))
+      when(mockGenealogyDatabaseService.getGenealogyDatabase(any())).thenReturn(
+        Future.successful(Some(models.GenealogyDatabase(1, "Name", "Path", None)))
+      )
 
       val request =
         FakeRequest(POST, controllers.add.routes.AddPersonAsPartnerController.selectLatestIndividualOnSubmit.url)
@@ -193,6 +207,9 @@ class AddPersonAsPartnerControllerSpec extends BaseSpec {
         .thenReturn(Future.successful(Some(IntegerForm(1, "Label"))))
       when(mockJourneyCacheRepository.get(eqTo(SearchIndividualForNewFamilyQuestion))(using any(), any()))
         .thenReturn(Future.successful(None))
+      when(mockGenealogyDatabaseService.getGenealogyDatabase(any())).thenReturn(
+        Future.successful(Some(models.GenealogyDatabase(1, "Name", "Path", None)))
+      )
 
       val result = sut.searchIndividual.apply(FakeRequest().withCSRFToken)
 
@@ -211,6 +228,9 @@ class AddPersonAsPartnerControllerSpec extends BaseSpec {
       when(mockJourneyCacheRepository.get(eqTo(SelectIndividualFromSearch))(using any(), any()))
         .thenReturn(Future.successful(None))
       when(mockPersonService.searchPersons(any(), any())).thenReturn(Future.successful(Seq(person1)))
+      when(mockGenealogyDatabaseService.getGenealogyDatabase(any())).thenReturn(
+        Future.successful(Some(models.GenealogyDatabase(1, "Name", "Path", None)))
+      )
 
       val request = FakeRequest(POST, controllers.add.routes.AddPersonAsPartnerController.searchIndividualOnSubmit.url)
         .withFormUrlEncodedBody("value" -> "John Doe")
@@ -227,16 +247,6 @@ class AddPersonAsPartnerControllerSpec extends BaseSpec {
       )(using any(), any())
       verify(mockPersonService).searchPersons(eqTo(1), eqTo(Seq("John", "Doe")))
     }
-
-    "return BadRequest when form is invalid" in {
-      when(mockJourneyCacheRepository.get(eqTo(SelectedDatabaseHidden))(using any(), any()))
-        .thenReturn(Future.successful(Some(IntegerForm(1, "Label"))))
-
-      // Use a value that exceeds some limit or is otherwise invalid if StringForm has constraints.
-      // Since it uses 'text', maybe it's never invalid unless we add constraints.
-      // Let's check if we can make it fail or if we should skip this test if no constraints.
-      // Wait, StringForm.stringForm uses 'text' which matches anything.
-    }
   }
 
   "selectSearchResultsOnSubmit" must {
@@ -248,6 +258,9 @@ class AddPersonAsPartnerControllerSpec extends BaseSpec {
         .thenReturn(Future.successful(Some(models.forms.StringForm("John Doe"))))
       when(mockJourneyCacheRepository.upsert(eqTo(SelectIndividualFromSearch), any())(using any(), any()))
         .thenReturn(Future.successful(UserAnswers(Map.empty)))
+      when(mockGenealogyDatabaseService.getGenealogyDatabase(any())).thenReturn(
+        Future.successful(Some(models.GenealogyDatabase(1, "Name", "Path", None)))
+      )
 
       val request =
         FakeRequest(POST, controllers.add.routes.AddPersonAsPartnerController.selectSearchResultsOnSubmit.url)
@@ -270,6 +283,9 @@ class AddPersonAsPartnerControllerSpec extends BaseSpec {
       when(mockJourneyCacheRepository.get(eqTo(SearchIndividualForNewFamilyQuestion))(using any(), any()))
         .thenReturn(Future.successful(Some(models.forms.StringForm("John"))))
       when(mockPersonService.searchPersons(any(), any())).thenReturn(Future.successful(Seq(person1)))
+      when(mockGenealogyDatabaseService.getGenealogyDatabase(any())).thenReturn(
+        Future.successful(Some(models.GenealogyDatabase(1, "Name", "Path", None)))
+      )
 
       val request =
         FakeRequest(POST, controllers.add.routes.AddPersonAsPartnerController.selectSearchResultsOnSubmit.url)
@@ -279,7 +295,7 @@ class AddPersonAsPartnerControllerSpec extends BaseSpec {
       val result = sut.selectSearchResultsOnSubmit.apply(request)
 
       status(result) mustBe BAD_REQUEST
-      contentAsString(result) must include("Search results")
+      contentAsString(result) must include("There is a problem")
     }
   }
 
@@ -291,6 +307,9 @@ class AddPersonAsPartnerControllerSpec extends BaseSpec {
         .thenReturn(Future.successful(Some(IntegerForm(1, ""))))
       when(mockJourneyCacheRepository.get(eqTo(SelectedFamilyIdHidden))(using any(), any()))
         .thenReturn(Future.successful(Some(IntegerForm(1, ""))))
+      when(mockGenealogyDatabaseService.getGenealogyDatabase(any())).thenReturn(
+        Future.successful(Some(models.GenealogyDatabase(1, "Name", "Path", None)))
+      )
 
       when(mockFamilyService.getFamilyDetails(any(), any())).thenReturn(
         OptionT.some[Future](

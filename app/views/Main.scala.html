@@ -43,26 +43,25 @@
 }
 
 @breadcrumbsMenu = @{
-    val homeEntry = BreadcrumbsItem(
+    val homeEntry = Some(BreadcrumbsItem(
         content = Text(messages("Home")),
         href = Some(controllers.routes.HomeController.onload().url),
         attributes = Map.empty
-    )
+    ))
 
-    val databaseEntry = authenticatedRequest.genealogyDatabase.fold(Seq(homeEntry)){ database =>
-        Seq(
-            homeEntry,
-            BreadcrumbsItem(
-                content = Text(messages("Database.title", database.name)),
-                href = Some(controllers.routes.HomeController.showSurnames(database.id).url),
-                attributes = Map.empty
-            )
+    val databaseEntry = database.map { someDatabase =>
+        BreadcrumbsItem(
+            content = Text(messages("Database.title", someDatabase.name)),
+            href = Some(controllers.routes.HomeController.showSurnames(someDatabase.id).url),
+            attributes = Map.empty
         )
     }
 
-    breadcrumbs.fold(Breadcrumbs(databaseEntry)) { someBreadcrumbs =>
+    val items = Seq(homeEntry, databaseEntry).flatten
+
+    breadcrumbs.fold(Breadcrumbs(items = items)) { someBreadcrumbs =>
         Breadcrumbs(
-            items = databaseEntry ++ someBreadcrumbs.items
+            items = items ++ someBreadcrumbs.items
         )
     }
 }
@@ -117,7 +116,16 @@
         @govukServiceNavigation(ServiceNavigation(
             serviceName = None,
             serviceUrl = Some("/"),
-            navigation = database.fold(Seq.empty)(db => Seq(
+            navigation = database.fold(
+                Seq(ServiceNavigationItem(
+                    content = Text("Admin"),
+                    href = controllers.admin.routes.AdminController.indexNoBase.url,
+                    active = false,
+                    current = false,
+                    classes = "",
+                    attributes = Map.empty
+                ))
+            )(db => Seq(
                 ServiceNavigationItem(
                     content = Text(messages("Surnames")),
                     href = controllers.routes.HomeController.showSurnames(db.id).url,
@@ -144,7 +152,7 @@
                 ),
                 ServiceNavigationItem(
                     content = Text("Admin"),
-                    href = controllers.admin.routes.AdminController.index.url,
+                    href = controllers.admin.routes.AdminController.index(db.id).url,
                     active = false,
                     current = false,
                     classes = "",

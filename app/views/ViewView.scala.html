@@ -16,7 +16,6 @@
 
 @main(Some(db)) {
 
-
     @block(messages("View")) {
         <ul class="govuk-list">
             <li><a class="govuk-link" href="@controllers.routes.RepositoryListController.showRepositories(db.id).url">View repositories</a></li>

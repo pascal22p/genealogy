@@ -21,8 +21,8 @@
     Breadcrumbs(
         items = Seq(
             BreadcrumbsItem(
-                content = Text(person.shortName),
-                href = Some(controllers.routes.IndividualController.showPerson(dbId, person.details.id).url)
+                content = Text(s"Surname ${person.details.surname}"),
+                href = Some(controllers.routes.HomeController.showFirstnames(database.fold(0)(_.id), person.details.surname).url)
             )
         )
     )

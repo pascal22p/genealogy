@@ -22,18 +22,19 @@
 }
 
 @breadcrumbs = @{
-  val personId = flatTree.headOption.flatMap(_._2.headOption).fold(0)(_.details.id)
-  Breadcrumbs(
-    items = Seq(
-      BreadcrumbsItem(
-        content = Text(flatTree.headOption.flatMap(_._2.headOption).fold("Unknown")(_.details.shortName)),
-        href = Some(controllers.routes.IndividualController.showPerson(dbId, personId).url)
+  flatTree.headOption.flatMap(_._2.headOption).map { person =>
+    Breadcrumbs(
+      items = Seq(
+        BreadcrumbsItem(
+          content = Text(s"Surname ${person.details.surname}"),
+          href = Some(controllers.routes.HomeController.showFirstnames(database.fold(0)(_.id), person.details.surname).url)
+        )
       )
     )
-  )
+  }
 }
 
-@main(database, breadcrumbs = Some(breadcrumbs), caption = Some(flatTree.headOption.flatMap(_._2.headOption).fold("Unknown")(_.details.shortName))) {
+@main(database, breadcrumbs = breadcrumbs, caption = Some(flatTree.headOption.flatMap(_._2.headOption).fold("Unknown")(_.details.shortName))) {
 
   @for(person <- flatTree.headOption.flatMap(_._2.headOption)) {
     @subNavigation("Ascendants list", dbId, person.details.id)

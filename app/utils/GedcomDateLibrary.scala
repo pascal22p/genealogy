@@ -33,7 +33,7 @@ object GedcomDateLibrary {
           case (None, None)               => ""
           case (Some(date), None)         => s"°$date"
           case (None, Some(date))         => s"†$date"
-          case (Some(date1), Some(date2)) => s"°$date1 – †$date2"
+          case (Some(date1), Some(date2)) => s"°$date1 – †$date2"
         }
     }
   }

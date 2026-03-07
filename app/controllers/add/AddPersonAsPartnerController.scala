@@ -7,6 +7,7 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
 import actions.AuthJourney
+import cats.data.OptionT
 import cats.implicits.toTraverseOps
 import config.AppConfig
 import models.forms.IntegerForm
@@ -53,27 +54,28 @@ class AddPersonAsPartnerController @Inject() (
 
   def startAddIndividualToFamily(dbId: Int, familyId: Int): Action[AnyContent] = authJourney.authWithAdminRight.async {
     implicit authenticatedRequest: AuthenticatedRequest[AnyContent] =>
-      for {
-        db <- genealogyDatabaseService.getGenealogyDatabases.map(
-          _.find(_.id == dbId).getOrElse(throw new Exception("Database not found"))
+      (for {
+        db <- OptionT(genealogyDatabaseService.getGenealogyDatabase(dbId))
+        _  <- OptionT.liftF(
+          journeyCacheRepository.upsert(SelectedDatabaseHidden, IntegerForm(db.id, s"${db.name} (${db.id})"))
         )
-        _      <- journeyCacheRepository.upsert(SelectedDatabaseHidden, IntegerForm(db.id, s"${db.name} (${db.id})"))
-        family <- familyService
-          .getFamilyDetails(familyId)
-          .value
-          .map(_.getOrElse(throw new Exception("Family not found")))
-          .map(family =>
-            if (family.parent1.isDefined && family.parent2.isDefined) {
-              throw new RuntimeException(s"Family $familyId already has two partners")
-            } else { family }
+        family <-
+          familyService
+            .getFamilyDetails(familyId)
+            .map { family =>
+              if (family.parent1.isDefined && family.parent2.isDefined) {
+                throw new RuntimeException(s"Family $familyId already has two partners")
+              } else family
+            }
+        _ <- OptionT.liftF(
+          journeyCacheRepository.upsert(
+            SelectedFamilyIdHidden,
+            IntegerForm(familyId, s"${family.parent1.fold("")(_.shortName)} - ${family.parent2.fold("")(_.shortName)}")
           )
-        _ <- journeyCacheRepository.upsert(
-          SelectedFamilyIdHidden,
-          IntegerForm(familyId, s"${family.parent1.fold("")(_.shortName)} - ${family.parent2.fold("")(_.shortName)}")
         )
       } yield {
         Redirect(controllers.add.routes.AddPersonAsPartnerController.selectLatestIndividual)
-      }
+      }).getOrElse(NotFound("Database or family not found"))
   }
 
   def selectLatestIndividual: Action[AnyContent] = authJourney.authWithAdminRight.async {
