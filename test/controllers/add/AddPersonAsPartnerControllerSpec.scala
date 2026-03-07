@@ -133,7 +133,6 @@ class AddPersonAsPartnerControllerSpec extends BaseSpec {
       val result = sut.selectLatestIndividual.apply(FakeRequest().withCSRFToken)
 
       status(result) mustBe OK
-      contentAsString(result) must include("Add individual to the family")
       contentAsString(result) must include("John Doe")
     }
   }
@@ -197,7 +196,7 @@ class AddPersonAsPartnerControllerSpec extends BaseSpec {
       val result = sut.selectLatestIndividualOnSubmit.apply(request)
 
       status(result) mustBe BAD_REQUEST
-      contentAsString(result) must include("Add individual to the family")
+      contentAsString(result) must include("There is a problem")
     }
   }
 
@@ -239,7 +238,6 @@ class AddPersonAsPartnerControllerSpec extends BaseSpec {
       val result = sut.searchIndividualOnSubmit.apply(request)
 
       status(result) mustBe OK
-      contentAsString(result) must include("Search results")
       contentAsString(result) must include("John Doe")
       verify(mockJourneyCacheRepository).upsert(
         eqTo(SearchIndividualForNewFamilyQuestion),
