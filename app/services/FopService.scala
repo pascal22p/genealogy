@@ -4,9 +4,6 @@ import java.io.ByteArrayOutputStream
 import java.io.StringReader
 import javax.inject.Inject
 import javax.xml.parsers.SAXParserFactory
-import javax.xml.transform.sax.SAXResult
-import javax.xml.transform.stream.StreamSource
-import javax.xml.transform.TransformerFactory
 
 import scala.concurrent.ExecutionContext
 
