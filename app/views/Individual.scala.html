@@ -9,7 +9,7 @@
   individualEvents: EventsDetails,
   parents: Parents)
 
-@(person: Person, dbId: Int)(implicit request: AuthenticatedRequest[?], messages: Messages)
+@(person: Person, database: Option[GenealogyDatabase])(implicit request: AuthenticatedRequest[?], messages: Messages)
 
 @title(family: Family) = {
   Family
@@ -21,40 +21,40 @@
   Breadcrumbs(
     items = Seq(
       BreadcrumbsItem(
-        content = Text(person.details.surname),
-        href = Some(controllers.routes.HomeController.showFirstnames(dbId, person.details.surname).url)
+        content = Text(s"Surname ${person.details.surname}"),
+        href = Some(controllers.routes.HomeController.showFirstnames(database.fold(0)(_.id), person.details.surname).url)
       )
     )
   )
 }
 
-@main(dbId, person.name, Some(breadcrumbs)) {
+@main(database, breadcrumbs = Some(breadcrumbs), caption = Some(person.name)) {
 
   <div id="person-details">
-  @personDetails(dbId, person)
+  @personDetails(database.fold(0)(_.id), person)
   
-  @individualEvents(dbId, person.events)
+  @individualEvents(database.fold(0)(_.id), person.events)
 
   @for(family <- person.families) {
     @block(title(family).toString,
       Some(Actions(
         items = Seq(ActionItem(
-          href = controllers.delete.routes.DeleteFamilyController.deleteFamilyConfirmation(dbId, family.id).url,
+          href = controllers.delete.routes.DeleteFamilyController.deleteFamilyConfirmation(database.fold(0)(_.id), family.id).url,
           content = Text(messages("Delete"))
         ))
       )),
       Some(Actions(
         items = Seq(ActionItem(
-          href = controllers.routes.FamilyController.showFamily(dbId, family.id).url,
+          href = controllers.routes.FamilyController.showFamily(database.fold(0)(_.id), family.id).url,
           content = Text(messages("View"))
         ))
       ))
     ) {
-      @familyView(dbId, family, person.findSelf(family.id))
+      @familyView(database.fold(0)(_.id), family, person.findSelf(family.id))
     }
   }
 
-  @parents(dbId, person)
+  @parents(database.fold(0)(_.id), person)
   </div>
 
 }

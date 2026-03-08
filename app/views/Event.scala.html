@@ -11,11 +11,14 @@
   lastModified: LastModified,
   govukSummaryList: GovukSummaryList
 )(
-  implicit val appConfig: AppConfig
+  implicit appConfig: AppConfig
 )
 
-@(event: EventDetail, dbId: Int)(implicit request: AuthenticatedRequest[?], messages: Messages)
+@(event: EventDetail, database: Option[GenealogyDatabase])(implicit request: AuthenticatedRequest[?], messages: Messages)
 
+@dbId = @{
+    database.map(_.id).getOrElse(0)
+}
 
 @breadcrumbs = @{
 Breadcrumbs(
@@ -37,9 +40,9 @@ Breadcrumbs(
 }
 
 @main(
-  dbId,
-  s"Event details for ${event.description.getOrElse(messages("Unknown"))}",
-  Some(breadcrumbs)
+    database,
+    breadcrumbs = Some(breadcrumbs),
+    caption = event.tag.map { tag => s"${messages(tag)} of ${event.description.getOrElse(messages("Unknown"))}" }
 ) {
 
   <div id="event-details">

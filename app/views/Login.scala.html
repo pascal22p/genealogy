@@ -1,9 +1,11 @@
 @import views.html.helper
+@import views.html.components.Block
 @import models.forms.UserDataForm
 @import uk.gov.hmrc.govukfrontend.views.Implicits.*
 
 @this(
         main: Main,
+        block: Block,
         formWithCSRF: FormWithCSRF,
         govukInput: GovukInput,
         govukButton: GovukButton
@@ -11,44 +13,47 @@
 
 @(userForm: Form[UserDataForm])(implicit request: AuthenticatedRequest[?], messages: Messages)
 
-@main(1, messages("login.into.account")) {
+@main(None) {
 
-        @if(userForm.hasGlobalErrors) {
-            @for(error <- userForm.globalErrors) {
-                <span class="error-message">@error.format(messages)</span>
-            }
-        }
+  @block(messages("login.into.account")) {
 
-        @formWithCSRF(controllers.routes.SessionController.loginOnSubmit()) {
-            @govukInput(
-                Input(
-                    label = Label(content = Text(messages("login.username"))),
-                    classes = "govuk-!-width-one-half"
-                ).withFormField(userForm("username"))
-            )
+      @if(userForm.hasGlobalErrors) {
+          @for(error <- userForm.globalErrors) {
+              <span class="error-message">@error.format(messages)</span>
+          }
+      }
 
-            @govukInput(
-                Input(
-                    label = Label(content = Text(messages("login.password"))),
-                    inputType = "password",
-                    classes = "govuk-!-width-one-half"
-                ).withFormField(userForm("password"))
-            )
+      @formWithCSRF(controllers.routes.SessionController.loginOnSubmit()) {
+          @govukInput(
+              Input(
+                  label = Label(content = Text(messages("login.username"))),
+                  classes = "govuk-!-width-one-half"
+              ).withFormField(userForm("username"))
+          )
 
-            @govukInput(
-                Input(
-                    inputType = "hidden",
-                    classes = "govuk-!-width-one-half",
-                    value = request.getQueryString("returnUrl")
-                ).withFormField(userForm("returnUrl"))
-            )
+          @govukInput(
+              Input(
+                  label = Label(content = Text(messages("login.password"))),
+                  inputType = "password",
+                  classes = "govuk-!-width-one-half"
+              ).withFormField(userForm("password"))
+          )
 
-            @govukButton(
-                Button(
-                    element = Some("button"),
-                    content = Text("Submit")
-                )
-            )
+          @govukInput(
+              Input(
+                  inputType = "hidden",
+                  classes = "govuk-!-width-one-half",
+                  value = request.getQueryString("returnUrl")
+              ).withFormField(userForm("returnUrl"))
+          )
 
-        }
+          @govukButton(
+              Button(
+                  element = Some("button"),
+                  content = Text("Submit")
+              )
+          )
+
+      }
+  }
 }

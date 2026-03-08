@@ -11,7 +11,22 @@
     subNavigation: SubNavigation
 )
 
-@(person: Person, dbId: Int)(implicit request: AuthenticatedRequest[?], messages: Messages)
+@(person: Person, database: Option[GenealogyDatabase])(implicit request: AuthenticatedRequest[?], messages: Messages)
+
+@dbId = @{
+    database.map(_.id).getOrElse(0)
+}
+
+@breadcrumbs = @{
+    Breadcrumbs(
+        items = Seq(
+            BreadcrumbsItem(
+                content = Text(s"Surname ${person.details.surname}"),
+                href = Some(controllers.routes.HomeController.showFirstnames(database.fold(0)(_.id), person.details.surname).url)
+            )
+        )
+    )
+}
 
 @aDescendant(person: Person, depth: Int = 1): Html = @{
     val isAllowedToSee = request.localSession.sessionData.userData.fold(false)(_.seePrivacy)
@@ -44,7 +59,7 @@
     }
 }
 
-@main(dbId, messages("descendants.title", person.name)) {
+@main(database, breadcrumbs = Some(breadcrumbs), caption = Some(person.name)) {
 
     @subNavigation("Descendants", dbId, person.details.id)
     @block("Descendants") {

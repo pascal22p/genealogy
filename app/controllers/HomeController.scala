@@ -43,10 +43,10 @@ class HomeController @Inject() (
   def showSurnames(id: Int): Action[AnyContent] = authAction.async {
     implicit request: AuthenticatedRequest[AnyContent] =>
       (for {
-        database <- OptionT(genealogyDatabaseService.getGenealogyDatabases.map(_.find(_.id == id)))
+        database <- OptionT(genealogyDatabaseService.getGenealogyDatabase(id))
         surnames <- OptionT.liftF(genealogyDatabaseService.getSurnamesList(id))
       } yield {
-        Ok(surnamesView(surnames, database))
+        Ok(surnamesView(surnames, Some(database)))
       }).getOrElse(NotFound(s"Genealogy database $id not found"))
   }
 
@@ -63,15 +63,17 @@ class HomeController @Inject() (
           }
         }
 
-      firstnamesListService.getFirstNamesListWithAnchors(id, name, cursor).map { firstnamesListPagination =>
+      (for {
+        database                 <- OptionT(genealogyDatabaseService.getGenealogyDatabase(id))
+        firstnamesListPagination <- OptionT.liftF(firstnamesListService.getFirstNamesListWithAnchors(id, name, cursor))
+      } yield {
         Ok(
           firstnamesView(
-            id,
+            Some(database),
             name,
-            s"Surname $name",
             firstnamesListPagination
           )
         )
-      }
+      }).getOrElse(NotFound(s"Genealogy database $id not found"))
   }
 }

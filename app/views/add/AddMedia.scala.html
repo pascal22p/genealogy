@@ -11,9 +11,11 @@
         govukFileUpload: GovukFileUpload
 )
 
-@(dbId: Int)(implicit request: AuthenticatedRequest[?], messages: Messages)
+@(database: Option[GenealogyDatabase])(implicit request: AuthenticatedRequest[?], messages: Messages)
 
-@main(1) {
+@dbId = @{ database.fold(0)(_.id) }
+
+@main(database) {
 
     @block("Add new media file") {
         @helper.form(action = controllers.add.routes.AddMediaController.upload(dbId), Symbol("enctype") -> "multipart/form-data") {

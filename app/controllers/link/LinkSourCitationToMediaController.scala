@@ -7,6 +7,7 @@ import scala.concurrent.Future
 
 import actions.AuthJourney
 import anorm.NamedParameter
+import cats.data.OptionT
 import models.forms.LinkForm
 import models.AuthenticatedRequest
 import models.MediaType.UnknownMedia
@@ -15,6 +16,7 @@ import play.api.i18n.*
 import play.api.mvc.*
 import queries.GetSqlQueries
 import queries.InsertSqlQueries
+import services.GenealogyDatabaseService
 import views.html.link.LinkSourCitationToMedia
 
 @Singleton
@@ -22,6 +24,7 @@ class LinkSourCitationToMediaController @Inject() (
     authJourney: AuthJourney,
     insertSqlQueries: InsertSqlQueries,
     getSqlQueries: GetSqlQueries,
+    genealogyDatabaseService: GenealogyDatabaseService,
     linkSourCitationToMediaView: LinkSourCitationToMedia,
     val controllerComponents: ControllerComponents
 )(
@@ -32,17 +35,23 @@ class LinkSourCitationToMediaController @Inject() (
   def showForm(dbId: Int, sourCitationId: Int): Action[AnyContent] = authJourney.authWithAdminRight.async {
     implicit authenticatedRequest: AuthenticatedRequest[AnyContent] =>
       val form = LinkForm.linkForm
-      getSqlQueries.getMedias(None, UnknownMedia, dbId).map { allMedias =>
-        Ok(linkSourCitationToMediaView(dbId, sourCitationId, form, allMedias))
-      }
+      (for {
+        database  <- OptionT(genealogyDatabaseService.getGenealogyDatabase(dbId))
+        allMedias <- OptionT.liftF(getSqlQueries.getMedias(None, UnknownMedia, dbId))
+      } yield {
+        Ok(linkSourCitationToMediaView(Some(database), sourCitationId, form, allMedias))
+      }).getOrElse(NotFound(s"Database $dbId not found"))
   }
 
   def onSubmit(dbId: Int, sourCitationId: Int): Action[AnyContent] = authJourney.authWithAdminRight.async {
     implicit authenticatedRequest =>
       val errorFunction: Form[LinkForm] => Future[Result] = { (formWithErrors: Form[LinkForm]) =>
-        getSqlQueries.getMedias(None, UnknownMedia, dbId).map { allMedias =>
-          BadRequest(linkSourCitationToMediaView(dbId, sourCitationId, formWithErrors, allMedias))
-        }
+        (for {
+          database  <- OptionT(genealogyDatabaseService.getGenealogyDatabase(dbId))
+          allMedias <- OptionT.liftF(getSqlQueries.getMedias(None, UnknownMedia, dbId))
+        } yield {
+          BadRequest(linkSourCitationToMediaView(Some(database), sourCitationId, formWithErrors, allMedias))
+        }).getOrElse(NotFound(s"Database $dbId not found"))
       }
 
       val successFunction: LinkForm => Future[Result] = { (dataForm: LinkForm) =>

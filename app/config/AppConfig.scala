@@ -9,6 +9,7 @@ import play.api.Configuration
 class AppConfig @Inject() (configuration: Configuration) {
   val protocol: String    = configuration.get[String]("protocol")
   val allowedHost: String = configuration.get[String]("allowedHost")
+  val appName: String     = configuration.get[String]("appName")
 
   val mediaPath: String          = configuration.get[String]("media-path")
   val uploadPath: String         = configuration.get[String]("upload-path")

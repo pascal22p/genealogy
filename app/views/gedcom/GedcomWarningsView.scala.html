@@ -17,7 +17,7 @@
 
 @(warnings: Seq[String], form: Form[TrueOrFalseForm])(implicit request: AuthenticatedRequest[?], messages: Messages)
 
-@main(1, title = messages("importGedcom.checkYourAnswers.title")) {
+@main(None) {
 
     @govukWarningText(WarningText(
         iconFallbackText = Some("Warning"),

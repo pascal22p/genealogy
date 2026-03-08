@@ -7,6 +7,7 @@ import scala.concurrent.Future
 
 import actions.AuthJourney
 import anorm.NamedParameter
+import cats.data.OptionT
 import cats.implicits.*
 import models.forms.LinkForm
 import models.Attributes
@@ -22,6 +23,7 @@ import queries.GetSqlQueries
 import queries.InsertSqlQueries
 import services.EventService
 import services.FamilyService
+import services.GenealogyDatabaseService
 import views.html.link.LinkChildToFamilyView
 
 @Singleton
@@ -31,6 +33,7 @@ class LinkChildToFamilyController @Inject() (
     getSqlQueries: GetSqlQueries,
     familyService: FamilyService,
     eventService: EventService,
+    genealogyDatabaseService: GenealogyDatabaseService,
     linkChildToFamilyView: LinkChildToFamilyView,
     val controllerComponents: ControllerComponents
 )(
@@ -41,9 +44,10 @@ class LinkChildToFamilyController @Inject() (
   def showForm(dbId: Int, familyId: Int): Action[AnyContent] = authJourney.authWithAdminRight.async {
     implicit authenticatedRequest: AuthenticatedRequest[AnyContent] =>
       val form = LinkForm.linkForm
-      for {
-        allPersonsDetails <- getSqlQueries.getAllPersonDetails(dbId)
-        allPersons        <- allPersonsDetails.traverse { person =>
+      (for {
+        database          <- OptionT(genealogyDatabaseService.getGenealogyDatabase(dbId))
+        allPersonsDetails <- OptionT.liftF(getSqlQueries.getAllPersonDetails(dbId))
+        allPersons        <- OptionT.liftF(allPersonsDetails.traverse { person =>
           eventService.getIndividualEvents(person.id).map { events =>
             Person(
               person,
@@ -53,13 +57,11 @@ class LinkChildToFamilyController @Inject() (
               List.empty
             )
           }
-        }
-        family <- familyService.getFamilyDetails(familyId, true).value
+        })
+        family <- familyService.getFamilyDetails(familyId, true)
       } yield {
-        family.fold(NotFound(s"Family id $familyId not found")) { someFamily =>
-          Ok(linkChildToFamilyView(dbId, allPersons, someFamily, form))
-        }
-      }
+        Ok(linkChildToFamilyView(Some(database), allPersons, family, form))
+      }).getOrElse(NotFound(s"Family id $familyId or database $dbId not found"))
   }
 
   def onSubmit(dbId: Int, familyId: Int): Action[AnyContent] = authJourney.authWithAdminRight.async {

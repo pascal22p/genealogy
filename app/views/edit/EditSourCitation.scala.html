@@ -13,9 +13,11 @@
         formWithCSRF: FormWithCSRF
 )
 
-@(dbId: Int, sourCitationForm: Form[SourCitationForm], sourCitation: SourCitation, sourRecords: List[SourRecord])(implicit request: AuthenticatedRequest[?], messages: Messages)
+@(database: Option[GenealogyDatabase], sourCitationForm: Form[SourCitationForm], sourCitation: SourCitation, sourRecords: List[SourRecord])(implicit request: AuthenticatedRequest[?], messages: Messages)
 
-@main(dbId) {
+@dbId = @{ database.fold(0)(_.id) }
+
+@main(database) {
 
     @sourCitation.sourceType match {
         case _: SourCitationType.EventSourCitation.type => {

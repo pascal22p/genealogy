@@ -28,6 +28,7 @@ import queries.InsertSqlQueries
 import queries.UpdateSqlQueries
 import services.EventService
 import services.FamilyService
+import services.GenealogyDatabaseService
 import services.PersonService
 import views.html.add.AddExistingFamilyView
 import views.html.add.AddFamilyView
@@ -41,6 +42,7 @@ class AddFamilyAsPartner @Inject() (
     getSqlQueries: GetSqlQueries,
     insertSqlQueries: InsertSqlQueries,
     updateSqlQueries: UpdateSqlQueries,
+    genealogyDatabaseService: GenealogyDatabaseService,
     showInterstitialView: ShowAddPersonToFamiliyInterstitialView,
     addFamilyView: AddFamilyView,
     addExistingFamilyView: AddExistingFamilyView,
@@ -51,10 +53,13 @@ class AddFamilyAsPartner @Inject() (
 
   def showInterstitial(baseId: Int, personId: Int): Action[AnyContent] = authJourney.authWithAdminRight.async {
     implicit authenticatedRequest: AuthenticatedRequest[AnyContent] =>
-      personService.getPerson(personId, true, true, true).map { maybePerson =>
+      for {
+        database    <- genealogyDatabaseService.getGenealogyDatabase(baseId)
+        maybePerson <- personService.getPerson(personId, true, true, true)
+      } yield {
         maybePerson.fold(NotFound(s"Person with id $personId cannot be found")) { person =>
           val form = TrueOrFalseForm.trueOrFalseForm.fill(TrueOrFalseForm(true))
-          Ok(showInterstitialView(baseId, person, form))
+          Ok(showInterstitialView(database, person, form))
         }
       }
   }
@@ -62,9 +67,12 @@ class AddFamilyAsPartner @Inject() (
   def submitInterstitial(baseId: Int, personId: Int): Action[AnyContent] = authJourney.authWithAdminRight.async {
     implicit authenticatedRequest: AuthenticatedRequest[AnyContent] =>
       val errorFunction: Form[TrueOrFalseForm] => Future[Result] = { (formWithErrors: Form[TrueOrFalseForm]) =>
-        personService.getPerson(personId, true, true, true).map { maybePerson =>
+        for {
+          database    <- genealogyDatabaseService.getGenealogyDatabase(baseId)
+          maybePerson <- personService.getPerson(personId, true, true, true)
+        } yield {
           maybePerson.fold(NotFound(s"Person with id $personId cannot be found")) { person =>
-            BadRequest(showInterstitialView(baseId, person, formWithErrors))
+            BadRequest(showInterstitialView(database, person, formWithErrors))
           }
         }
       }
@@ -86,6 +94,7 @@ class AddFamilyAsPartner @Inject() (
   def showNewFamilyForm(baseId: Int, personId: Int): Action[AnyContent] = authJourney.authWithAdminRight.async {
     implicit authenticatedRequest: AuthenticatedRequest[AnyContent] =>
       for {
+        database          <- genealogyDatabaseService.getGenealogyDatabase(baseId)
         allPersonsDetails <- getSqlQueries.getAllPersonDetails(baseId)
         allPersons        <- allPersonsDetails.traverse { person =>
           eventService.getIndividualEvents(person.id).map { events =>
@@ -102,7 +111,7 @@ class AddFamilyAsPartner @Inject() (
       } yield {
         maybePerson.fold(NotFound(s"Person with id $personId cannot be found")) { person =>
           val form = FamilyForm.familyForm.fill(FamilyForm(baseId, Some(personId), None, None))
-          Ok(addFamilyView(baseId, allPersons, person, form))
+          Ok(addFamilyView(database, allPersons, person, form))
         }
       }
   }
@@ -111,6 +120,7 @@ class AddFamilyAsPartner @Inject() (
     implicit authenticatedRequest: AuthenticatedRequest[AnyContent] =>
       val errorFunction: Form[FamilyForm] => Future[Result] = { (formWithErrors: Form[FamilyForm]) =>
         for {
+          database          <- genealogyDatabaseService.getGenealogyDatabase(baseId)
           allPersonsDetails <- getSqlQueries.getAllPersonDetails(baseId)
           allPersons        <- allPersonsDetails.traverse { person =>
             eventService.getIndividualEvents(person.id).map { events =>
@@ -126,7 +136,7 @@ class AddFamilyAsPartner @Inject() (
           maybePerson <- personService.getPerson(personId, true, true, true)
         } yield {
           maybePerson.fold(NotFound(s"Person with id $personId cannot be found")) { person =>
-            BadRequest(addFamilyView(baseId, allPersons, person, formWithErrors))
+            BadRequest(addFamilyView(database, allPersons, person, formWithErrors))
           }
         }
       }
@@ -145,6 +155,7 @@ class AddFamilyAsPartner @Inject() (
   def showExistingFamilyForm(baseId: Int, personId: Int): Action[AnyContent] = authJourney.authWithAdminRight.async {
     implicit authenticatedRequest: AuthenticatedRequest[AnyContent] =>
       for {
+        database    <- genealogyDatabaseService.getGenealogyDatabase(baseId)
         allFamilies <- familyService.getAllFamilies(baseId)
         maybePerson <- personService.getPerson(personId, true, true, true)
       } yield {
@@ -152,7 +163,7 @@ class AddFamilyAsPartner @Inject() (
           val form = LinkForm.linkForm
           Ok(
             addExistingFamilyView(
-              baseId,
+              database,
               allFamilies.filter(family =>
                 (family.parent1.isEmpty || family.parent2.isEmpty) &&
                   !family.parent1.map(_.details.id).contains(personId) &&
@@ -170,13 +181,14 @@ class AddFamilyAsPartner @Inject() (
     implicit authenticatedRequest: AuthenticatedRequest[AnyContent] =>
       val errorFunction: Form[LinkForm] => Future[Result] = { (formWithErrors: Form[LinkForm]) =>
         for {
+          database    <- genealogyDatabaseService.getGenealogyDatabase(baseId)
           allFamilies <- familyService.getAllFamilies(baseId)
           maybePerson <- personService.getPerson(personId, true, true, true)
         } yield {
           maybePerson.fold(NotFound(s"Person with id $personId cannot be found")) { person =>
             BadRequest(
               addExistingFamilyView(
-                baseId,
+                database,
                 allFamilies.filter(family =>
                   (family.parent1.isEmpty || family.parent2.isEmpty) &&
                     !family.parent1.map(_.details.id).contains(personId) &&

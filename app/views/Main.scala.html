@@ -14,7 +14,7 @@
 )
 
 
-@(dbId: Int, title: String = "", breadcrumbs: Option[Breadcrumbs] = None)(contentBlock: Html)(implicit authenticatedRequest: AuthenticatedRequest[?], messages: Messages)
+@(database: Option[GenealogyDatabase], breadcrumbs: Option[Breadcrumbs] = None, caption: Option[String] = None)(contentBlock: Html)(implicit authenticatedRequest: AuthenticatedRequest[?], messages: Messages)
 
 @timeoutDialog = {  
     @hmrcTimeoutDialog(TimeoutDialog(
@@ -28,7 +28,7 @@
 
 @loginOrlogoutUrl = @{
     if(authenticatedRequest.localSession.sessionData.userData.isEmpty) {
-        s"${controllers.routes.SessionController.loginOnLoad().url}?returnUrl=${authenticatedRequest.request.uri}"
+        controllers.routes.SessionController.loginOnLoad(authenticatedRequest.request.uri).url
     } else {
         controllers.routes.SessionController.logoutOnLoad().url
     }
@@ -43,26 +43,25 @@
 }
 
 @breadcrumbsMenu = @{
-    val homeEntry = BreadcrumbsItem(
+    val homeEntry = Some(BreadcrumbsItem(
         content = Text(messages("Home")),
         href = Some(controllers.routes.HomeController.onload().url),
         attributes = Map.empty
-    )
+    ))
 
-    val databaseEntry = authenticatedRequest.genealogyDatabase.fold(Seq(homeEntry)){ database =>
-        Seq(
-            homeEntry,
-            BreadcrumbsItem(
-                content = Text(messages("Database.title", database.name)),
-                href = Some(controllers.routes.HomeController.showSurnames(database.id).url),
-                attributes = Map.empty
-            )
+    val databaseEntry = database.map { someDatabase =>
+        BreadcrumbsItem(
+            content = Text(messages("Database.title", someDatabase.name)),
+            href = Some(controllers.routes.HomeController.showSurnames(someDatabase.id).url),
+            attributes = Map.empty
         )
     }
 
-    breadcrumbs.fold(Breadcrumbs(databaseEntry)) { someBreadcrumbs =>
+    val items = Seq(homeEntry, databaseEntry).flatten
+
+    breadcrumbs.fold(Breadcrumbs(items = items)) { someBreadcrumbs =>
         Breadcrumbs(
-            items = databaseEntry ++ someBreadcrumbs.items
+            items = items ++ someBreadcrumbs.items
         )
     }
 }
@@ -70,7 +69,7 @@
 <!DOCTYPE html>
 <html lang="@messages.lang.code" class="govuk-template">
 <head>
-    <title>@title</title>
+    <title>@appConfig.appName - @messages("genealogy")</title>
     <meta name="Description" content="" />
     <meta name="Keywords" content="genealogie, genealogy" />
     <meta name="Author" content="Pascal Parois" />
@@ -100,7 +99,7 @@
             <div class="govuk-grid-column-full">
                 <div class="govuk-width-container">
                 <div class="govuk-grid-column-one-half" style=" padding-left:0">
-                    <a class="govuk-link--no-underline govuk-link--no-visited-state" style="color:white" href="/">Parois.net - @messages("genealogy")</a>
+                    <a class="govuk-link--no-underline govuk-link--no-visited-state" style="color:white" href="/">@appConfig.appName - @messages("genealogy")</a>
                 </div>
                 <div class="govuk-grid-column-one-half" style="display: flex; justify-content: flex-end;padding-right:0">
                     <a class="govuk-link hmrc-sign-out-nav__link govuk-!-text-align-right" href="@loginOrlogoutUrl">
@@ -117,48 +116,49 @@
         @govukServiceNavigation(ServiceNavigation(
             serviceName = None,
             serviceUrl = Some("/"),
-            navigation = Seq(
-                Some(ServiceNavigationItem(
+            navigation = database.fold(
+                Seq(ServiceNavigationItem(
+                    content = Text("Admin"),
+                    href = controllers.admin.routes.AdminController.indexNoBase.url,
+                    active = false,
+                    current = false,
+                    classes = "",
+                    attributes = Map.empty
+                ))
+            )(db => Seq(
+                ServiceNavigationItem(
                     content = Text(messages("Surnames")),
-                    href = controllers.routes.HomeController.showSurnames(dbId).url,
+                    href = controllers.routes.HomeController.showSurnames(db.id).url,
                     active = false,
                     current = false,
                     classes = "",
                     attributes = Map.empty
-                )),
-                Some(ServiceNavigationItem(
+                ),
+                ServiceNavigationItem(
                     content = Text("View"),
-                    href = controllers.routes.ViewController.index(dbId).url,
+                    href = controllers.routes.ViewController.index(db.id).url,
                     active = false,
                     current = false,
                     classes = "",
                     attributes = Map.empty
-                )),
-                if(authenticatedRequest.localSession.sessionData.userData.fold(false)(_.isAdmin)) {
-                    Some(ServiceNavigationItem(
-                        content = Text("Add"),
-                        href = controllers.add.routes.AddController.index(dbId).url,
-                        active = false,
-                        current = false,
-                        classes = "",
-                        attributes = Map.empty
-                    ))
-                } else {
-                    None
-                },
-                if(authenticatedRequest.localSession.sessionData.userData.fold(false)(_.isAdmin)) {
-                    Some(ServiceNavigationItem(
-                        content = Text("Admin"),
-                        href = controllers.admin.routes.AdminController.index.url,
-                        active = false,
-                        current = false,
-                        classes = "",
-                        attributes = Map.empty
-                    ))
-                } else {
-                    None
-                }
-            ).flatten,
+                ),
+                ServiceNavigationItem(
+                    content = Text("Add"),
+                    href = controllers.add.routes.AddController.index(db.id).url,
+                    active = false,
+                    current = false,
+                    classes = "",
+                    attributes = Map.empty
+                ),
+                ServiceNavigationItem(
+                    content = Text("Admin"),
+                    href = controllers.admin.routes.AdminController.index(db.id).url,
+                    active = false,
+                    current = false,
+                    classes = "",
+                    attributes = Map.empty
+                )
+            )),
             navigationClasses = "",
             navigationId = "navigation",
             navigationLabel = Some("navigationLabel"),
@@ -183,7 +183,12 @@
     <main class="govuk-main-wrapper">
         <div class="govuk-width-container">
             <div class="hmrc-page-heading ">
-                <h1 id="pageHeading" class="govuk-heading-l govuk-!-margin-bottom-3">@title</h1>
+                <h1 id="pageHeading" class="govuk-heading-l govuk-!-margin-bottom-3">
+                    @for(c <-caption) {
+                        <span class="govuk-caption-l">@c</span>
+                    }
+                    @database.fold(messages("h1.title"))(db => messages("h1.title.withDb", db.name))
+                </h1>
             </div>
 
             <div class="govuk-grid-row">

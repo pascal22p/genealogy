@@ -7,11 +7,13 @@ import scala.concurrent.ExecutionContext
 
 import actions.AuthAction
 import models.AuthenticatedRequest
+import cats.data.OptionT
 import play.api.i18n.I18nSupport
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.BaseController
 import play.api.mvc.ControllerComponents
+import services.GenealogyDatabaseService
 import queries.GetSqlQueries
 import views.html.RepositoryListView
 
@@ -20,6 +22,7 @@ class RepositoryListController @Inject() (
     authAction: AuthAction,
     getSqlQueries: GetSqlQueries,
     repositoryListView: RepositoryListView,
+    genealogyDatabaseService: GenealogyDatabaseService,
     val controllerComponents: ControllerComponents
 )(
     implicit ec: ExecutionContext
@@ -28,8 +31,11 @@ class RepositoryListController @Inject() (
 
   def showRepositories(dbId: Int): Action[AnyContent] = authAction.async {
     implicit request: AuthenticatedRequest[AnyContent] =>
-      getSqlQueries.getRepositories(dbId).map { repos =>
-        Ok(repositoryListView(dbId, repos.sortBy(_.name)))
-      }
+      (for {
+        database <- OptionT(genealogyDatabaseService.getGenealogyDatabase(dbId))
+        repos    <- OptionT.liftF(getSqlQueries.getRepositories(dbId))
+      } yield {
+        Ok(repositoryListView(Some(database), repos.sortBy(_.name)))
+      }).getOrElse(NotFound(s"Genealogy database $dbId not found"))
   }
 }

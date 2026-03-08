@@ -2,6 +2,9 @@
 
 genealogy = Genealogy
 
+h1.title.withDb = Database {0}
+h1.title = My family tree
+
 Admin = Admin
 Address = Address
 Add = Add
@@ -49,30 +52,30 @@ CheckYourAnswers = Check your answers
 service.unavailable = Service unavailable
 
 ABBR = Titre, description...
-ADDR = Adresse
+ADDR = Address
 ADOP = Adoption
 AGE = Age
 AGNC = Entreprise ou Institution
 ANUL = Déclaration de nullité d'un mariage
 ASSO = Relation
 AUTH = Auteur qui a relevés les informations
-BAPM = Baptème
-BIRT = Naissance
+BAPM = Christening
+BIRT = Birth
 BURI = Inhumation
 CAST = Rang ou status
 CAUS = Cause d'un évènement
-CHIL = Enfant
-CHR = Baptème religieux
-CHRA = Baptème religieux (Adulte)
+CHIL = Child
+CHR = Christening
+CHRA = Adult christening
 CONF = Confirmation
 FCOM = Première communion
-CHIL = Enfant
-CREM = Incinération
-DEAT = Décès
+CHIL = Child
+CREM = Cremation
+DEAT = Death
 DIV = Divorce
 ENGA = Fiançaille
-MARR = Mariage
-OCCU = Profession
+MARR = Marriage
+OCCU = Occupation
 ORDN = Ordination
 NATU = Naturalisation
 EMIG = Emigration
@@ -275,3 +278,5 @@ importGedcom.place.field.Locality = Locality
 importGedcom.choosePlaceElements.title = Map subdivisions from GEDCOM file to database fields
 
 AddIndividualToFamily.checkYourAnswers.title = Add a Partner to a family
+
+firstnamesPage.caption = Surname {0}

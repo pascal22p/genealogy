@@ -18,13 +18,15 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.*
 import play.api.test.Helpers.*
 import services.DescendanceService
+import services.GenealogyDatabaseService
 import testUtils.BaseSpec
 import testUtils.FakeAuthAction
 
 class DescendanceControllerSpec extends BaseSpec {
-  val userData: UserData                         = UserData(1, "username", "hashedPassword", true, true)
-  val fakeAuthAction: FakeAuthAction             = new FakeAuthAction(Session("id", SessionData(Some(userData)), LocalDateTime.now))
-  val mockDescendanceService: DescendanceService = mock[DescendanceService]
+  val userData: UserData                                     = UserData(1, "username", "hashedPassword", true, true)
+  val fakeAuthAction: FakeAuthAction                         = new FakeAuthAction(Session("id", SessionData(Some(userData)), LocalDateTime.now))
+  val mockDescendanceService: DescendanceService             = mock[DescendanceService]
+  val mockGenealogyDatabaseService: GenealogyDatabaseService = mock[GenealogyDatabaseService]
 
   val personD: Person =
     Person(
@@ -78,7 +80,8 @@ class DescendanceControllerSpec extends BaseSpec {
     GuiceApplicationBuilder()
       .overrides(
         bind[AuthAction].toInstance(fakeAuthAction),
-        bind[DescendanceService].toInstance(mockDescendanceService)
+        bind[DescendanceService].toInstance(mockDescendanceService),
+        bind[GenealogyDatabaseService].toInstance(mockGenealogyDatabaseService)
       )
 
   val sut: DescendanceController = app.injector.instanceOf[DescendanceController]
@@ -88,7 +91,9 @@ class DescendanceControllerSpec extends BaseSpec {
       when(mockDescendanceService.getDescendant(any(), any())).thenReturn(
         Future.successful(Some(personA))
       )
-
+      when(mockGenealogyDatabaseService.getGenealogyDatabase(any())).thenReturn(
+        Future.successful(Some(models.GenealogyDatabase(1, "Name", "Path", None)))
+      )
       val expected =
         """
           |<divclass="govuk-!-padding-4box">

@@ -14,6 +14,7 @@ import play.api.i18n.*
 import play.api.mvc.*
 import queries.GetSqlQueries
 import queries.InsertSqlQueries
+import services.GenealogyDatabaseService
 import views.html.add.AddSourCitation
 import views.html.ServiceUnavailable
 
@@ -22,6 +23,7 @@ class AddSourCitationController @Inject() (
     authJourney: AuthJourney,
     insertSqlQueries: InsertSqlQueries,
     getSqlQueries: GetSqlQueries,
+    genealogyDatabaseService: GenealogyDatabaseService,
     addSourCitationView: AddSourCitation,
     serviceUnavailableView: ServiceUnavailable,
     val controllerComponents: ControllerComponents
@@ -32,17 +34,23 @@ class AddSourCitationController @Inject() (
 
   def showForm(baseId: Int, ownerId: Int, sourCitationType: SourCitationType): Action[AnyContent] =
     authJourney.authWithAdminRight.async { implicit authenticatedRequest: AuthenticatedRequest[AnyContent] =>
-      getSqlQueries.getAllSourRecords.map { records =>
+      for {
+        database <- genealogyDatabaseService.getGenealogyDatabase(baseId)
+        records  <- getSqlQueries.getAllSourRecords
+      } yield {
         val form = SourCitationForm.sourCitationForm
-        Ok(addSourCitationView(form, baseId, ownerId, sourCitationType, records))
+        Ok(addSourCitationView(form, database, ownerId, sourCitationType, records))
       }
     }
 
   def onSubmit(baseId: Int, ownerId: Int, sourCitationType: SourCitationType): Action[AnyContent] =
     authJourney.authWithAdminRight.async { implicit authenticatedRequest =>
       val errorFunction: Form[SourCitationForm] => Future[Result] = { (formWithErrors: Form[SourCitationForm]) =>
-        getSqlQueries.getAllSourRecords.map { records =>
-          BadRequest(addSourCitationView(formWithErrors, baseId, ownerId, sourCitationType, records))
+        for {
+          database <- genealogyDatabaseService.getGenealogyDatabase(baseId)
+          records  <- getSqlQueries.getAllSourRecords
+        } yield {
+          BadRequest(addSourCitationView(formWithErrors, database, ownerId, sourCitationType, records))
         }
       }
 

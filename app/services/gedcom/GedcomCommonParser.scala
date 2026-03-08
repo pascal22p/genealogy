@@ -66,7 +66,7 @@ class GedcomCommonParser @Inject() () {
       .toSet
 
     (for {
-      separator    <- separatorOption
+      separator    <- separatorOption.map(_.head) // convert to char to avoid using .split with a regex
       paddingOrder <- paddingOrderOption
     } yield {
       val splitLines = uniquePlaces.map(_.split(separator).map(_.trim).toList)

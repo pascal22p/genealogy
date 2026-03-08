@@ -15,9 +15,11 @@
         formWithCSRF: FormWithCSRF
 )
 
-@(dbId: Int, personDetailsForm: Form[PersonDetailsForm])(implicit request: AuthenticatedRequest[?], messages: Messages)
+@(database: Option[GenealogyDatabase], personDetailsForm: Form[PersonDetailsForm])(implicit request: AuthenticatedRequest[?], messages: Messages)
 
-@main(1) {
+@dbId = @{ database.fold(0)(_.id) }
+
+@main(database) {
 
 
   @block("Edit person details") {

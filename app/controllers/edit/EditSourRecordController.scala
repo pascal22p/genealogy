@@ -20,6 +20,7 @@ import play.api.mvc.BaseController
 import play.api.mvc.ControllerComponents
 import play.api.mvc.Result
 import queries.UpdateSqlQueries
+import services.GenealogyDatabaseService
 import services.SourCitationService
 import services.SourRecordService
 import views.html.edit.EditSourRecord
@@ -30,6 +31,7 @@ class EditSourRecordController @Inject() (
     authJourney: AuthJourney,
     sourRecordService: SourRecordService,
     sourCitationService: SourCitationService,
+    genealogyDatabaseService: GenealogyDatabaseService,
     updateSqlQueries: UpdateSqlQueries,
     sourRecordView: EditSourRecord,
     serviceUnavailableView: ServiceUnavailable,
@@ -48,14 +50,18 @@ class EditSourRecordController @Inject() (
     authJourney.authWithAdminRight.async { implicit request =>
       handleSourRecord(sourRecordId) { sourRecord =>
         val form = SourRecordForm.sourRecordForm.fill(sourRecord.toForm(sourCitationId, sourCitationType))
-        Future.successful(Ok(sourRecordView(baseId, form, sourRecord)))
+        genealogyDatabaseService.getGenealogyDatabase(baseId).map { database =>
+          Ok(sourRecordView(database, form, sourRecord))
+        }
       }
     }
 
   def onSubmit(baseId: Int, sourRecordId: Int) = authJourney.authWithAdminRight.async { implicit request =>
     def errorFunction(formWithErrors: Form[SourRecordForm]): Future[Result] = {
       handleSourRecord(sourRecordId) { sourRecord =>
-        Future.successful(BadRequest(sourRecordView(baseId, formWithErrors, sourRecord)))
+        genealogyDatabaseService.getGenealogyDatabase(baseId).map { database =>
+          BadRequest(sourRecordView(database, formWithErrors, sourRecord))
+        }
       }
     }
 

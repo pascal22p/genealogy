@@ -17,7 +17,9 @@ govukButton: GovukButton,
 govukErrorSummary: GovukErrorSummary
 )(implicit appConfig: AppConfig)
 
-@(dbId: Int, allFamilies: List[Family], person: Person, familyForm: Form[LinkForm])(implicit request: AuthenticatedRequest[?], messages: Messages)
+@(database: Option[GenealogyDatabase], allFamilies: List[Family], person: Person, familyForm: Form[LinkForm])(implicit request: AuthenticatedRequest[?], messages: Messages)
+
+@dbId = @{ database.fold(0)(_.id) }
 
 @familyItem(family: Family): String = @{
     val partner1 = family.parent1.fold("") { person =>
@@ -32,7 +34,7 @@ govukErrorSummary: GovukErrorSummary
     partner1 + partner2 + children
 }
 
-@main(dbId) {
+@main(database) {
 
 
 @block(messages("add.existing.family.title", person.details.shortName)) {

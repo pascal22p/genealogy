@@ -16,9 +16,11 @@
         govukErrorSummary: GovukErrorSummary
 )
 
-@(dbId: Int, personDetailsForm: Form[PersonDetailsForm])(implicit request: AuthenticatedRequest[?], messages: Messages)
+@(database: Option[GenealogyDatabase], personDetailsForm: Form[PersonDetailsForm])(implicit request: AuthenticatedRequest[?], messages: Messages)
 
-@main(dbId) {
+@dbId = @{ database.fold(0)(_.id) }
+
+@main(database) {
 
 
   @block("Add new person details") {

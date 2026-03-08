@@ -8,6 +8,7 @@ import actions.AuthAction
 import models.Attributes
 import models.EventType.IndividualEvent
 import models.Events
+import models.GenealogyDatabase
 import models.Person
 import models.ResnType.PrivacyResn
 import models.Session
@@ -22,20 +23,23 @@ import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.*
 import play.api.test.Helpers.*
+import services.GenealogyDatabaseService
 import services.PersonService
 import testUtils.BaseSpec
 import testUtils.FakeAuthAction
 
 class individualControllerSpec extends BaseSpec {
-  val userData: UserData               = UserData(1, "username", "hashedPassword", true, true)
-  val fakeAuthAction: FakeAuthAction   = new FakeAuthAction(Session("id", SessionData(Some(userData)), LocalDateTime.now))
-  val mockPersonService: PersonService = mock[PersonService]
+  val userData: UserData                                     = UserData(1, "username", "hashedPassword", true, true)
+  val fakeAuthAction: FakeAuthAction                         = new FakeAuthAction(Session("id", SessionData(Some(userData)), LocalDateTime.now))
+  val mockPersonService: PersonService                       = mock[PersonService]
+  val mockGenealogyDatabaseService: GenealogyDatabaseService = mock[GenealogyDatabaseService]
 
   protected override def localGuiceApplicationBuilder(): GuiceApplicationBuilder =
     GuiceApplicationBuilder()
       .overrides(
         bind[AuthAction].toInstance(fakeAuthAction),
-        bind[PersonService].toInstance(mockPersonService)
+        bind[PersonService].toInstance(mockPersonService),
+        bind[GenealogyDatabaseService].toInstance(mockGenealogyDatabaseService)
       )
 
   val sut: IndividualController = app.injector.instanceOf[IndividualController]
@@ -54,7 +58,9 @@ class individualControllerSpec extends BaseSpec {
             )
           )
         )
-
+        when(mockGenealogyDatabaseService.getGenealogyDatabase(any())).thenReturn(
+          Future.successful(Some(GenealogyDatabase(1, "name", "description", None)))
+        )
         val result = sut.showPerson(1, 1).apply(FakeRequest().withHeaders(("seePrivacy", "true")))
         status(result) mustBe OK
         val html = Jsoup.parse(contentAsString(result))
@@ -73,6 +79,9 @@ class individualControllerSpec extends BaseSpec {
             )
           )
         )
+      )
+      when(mockGenealogyDatabaseService.getGenealogyDatabase(any())).thenReturn(
+        Future.successful(Some(GenealogyDatabase(1, "name", "description", None)))
       )
 
       val result = sut.showPerson(1, 1).apply(FakeRequest().withHeaders(("seePrivacy", "false")))
@@ -94,6 +103,9 @@ class individualControllerSpec extends BaseSpec {
           )
         )
       )
+      when(mockGenealogyDatabaseService.getGenealogyDatabase(any())).thenReturn(
+        Future.successful(Some(GenealogyDatabase(1, "name", "description", None)))
+      )
 
       val result = sut.showPerson(1, 1).apply(FakeRequest().withHeaders(("seePrivacy", "false")))
       status(result) mustBe FORBIDDEN
@@ -111,6 +123,9 @@ class individualControllerSpec extends BaseSpec {
           )
         )
       )
+      when(mockGenealogyDatabaseService.getGenealogyDatabase(any())).thenReturn(
+        Future.successful(Some(GenealogyDatabase(1, "name", "description", None)))
+      )
 
       val result = sut.showPerson(1, 1).apply(FakeRequest().withHeaders(("userData", "false")))
       status(result) mustBe FORBIDDEN
@@ -120,6 +135,9 @@ class individualControllerSpec extends BaseSpec {
   "returns not found" in {
     when(mockPersonService.getPerson(any(), any[Boolean], any[Boolean], any[Boolean])).thenReturn(
       Future.successful(None)
+    )
+    when(mockGenealogyDatabaseService.getGenealogyDatabase(any())).thenReturn(
+      Future.successful(Some(GenealogyDatabase(1, "name", "description", None)))
     )
 
     val result = sut.showPerson(1, 1).apply(FakeRequest())

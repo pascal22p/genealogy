@@ -11,9 +11,11 @@
         govukButton: GovukButton
 )
 
-@(dbId: Int, sourCitation: SourCitation)(implicit request: AuthenticatedRequest[?], messages: Messages)
+@(database: Option[GenealogyDatabase], sourCitation: SourCitation)(implicit request: AuthenticatedRequest[?], messages: Messages)
 
-@main(1) {
+@dbId = @{ database.fold(0)(_.id) }
+
+@main(database) {
 
 @oneSourCitation(dbId, sourCitation)
 

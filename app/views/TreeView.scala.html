@@ -7,21 +7,22 @@
         subNavigation: SubNavigation
 )
 
-@(dbId: Int, person: Person, depth: Int)(implicit request: AuthenticatedRequest[?], messages: Messages)
+@(database: Option[GenealogyDatabase], person: Person, depth: Int)(implicit request: AuthenticatedRequest[?], messages: Messages)
 
+@dbId = @{ database.fold(0)(_.id) }
 
 @breadcrumbs = @{
   Breadcrumbs(
     items = Seq(
       BreadcrumbsItem(
-        content = Text(person.shortName),
-        href = Some(controllers.routes.IndividualController.showPerson(dbId, person.details.id).url)
+        content = Text(s"Surname ${person.details.surname}"),
+        href = Some(controllers.routes.HomeController.showFirstnames(database.fold(0)(_.id), person.details.surname).url)
       )
     )
   )
 }
 
-@main(dbId, person.name, Some(breadcrumbs)) {
+@main(database, breadcrumbs = Some(breadcrumbs), caption = Some(person.name)) {
 
 @subNavigation("Tree", dbId, person.details.id)
 @block("Tree view", Some(Actions(

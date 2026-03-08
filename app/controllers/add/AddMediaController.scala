@@ -12,6 +12,7 @@ import actions.AuthJourney
 import models.Media
 import models.MediaType
 import play.api.i18n.I18nSupport
+import services.GenealogyDatabaseService
 import play.api.libs.Files
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
@@ -28,6 +29,7 @@ class AddMediaController @Inject() (
     authJourney: AuthJourney,
     getSqlQueries: GetSqlQueries,
     insertSqlQueries: InsertSqlQueries,
+    genealogyDatabaseService: GenealogyDatabaseService,
     addMediaView: AddMedia,
     serviceUnavailableView: ServiceUnavailable,
     val controllerComponents: ControllerComponents
@@ -36,7 +38,9 @@ class AddMediaController @Inject() (
     with I18nSupport {
 
   def showForm(baseId: Int): Action[AnyContent] = authJourney.authWithAdminRight.async { implicit request =>
-    Future.successful(Ok(addMediaView(baseId)))
+    genealogyDatabaseService.getGenealogyDatabase(baseId).map { database =>
+      Ok(addMediaView(database))
+    }
   }
 
   def upload(baseId: Int): Action[MultipartFormData[Files.TemporaryFile]] =

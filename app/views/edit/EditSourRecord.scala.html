@@ -11,9 +11,11 @@
         block: Block
 )
 
-@(dbId: Int, sourRecordForm: Form[SourRecordForm], sourRecord: SourRecord)(implicit request: AuthenticatedRequest[?], messages: Messages)
+@(database: Option[GenealogyDatabase], sourRecordForm: Form[SourRecordForm], sourRecord: SourRecord)(implicit request: AuthenticatedRequest[?], messages: Messages)
 
-@main(1) {
+@dbId = @{ database.fold(0)(_.id) }
+
+@main(database) {
 
     @block("Edit source record") {
 

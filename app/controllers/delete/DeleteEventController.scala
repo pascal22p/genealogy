@@ -14,6 +14,7 @@ import play.api.i18n.*
 import play.api.mvc.*
 import queries.DeleteSqlQueries
 import services.EventService
+import services.GenealogyDatabaseService
 import views.html.delete.DeleteEventView
 
 @Singleton
@@ -22,6 +23,7 @@ class DeleteEventController @Inject() (
     deleteEventView: DeleteEventView,
     deleteSqlQueries: DeleteSqlQueries,
     eventService: EventService,
+    genealogyDatabaseService: GenealogyDatabaseService,
     val controllerComponents: ControllerComponents
 )(
     implicit ec: ExecutionContext
@@ -30,9 +32,12 @@ class DeleteEventController @Inject() (
 
   def deleteEventConfirmation(baseId: Int, id: Int): Action[AnyContent] = authJourney.authWithAdminRight.async {
     implicit authenticatedRequest: AuthenticatedRequest[AnyContent] =>
-      OptionT(eventService.getEvent(id)).fold(NotFound("Nothing here")) { event =>
-        Ok(deleteEventView(baseId, Events(List(event), None, UnknownEvent)))
-      }
+      (for {
+        database <- OptionT(genealogyDatabaseService.getGenealogyDatabase(baseId))
+        event    <- OptionT(eventService.getEvent(id))
+      } yield {
+        Ok(deleteEventView(Some(database), Events(List(event), None, UnknownEvent)))
+      }).getOrElse(NotFound("Database or event not found"))
   }
 
   def deleteEventAction(baseId: Int, id: Int): Action[AnyContent] = authJourney.authWithAdminRight.async {

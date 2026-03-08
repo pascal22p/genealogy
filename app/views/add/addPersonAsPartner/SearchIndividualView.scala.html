@@ -15,13 +15,12 @@
   govukErrorSummary: GovukErrorSummary
 )
 
-@(dbId: Int,
+@(database: Option[GenealogyDatabase],
   form: Form[StringForm]
 )(implicit authenticatedRequest: AuthenticatedRequest[?], messages: Messages)
 
 @main(
-  dbId = dbId,
-  title = "Search individual",
+  database = database,
   breadcrumbs = None
 ) {
 

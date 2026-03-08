@@ -13,9 +13,11 @@
     govukErrorSummary: GovukErrorSummary
 )
 
-@(dbId: Int, person: Person, form: Form[TrueOrFalseForm])(implicit request: AuthenticatedRequest[?], messages: Messages, appConfig: AppConfig)
+@(database: Option[GenealogyDatabase], person: Person, form: Form[TrueOrFalseForm])(implicit request: AuthenticatedRequest[?], messages: Messages, appConfig: AppConfig)
 
-@main(1) {
+@dbId = @{ database.fold(0)(_.id) }
+
+@main(database) {
 
 
 @block(s"Add ${person.details.shortName} (${person.events.birthAndDeathDate()}) to a family") {

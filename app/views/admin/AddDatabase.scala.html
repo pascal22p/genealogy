@@ -17,7 +17,7 @@
 
 @(databaseForm: Form[CreateNewDatabaseForm], onSubmit: Call)(implicit request: AuthenticatedRequest[?], messages: Messages)
 
-@main(1, title = messages("addDatabase.title")) {
+@main(None) {
 
 
   @block("Add a new database") {

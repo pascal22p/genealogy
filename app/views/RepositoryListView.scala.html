@@ -8,7 +8,9 @@
         govukSummaryList: GovukSummaryList
 )
 
-@(dbId: Int, repos: List[RepositoryQueryData])(implicit request: AuthenticatedRequest[?], messages: Messages)
+@(database: Option[GenealogyDatabase], repos: List[RepositoryQueryData])(implicit request: AuthenticatedRequest[?], messages: Messages)
+
+@dbId = @{ database.fold(0)(_.id) }
 
 @addressContent(address: AddressQueryData) = {
   <ul class="govuk-list">
@@ -20,7 +22,7 @@
   </ul>
 }
 
-@main(1, title = messages("mediaList.title")) {
+@main(database) {
 
   @govukSummaryList(
     SummaryList(

@@ -11,7 +11,9 @@
         govukButton: GovukButton
 )
 
-@(dbId: Int, media: Media)(implicit request: AuthenticatedRequest[?], messages: Messages)
+@(database: Option[GenealogyDatabase], media: Media)(implicit request: AuthenticatedRequest[?], messages: Messages)
+
+@dbId = @{ database.fold(0)(_.id) }
 
 @keyContent(media: Media): String = @{
   if(media.title.isEmpty) {
@@ -21,7 +23,7 @@
   }
 }
 
-@main(1) {
+@main(database) {
 
 @govukSummaryList(
   SummaryList(

@@ -12,19 +12,20 @@
         block: Block
 )
 
-@(db: GenealogyDatabase)(implicit request: AuthenticatedRequest[?], messages: Messages)
+@(database: Option[GenealogyDatabase])(implicit request: AuthenticatedRequest[?], messages: Messages)
 
-@main(db.id, title = messages("add.index.title", db.name)) {
+@dbId = @{ database.fold(0)(_.id) }
+
+@main(database) {
 
 
     @block(messages("Add")) {
         <ul class="govuk-list">
-            <li><a class="govuk-link" href="@controllers.add.routes.AddDatabaseController.showForm.url">Add a new database</a></li>
-            <li><a class="govuk-link" href="@controllers.add.routes.AddPersonDetailsController.showForm(db.id).url">Add a new person</a></li>
+            <li><a class="govuk-link" href="@controllers.add.routes.AddPersonDetailsController.showForm(dbId).url">Add a new person</a></li>
             <li>Add a new family</li>
             <li>Add a new source record</li>
-            <li><a class="govuk-link" href="@controllers.add.routes.AddRepositoryController.showForm(db.id).url">Add a new repository</a></li>
-            <li><a class="govuk-link" href="@controllers.add.routes.AddMediaController.showForm(db.id).url">Add a new media</a></li>
+            <li><a class="govuk-link" href="@controllers.add.routes.AddRepositoryController.showForm(dbId).url">Add a new repository</a></li>
+            <li><a class="govuk-link" href="@controllers.add.routes.AddMediaController.showForm(dbId).url">Add a new media</a></li>
         </ul>
     }
 }

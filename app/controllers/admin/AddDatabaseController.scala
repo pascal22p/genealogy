@@ -1,4 +1,4 @@
-package controllers.add
+package controllers.admin
 
 import javax.inject.*
 
@@ -12,7 +12,7 @@ import play.api.data.Form
 import play.api.i18n.*
 import play.api.mvc.*
 import queries.InsertSqlQueries
-import views.html.add.AddDatabase
+import views.html.admin.AddDatabase
 import views.html.ServiceUnavailable
 
 @Singleton
@@ -27,7 +27,7 @@ class AddDatabaseController @Inject() (
 ) extends BaseController
     with I18nSupport {
 
-  private val onSubmitDestination: Call = controllers.add.routes.AddDatabaseController.onSubmit
+  private val onSubmitDestination: Call = controllers.admin.routes.AddDatabaseController.onSubmit
 
   def showForm: Action[AnyContent] = authJourney.authWithAdminRight.async {
     implicit authenticatedRequest: AuthenticatedRequest[AnyContent] =>
