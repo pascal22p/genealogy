@@ -19,19 +19,22 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.*
 import play.api.test.Helpers.*
 import services.AscendanceService
+import services.GenealogyDatabaseService
 import testUtils.BaseSpec
 import testUtils.FakeAuthAction
 
 class AscendanceControllerSpec extends BaseSpec {
-  val userData: UserData                            = UserData(1, "username", "hashedPassword", true, true)
-  val fakeAuthAction: FakeAuthAction                = new FakeAuthAction(Session("id", SessionData(Some(userData)), LocalDateTime.now))
-  lazy val mockAscendanceService: AscendanceService = mock[AscendanceService]
+  val userData: UserData                                          = UserData(1, "username", "hashedPassword", true, true)
+  val fakeAuthAction: FakeAuthAction                              = new FakeAuthAction(Session("id", SessionData(Some(userData)), LocalDateTime.now))
+  lazy val mockAscendanceService: AscendanceService               = mock[AscendanceService]
+  lazy val mockGenealogyDatabaseService: GenealogyDatabaseService = mock[GenealogyDatabaseService]
 
   protected override def localGuiceApplicationBuilder(): GuiceApplicationBuilder =
     GuiceApplicationBuilder()
       .overrides(
         bind[AuthAction].toInstance(fakeAuthAction),
-        bind[AscendanceService].toInstance(mockAscendanceService)
+        bind[AscendanceService].toInstance(mockAscendanceService),
+        bind[GenealogyDatabaseService].toInstance(mockGenealogyDatabaseService)
       )
 
   val sut: AscendanceController = app.injector.instanceOf[AscendanceController]
@@ -95,6 +98,9 @@ class AscendanceControllerSpec extends BaseSpec {
 
       when(mockAscendanceService.getAscendant(any(), any())).thenReturn(
         Future.successful(Some(personA))
+      )
+      when(mockGenealogyDatabaseService.getGenealogyDatabase(any())).thenReturn(
+        Future.successful(Some(GenealogyDatabase(1, "name", "description", None)))
       )
 
       val result      = sut.showAscendantList(1, 1).apply(FakeRequest())
@@ -184,6 +190,9 @@ class AscendanceControllerSpec extends BaseSpec {
 
       when(mockAscendanceService.getAscendant(any(), any())).thenReturn(
         Future.successful(Some(personA))
+      )
+      when(mockGenealogyDatabaseService.getGenealogyDatabase(any())).thenReturn(
+        Future.successful(Some(GenealogyDatabase(1, "name", "description", None)))
       )
 
       val result      = sut.showAscendantList(1, 1).apply(FakeRequest())
