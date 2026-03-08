@@ -87,6 +87,10 @@
     <script type="module" src="@{assetConfig.hmrcFrontendJsUrl}"></script>
     <link rel="stylesheet" media="screen" href="@routes.AssetsController.get("stylesheets/main.css")">
 
+    @if(authenticatedRequest.request.uri.contains(controllers.routes.SessionController.loginOnLoad("").path.takeWhile(_ != '?'))) {
+        <link rel="canonical" href="@authenticatedRequest.request.host@controllers.routes.SessionController.loginOnLoad("").path.takeWhile(_ != '?')">
+    }
+
     @if(authenticatedRequest.localSession.sessionData.userData.isDefined){
       @timeoutDialog
     }
