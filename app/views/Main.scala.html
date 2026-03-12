@@ -89,6 +89,7 @@
 
     @if(authenticatedRequest.request.uri.contains(controllers.routes.SessionController.loginOnLoad("").path.takeWhile(_ != '?'))) {
         <link rel="canonical" href="@authenticatedRequest.request.host@controllers.routes.SessionController.loginOnLoad("").path.takeWhile(_ != '?')">
+        <meta name="robots" content="noindex">
     }
 
     @if(authenticatedRequest.localSession.sessionData.userData.isDefined){
