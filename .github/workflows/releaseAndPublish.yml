@@ -24,10 +24,10 @@ jobs:
           
     steps:
     - uses: actions/checkout@v6
-    - name: Set up JDK 21
+    - name: Set up JDK 25
       uses: actions/setup-java@v5
       with:
-        java-version: '21'
+        java-version: '25'
         distribution: 'temurin'
         cache: 'sbt'
     - name: Set up sbt
@@ -37,7 +37,7 @@ jobs:
       run: sbt test
       # Optional: This step uploads information to the GitHub dependency graph and unblocking Dependabot alerts for the repository
     - name: Upload dependency graph
-      uses: scalacenter/sbt-dependency-submission@9d03fb6346954712882d90ae686616fb65b5aef8
+      uses: scalacenter/sbt-dependency-submission@v2
 
     - name: Extract version
       id: version
