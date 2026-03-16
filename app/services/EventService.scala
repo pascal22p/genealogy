@@ -53,7 +53,6 @@ class EventService @Inject() (mariadbQueries: GetSqlQueries, sourCitationService
 
   def getEmptyEvents(dbId: Int): Future[List[EventDetail]] = {
     mariadbQueries.getEmptyEvents(dbId).map { events =>
-      println(events)
       events.map(event => EventDetail(event, none, List.empty))
     }
   }
