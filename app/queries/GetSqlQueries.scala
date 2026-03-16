@@ -10,8 +10,9 @@ import anorm.SqlParser.*
 import cats.data.OptionT
 import models.*
 import models.queryData.*
-import models.EventType.EventType
+import models.EventType
 import models.EventType.FamilyEvent
+import models.EventType.IndividualAttribute
 import models.EventType.IndividualEvent
 import models.EventType.UnknownEvent
 import models.MediaType.EventMedia
@@ -79,36 +80,43 @@ final class GetSqlQueries @Inject() (
     }
   }(using databaseExecutionContext)
 
+  @SuppressWarnings(Array("org.wartremover.warts.ToString"))
   def getEvents(id: Int, eventType: EventType): Future[List[EventDetailQueryData]] = Future {
     db.withConnection { implicit conn =>
       val where = eventType match {
-        case _: IndividualEvent.type => "WHERE rel_indi_events.indi_id = {id}"
-        case _: FamilyEvent.type     => "WHERE rel_familles_events.familles_id = {id}"
-        case _                       => "WHERE genea_events_details.events_details_id = {id}"
+        case _: IndividualEvent.type     => "WHERE rel_indi_events.indi_id = {id}"
+        case _: IndividualAttribute.type => "WHERE rel_indi_attributes.indi_id = {id}"
+        case _: FamilyEvent.type         => "WHERE rel_familles_events.familles_id = {id}"
+        case _                           => "WHERE genea_events_details.events_details_id = {id}"
       }
       SQL(s"""SELECT genea_events_details.*, rel_indi_events.*, rel_familles_events.*, r.sourCount,
              |       CASE
-             |           WHEN rel_indi_events.indi_id IS NOT NULL THEN CONCAT(genea_individuals.indi_prenom, ' ', genea_individuals.indi_nom)
+             |           WHEN rel_indi_events.indi_id IS NOT NULL THEN CONCAT(indis_events.indi_prenom, ' ', indis_events.indi_nom)
+             |           WHEN rel_indi_attributes.indi_id IS NOT NULL THEN CONCAT(indis_attributes.indi_prenom, ' ', indis_attributes.indi_nom)
              |           WHEN rel_familles_events.familles_id IS NOT NULL THEN CONCAT(husb.indi_nom, ' - ', wife.indi_nom)
              |           ELSE NULL
              |       END AS description,
              |       CASE
              |           WHEN rel_indi_events.indi_id IS NOT NULL THEN rel_indi_events.events_tag
+             |           WHEN rel_indi_attributes.indi_id IS NOT NULL THEN rel_indi_attributes.events_tag
              |           WHEN rel_familles_events.familles_id IS NOT NULL THEN rel_familles_events.events_tag
              |           ELSE NULL
              |       END AS tag,
              |       CASE
-             |           WHEN rel_indi_events.indi_id IS NOT NULL THEN "${IndividualEvent.toString}"
+             |           WHEN rel_indi_events.indi_id IS NOT NULL THEN "$IndividualEvent"
+             |           WHEN rel_indi_attributes.indi_id IS NOT NULL THEN "$IndividualAttribute"
              |           WHEN rel_familles_events.familles_id IS NOT NULL THEN "${FamilyEvent.toString}"
-             |           ELSE "${UnknownEvent.toString}"
+             |           ELSE "$UnknownEvent"
              |       END AS event_type,
              |       CASE
              |           WHEN rel_indi_events.indi_id IS NOT NULL THEN rel_indi_events.indi_id
+             |           WHEN rel_indi_attributes.indi_id IS NOT NULL THEN rel_indi_attributes.indi_id
              |           WHEN rel_familles_events.familles_id IS NOT NULL THEN rel_familles_events.familles_id
              |           ELSE NULL
              |       END AS ownerId,
              |       CASE
-             |           WHEN rel_indi_events.indi_id IS NOT NULL THEN genea_individuals.indi_resn
+             |           WHEN rel_indi_events.indi_id IS NOT NULL THEN indis_events.indi_resn
+             |           WHEN rel_indi_attributes.indi_id IS NOT NULL THEN indis_attributes.indi_resn
              |           WHEN rel_familles_events.familles_id IS NOT NULL THEN genea_familles.familles_resn
              |           ELSE NULL
              |       END AS resn
@@ -116,8 +124,12 @@ final class GetSqlQueries @Inject() (
              |FROM `genea_events_details`
              |LEFT JOIN `rel_indi_events`
              |ON genea_events_details.events_details_id = rel_indi_events.events_details_id
-             |LEFT JOIN genea_individuals
-             |ON genea_individuals.indi_id = rel_indi_events.indi_id
+             |LEFT JOIN `rel_indi_attributes`
+             |ON genea_events_details.events_details_id = rel_indi_attributes.events_details_id
+             |LEFT JOIN genea_individuals AS indis_events
+             |ON indis_events.indi_id = rel_indi_events.indi_id
+             |LEFT JOIN genea_individuals AS indis_attributes
+             |ON indis_attributes.indi_id = rel_indi_attributes.indi_id
              |LEFT JOIN `rel_familles_events`
              |ON genea_events_details.events_details_id = rel_familles_events.events_details_id
              |LEFT JOIN `genea_familles`
@@ -591,6 +603,75 @@ final class GetSqlQueries @Inject() (
             |""".stripMargin)
         .on("baseId" -> baseId)
         .as[List[EventDetailQueryData]](EventDetailQueryData.mysqlParserEventDetailOnly.*)
+    }
+  }(using databaseExecutionContext)
+
+  @SuppressWarnings(Array("org.wartremover.warts.ToString"))
+  def getEmptyEvents(baseId: Int): Future[List[EventDetailQueryData]] = Future {
+    db.withConnection { implicit conn =>
+      SQL(s"""SELECT genea_events_details.*, rel_indi_events.*, rel_familles_events.*, r.sourCount,
+             |       CASE
+             |           WHEN rel_indi_events.indi_id IS NOT NULL THEN CONCAT(indis_events.indi_prenom, ' ', indis_events.indi_nom)
+             |           WHEN rel_indi_attributes.indi_id IS NOT NULL THEN CONCAT(indis_attributes.indi_prenom, ' ', indis_attributes.indi_nom)
+             |           WHEN rel_familles_events.familles_id IS NOT NULL THEN CONCAT(husb.indi_nom, ' - ', wife.indi_nom)
+             |           ELSE NULL
+             |       END AS description,
+             |       CASE
+             |           WHEN rel_indi_events.indi_id IS NOT NULL THEN rel_indi_events.events_tag
+             |           WHEN rel_indi_attributes.indi_id IS NOT NULL THEN rel_indi_attributes.events_tag
+             |           WHEN rel_familles_events.familles_id IS NOT NULL THEN rel_familles_events.events_tag
+             |           ELSE NULL
+             |       END AS tag,
+             |       CASE
+             |           WHEN rel_indi_events.indi_id IS NOT NULL THEN "$IndividualEvent"
+             |           WHEN rel_indi_attributes.indi_id IS NOT NULL THEN "$IndividualAttribute"
+             |           WHEN rel_familles_events.familles_id IS NOT NULL THEN "${FamilyEvent.toString}"
+             |           ELSE "$UnknownEvent"
+             |       END AS event_type,
+             |       CASE
+             |           WHEN rel_indi_events.indi_id IS NOT NULL THEN rel_indi_events.indi_id
+             |           WHEN rel_indi_attributes.indi_id IS NOT NULL THEN rel_indi_attributes.indi_id
+             |           WHEN rel_familles_events.familles_id IS NOT NULL THEN rel_familles_events.familles_id
+             |           ELSE NULL
+             |       END AS ownerId,
+             |       CASE
+             |           WHEN rel_indi_events.indi_id IS NOT NULL THEN indis_events.indi_resn
+             |           WHEN rel_indi_attributes.indi_id IS NOT NULL THEN indis_attributes.indi_resn
+             |           WHEN rel_familles_events.familles_id IS NOT NULL THEN genea_familles.familles_resn
+             |           ELSE NULL
+             |       END AS resn
+             |
+             |FROM `genea_events_details`
+             |LEFT JOIN `rel_indi_events`
+             |ON genea_events_details.events_details_id = rel_indi_events.events_details_id
+             |LEFT JOIN `rel_indi_attributes`
+             |ON genea_events_details.events_details_id = rel_indi_attributes.events_details_id
+             |LEFT JOIN genea_individuals AS indis_events
+             |ON indis_events.indi_id = rel_indi_events.indi_id
+             |LEFT JOIN genea_individuals AS indis_attributes
+             |ON indis_attributes.indi_id = rel_indi_attributes.indi_id
+             |LEFT JOIN `rel_familles_events`
+             |ON genea_events_details.events_details_id = rel_familles_events.events_details_id
+             |LEFT JOIN `genea_familles`
+             |ON  genea_familles.familles_id = rel_familles_events.familles_id
+             |LEFT JOIN `genea_individuals` AS husb
+             |ON husb.indi_id = genea_familles.familles_husb
+             |LEFT JOIN `genea_individuals` AS wife
+             |ON wife.indi_id = genea_familles.familles_wife
+             |LEFT JOIN (
+             |    SELECT events_details_id , count(*) AS sourCount FROM rel_events_sources GROUP BY rel_events_sources.events_details_id
+             | ) r ON r.events_details_id = genea_events_details.events_details_id
+             |
+             | WHERE (events_details_descriptor IS NULL OR events_details_descriptor = '')
+             | AND (events_details_gedcom_date IS NULL OR events_details_gedcom_date = '')
+             | AND (events_details_age IS NULL OR events_details_age = '')
+             | AND (events_details_cause IS NULL OR events_details_cause = '')
+             | AND events_details_famc IS NULL
+             | AND (events_details_adop IS NULL OR events_details_adop = '')
+             | AND genea_events_details.base = {baseId}
+             |""".stripMargin)
+        .on("baseId" -> baseId)
+        .as[List[EventDetailQueryData]](EventDetailQueryData.mysqlParser.*)
     }
   }(using databaseExecutionContext)
 

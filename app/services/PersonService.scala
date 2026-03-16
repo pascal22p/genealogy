@@ -64,6 +64,9 @@ class PersonService @Inject() (
     }
   }
 
+  def getPersonDetails(id: Int): Future[Option[PersonDetails]] =
+    personDetailsService.getPersonDetails(id)
+
   def getLatestPersons(
       dbId: Int,
       maxNumber: Int

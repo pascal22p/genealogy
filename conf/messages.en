@@ -186,6 +186,7 @@ ascendants.generation = Generation {0}
 descendants.title = Descendance of {0}
 
 event.details = Event details
+event.details.of = Event or attribute of
 
 list.of.databases = List of databases
 
@@ -203,6 +204,7 @@ problems.orphaned.individuals = Orphaned individuals
 problems.orphaned.families = Orphaned families
 problems.orphaned.medias = Orphaned medias
 problems.orphaned.events = Orphaned events
+problems.empty.events = Empty events
 problems.orphaned.sources = Orphaned source citations
 
 sourCitation.see.event = See Event

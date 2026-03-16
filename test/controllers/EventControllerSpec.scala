@@ -19,6 +19,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.*
 import play.api.test.Helpers.*
 import services.EventService
+import services.FamilyService
 import services.GenealogyDatabaseService
 import services.PersonService
 import testUtils.BaseSpec
@@ -30,6 +31,7 @@ class EventControllerSpec extends BaseSpec {
   val mockEventService: EventService                         = mock[EventService]
   val mockGenealogyDatabaseService: GenealogyDatabaseService = mock[GenealogyDatabaseService]
   val mockPersonService: PersonService                       = mock[PersonService]
+  val mockFamilyService: FamilyService                       = mock[FamilyService]
 
   protected override def localGuiceApplicationBuilder(): GuiceApplicationBuilder =
     GuiceApplicationBuilder()
@@ -37,7 +39,8 @@ class EventControllerSpec extends BaseSpec {
         bind[AuthAction].toInstance(fakeAuthAction),
         bind[EventService].toInstance(mockEventService),
         bind[GenealogyDatabaseService].toInstance(mockGenealogyDatabaseService),
-        bind[PersonService].toInstance(mockPersonService)
+        bind[PersonService].toInstance(mockPersonService),
+        bind[FamilyService].toInstance(mockFamilyService)
       )
 
   val sut: EventController = app.injector.instanceOf[EventController]
@@ -46,20 +49,22 @@ class EventControllerSpec extends BaseSpec {
     "display event details" when {
       "privacy is set and see_privacy is true" in {
         when(mockEventService.getEvent(any())).thenReturn(
-          Future.successful(Some(fakeEventDetail(privacyRestriction = Some(PrivacyResn), ownerId = Some(1))))
+          Future.successful(
+            Some(
+              fakeEventDetail(
+                privacyRestriction = Some(PrivacyResn),
+                ownerId = Some(1),
+                eventType = EventType.IndividualEvent
+              )
+            )
+          )
         )
         when(mockGenealogyDatabaseService.getGenealogyDatabase(any())).thenReturn(
           Future.successful(Some(GenealogyDatabase(1, "name", "description", None)))
         )
-        when(mockPersonService.getPerson(any(), any(), any(), any())).thenReturn(
+        when(mockPersonService.getPersonDetails(any())).thenReturn(
           Future.successful(
-            Some(
-              Person(
-                fakePersonDetails(),
-                Events(List.empty, None, EventType.UnknownEvent),
-                Attributes(List.empty, None, EventType.UnknownEvent)
-              )
-            )
+            Some(fakePersonDetails())
           )
         )
 
@@ -67,7 +72,8 @@ class EventControllerSpec extends BaseSpec {
         status(result) mustBe OK
         verify(mockEventService, times(1)).getEvent(any())
         verify(mockGenealogyDatabaseService, times(1)).getGenealogyDatabase(any())
-        verify(mockPersonService, times(1)).getPerson(any(), any(), any(), any())
+        verify(mockPersonService, times(1)).getPersonDetails(any())
+        verify(mockFamilyService, times(0)).getFamilyDetails(any(), any())
         val html = Jsoup.parse(contentAsString(result))
         html.getElementById("event-details") must not be null
       }

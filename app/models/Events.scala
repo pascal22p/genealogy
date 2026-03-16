@@ -5,7 +5,7 @@ import play.api.i18n.Messages
 import play.twirl.api.Html
 import utils.GedcomDateLibrary
 
-final case class Events(eventsDetails: List[EventDetail], ownerId: Option[Int], ownerType: EventType.EventType)
+final case class Events(eventsDetails: List[EventDetail], ownerId: Option[Int], ownerType: EventType)
     extends EventsOrAttributes {
 
   def birthAndDeathDate(shortMonth: Boolean = false)(

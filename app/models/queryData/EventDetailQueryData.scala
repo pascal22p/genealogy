@@ -5,7 +5,6 @@ import java.time.Instant
 import anorm.*
 import anorm.SqlParser.*
 import models.EventType
-import models.EventType.EventType
 import models.EventType.UnknownEvent
 import models.ResnType
 

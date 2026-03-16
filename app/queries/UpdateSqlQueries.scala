@@ -10,6 +10,7 @@ import anorm.*
 import models.*
 import models.queryData.FamilyQueryData
 import models.EventType.FamilyEvent
+import models.EventType.IndividualAttribute
 import models.EventType.IndividualEvent
 import models.EventType.UnknownEvent
 import play.api.db.Database
@@ -92,6 +93,18 @@ final class UpdateSqlQueries @Inject() (db: Database, databaseExecutionContext: 
             .executeUpdate()
         case _: IndividualEvent.type =>
           SQL("""UPDATE rel_indi_events
+                |SET events_tag = {tag},
+                |timestamp = {timestamp}
+                |WHERE events_details_id = {id}
+                |""".stripMargin)
+            .on(
+              "id"        -> event.events_details_id,
+              "tag"       -> event.tag,
+              "timestamp" -> Instant.now
+            )
+            .executeUpdate()
+        case _: IndividualAttribute.type =>
+          SQL("""UPDATE rel_indi_attributes
                 |SET events_tag = {tag},
                 |timestamp = {timestamp}
                 |WHERE events_details_id = {id}

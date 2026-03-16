@@ -14,7 +14,7 @@
   implicit appConfig: AppConfig
 )
 
-@(event: EventDetail, database: Option[GenealogyDatabase])(implicit request: AuthenticatedRequest[?], messages: Messages)
+@(event: EventDetail, owner:(String, Option[String]), database: Option[GenealogyDatabase])(implicit request: AuthenticatedRequest[?], messages: Messages)
 
 @dbId = @{
     database.map(_.id).getOrElse(0)
@@ -90,7 +90,22 @@ Breadcrumbs(
               value = Value(Text(event.events_details_cause)),
               classes = "govuk-summary-list__row--no-border",
               actions = None
-            )) 
+            )),
+            Some(SummaryListRow(
+                key = Key(Text(messages("event.details.of"))),
+                value = Value(Text(owner._1)),
+                classes = "govuk-summary-list__row--no-border",
+                actions = owner._2.map { ownerHref =>
+                    Actions(
+                        items = Seq(
+                            ActionItem(
+                                href = ownerHref,
+                                content = Text(messages("View"))
+                            )
+                        )
+                    )
+                }
+            ))
         ).flatten,
         card = Some(Card(
             title = Some(CardTitle(content = Text(messages("event.details")))),
