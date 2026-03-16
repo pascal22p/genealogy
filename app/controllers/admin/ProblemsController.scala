@@ -62,7 +62,6 @@ class ProblemsController @Inject() (
         orphanedEvents  <- OptionT.liftF(eventService.getOrphanedEvents(dbId))
         emptyEvents     <- OptionT.liftF(eventService.getEmptyEvents(dbId))
       } yield {
-        println(s"OOOOOO ${emptyEvents.head}")
         Ok(
           problemsView(
             Some(database),

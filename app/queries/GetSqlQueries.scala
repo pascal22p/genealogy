@@ -71,9 +71,6 @@ final class GetSqlQueries @Inject() (
         case (word, i) => NamedParameter(s"word$i", s"%$word%")
       }
 
-      println(query)
-      println(parameters)
-
       SQL(query)
         .on(parameters*)
         .as[List[PersonDetails]](PersonDetails.mysqlParser.*)
