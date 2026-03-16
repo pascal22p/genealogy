@@ -16,7 +16,8 @@
   persons: List[Person],
   families: List[Family],
   citations: List[SourCitationQueryData],
-  events: Events
+  orphanedEvents: Events,
+  emptyEvents: Events
 )(implicit request: AuthenticatedRequest[?], messages: Messages, appConfig: AppConfig)
 
 @dbId = @{ database.fold(0)(_.id) }
@@ -129,8 +130,9 @@
     )
 )
 
-@eventsDetails(dbId, events, messages("problems.orphaned.events"))
+@eventsDetails(dbId, orphanedEvents, messages("problems.orphaned.events"))
 
+@eventsDetails(dbId, emptyEvents, messages("problems.empty.events"))
 
 @govukSummaryList(
     SummaryList(

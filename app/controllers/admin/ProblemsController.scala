@@ -60,7 +60,9 @@ class ProblemsController @Inject() (
         )
         orphanCitations <- OptionT.liftF(getSqlQueries.getOrphanedSourCitations(dbId))
         orphanedEvents  <- OptionT.liftF(eventService.getOrphanedEvents(dbId))
+        emptyEvents     <- OptionT.liftF(eventService.getEmptyEvents(dbId))
       } yield {
+        println(s"OOOOOO ${emptyEvents.head}")
         Ok(
           problemsView(
             Some(database),
@@ -68,7 +70,8 @@ class ProblemsController @Inject() (
             orphanedIndividuals,
             orphanedFamilies,
             orphanCitations,
-            Events(orphanedEvents, None, UnknownEvent)
+            Events(orphanedEvents, None, UnknownEvent),
+            Events(emptyEvents, None, UnknownEvent)
           )
         )
       }).getOrElse(NotFound(s"Genealogy database $dbId not found"))

@@ -3,7 +3,7 @@ package testUtils
 import java.time.Instant
 
 import models.EventDetail
-import models.EventType.EventType
+import models.EventType
 import models.EventType.UnknownEvent
 import models.MaleSex
 import models.PersonDetails

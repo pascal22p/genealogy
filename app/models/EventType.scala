@@ -1,26 +1,14 @@
 package models
 
+enum EventType derives CanEqual {
+  case IndividualEvent
+  case IndividualAttribute
+  case FamilyEvent
+  case UnknownEvent
+}
+
 object EventType {
-
-  def fromString(s: String): EventType = {
-    s match {
-      case s if s == IndividualEvent.toString => IndividualEvent
-      case s if s == FamilyEvent.toString     => FamilyEvent
-      case _                                  => UnknownEvent
-    }
-  }
-
-  sealed trait EventType
-
-  case object IndividualEvent extends EventType {
-    override def toString = "individualType"
-  }
-
-  case object FamilyEvent extends EventType {
-    override def toString = "familyType"
-  }
-
-  case object UnknownEvent extends EventType {
-    override def toString = "unknownType"
-  }
+  @SuppressWarnings(Array("org.wartremover.warts.ToString"))
+  def fromString(s: String): EventType =
+    EventType.values.find(_.toString == s).getOrElse(UnknownEvent)
 }

@@ -81,7 +81,31 @@ final class DeleteSqlQueries @Inject() (db: Database, databaseExecutionContext: 
   }(using databaseExecutionContext)
 
   def deleteGenealogyDatabase(id: Int): Future[Int] = Future {
-    db.withConnection { implicit conn =>
+    val rel_indi_tables = Seq(
+      "rel_familles_indi",
+      "rel_indi_attributes",
+      "rel_indi_events",
+      "rel_indi_multimedia",
+      "rel_indi_notes",
+      "rel_indi_refn",
+      "rel_indi_sources"
+    )
+    db.withTransaction { implicit conn =>
+      rel_indi_tables.foreach { table =>
+        SQL(s"""
+               | DELETE FROM $table
+               |      WHERE indi_id IN (
+               |        SELECT indi_id
+               |          FROM genea_individuals
+               |          WHERE base = {id}
+               |      );
+               |""".stripMargin)
+          .on(
+            "id" -> id
+          )
+          .executeUpdate()
+      }
+
       SQL("""DELETE FROM genea_infos
             | WHERE id = {id}
         """.stripMargin)

@@ -18,6 +18,15 @@ final case class Family(
     val partner = parent1.orElse(parent2)
     partner.map(p => s"${p.details.firstname} ${p.details.surname}").getOrElse("Unknown")
   }
+
+  def formatFamilyName: String = {
+    (parent1, parent2) match {
+      case (None, None)         => "Unknown Family"
+      case (Some(p1), None)     => p1.details.surname
+      case (None, Some(p2))     => p2.details.surname
+      case (Some(p1), Some(p2)) => s"${p1.details.surname} — ${p2.details.surname}"
+    }
+  }
 }
 
 object Family {

@@ -5,7 +5,7 @@ import java.time.Instant
 import config.AppConfig
 import models.forms.EventDetailForm
 import models.queryData.EventDetailQueryData
-import models.EventType.EventType
+import models.EventType
 import play.api.i18n.Messages
 import utils.GedcomDateLibrary
 

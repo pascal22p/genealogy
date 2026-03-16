@@ -29,7 +29,7 @@ final class InsertSqlQueries @Inject() (db: Database, databaseExecutionContext: 
     }
 
     db.withConnection { implicit conn =>
-      SQL("""INSERT INTO genea_individuals 
+      SQL("""INSERT INTO genea_individuals
             | (base, indi_nom, indi_prenom, indi_sexe, indi_npfx, indi_givn, indi_nick, indi_spfx, indi_nsfx, indi_resn)
             | VALUES ({base}, {surname}, {firstname},{sex}, {npfx}, {nameGiven}, {nickname}, {spfx}, {nsfx}, {resn})
           """.stripMargin)
