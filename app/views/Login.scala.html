@@ -26,6 +26,7 @@
       @formWithCSRF(controllers.routes.SessionController.loginOnSubmit()) {
           @govukInput(
               Input(
+                  autocomplete = Some("data-default-value"),
                   label = Label(content = Text(messages("login.username"))),
                   classes = "govuk-!-width-one-half"
               ).withFormField(userForm("username"))
@@ -49,7 +50,6 @@
 
           @govukButton(
               Button(
-                  element = Some("button"),
                   content = Text("Submit")
               )
           )
