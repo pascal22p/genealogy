@@ -6,7 +6,8 @@
 @this(
     main: Main,
     govukSummaryList: GovukSummaryList,
-    formWithCSRF: FormWithCSRF
+    formWithCSRF: FormWithCSRF,
+    govukButton: GovukButton
 )
 
 @(answers: Map[UserAnswersKey[?], Map[String, String]], messagePrefix: JourneyId, postCall: Call)(implicit messages: Messages, request: AuthenticatedRequest[?])
@@ -42,8 +43,10 @@
     )
 
     @formWithCSRF(postCall) {
-        <button class="govuk-button" type="submit">
-            Confirm and continue
-        </button>
+        @govukButton(
+            Button(
+                content = Text("Confirm and continue ")
+            )
+        )
     }
 }
