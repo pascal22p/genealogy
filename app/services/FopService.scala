@@ -14,12 +14,13 @@ import org.apache.xmlgraphics.util.MimeConstants
 import play.api.i18n.Messages
 import views.xml.pdfTemplates.PdfCompactTree
 import org.xml.sax.InputSource
+import models.LoggingWithRequest
 
-class FopService @Inject() (compactTree: PdfCompactTree)(implicit val ec: ExecutionContext) {
+class FopService @Inject() (compactTree: PdfCompactTree)(implicit val ec: ExecutionContext) extends LoggingWithRequest {
 
   def xmlTopdf(
       sosaList: Map[Int, Person]
-  )(implicit request: AuthenticatedRequest[?], messages: Messages): Array[Byte] = {
+  )(implicit request: AuthenticatedRequest[?], messages: Messages): Array[Byte] = withRequestLogging {
     val title = sosaList.get(1).fold("") { person =>
       s"Ascendance of ${person.name}"
     }
