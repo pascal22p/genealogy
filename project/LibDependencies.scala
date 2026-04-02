@@ -9,7 +9,7 @@ object LibDependencies {
     "org.playframework.anorm" %% "anorm"               % "2.11.0",
     "org.typelevel"           %% "cats-core"           % "2.13.0",
     "com.password4j"          %  "password4j"          % "1.8.4",
-    "uk.gov.hmrc"             %% "play-frontend-hmrc-play-30" % "13.2.0",
+    "uk.gov.hmrc"             %% "play-frontend-hmrc-play-30" % "13.3.0",
     "org.apache.xmlgraphics"  %  "fop"                 % "2.11",
     "net.logstash.logback" % "logstash-logback-encoder" % "9.0"
   )
