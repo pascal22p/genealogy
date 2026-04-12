@@ -49,7 +49,7 @@ jobs:
       run: sbt Universal/packageBin Universal/packageZipTarball
 
     - name: Create Release
-      uses: softprops/action-gh-release@v2
+      uses: softprops/action-gh-release@v3
       with:
         tag_name: v${{ env.VERSION }}
         name: Release v${{ env.VERSION }}
