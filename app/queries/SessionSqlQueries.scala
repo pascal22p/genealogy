@@ -1,6 +1,5 @@
 package queries
 
-import java.time.LocalDateTime
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -28,16 +27,15 @@ final class SessionSqlQueries @Inject() (db: Database, databaseExecutionContext:
 
   def putSessionData(session: Session): Future[Option[String]] = Future {
     db.withConnection { implicit conn =>
-      SQL("""INSERT INTO genea_sessions (sessionId, sessionData, timeStamp)
-            |VALUES ({id}, {data}, {timeStamp})
+      SQL("""INSERT INTO genea_sessions (sessionId, sessionData)
+            |VALUES ({id}, {data})
             |ON DUPLICATE KEY UPDATE
             |sessionData = VALUES(sessionData),
-            |timeStamp = VALUES(timeStamp);
+            |timeStamp = CURRENT_TIMESTAMP(6);
             |""".stripMargin)
         .on(
-          "id"        -> session.sessionId,
-          "data"      -> Json.toJson(session.sessionData).toString,
-          "timeStamp" -> LocalDateTime.now
+          "id"   -> session.sessionId,
+          "data" -> Json.toJson(session.sessionData).toString
         )
         .executeInsert(str(1).singleOpt)
     }

@@ -12,6 +12,7 @@ import play.api.i18n.MessagesApi
 import play.api.mvc.ActionFilter
 import play.api.mvc.ControllerComponents
 import play.api.mvc.Result
+import play.api.mvc.Results.Forbidden
 import play.api.mvc.Results.Redirect
 
 @Singleton
@@ -23,13 +24,14 @@ class AdminFilter @Inject() (
   override def messagesApi: MessagesApi = cc.messagesApi
 
   // scalastyle:off cyclomatic.complexity
-  override def filter[A](request: AuthenticatedRequest[A]): Future[Option[Result]] = {
-    val isAdmin: Boolean = request.localSession.sessionData.userData.exists(_.isAdmin)
-
-    if (isAdmin) {
-      Future.successful(None)
-    } else {
-      Future.successful(Some(Redirect(controllers.routes.SessionController.loginOnLoad(request.uri))))
+  override def filter[A](request: AuthenticatedRequest[A]): Future[Option[Result]] = Future {
+    request.localSession.sessionData.userData.map(_.isAdmin) match {
+      // not authenticated
+      case None => Some(Redirect(controllers.routes.SessionController.loginOnLoad(request.uri)))
+      // authenticated but not an admin
+      case Some(false) => Some(Forbidden("Current credential is not an admin"))
+      // authenticate and an admin
+      case Some(true) => None
     }
   }
 
