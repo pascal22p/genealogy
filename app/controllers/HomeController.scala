@@ -4,6 +4,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 import scala.concurrent.ExecutionContext
+import scala.util.Try
 
 import actions.AuthAction
 import cats.data.OptionT
@@ -57,8 +58,13 @@ class HomeController @Inject() (
         .flatMap { s =>
           s.headOption.flatMap { cursorString =>
             cursorString.reverse.split("#", 4).map(_.reverse).toList.reverse match {
-              case name :: id :: birthJd :: deathJd :: _ => Some((name, id.toInt, birthJd.toInt, deathJd.toInt))
-              case _                                     => None
+              case name :: id :: birthJd :: deathJd :: _ =>
+                for {
+                  idInt      <- Try(id.toInt).toOption
+                  birthJdInt <- Try(birthJd.toInt).toOption
+                  deathJdInt <- Try(deathJd.toInt).toOption
+                } yield (name, idInt, birthJdInt, deathJdInt)
+              case _ => None
             }
           }
         }
