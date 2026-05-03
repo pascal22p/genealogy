@@ -12,5 +12,3 @@ addSbtPlugin("org.wartremover" % "sbt-wartremover" % "3.5.6")
 addSbtPlugin("com.github.sbt" % "sbt-git" % "2.1.0")
 
 addSbtPlugin("com.github.sbt" % "sbt-javaagent" % "0.2.0")
-
-addSbtPlugin("uk.gov.hmrc" % "sbt-journey" % "0.1.0-SNAPSHOT")

@@ -97,7 +97,6 @@ lazy val genealogy = (project in file("."))
   .enablePlugins(JavaAppPackaging)
   .enablePlugins(SbtWeb)
   .enablePlugins(JavaAgent)
-  .enablePlugins(JourneyPlugin)
   .settings(
     javaAgents += "io.pyroscope" % "agent" % "2.5.2",
     PlayKeys.playDefaultPort := 9123,
