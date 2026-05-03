@@ -31,7 +31,6 @@
 @govukSummaryList(
     SummaryList(
         rows = events.eventsDetails.sortBy(_.jd_count).map { event =>
-          println(event)
             SummaryListRow(
                 key = Key(Text(event.tag.fold("Unknown")(tag => messages(tag)))),
                 value = Value(HtmlContent(eventDetailRow(event))),
