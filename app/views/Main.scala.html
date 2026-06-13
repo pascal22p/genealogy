@@ -96,6 +96,9 @@
       @timeoutDialog
     }
 
+    @appConfig.customJsFile.map { file =>
+        <script src="@routes.AssetsController.get(file)"></script>
+    }
 </head>
 <body class="govuk-frontend-supported">
     <header class="govuk-header" data-module="govuk-header">
