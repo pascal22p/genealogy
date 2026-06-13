@@ -60,6 +60,11 @@ class AddPersonAsPartnerControllerSpec extends BaseSpec {
       fakeAuthAction.andThen(new actions.AdminFilter(stubControllerComponents()))
   }
 
+  override def beforeEach(): Unit = {
+    when(mockAppConfig.customJsFile).thenReturn(None)
+    super.beforeEach()
+  }
+
   protected override def localGuiceApplicationBuilder(): GuiceApplicationBuilder =
     GuiceApplicationBuilder()
       .overrides(

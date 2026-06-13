@@ -22,4 +22,7 @@ class AppConfig @Inject() (configuration: Configuration) {
   val commitHash: String = sys.props.getOrElse("git.commit.hash", "unknown")
 
   val pageSize = 20
+
+  val customJsFile: Option[String] =
+    Option(configuration.get[String]("custom.js.file")).map(_.trim).filter(_.nonEmpty)
 }
