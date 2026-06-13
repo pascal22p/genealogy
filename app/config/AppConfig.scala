@@ -24,5 +24,5 @@ class AppConfig @Inject() (configuration: Configuration) {
   val pageSize = 20
 
   val customJsFile: Option[String] =
-    configuration.getOptional[String]("custom.js.file")
+    Option(configuration.get[String]("custom.js.file")).map(_.trim).filter(_.nonEmpty)
 }
