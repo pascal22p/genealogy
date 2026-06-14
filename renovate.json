@@ -10,6 +10,10 @@
             "registryUrls": [
                 "https://open.artefacts.tax.service.gov.uk/maven2/"
             ]
+        },
+        {
+          "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
+          "automerge": true
         }
     ]
 }
