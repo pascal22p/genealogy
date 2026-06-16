@@ -11,6 +11,7 @@ import cats.implicits.*
 import models.*
 import models.EventType.IndividualEvent
 import queries.GetSqlQueries
+import io.opentelemetry.instrumentation.annotations.WithSpan
 
 @Singleton
 class PersonDetailsService @Inject() (
@@ -20,15 +21,19 @@ class PersonDetailsService @Inject() (
     implicit ec: ExecutionContext
 ) {
 
+  @WithSpan
   def getPersonDetails(id: Int): Future[Option[PersonDetails]] =
     mariadbQueries.getPersonDetails(id).map(_.headOption)
 
+  @WithSpan
   def getLatestPersonDetails(dbId: Int, maxNumber: Int): Future[List[PersonDetails]] =
     mariadbQueries.getLatestPersonDetails(dbId, maxNumber)
 
+  @WithSpan
   def searchPersonDetails(dbId: Int, words: Seq[String]): Future[List[PersonDetails]] =
     mariadbQueries.searchIndividuals(dbId, words)
 
+  @WithSpan
   def getParents(id: Int): Future[List[Parents]] = {
     mariadbQueries.getFamiliesFromIndividualId(id).flatMap { families =>
       families.map { familyQueryData =>

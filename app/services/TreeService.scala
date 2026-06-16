@@ -14,11 +14,14 @@ import models.LoggingWithRequest
 import models.ResnType.PrivacyResn
 import models.Tree
 import play.api.mvc.Request
+import io.opentelemetry.instrumentation.annotations.WithSpan
 
 @Singleton
 class TreeService @Inject() (personService: PersonService, familyService: FamilyService, appConfig: AppConfig)(
     implicit ec: ExecutionContext
 ) extends LoggingWithRequest {
+
+  @WithSpan
   def loadTree(id: Int, depth: Int = 0, maxDepth: Int = 2, tree: Tree, isAllowedToSee: Boolean)(
       implicit request: Request[?]
   ): Future[Boolean] = {

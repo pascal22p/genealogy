@@ -15,6 +15,7 @@ import play.api.i18n.Messages
 import queries.GetSqlQueries
 import utils.GedcomDateLibrary
 import cats.implicits.*
+import io.opentelemetry.instrumentation.annotations.WithSpan
 
 @Singleton
 class FirstnamesListService @Inject() (
@@ -27,6 +28,7 @@ class FirstnamesListService @Inject() (
   private val PAGE_NUMBER = 8
   private val sidePage    = (PAGE_NUMBER - 1 - 1) / 2
 
+  @WithSpan
   def getFirstNamesListWithAnchors(
       dbId: Int,
       name: String,

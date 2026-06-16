@@ -16,11 +16,13 @@ import models.EventType.UnknownEvent
 import models.SourCitation
 import models.SourCitationType.EventSourCitation
 import queries.GetSqlQueries
+import io.opentelemetry.instrumentation.annotations.WithSpan
 
 @Singleton
 class EventService @Inject() (mariadbQueries: GetSqlQueries, sourCitationService: SourCitationService)(
     implicit ec: ExecutionContext
 ) {
+  @WithSpan
   def getIndividualEvents(personId: Int, omitSources: Boolean = false): Future[List[EventDetail]] = {
     mariadbQueries.getEvents(personId, IndividualEvent).flatMap { events =>
       events.traverse { event =>
@@ -29,6 +31,7 @@ class EventService @Inject() (mariadbQueries: GetSqlQueries, sourCitationService
     }
   }
 
+  @WithSpan
   def getFamilyEvents(familyId: Int, omitSources: Boolean = false): Future[List[EventDetail]] = {
     mariadbQueries.getEvents(familyId, FamilyEvent).flatMap { events =>
       events.traverse { event =>
@@ -37,6 +40,7 @@ class EventService @Inject() (mariadbQueries: GetSqlQueries, sourCitationService
     }
   }
 
+  @WithSpan
   def getEvent(eventId: Int): Future[Option[EventDetail]] = {
     mariadbQueries.getEvents(eventId, UnknownEvent).flatMap { events =>
       events.headOption.traverse { event =>
@@ -45,12 +49,14 @@ class EventService @Inject() (mariadbQueries: GetSqlQueries, sourCitationService
     }
   }
 
+  @WithSpan
   def getOrphanedEvents(dbId: Int): Future[List[EventDetail]] = {
     mariadbQueries.getOrphanedEvents(dbId).map { events =>
       events.map(event => EventDetail(event, none, List.empty))
     }
   }
 
+  @WithSpan
   def getEmptyEvents(dbId: Int): Future[List[EventDetail]] = {
     mariadbQueries.getEmptyEvents(dbId).map { events =>
       events.map(event => EventDetail(event, none, List.empty))

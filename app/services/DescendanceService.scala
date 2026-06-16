@@ -7,10 +7,12 @@ import scala.concurrent.Future
 
 import cats.implicits.*
 import models.Person
+import io.opentelemetry.instrumentation.annotations.WithSpan
 
 class DescendanceService @Inject() (personService: PersonService)(implicit val ec: ExecutionContext) {
 
   @SuppressWarnings(Array("org.wartremover.warts.Recursion"))
+  @WithSpan
   def getDescendant(id: Int, depth: Int): Future[Option[Person]] = {
     personService
       .getPerson(id, omitSources = true, omitParents = true)

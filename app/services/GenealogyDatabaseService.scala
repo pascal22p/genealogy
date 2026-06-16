@@ -17,6 +17,7 @@ import models.Person
 import models.SurnameElement
 import queries.GetSqlQueries
 import utils.GedcomDateLibrary
+import io.opentelemetry.instrumentation.annotations.WithSpan
 
 @Singleton
 class GenealogyDatabaseService @Inject() (
@@ -25,11 +26,14 @@ class GenealogyDatabaseService @Inject() (
 )(
     implicit ec: ExecutionContext
 ) {
+  @WithSpan
   def getGenealogyDatabases: Future[List[GenealogyDatabase]] = mariadbQueries.getGenealogyDatabases
 
+  @WithSpan
   def getGenealogyDatabase(dbId: Int): Future[Option[GenealogyDatabase]] =
     mariadbQueries.getGenealogyDatabases.map(_.find(_.id == dbId))
 
+  @WithSpan
   def getSurnamesList(id: Int)(
       implicit authenticatedRequest: AuthenticatedRequest[?]
   ): Future[List[SurnameElement]] =
@@ -45,6 +49,7 @@ class GenealogyDatabaseService @Inject() (
       }
     }
 
+  @WithSpan
   def getFirstnamesList(id: Int, name: String)(
       implicit authenticatedRequest: AuthenticatedRequest[?]
   ): Future[List[Person]] = {
