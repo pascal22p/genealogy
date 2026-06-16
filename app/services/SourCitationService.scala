@@ -16,11 +16,13 @@ import models.SourCitationType.SourCitationType
 import models.SourCitationType.UnknownSourCitation
 import models.SourRecord
 import queries.GetSqlQueries
+import io.opentelemetry.instrumentation.annotations.WithSpan
 
 @Singleton
 class SourCitationService @Inject() (mariadbQueries: GetSqlQueries)(
     implicit ec: ExecutionContext
 ) {
+  @WithSpan
   def getSourCitations(
       sourCitationId: Int,
       sourCitationType: SourCitationType,
@@ -33,6 +35,7 @@ class SourCitationService @Inject() (mariadbQueries: GetSqlQueries)(
     }
   }
 
+  @WithSpan
   def getSourCitation(sourCitationId: Int, dbId: Int): OptionT[Future, SourCitation] = {
     OptionT(
       mariadbQueries
@@ -65,6 +68,7 @@ class SourCitationService @Inject() (mariadbQueries: GetSqlQueries)(
     }
   }
 
+  @WithSpan
   def getSourRecords(dbId: Int): Future[List[SourRecord]] = {
     mariadbQueries.getSourRecords(dbId)
   }

@@ -9,6 +9,7 @@ import scala.concurrent.Future
 import cats.implicits.*
 import models.*
 import models.EventType.IndividualEvent
+import io.opentelemetry.instrumentation.annotations.WithSpan
 
 @Singleton
 class PersonService @Inject() (
@@ -40,6 +41,7 @@ class PersonService @Inject() (
     }
   }
 
+  @WithSpan
   def getPerson(
       id: Int,
       omitSources: Boolean = false,
@@ -64,9 +66,11 @@ class PersonService @Inject() (
     }
   }
 
+  @WithSpan
   def getPersonDetails(id: Int): Future[Option[PersonDetails]] =
     personDetailsService.getPersonDetails(id)
 
+  @WithSpan
   def getLatestPersons(
       dbId: Int,
       maxNumber: Int
@@ -84,6 +88,7 @@ class PersonService @Inject() (
     }
   }
 
+  @WithSpan
   def searchPersons(
       dbId: Int,
       words: Seq[String]

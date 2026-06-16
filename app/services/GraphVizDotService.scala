@@ -15,6 +15,7 @@ import models.Tree
 import play.api.i18n.Messages
 import views.txt.dotTemplates.DotMainView
 import play.api.Logging
+import io.opentelemetry.instrumentation.annotations.WithSpan
 
 @Singleton
 class GraphVizDotService @Inject() (
@@ -22,6 +23,7 @@ class GraphVizDotService @Inject() (
 ) extends Logging
     with LoggingWithRequest {
 
+  @WithSpan
   def treeToDot(
       tree: Tree,
       origin: Int
@@ -30,6 +32,7 @@ class GraphVizDotService @Inject() (
   }
 
   @SuppressWarnings(Array("org.wartremover.warts.StringPlusAny"))
+  @WithSpan
   def generateImageTree(dotString: String, fileType: String): Array[Byte] = {
     val dotProcess = Process(s"dot -T$fileType")
     val stdout     = new ByteArrayOutputStream()

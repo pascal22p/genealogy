@@ -17,6 +17,7 @@ import models.Events
 import models.Family
 import models.Person
 import queries.GetSqlQueries
+import io.opentelemetry.instrumentation.annotations.WithSpan
 
 @Singleton
 class FamilyService @Inject() (
@@ -26,6 +27,8 @@ class FamilyService @Inject() (
 )(
     implicit ec: ExecutionContext
 ) {
+
+  @WithSpan
   def getChildren(familyId: Int, omitSources: Boolean = false): Future[List[Child]] = {
     mariadbQueries.getChildren(familyId).flatMap { children =>
       children.traverse { (child: Child) =>
@@ -37,10 +40,12 @@ class FamilyService @Inject() (
     }
   }
 
+  @WithSpan
   def getFamilyIdsFromPartnerId(id: Int): Future[List[Int]] = {
     mariadbQueries.getFamilyIdsFromPartnerId(id)
   }
 
+  @WithSpan
   def getAllFamilies(base: Int): Future[List[Family]] = {
     mariadbQueries
       .getAllFamilies(base)
@@ -80,6 +85,7 @@ class FamilyService @Inject() (
       )
   }
 
+  @WithSpan
   def getFamilyDetails(id: Int, omitSources: Boolean = false): OptionT[Future, Family] = {
     mariadbQueries
       .getFamilyDetails(id)

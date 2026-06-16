@@ -15,9 +15,11 @@ import play.api.i18n.Messages
 import views.xml.pdfTemplates.PdfCompactTree
 import org.xml.sax.InputSource
 import models.LoggingWithRequest
+import io.opentelemetry.instrumentation.annotations.WithSpan
 
 class FopService @Inject() (compactTree: PdfCompactTree)(implicit val ec: ExecutionContext) extends LoggingWithRequest {
 
+  @WithSpan
   def xmlTopdf(
       sosaList: Map[Int, Person]
   )(implicit request: AuthenticatedRequest[?], messages: Messages): Array[Byte] = withRequestLogging {

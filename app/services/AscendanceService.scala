@@ -12,10 +12,12 @@ import models.Events
 import models.Family
 import models.Parents
 import models.Person
+import io.opentelemetry.instrumentation.annotations.WithSpan
 
 class AscendanceService @Inject() (personService: PersonService)(implicit val ec: ExecutionContext) {
 
   @SuppressWarnings(Array("org.wartremover.warts.Recursion"))
+  @WithSpan
   def getAscendant(id: Int, depth: Int = 1): Future[Option[Person]] = {
     personService
       .getPerson(id, omitSources = true, omitFamilies = true)
@@ -53,6 +55,7 @@ class AscendanceService @Inject() (personService: PersonService)(implicit val ec
   }
 
   @SuppressWarnings(Array("org.wartremover.warts.Recursion"))
+  @WithSpan
   def buildSosaList(personId: Int, sosaNumber: Int = 1, maxDepth: Int = 6): Future[Map[Int, Person]] = {
     personService
       .getPerson(personId, omitSources = true, omitFamilies = true, omitParents = false)
