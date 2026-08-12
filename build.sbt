@@ -115,7 +115,8 @@ lazy val genealogy = (project in file("."))
     TwirlKeys.templateImports ++= Seq(
       "uk.gov.hmrc.govukfrontend.views.html.components._"
     ),
-    semanticdbEnabled := false,
+    semanticdbEnabled := true,
+    semanticdbTargetRoot := (Compile / target).value / "semanticdb",
     scalacOptions ++= Seq(
       "-no-indent",
       "-deprecation",
