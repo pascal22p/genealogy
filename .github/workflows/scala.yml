@@ -47,6 +47,20 @@ jobs:
         
     - name: Run tests
       run: sbt test
-      # Optional: This step uploads information to the GitHub dependency graph and unblocking Dependabot alerts for the repository
+
+    # ----------------------------------------
+    # Make SemanticDB available to AI review
+    # ----------------------------------------
+
+    - name: Upload SemanticDB
+      uses: actions/upload-artifact@v7
+      with:
+        name: semanticdb
+        path: |
+          **/target/**/semanticdb/**/*.semanticdb
+        if-no-files-found: warn
+        retention-days: 1
+        
+    # Optional: This step uploads information to the GitHub dependency graph and unblocking Dependabot alerts for the repository
     - name: Upload dependency graph
       uses: scalacenter/sbt-dependency-submission@v3
