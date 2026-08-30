@@ -6,11 +6,13 @@ on:
       - Scala CI
     types:
       - completed
+  workflow_dispatch:
 
 permissions:
   contents: read
   pull-requests: write
   actions: read
+  statuses: write
 
 jobs:
   review:
@@ -20,5 +22,10 @@ jobs:
     uses: pascal22p/shared-workflows/.github/workflows/AIreview.yml@main
     with:
       run_id: ${{ github.event.workflow_run.id }}
+      model: "gpt-oss-120b"
+      reasoning_effort: "high"
+      temperature: "0.0"
     secrets:
       OVH_AI_ENDPOINTS_API_KEY: ${{ secrets.OVH_AI_ENDPOINTS_API_KEY }}
+
+      
