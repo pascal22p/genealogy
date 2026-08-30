@@ -10,7 +10,7 @@ enablePlugins(GitPlugin)
 
 ThisBuild / version := "0.3.0"
 ThisBuild / organization := "parois.net"
-ThisBuild / scalaVersion := "3.8.4"
+ThisBuild / scalaVersion := "3.9.0"
 ThisBuild / scalafmtOnCompile := true
 
 Test / parallelExecution := true
