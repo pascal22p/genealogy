@@ -6,6 +6,7 @@ import javax.inject.Singleton
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
+import cats.data.OptionT
 import cats.implicits.*
 import models.*
 import models.EventType.IndividualEvent
@@ -50,25 +51,23 @@ class PersonService @Inject() (
   ): Future[Option[Person]] = {
     for {
       personDetails          <- personDetailsService.getPersonDetails(id)
-      events                 <- eventService.getIndividualEvents(id, omitSources)
-      parents                <- getParents(id, omitParents)
-      families: List[Family] <- getFamilies(id, omitSources, omitFamilies)
+      events                 <- OptionT.liftF(eventService.getIndividualEvents(id, omitSources))
+      parents                <- OptionT.liftF(getParents(id, omitParents))
+      families: List[Family] <- OptionT.liftF(getFamilies(id, omitSources, omitFamilies))
     } yield {
-      personDetails.map(person =>
-        Person(
-          person,
-          Events(events, Some(person.id), IndividualEvent),
-          Attributes(List.empty, Some(person.id), IndividualEvent),
-          parents,
-          families
-        )
+      Person(
+        personDetails,
+        Events(events, Some(personDetails.id), IndividualEvent),
+        Attributes(List.empty, Some(personDetails.id), IndividualEvent),
+        parents,
+        families
       )
     }
-  }
+  }.value
 
   @WithSpan
   def getPersonDetails(id: Int): Future[Option[PersonDetails]] =
-    personDetailsService.getPersonDetails(id)
+    personDetailsService.getPersonDetails(id).value
 
   @WithSpan
   def getLatestPersons(

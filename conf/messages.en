@@ -282,3 +282,25 @@ importGedcom.choosePlaceElements.title = Map subdivisions from GEDCOM file to da
 AddIndividualToFamily.checkYourAnswers.title = Add a Partner to a family
 
 firstnamesPage.caption = Surname {0}
+
+sourRecordsListView.showOnlyEmpty = Show only empty records
+sourRecordsListView.listOfSources = List of Source records
+
+sourCitationsFromRecordListView.page = Page:
+sourCitationsFromRecordListView.dates = Dates:
+sourCitationsFromRecordListView.text = Text:
+sourCitationsFromRecordListView.quay = Quay:
+sourCitationsFromRecordListView.subm = Subm:
+sourCitationsFromRecordListView.usages = Usages of this source citation:
+sourCitationsFromRecordListView.sourceRecord = Source Record
+sourCitationsFromRecordListView.id = id:
+sourCitationsFromRecordListView.auth = Auth:
+sourCitationsFromRecordListView.title = Title:
+sourCitationsFromRecordListView.abbr = Abbr:
+sourCitationsFromRecordListView.publ = Publ:
+sourCitationsFromRecordListView.agnc = Agnc:
+sourCitationsFromRecordListView.rin = Rin:
+sourCitationsFromRecordListView.repo = Repo:
+sourCitationsFromRecordListView.repoCaln = Repo caln:
+sourCitationsFromRecordListView.repoMedi = Repo medi:
+sourCitationsFromRecordListView.listOfSourceCitations = List of Source citations

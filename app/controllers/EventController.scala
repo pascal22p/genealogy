@@ -40,7 +40,7 @@ class EventController @Inject() (
           genealogyDatabaseService.getGenealogyDatabase(baseId),
           NotFound("database not found")
         )
-        event  <- EitherT.fromOptionF(eventService.getEvent(id), NotFound("event not found"))
+        event  <- eventService.getEvent(id).toRight(NotFound("event not found"))
         person <-
           if (event.eventType == EventType.IndividualEvent || event.eventType == EventType.IndividualAttribute) {
             EitherT.liftF(

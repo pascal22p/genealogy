@@ -2,6 +2,7 @@
 @import views.html.components.{Block, LastModified}
 @import models.queryData.RepositoryQueryData
 @import models.queryData.AddressQueryData
+@import viewModels.{HtmlLinkViewModel, SourCitationUsageViewModel, SourCitationViewModel}
 
 @this(
         main: Main,
@@ -9,42 +10,66 @@
         govukSummaryList: GovukSummaryList
 )
 
-@(database: Option[GenealogyDatabase], sourRecord: SourRecord, citations: List[SourCitationQueryData])(implicit request: AuthenticatedRequest[?], messages: Messages)
+@(
+        database: Option[GenealogyDatabase],
+        sourRecord: SourRecord,
+        citations: List[SourCitationViewModel]
+)(implicit request: AuthenticatedRequest[?], messages: Messages)
 
 @dbId = @{ database.fold(0)(_.id) }
 
-@citationContent(source: SourCitationQueryData) = {
+@citationContent(
+        source: SourCitationQueryData,
+        usages: List[SourCitationUsageViewModel]
+) = {
   <ul class="govuk-list">
-    <li>Page: @source.page</li>
-    <li>Dates: @source.dates</li>
-    <li>Text: @source.text</li>
-    <li>Quay: @source.quay</li>
-    <li>Subm: @source.subm</li>
+    <li>@messages("sourCitationsFromRecordListView.page") @source.page</li>
+    <li>@messages("sourCitationsFromRecordListView.dates") @source.dates</li>
+    <li>@messages("sourCitationsFromRecordListView.text") @source.text</li>
+    <li>@messages("sourCitationsFromRecordListView.quay") @source.quay</li>
+    <li>@messages("sourCitationsFromRecordListView.subm") @source.subm</li>
   </ul>
+  @messages("sourCitationsFromRecordListView.usages")
+    <ul class="govuk-list">
+    @usages.map { usage =>
+      <li>
+        @for(owner <- usage.owner) {
+            <a class="govuk-link" href="@owner.url">@owner.description</a>
+        }
+        <ul class="govuk-list" style="margin-left: 1em;">
+        @usage.persons.map { person =>
+            <li><a class="govuk-link" href="@person.url">@person.description</a></li>
+        }
+        </ul>
+      </li>
+    }
+    </ul>
 }
 
 @main(database) {
 
-  @block("Source Record") {
+  @block(messages("sourCitationsFromRecordListView.sourceRecord")) {
     <ul class="govuk-list">
-      <li>id: @sourRecord.id</li>
-      <li>Auth: @sourRecord.auth</li>
-      <li>Title: @sourRecord.title</li>
-      <li>Abbr: @sourRecord.abbr</li>
-      <li>Publ: @sourRecord.publ</li>
-      <li>Agnc: @sourRecord.agnc</li>
-      <li>Rin: @sourRecord.rin</li>
-      <li>Repo: @sourRecord.repoId</li>
-      <li>Repo caln: @sourRecord.repoCaln</li>
-      <li>Repo medi: @sourRecord.repoMedi</li>
+      <li>@messages("sourCitationsFromRecordListView.id") @sourRecord.id</li>
+      <li>@messages("sourCitationsFromRecordListView.auth") @sourRecord.auth</li>
+      <li>@messages("sourCitationsFromRecordListView.title") @sourRecord.title</li>
+      <li>@messages("sourCitationsFromRecordListView.abbr") @sourRecord.abbr</li>
+      <li>@messages("sourCitationsFromRecordListView.publ") @sourRecord.publ</li>
+      <li>@messages("sourCitationsFromRecordListView.agnc") @sourRecord.agnc</li>
+      <li>@messages("sourCitationsFromRecordListView.rin") @sourRecord.rin</li>
+      <li>@messages("sourCitationsFromRecordListView.repo") @sourRecord.repoId</li>
+      <li>@messages("sourCitationsFromRecordListView.repoCaln") @sourRecord.repoCaln</li>
+      <li>@messages("sourCitationsFromRecordListView.repoMedi") @sourRecord.repoMedi</li>
     </ul>
 
     @govukSummaryList(
       SummaryList(
-        rows = citations.map { citation =>
+        rows = citations.map { citationWithUsages =>
+          val citation = citationWithUsages.sourCitation
+          val usages = citationWithUsages.usages
           SummaryListRow(
             key = Key(Text(citation.id.toString)),
-            value = Value(HtmlContent(citationContent(citation))),
+            value = Value(HtmlContent(citationContent(citation, usages))),
             classes = "",
             actions = Some(Actions(
               items = Seq(
@@ -64,7 +89,7 @@
           )
         },
         card = Some(Card(
-          title = Some(CardTitle(content = Text("List of Source citations"))),
+          title = Some(CardTitle(content = Text(messages("sourCitationsFromRecordListView.listOfSourceCitations")))),
           actions = Some(
             Actions(
               items = Seq(

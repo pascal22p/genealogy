@@ -695,4 +695,17 @@ final class GetSqlQueries @Inject() (
     }
   }(using databaseExecutionContext)
 
+  def findEmptyCaln(baseId: Int): Future[Seq[SourRecord]] = Future {
+    db.withConnection { implicit conn =>
+      SQL("""SELECT *
+            |FROM genea_sour_records
+            |WHERE (repo_caln IS NULL
+            |   OR TRIM(repo_caln) = '')
+            |   AND base = {baseId}
+            |""".stripMargin)
+        .on("baseId" -> baseId)
+        .as[Seq[SourRecord]](SourRecord.mysqlParser.*)
+    }
+  }(using databaseExecutionContext)
+
 }

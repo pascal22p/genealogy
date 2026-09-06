@@ -9,7 +9,7 @@
         govukSummaryList: GovukSummaryList
 )
 
-@(database: Option[GenealogyDatabase], sources: List[SourRecord])(implicit request: AuthenticatedRequest[?], messages: Messages)
+@(database: Option[GenealogyDatabase], sources: List[SourRecord], filterOption: Option[String])(implicit request: AuthenticatedRequest[?], messages: Messages)
 
 @dbId = @{ database.fold(0)(_.id) }
 
@@ -24,6 +24,12 @@
 }
 
 @main(database) {
+
+  @if(!filterOption.contains("only-empty")) {
+    <a class="govuk-link" href="@controllers.routes.SourRecordsController.index(dbId, Some("only-empty")).url">
+      @messages("sourRecordsListView.showOnlyEmpty")
+    </a>
+  }
 
   @govukSummaryList(
     SummaryList(
@@ -49,7 +55,7 @@
         )
       },
       card = Some(Card(
-        title = Some(CardTitle(content = Text("List of Source records"))),
+        title = Some(CardTitle(content = Text(messages("sourRecordsListView.listOfSources")))),
         actions = Some(
           Actions(
             items = Seq(

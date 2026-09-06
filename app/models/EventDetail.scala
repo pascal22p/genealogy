@@ -40,6 +40,23 @@ final case class EventDetail(
   ): String =
     GedcomDateLibrary.formatDate(events_details_gedcom_date, shortMonth).getOrElse("")
 
+  def eventShortDescription(
+      implicit messages: Messages,
+      authenticatedRequest: AuthenticatedRequest[?],
+      appConfig: AppConfig
+  ): String = {
+    val eventLabel =
+      tag
+        .map(tag => messages(s"$tag"))
+        .getOrElse(events_details_descriptor)
+
+    List(
+      Some(eventLabel),
+      Option(formatDate(true)).filter(_.nonEmpty),
+      place.map(p => Option(p.lieuDit).filter(_.nonEmpty).getOrElse(p.city)).filter(_.nonEmpty)
+    ).flatten.mkString(" — ")
+  }
+
   def toForm: EventDetailForm =
     EventDetailForm(
       base,

@@ -34,7 +34,7 @@ class DeleteEventController @Inject() (
     implicit authenticatedRequest: AuthenticatedRequest[AnyContent] =>
       (for {
         database <- OptionT(genealogyDatabaseService.getGenealogyDatabase(baseId))
-        event    <- OptionT(eventService.getEvent(id))
+        event    <- eventService.getEvent(id)
       } yield {
         Ok(deleteEventView(Some(database), Events(List(event), None, UnknownEvent)))
       }).getOrElse(NotFound("Database or event not found"))
