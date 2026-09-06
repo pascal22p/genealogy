@@ -320,3 +320,25 @@ importGedcom.choosePlaceElements.title = Associer les subdivisions du fichier GE
 AddIndividualToFamily.checkYourAnswers.title = Ajouter un partenaire a une famille
 
 firstnamesPage.caption = Nom {0}
+
+sourRecordsListView.showOnlyEmpty = Afficher uniquement les enregistrements vides
+sourRecordsListView.listOfSources = Liste des enregistrements de source
+
+sourCitationsFromRecordListView.page = Page :
+sourCitationsFromRecordListView.dates = Dates :
+sourCitationsFromRecordListView.text = Texte :
+sourCitationsFromRecordListView.quay = Qualité :
+sourCitationsFromRecordListView.subm = Déposant :
+sourCitationsFromRecordListView.usages = Utilisations de cette citation de source :
+sourCitationsFromRecordListView.sourceRecord = Enregistrement de source
+sourCitationsFromRecordListView.id = Id :
+sourCitationsFromRecordListView.auth = Auteur :
+sourCitationsFromRecordListView.title = Titre :
+sourCitationsFromRecordListView.abbr = Abréviation :
+sourCitationsFromRecordListView.publ = Publication :
+sourCitationsFromRecordListView.agnc = Agence :
+sourCitationsFromRecordListView.rin = Rin :
+sourCitationsFromRecordListView.repo = Dépôt :
+sourCitationsFromRecordListView.repoCaln = Cote de dépôt :
+sourCitationsFromRecordListView.repoMedi = Type de média du dépôt :
+sourCitationsFromRecordListView.listOfSourceCitations = Liste des citations de source

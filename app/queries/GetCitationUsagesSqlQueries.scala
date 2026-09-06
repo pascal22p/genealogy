@@ -25,8 +25,6 @@ final class GetCitationUsagesSqlQueries @Inject() (
    *   1. Individuals
    *   2. Families
    *   3. Events
-   *   4. Multimedia
-   *   5. Notes
    */
   def getSourCitationUsages(
       sourCitationId: Int

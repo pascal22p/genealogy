@@ -27,7 +27,8 @@
 
   @if(!filterOption.contains("only-empty")) {
     <a class="govuk-link" href="@controllers.routes.SourRecordsController.index(dbId, Some("only-empty")).url">
-      Show only empty records</a>
+      @messages("sourRecordsListView.showOnlyEmpty")
+    </a>
   }
 
   @govukSummaryList(
@@ -54,7 +55,7 @@
         )
       },
       card = Some(Card(
-        title = Some(CardTitle(content = Text("List of Source records"))),
+        title = Some(CardTitle(content = Text(messages("sourRecordsListView.listOfSources")))),
         actions = Some(
           Actions(
             items = Seq(
