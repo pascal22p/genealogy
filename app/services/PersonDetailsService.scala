@@ -7,6 +7,7 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
 import cats.*
+import cats.data.OptionT
 import cats.implicits.*
 import models.*
 import models.EventType.IndividualEvent
@@ -22,8 +23,9 @@ class PersonDetailsService @Inject() (
 ) {
 
   @WithSpan
-  def getPersonDetails(id: Int): Future[Option[PersonDetails]] =
+  def getPersonDetails(id: Int): OptionT[Future, PersonDetails] = OptionT {
     mariadbQueries.getPersonDetails(id).map(_.headOption)
+  }
 
   @WithSpan
   def getLatestPersonDetails(dbId: Int, maxNumber: Int): Future[List[PersonDetails]] =
@@ -38,9 +40,9 @@ class PersonDetailsService @Inject() (
     mariadbQueries.getFamiliesFromIndividualId(id).flatMap { families =>
       families.map { familyQueryData =>
         for {
-          parent1 <- familyQueryData.family.parent1.traverse(getPersonDetails).map(_.flatten)
+          parent1 <- familyQueryData.family.parent1.traverse(id => getPersonDetails(id).value).map(_.flatten)
           events1 <- parent1.traverse(i => eventService.getIndividualEvents(i.id))
-          parent2 <- familyQueryData.family.parent2.traverse(getPersonDetails).map(_.flatten)
+          parent2 <- familyQueryData.family.parent2.traverse(id => getPersonDetails(id).value).map(_.flatten)
           events2 <- parent2.traverse(i => eventService.getIndividualEvents(i.id))
         } yield {
           Parents(

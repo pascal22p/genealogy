@@ -52,9 +52,9 @@ class FamilyService @Inject() (
       .flatMap(families =>
         families.traverse { family =>
           for {
-            parent1      <- family.parent1.traverse(personDetailsService.getPersonDetails).map(_.flatten)
+            parent1      <- family.parent1.traverse(id => personDetailsService.getPersonDetails(id).value).map(_.flatten)
             events1      <- parent1.traverse(i => eventService.getIndividualEvents(i.id, true))
-            parent2      <- family.parent2.traverse(personDetailsService.getPersonDetails).map(_.flatten)
+            parent2      <- family.parent2.traverse(id => personDetailsService.getPersonDetails(id).value).map(_.flatten)
             events2      <- parent2.traverse(i => eventService.getIndividualEvents(i.id, true))
             familyEvents <- eventService.getFamilyEvents(family.id)
             children     <- getChildren(family.id, true)
@@ -91,9 +91,9 @@ class FamilyService @Inject() (
       .getFamilyDetails(id)
       .semiflatMap { family =>
         for {
-          parent1      <- family.parent1.traverse(personDetailsService.getPersonDetails).map(_.flatten)
+          parent1      <- family.parent1.traverse(id => personDetailsService.getPersonDetails(id).value).map(_.flatten)
           events1      <- parent1.traverse(i => eventService.getIndividualEvents(i.id, omitSources))
-          parent2      <- family.parent2.traverse(personDetailsService.getPersonDetails).map(_.flatten)
+          parent2      <- family.parent2.traverse(id => personDetailsService.getPersonDetails(id).value).map(_.flatten)
           events2      <- parent2.traverse(i => eventService.getIndividualEvents(i.id, omitSources))
           familyEvents <- eventService.getFamilyEvents(id)
           children     <- getChildren(family.id, omitSources)

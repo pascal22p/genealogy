@@ -41,7 +41,7 @@ class EventService @Inject() (mariadbQueries: GetSqlQueries, sourCitationService
   }
 
   @WithSpan
-  def getEvent(eventId: Int): Future[Option[EventDetail]] = {
+  def getEvent(eventId: Int): OptionT[Future, EventDetail] = OptionT {
     mariadbQueries.getEvents(eventId, UnknownEvent).flatMap { events =>
       events.headOption.traverse { event =>
         fillExtraData(event)

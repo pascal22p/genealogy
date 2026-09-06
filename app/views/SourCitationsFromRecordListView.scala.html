@@ -2,6 +2,7 @@
 @import views.html.components.{Block, LastModified}
 @import models.queryData.RepositoryQueryData
 @import models.queryData.AddressQueryData
+@import viewModels.{HtmlLinkViewModel, SourCitationUsageViewModel, SourCitationViewModel}
 
 @this(
         main: Main,
@@ -9,11 +10,18 @@
         govukSummaryList: GovukSummaryList
 )
 
-@(database: Option[GenealogyDatabase], sourRecord: SourRecord, citations: List[SourCitationQueryData])(implicit request: AuthenticatedRequest[?], messages: Messages)
+@(
+        database: Option[GenealogyDatabase],
+        sourRecord: SourRecord,
+        citations: List[SourCitationViewModel]
+)(implicit request: AuthenticatedRequest[?], messages: Messages)
 
 @dbId = @{ database.fold(0)(_.id) }
 
-@citationContent(source: SourCitationQueryData) = {
+@citationContent(
+        source: SourCitationQueryData,
+        usages: List[SourCitationUsageViewModel]
+) = {
   <ul class="govuk-list">
     <li>Page: @source.page</li>
     <li>Dates: @source.dates</li>
@@ -21,6 +29,21 @@
     <li>Quay: @source.quay</li>
     <li>Subm: @source.subm</li>
   </ul>
+  Usages:
+    <ul class="govuk-list">
+    @usages.map { usage =>
+      <li>
+        @for(owner <- usage.owner) {
+            <a class="govuk-link" href="@owner.url">@owner.description</a>
+        }
+        <ul class="govuk-list" style="margin-left: 1em;">
+        @usage.persons.map { person =>
+            <li><a class="govuk-link" href="@person.url">@person.description</a></li>
+        }
+        </ul>
+      </li>
+    }
+    </ul>
 }
 
 @main(database) {
@@ -41,10 +64,12 @@
 
     @govukSummaryList(
       SummaryList(
-        rows = citations.map { citation =>
+        rows = citations.map { citationWithUsages =>
+          val citation = citationWithUsages.sourCitation
+          val usages = citationWithUsages.usages
           SummaryListRow(
             key = Key(Text(citation.id.toString)),
-            value = Value(HtmlContent(citationContent(citation))),
+            value = Value(HtmlContent(citationContent(citation, usages))),
             classes = "",
             actions = Some(Actions(
               items = Seq(

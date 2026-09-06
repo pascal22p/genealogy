@@ -2,9 +2,12 @@ package controllers
 
 import java.time.LocalDateTime
 
+import scala.concurrent.ExecutionContext
+import scala.concurrent.ExecutionContext.global
 import scala.concurrent.Future
 
 import actions.AuthAction
+import cats.data.OptionT
 import models.*
 import models.ResnType.PrivacyResn
 import org.jsoup.Jsoup
@@ -45,17 +48,17 @@ class EventControllerSpec extends BaseSpec {
 
   val sut: EventController = app.injector.instanceOf[EventController]
 
+  given ExecutionContext = global
+
   "showEvent" must {
     "display event details" when {
       "privacy is set and see_privacy is true" in {
         when(mockEventService.getEvent(any())).thenReturn(
-          Future.successful(
-            Some(
-              fakeEventDetail(
-                privacyRestriction = Some(PrivacyResn),
-                ownerId = Some(1),
-                eventType = EventType.IndividualEvent
-              )
+          OptionT.some[Future](
+            fakeEventDetail(
+              privacyRestriction = Some(PrivacyResn),
+              ownerId = Some(1),
+              eventType = EventType.IndividualEvent
             )
           )
         )
@@ -81,7 +84,7 @@ class EventControllerSpec extends BaseSpec {
 
     "privacy is not set and see_privacy is false" in {
       when(mockEventService.getEvent(any())).thenReturn(
-        Future.successful(Some(fakeEventDetail(ownerId = Some(1))))
+        OptionT.some[Future](fakeEventDetail(ownerId = Some(1)))
       )
       when(mockGenealogyDatabaseService.getGenealogyDatabase(any())).thenReturn(
         Future.successful(Some(GenealogyDatabase(1, "name", "description", None)))
@@ -108,7 +111,7 @@ class EventControllerSpec extends BaseSpec {
   "not display event details" when {
     "privacy is set and see_privacy is false" in {
       when(mockEventService.getEvent(any())).thenReturn(
-        Future.successful(Some(fakeEventDetail(privacyRestriction = Some(PrivacyResn), ownerId = Some(1))))
+        OptionT.some[Future](fakeEventDetail(privacyRestriction = Some(PrivacyResn), ownerId = Some(1)))
       )
       when(mockGenealogyDatabaseService.getGenealogyDatabase(any())).thenReturn(
         Future.successful(Some(GenealogyDatabase(1, "name", "description", None)))
@@ -131,7 +134,7 @@ class EventControllerSpec extends BaseSpec {
 
     "privacy is set and UserData is None" in {
       when(mockEventService.getEvent(any())).thenReturn(
-        Future.successful(Some(fakeEventDetail(privacyRestriction = Some(PrivacyResn), ownerId = Some(1))))
+        OptionT.some[Future](fakeEventDetail(privacyRestriction = Some(PrivacyResn), ownerId = Some(1)))
       )
       when(mockGenealogyDatabaseService.getGenealogyDatabase(any())).thenReturn(
         Future.successful(Some(GenealogyDatabase(1, "name", "description", None)))
@@ -155,7 +158,7 @@ class EventControllerSpec extends BaseSpec {
 
   "returns not found" in {
     when(mockEventService.getEvent(any())).thenReturn(
-      Future.successful(None)
+      OptionT.none[Future, EventDetail]
     )
     when(mockGenealogyDatabaseService.getGenealogyDatabase(any())).thenReturn(
       Future.successful(Some(GenealogyDatabase(1, "name", "description", None)))

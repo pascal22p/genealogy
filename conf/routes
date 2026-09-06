@@ -26,7 +26,7 @@ GET     /base/:baseId/ascendant/list/:id          controllers.AscendanceControll
 GET     /base/:baseId/ascendant/tree/:id          controllers.AscendanceController.showAscendantTree(baseId: Int, id: Int)
 GET     /base/:baseId/medias/show                 controllers.MediaListController.showMedias(baseId: Int)
 GET     /base/:baseId/repositories/show           controllers.RepositoryListController.showRepositories(baseId: Int)
-GET     /base/:baseId/source-records/show         controllers.SourRecordsController.index(baseId: Int)
+GET     /base/:baseId/source-records/show         controllers.SourRecordsController.index(baseId: Int, filter: Option[String])
 GET     /base/:baseId/source-record/:sourRecordId/citations    controllers.SourRecordsController.showSourCitationsFromRecord(baseId: Int, sourRecordId: Int)
 GET     /base/:baseId/view                        controllers.ViewController.index(baseId: Int)
 

@@ -81,7 +81,7 @@ class EditEventDetailController @Inject() (
   private def handleEvent(id: Int)(
       result: (EventDetail, Option[Person], List[Place]) => Future[Result]
   )(implicit request: AuthenticatedRequest[AnyContent]): Future[Result] = {
-    eventService.getEvent(id).flatMap { eventOption =>
+    eventService.getEvent(id).value.flatMap { eventOption =>
       getSqlQueries.getAllPlaces.flatMap { allPlace =>
         eventOption.fold(Future.successful(NotFound("Event could not be found"))) { event =>
           event.ownerId.traverse(personId => personService.getPerson(personId)).flatMap { person =>
