@@ -701,7 +701,7 @@ final class GetSqlQueries @Inject() (
             |FROM genea_sour_records
             |WHERE (repo_caln IS NULL
             |   OR TRIM(repo_caln) = '')
-            |   AND base = {baseId};
+            |   AND base = {baseId}
             |""".stripMargin)
         .on("baseId" -> baseId)
         .as[Seq[SourRecord]](SourRecord.mysqlParser.*)
