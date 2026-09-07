@@ -34,15 +34,15 @@ final class GetSqlQueries @Inject() (
     databaseExecutionContext: DatabaseExecutionContext
 ) {
 
-  def getPersonDetails(id: Int): Future[List[PersonDetails]] = Future {
+  def getPersonDetails(id: Int): OptionT[Future, PersonDetails] = OptionT(Future {
     db.withConnection { implicit conn =>
       SQL("""SELECT *
             |FROM genea_individuals
             |WHERE indi_id = {id}""".stripMargin)
         .on("id" -> id)
-        .as[List[PersonDetails]](PersonDetails.mysqlParser.*)
+        .as[Option[PersonDetails]](PersonDetails.mysqlParser.singleOpt)
     }
-  }(using databaseExecutionContext)
+  }(using databaseExecutionContext))
 
   def getLatestPersonDetails(dbId: Int, maxNumber: Int): Future[List[PersonDetails]] = Future {
     db.withConnection { implicit conn =>
@@ -77,6 +77,22 @@ final class GetSqlQueries @Inject() (
     }
   }(using databaseExecutionContext)
 
+  /**
+   * Retrieves a list of event details based on the entity ID and the specified event type.
+   *
+   * Depending on `eventType`, the `id` parameter is interpreted as:
+   *  - `IndividualEvent`: Individual ID (`indi_id`) to fetch individual events.
+   *  - `IndividualAttribute`: Individual ID (`indi_id`) to fetch individual attributes.
+   *  - `FamilyEvent`: Family ID (`familles_id`) to fetch family events.
+   *  - Other / Default: Specific event detail ID (`events_details_id`).
+   *
+   * Joins related individual and family records to populate descriptions, event tags, owner IDs,
+   * privacy restrictions, and the count of attached source citations.
+   *
+   * @param id The entity ID (individual ID, family ID, or event details ID depending on `eventType`).
+   * @param eventType The type of event to filter by ([[models.EventType]]).
+   * @return A [[scala.concurrent.Future]] containing the list of matching [[models.queryData.EventDetailQueryData]].
+   */
   @SuppressWarnings(Array("org.wartremover.warts.ToString"))
   def getEvents(id: Int, eventType: EventType): Future[List[EventDetailQueryData]] = Future {
     db.withConnection { implicit conn =>

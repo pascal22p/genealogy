@@ -1,5 +1,6 @@
 package testUtils
 
+import java.time.temporal.ChronoUnit
 import java.time.Instant
 
 import models.EventDetail
@@ -39,7 +40,7 @@ trait BaseSpec
       firstname: String = "Firstname",
       surname: String = "Surname", // SURN
       sex: Sex = MaleSex,          // SEX
-      timestamp: Instant = Instant.now(),
+      timestamp: Instant = Instant.now().truncatedTo(ChronoUnit.SECONDS),
       firstnamePrefix: String = "firstnamePrefix",         // NPFX
       surnamePrefix: String = "surnamePrefix",             // SPFX
       nameSuffix: String = "nameSuffix",                   // NSFX
