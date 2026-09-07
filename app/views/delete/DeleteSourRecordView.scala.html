@@ -1,0 +1,94 @@
+@import models.SessionData
+@import models.SourRecord
+@import views.html.components.LastModified
+
+@this(
+        main: Main,
+        govukSummaryList: GovukSummaryList,
+        formWithCSRF: FormWithCSRF,
+        govukButton: GovukButton
+)
+
+@(database: Option[GenealogyDatabase], sourRecord: SourRecord)(implicit request: AuthenticatedRequest[?], messages: Messages)
+
+@dbId = @{ database.fold(0)(_.id) }
+
+@main(database) {
+
+  @govukSummaryList(
+    SummaryList(
+      rows = Seq(
+        SummaryListRow(
+          key = Key(Text("Author")),
+          value = Value(Text(sourRecord.auth)),
+          classes = "govuk-summary-list__row--no-border",
+          actions = None
+        ),
+        SummaryListRow(
+          key = Key(Text("Title")),
+          value = Value(Text(sourRecord.title)),
+          classes = "govuk-summary-list__row--no-border",
+          actions = None
+        ),
+        SummaryListRow(
+          key = Key(Text("Short title")),
+          value = Value(Text(sourRecord.abbr)),
+          classes = "govuk-summary-list__row--no-border",
+          actions = None
+        ),
+        SummaryListRow(
+          key = Key(Text("Publication")),
+          value = Value(Text(sourRecord.publ)),
+          classes = "govuk-summary-list__row--no-border",
+          actions = None
+        ),
+        SummaryListRow(
+          key = Key(Text("Agency")),
+          value = Value(Text(sourRecord.agnc)),
+          classes = "govuk-summary-list__row--no-border",
+          actions = None
+        ),
+        SummaryListRow(
+          key = Key(Text("Rin")),
+          value = Value(Text(sourRecord.rin)),
+          classes = "govuk-summary-list__row--no-border",
+          actions = None
+        ),
+        SummaryListRow(
+          key = Key(Text("Repo id")),
+          value = Value(Text(sourRecord.repoId.fold("N/A")(_.toString))),
+          classes = "govuk-summary-list__row--no-border",
+          actions = None
+        ),
+        SummaryListRow(
+          key = Key(Text("Repo caln")),
+          value = Value(Text(sourRecord.repoCaln)),
+          classes = "govuk-summary-list__row--no-border",
+          actions = None
+        ),
+        SummaryListRow(
+          key = Key(Text("Repo medi")),
+          value = Value(Text(sourRecord.repoMedi)),
+          classes = "govuk-summary-list__row--no-border",
+          actions = None
+        )
+      ),
+      card = Some(Card(
+        title = Some(CardTitle(content = Text("Source record to be deleted"))),
+        actions = None,
+        classes = "govuk-!-margin-4",
+        attributes = Map.empty
+      )),
+      classes = "",
+      attributes = Map.empty
+    )
+  )
+
+  @formWithCSRF(controllers.delete.routes.DeleteSourRecordController.deleteSourRecordAction(dbId, sourRecord.id)) {
+    @govukButton(Button(
+      inputType = Some("submit"),
+      content = Text("Delete this source record"),
+      classes = "govuk-button--warning"
+    ))
+  }
+}

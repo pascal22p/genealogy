@@ -40,7 +40,7 @@
           classes = "",
           actions = Some(Actions(
             items = Seq(ActionItem(
-                href = "#",
+                href = controllers.delete.routes.DeleteSourRecordController.deleteSourRecordConfirmation(dbId, source.id).url,
                 content = Text(messages("Delete"))
               ),
               ActionItem(

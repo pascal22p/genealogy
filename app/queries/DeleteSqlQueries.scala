@@ -225,4 +225,33 @@ final class DeleteSqlQueries @Inject() (db: Database, databaseExecutionContext: 
     }
   }(using databaseExecutionContext)
 
+  def deleteSourRecord(sourRecordId: Int): Future[Int] = Future {
+    db.withTransaction { implicit conn =>
+      SQL("""DELETE FROM rel_sour_records_notes
+            | WHERE rel_sour_records_notes.sour_records_id = {id}
+        """.stripMargin)
+        .on(
+          "id" -> sourRecordId
+        )
+        .executeUpdate()
+
+      SQL("""UPDATE genea_sour_citations
+            | SET sour_records_id = NULL
+            | WHERE sour_records_id = {id}
+        """.stripMargin)
+        .on(
+          "id" -> sourRecordId
+        )
+        .executeUpdate()
+
+      SQL("""DELETE FROM genea_sour_records
+            | WHERE sour_records_id = {sourRecordId}
+        """.stripMargin)
+        .on(
+          "sourRecordId" -> sourRecordId
+        )
+        .executeUpdate()
+    }
+  }(using databaseExecutionContext)
+
 }
