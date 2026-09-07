@@ -32,7 +32,7 @@ class DeleteSourRecordController @Inject() (
     implicit authenticatedRequest: AuthenticatedRequest[AnyContent] =>
       (for {
         database   <- OptionT(genealogyDatabaseService.getGenealogyDatabase(baseId))
-        sourRecord <- getSqlQueries.getSourRecord(id)
+        sourRecord <- getSqlQueries.getSourRecord(baseId, id)
       } yield {
         Ok(deleteSourRecordView(Some(database), sourRecord))
       }).getOrElse(NotFound("Database or source record not found"))
@@ -40,7 +40,7 @@ class DeleteSourRecordController @Inject() (
 
   def deleteSourRecordAction(baseId: Int, id: Int): Action[AnyContent] = authJourney.authWithAdminRight.async {
     implicit authenticatedRequest: AuthenticatedRequest[AnyContent] =>
-      deleteSqlQueries.deleteSourRecord(id).map { _ =>
+      deleteSqlQueries.deleteSourRecord(baseId, id).map { _ =>
         Redirect(controllers.routes.SourRecordsController.index(baseId, None))
       }
   }

@@ -53,8 +53,8 @@ class DeleteSqlQueriesSpec extends MariadbHelper with Logging {
         _             <- executeSql(sqlSourCitation(citationId, Some(sourRecordId), 1))
         _             <- executeSql(sqlNote(noteId, 1))
         _             <- executeSql(sqlRelSourRecordNote(sourRecordId, noteId))
-        _             <- sut.deleteSourRecord(sourRecordId)
-        deletedRecord <- getSqlQueries.getSourRecord(sourRecordId).value
+        _             <- sut.deleteSourRecord(1, sourRecordId)
+        deletedRecord <- getSqlQueries.getSourRecord(1, sourRecordId).value
         citations     <- getSqlQueries.getSourCitationsFromRecord(sourRecordId)
       } yield (deletedRecord, citations)).futureValue
 

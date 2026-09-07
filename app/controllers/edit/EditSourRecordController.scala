@@ -41,14 +41,16 @@ class EditSourRecordController @Inject() (
 ) extends BaseController
     with I18nSupport {
 
-  private def handleSourRecord(id: Int)(
+  private def handleSourRecord(dbId: Int, id: Int)(
       block: SourRecord => Future[Result]
   ): Future[Result] =
-    sourRecordService.getSourRecord(id).foldF(Future.successful(NotFound("SourCitation could not be found")))(block)
+    sourRecordService
+      .getSourRecord(dbId, id)
+      .foldF(Future.successful(NotFound("SourCitation could not be found")))(block)
 
   def showForm(baseId: Int, sourRecordId: Int, sourCitationType: SourCitationType, sourCitationId: Int) =
     authJourney.authWithAdminRight.async { implicit request =>
-      handleSourRecord(sourRecordId) { sourRecord =>
+      handleSourRecord(baseId, sourRecordId) { sourRecord =>
         val form = SourRecordForm.sourRecordForm.fill(sourRecord.toForm(sourCitationId, sourCitationType))
         genealogyDatabaseService.getGenealogyDatabase(baseId).map { database =>
           Ok(sourRecordView(database, form, sourRecord))
@@ -58,7 +60,7 @@ class EditSourRecordController @Inject() (
 
   def onSubmit(baseId: Int, sourRecordId: Int) = authJourney.authWithAdminRight.async { implicit request =>
     def errorFunction(formWithErrors: Form[SourRecordForm]): Future[Result] = {
-      handleSourRecord(sourRecordId) { sourRecord =>
+      handleSourRecord(baseId, sourRecordId) { sourRecord =>
         genealogyDatabaseService.getGenealogyDatabase(baseId).map { database =>
           BadRequest(sourRecordView(database, formWithErrors, sourRecord))
         }
@@ -66,7 +68,7 @@ class EditSourRecordController @Inject() (
     }
 
     val successFunction: SourRecordForm => Future[Result] = { dataForm =>
-      handleSourRecord(sourRecordId) { sourRecord =>
+      handleSourRecord(baseId, sourRecordId) { sourRecord =>
         updateSqlQueries.updateSourRecord(sourRecord.fromForm(dataForm)).flatMap {
           case 1 =>
             dataForm.parentType match {

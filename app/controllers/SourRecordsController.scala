@@ -50,7 +50,7 @@ class SourRecordsController @Inject() (
     implicit authenticatedRequest: AuthenticatedRequest[AnyContent] =>
       (for {
         database                <- OptionT(genealogyDatabaseService.getGenealogyDatabase(dbId))
-        sourRecord              <- getSqlQueries.getSourRecord(sourRecordId)
+        sourRecord              <- getSqlQueries.getSourRecord(dbId, sourRecordId)
         sourCitations           <- OptionT.liftF(getSqlQueries.getSourCitationsFromRecord(sourRecordId))
         sourCitationsWithUsages <-
           OptionT.liftF(sourCitations.traverse { sourCitation =>

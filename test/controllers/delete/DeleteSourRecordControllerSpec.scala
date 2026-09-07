@@ -68,7 +68,7 @@ class DeleteSourRecordControllerSpec extends BaseSpec {
       when(mockGenealogyDatabaseService.getGenealogyDatabase(1)).thenReturn(
         Future.successful(Some(GenealogyDatabase(1, "Name", "Description", None)))
       )
-      when(mockGetSqlQueries.getSourRecord(1)).thenReturn(
+      when(mockGetSqlQueries.getSourRecord(1, 1)).thenReturn(
         OptionT.some[Future](fakeSourRecord)
       )
 
@@ -86,7 +86,7 @@ class DeleteSourRecordControllerSpec extends BaseSpec {
       when(mockGenealogyDatabaseService.getGenealogyDatabase(1)).thenReturn(
         Future.successful(Some(GenealogyDatabase(1, "Name", "Description", None)))
       )
-      when(mockGetSqlQueries.getSourRecord(1)).thenReturn(
+      when(mockGetSqlQueries.getSourRecord(1, 1)).thenReturn(
         OptionT.none[Future, SourRecord]
       )
 
@@ -98,13 +98,13 @@ class DeleteSourRecordControllerSpec extends BaseSpec {
 
   "deleteSourRecordAction" must {
     "delete the sourRecord and redirect to sour records list" in {
-      when(mockDeleteSqlQueries.deleteSourRecord(1)).thenReturn(Future.successful(1))
+      when(mockDeleteSqlQueries.deleteSourRecord(1, 1)).thenReturn(Future.successful(1))
 
       val result = sut.deleteSourRecordAction(1, 1).apply(FakeRequest().withCSRFToken)
 
       status(result) mustBe SEE_OTHER
       redirectLocation(result) mustBe Some(controllers.routes.SourRecordsController.index(1, None).url)
-      verify(mockDeleteSqlQueries).deleteSourRecord(1)
+      verify(mockDeleteSqlQueries).deleteSourRecord(1, 1)
     }
   }
 }

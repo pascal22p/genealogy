@@ -502,12 +502,12 @@ final class GetSqlQueries @Inject() (
     }
   }(using databaseExecutionContext))
 
-  def getSourRecord(id: Int): OptionT[Future, SourRecord] = OptionT(Future {
+  def getSourRecord(dbId: Int, id: Int): OptionT[Future, SourRecord] = OptionT(Future {
     db.withConnection { implicit conn =>
       SQL("""SELECT *
             |FROM genea_sour_records
-            |WHERE sour_records_id = {id}""".stripMargin)
-        .on("id" -> id)
+            |WHERE sour_records_id = {id} AND base = {dbId}""".stripMargin)
+        .on("id" -> id, "dbId" -> dbId)
         .as[Option[SourRecord]](SourRecord.mysqlParser.singleOpt)
     }
   }(using databaseExecutionContext))

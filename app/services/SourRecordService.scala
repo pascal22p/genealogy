@@ -13,8 +13,8 @@ import io.opentelemetry.instrumentation.annotations.WithSpan
 @Singleton
 class SourRecordService @Inject() (mariadbQueries: GetSqlQueries)() {
   @WithSpan
-  def getSourRecord(sourRecordId: Int): OptionT[Future, SourRecord] = {
-    mariadbQueries.getSourRecord(sourRecordId)
+  def getSourRecord(dbId: Int, sourRecordId: Int): OptionT[Future, SourRecord] = {
+    mariadbQueries.getSourRecord(dbId, sourRecordId)
   }
 
 }
