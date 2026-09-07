@@ -23,9 +23,8 @@ class PersonDetailsService @Inject() (
 ) {
 
   @WithSpan
-  def getPersonDetails(id: Int): OptionT[Future, PersonDetails] = OptionT {
-    mariadbQueries.getPersonDetails(id).map(_.headOption)
-  }
+  def getPersonDetails(id: Int): OptionT[Future, PersonDetails] =
+    mariadbQueries.getPersonDetails(id)
 
   @WithSpan
   def getLatestPersonDetails(dbId: Int, maxNumber: Int): Future[List[PersonDetails]] =

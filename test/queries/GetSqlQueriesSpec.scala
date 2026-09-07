@@ -2,6 +2,7 @@ package queries
 
 import java.time.LocalDateTime
 
+import cats.data.OptionT
 import models.*
 import models.queryData.EventDetailQueryData
 import models.queryData.FamilyAsChildQueryData
@@ -15,7 +16,8 @@ import play.api.Logging
 import testUtils.MariadbHelper
 
 class GetSqlQueriesSpec extends MariadbHelper with Logging {
-  lazy val sut: GetSqlQueries = app.injector.instanceOf[GetSqlQueries]
+  lazy val databaseExecutionContext = app.injector.instanceOf[DatabaseExecutionContext]
+  lazy val sut: GetSqlQueries       = new GetSqlQueries(db, databaseExecutionContext)
 
   implicit val request: Request[?] = FakeRequest()
     .withHeaders("X-Request-Id" -> "requestID")
@@ -23,8 +25,8 @@ class GetSqlQueriesSpec extends MariadbHelper with Logging {
     .addAttr(Attrs.SessionId, "sessionID")
 
   def sqlPersonDetails(person: PersonDetails): String =
-    s"""INSERT INTO `genea_individuals` (`indi_id`, `base`, `indi_nom`, `indi_prenom`, `indi_sexe`, `indi_npfx`, `indi_givn`, `indi_nick`, `indi_spfx`, `indi_nsfx`, `indi_resn`) VALUES
-       |(${person.id},	${person.base},	'${person.surname}',	'${person.firstname}',	'${person.sex.gedcom}',	'${person.firstnamePrefix}',	'${person.nameGiven}',	'${person.nameNickname}',	'${person.surnamePrefix}',	'${person.nameSuffix}',	${person.privacyRestriction.fold("NULL")(r => s"'$r'")});
+    s"""INSERT INTO `genea_individuals` (`indi_id`, `base`, `indi_nom`, `indi_prenom`, `indi_sexe`, `indi_timestamp`, `indi_npfx`, `indi_givn`, `indi_nick`, `indi_spfx`, `indi_nsfx`, `indi_resn`) VALUES
+       |(${person.id},	${person.base},	'${person.surname}',	'${person.firstname}',	'${person.sex.gedcom}',	FROM_UNIXTIME(${person.timestamp.getEpochSecond}),	'${person.firstnamePrefix}',	'${person.nameGiven}',	'${person.nameNickname}',	'${person.surnamePrefix}',	'${person.nameSuffix}',	${person.privacyRestriction.fold("NULL")(r => s"'$r'")});
        |""".stripMargin
 
   def sqlEventDetails(event: EventDetail): String =
@@ -99,20 +101,18 @@ class GetSqlQueriesSpec extends MariadbHelper with Logging {
     "returns person details" in {
       val person = fakePersonDetails(id = 1)
       val result = (for {
-        _      <- executeSql(sqlPersonDetails(person))
+        _      <- OptionT.liftF(executeSql(sqlPersonDetails(person)))
         result <- sut.getPersonDetails(person.id)
-      } yield result).futureValue
+      } yield result).value.futureValue
 
-      result mustBe a[List[PersonDetails]]
-      result.size mustBe 1
-      result.head.id mustBe person.id
+      result mustBe Some(person)
     }
 
     "returns nothing" in {
       val idPerson = 1
-      val result   = sut.getPersonDetails(idPerson).futureValue
+      val result   = sut.getPersonDetails(idPerson).value.futureValue
 
-      result mustBe List.empty[PersonDetails]
+      result mustBe None
     }
   }
 

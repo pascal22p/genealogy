@@ -27,8 +27,9 @@ trait MariadbHelper extends BaseSpec with BeforeAndAfterEach with LoggingWithReq
   implicit override lazy val app: Application = localGuiceApplicationBuilder()
     .configure(
       "database.name"  -> testDataBase,
-      "db.default.url" -> "jdbc:mariadb://localhost:3306",
-      "upload-path"    -> "test/resources/gedcom/"
+      "db.default.url" ->
+        "jdbc:mariadb://localhost:3306?connectionTimeZone=UTC&forceConnectionTimeZoneToSession=true&preserveInstants=true",
+      "upload-path" -> "test/resources/gedcom/"
     )
     .overrides(
       bind[JourneyCacheRepository].toInstance(mockJourneyCacheRepository)
@@ -39,9 +40,36 @@ trait MariadbHelper extends BaseSpec with BeforeAndAfterEach with LoggingWithReq
     db.withConnection { implicit conn =>
       queries.trim
         .split(";")
+        .filter(_.trim.nonEmpty)
         .map { query =>
           if (logMe) logger.error("Query: " + query)
-          Try(SQL(query).execute()) match {
+
+          val trimmed = query.trim
+          Try {
+            if (trimmed.toLowerCase.startsWith("select")) {
+              val stmt     = conn.createStatement()
+              val rs       = stmt.executeQuery(trimmed)
+              val meta     = rs.getMetaData
+              val colCount = meta.getColumnCount
+
+              var hasRows = false
+              while (rs.next()) {
+                hasRows = true
+                val values = (1 to colCount).map { i =>
+                  val colName = meta.getColumnName(i)
+                  val value   = rs.getObject(i)
+                  val cls     = Option(value).map(_.getClass.getName).getOrElse("null")
+                  s"$colName -> value=$value, class=$cls"
+                }
+                println(s"RAW ROW: ${values.mkString(", ")}")
+              }
+              rs.close()
+              stmt.close()
+              hasRows
+            } else {
+              SQL(trimmed).execute()
+            }
+          } match {
             case Success(bool)  => bool
             case Failure(error) =>
               logger.error("Error with query: " + query)
