@@ -15,3 +15,6 @@ POST    /base/:baseId/event/:id                controllers.delete.DeleteEventCon
 
 GET     /base/:baseId/source-citation/:id                controllers.delete.DeleteSourCitationController.deleteSourCitationConfirmation(baseId: Int, id: Int)
 POST    /base/:baseId/source-citation/:id                controllers.delete.DeleteSourCitationController.deleteSourCitationAction(baseId: Int, id: Int)
+
+GET     /base/:baseId/source-record/:id                controllers.delete.DeleteSourRecordController.deleteSourRecordConfirmation(baseId: Int, id: Int)
+POST    /base/:baseId/source-record/:id                controllers.delete.DeleteSourRecordController.deleteSourRecordAction(baseId: Int, id: Int)

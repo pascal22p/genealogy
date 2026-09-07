@@ -225,4 +225,58 @@ final class DeleteSqlQueries @Inject() (db: Database, databaseExecutionContext: 
     }
   }(using databaseExecutionContext)
 
+  def deleteSourRecord(dbId: Int, sourRecordId: Int): Future[Int] = Future {
+    db.withTransaction { implicit conn =>
+      SQL("""DELETE FROM rel_sour_records_notes
+            | WHERE rel_sour_records_notes.sour_records_id = {id}
+        """.stripMargin)
+        .on(
+          "id" -> sourRecordId
+        )
+        .executeUpdate()
+
+      SQL("""DELETE FROM rel_events_sources
+            |WHERE sour_citations_id IN (
+            |  SELECT sour_citations_id
+            |  FROM genea_sour_citations
+            |  WHERE sour_records_id = {id}
+            |)
+        """.stripMargin)
+        .on(
+          "id" -> sourRecordId
+        )
+        .executeUpdate()
+
+      SQL("""DELETE FROM rel_sour_citations_multimedia
+            |WHERE sour_citations_id IN (
+            |  SELECT sour_citations_id
+            |  FROM genea_sour_citations
+            |  WHERE sour_records_id = {id}
+            |)
+        """.stripMargin)
+        .on(
+          "id" -> sourRecordId
+        )
+        .executeUpdate()
+
+      SQL("""DELETE FROM genea_sour_citations
+            | WHERE sour_records_id = {id} AND base = {dbId}
+        """.stripMargin)
+        .on(
+          "id"   -> sourRecordId,
+          "dbId" -> dbId
+        )
+        .executeUpdate()
+
+      SQL("""DELETE FROM genea_sour_records
+            | WHERE sour_records_id = {sourRecordId} AND base = {dbId}
+        """.stripMargin)
+        .on(
+          "sourRecordId" -> sourRecordId,
+          "dbId"         -> dbId
+        )
+        .executeUpdate()
+    }
+  }(using databaseExecutionContext)
+
 }
