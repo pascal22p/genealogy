@@ -188,10 +188,10 @@ CREATE TABLE `genea_multimedia` (
                                     `media_file` varchar(200) NOT NULL DEFAULT '',
                                     `media_timestamp` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
                                     PRIMARY KEY (`media_id`),
+                                    UNIQUE KEY `base_media_file` (`base`,`media_file`),
                                     KEY `base` (`base`),
                                     CONSTRAINT `genea_multimedia_ibfk_1` FOREIGN KEY (`base`) REFERENCES `genea_infos` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci COMMENT='Liste des documents multimÃ©dia';
-
 
 DROP TABLE IF EXISTS `genea_notes`;
 CREATE TABLE `genea_notes` (

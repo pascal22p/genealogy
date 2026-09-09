@@ -11,9 +11,9 @@ class AppConfig @Inject() (configuration: Configuration) {
   val allowedHost: String = configuration.get[String]("allowedHost")
   val appName: String     = configuration.get[String]("appName")
 
-  val mediaPath: String          = configuration.get[String]("media-path")
-  val uploadPath: String         = configuration.get[String]("upload-path")
-  val externalAssetsPath: String = configuration.get[String]("external-assets-path")
+  val mediaPath: String          = configuration.get[String]("media-path").reverse.dropWhile(_ == '/').reverse
+  val uploadPath: String         = configuration.get[String]("upload-path").reverse.dropWhile(_ == '/').reverse
+  val externalAssetsPath: String = configuration.get[String]("external-assets-path").reverse.dropWhile(_ == '/').reverse
 
   val databaseName: String = configuration.get[String]("database.name")
 
