@@ -22,7 +22,7 @@ final case class SourRecord(
     timestamp: Instant
 ) {
   def toForm(parentId: Int, parentType: SourCitationType): SourRecordForm =
-    SourRecordForm(auth, title, abbr, publ, agnc, rin, repoCaln, repoMedi, parentId, parentType)
+    SourRecordForm(auth, title, abbr, publ, agnc, rin, repoCaln, repoMedi, repoId, parentId, parentType)
 
   def fromForm(form: SourRecordForm): SourRecord = SourRecord(
     id,
@@ -32,7 +32,7 @@ final case class SourRecord(
     form.publ,
     form.agnc,
     form.rin,
-    repoId,
+    form.repoId,
     form.repoCaln,
     form.repoMedi,
     timestamp

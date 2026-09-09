@@ -4,11 +4,10 @@ import java.nio.file.Paths
 import java.time.Instant
 import javax.inject.Inject
 import javax.inject.Singleton
-
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
-
 import actions.AuthJourney
+import config.AppConfig
 import models.Media
 import models.MediaType
 import play.api.i18n.I18nSupport
@@ -30,6 +29,7 @@ class AddMediaController @Inject() (
     getSqlQueries: GetSqlQueries,
     insertSqlQueries: InsertSqlQueries,
     genealogyDatabaseService: GenealogyDatabaseService,
+    appConfig: AppConfig,
     addMediaView: AddMedia,
     serviceUnavailableView: ServiceUnavailable,
     val controllerComponents: ControllerComponents
@@ -56,10 +56,10 @@ class AddMediaController @Inject() (
           getSqlQueries
             .getGenealogyDatabase(baseId)
             .foldF(Future.successful(NotFound("Genealogy database not found"))) { genealogyDb =>
-              picture.ref.copyTo(Paths.get(s"Medias/${genealogyDb.name}/$filename"), replace = false)
+              picture.ref.copyTo(Paths.get(s"${appConfig.mediaPath}${genealogyDb.name}/$filename"), replace = false)
               val media = Media(0, baseId, "", ext, s"$filename", Instant.now, None, MediaType.UnknownMedia)
               insertSqlQueries.insertMedia(media).value.map { _ =>
-                Ok(s"File uploaded Medias/${genealogyDb.name}/$filename")
+                Ok(s"File uploaded ${appConfig.mediaPath}${genealogyDb.name}/$filename")
               }
             }
         }

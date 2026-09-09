@@ -5,6 +5,7 @@ import play.api.data.Form
 import play.api.data.Forms.mapping
 import play.api.data.Forms.number
 import play.api.data.Forms.of
+import play.api.data.Forms.optional
 import play.api.data.Forms.text
 
 final case class SourRecordForm(
@@ -16,6 +17,7 @@ final case class SourRecordForm(
     rin: String,
     repoCaln: String,
     repoMedi: String,
+    repoId: Option[Int],
     parentId: Int,
     parentType: SourCitationType.SourCitationType
 )
@@ -24,8 +26,22 @@ object SourRecordForm {
 
   def unapply(
       u: SourRecordForm
-  ): Option[(String, String, String, String, String, String, String, String, Int, SourCitationType.SourCitationType)] =
-    Some((u.auth, u.title, u.abbr, u.publ, u.agnc, u.rin, u.repoCaln, u.repoMedi, u.parentId, u.parentType))
+  ): Option[
+    (
+        String,
+        String,
+        String,
+        String,
+        String,
+        String,
+        String,
+        String,
+        Option[Int],
+        Int,
+        SourCitationType.SourCitationType
+    )
+  ] =
+    Some((u.auth, u.title, u.abbr, u.publ, u.agnc, u.rin, u.repoCaln, u.repoMedi, u.repoId, u.parentId, u.parentType))
 
   val sourRecordForm: Form[SourRecordForm] = Form(
     mapping(
@@ -37,6 +53,7 @@ object SourRecordForm {
       "rin"        -> text,
       "repoCaln"   -> text,
       "repoMedi"   -> text,
+      "repoId"     -> optional(number),
       "parentId"   -> number,
       "parentType" -> of[SourCitationType.SourCitationType](using SourCitationType.formatter)
     )(SourRecordForm.apply)(SourRecordForm.unapply)

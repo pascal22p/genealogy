@@ -8,6 +8,8 @@ import scala.concurrent.Future
 
 import actions.AuthJourney
 import models.forms.SourRecordForm
+import models.queryData.RepositoryQueryData
+import models.GenealogyDatabase
 import models.SourCitationType.EventSourCitation
 import models.SourCitationType.FamilySourCitation
 import models.SourCitationType.IndividualSourCitation
@@ -19,6 +21,7 @@ import play.api.i18n.I18nSupport
 import play.api.mvc.BaseController
 import play.api.mvc.ControllerComponents
 import play.api.mvc.Result
+import queries.GetSqlQueries
 import queries.UpdateSqlQueries
 import services.GenealogyDatabaseService
 import services.SourCitationService
@@ -32,6 +35,7 @@ class EditSourRecordController @Inject() (
     sourRecordService: SourRecordService,
     sourCitationService: SourCitationService,
     genealogyDatabaseService: GenealogyDatabaseService,
+    getSqlQueries: GetSqlQueries,
     updateSqlQueries: UpdateSqlQueries,
     sourRecordView: EditSourRecord,
     serviceUnavailableView: ServiceUnavailable,
@@ -42,33 +46,35 @@ class EditSourRecordController @Inject() (
     with I18nSupport {
 
   private def handleSourRecord(dbId: Int, id: Int)(
-      block: SourRecord => Future[Result]
+      block: (SourRecord, Option[GenealogyDatabase], List[RepositoryQueryData]) => Future[Result]
   ): Future[Result] =
     sourRecordService
       .getSourRecord(dbId, id)
-      .foldF(Future.successful(NotFound("SourCitation could not be found")))(block)
+      .foldF(Future.successful(NotFound("SourCitation could not be found"))) { sourRecord =>
+        for {
+          database     <- genealogyDatabaseService.getGenealogyDatabase(dbId)
+          repositories <- getSqlQueries.getRepositories(dbId)
+          result       <- block(sourRecord, database, repositories.sortBy(_.name))
+        } yield result
+      }
 
   def showForm(baseId: Int, sourRecordId: Int, sourCitationType: SourCitationType, sourCitationId: Int) =
     authJourney.authWithAdminRight.async { implicit request =>
-      handleSourRecord(baseId, sourRecordId) { sourRecord =>
+      handleSourRecord(baseId, sourRecordId) { (sourRecord, database, repositories) =>
         val form = SourRecordForm.sourRecordForm.fill(sourRecord.toForm(sourCitationId, sourCitationType))
-        genealogyDatabaseService.getGenealogyDatabase(baseId).map { database =>
-          Ok(sourRecordView(database, form, sourRecord))
-        }
+        Future.successful(Ok(sourRecordView(database, form, sourRecord, repositories)))
       }
     }
 
   def onSubmit(baseId: Int, sourRecordId: Int) = authJourney.authWithAdminRight.async { implicit request =>
     def errorFunction(formWithErrors: Form[SourRecordForm]): Future[Result] = {
-      handleSourRecord(baseId, sourRecordId) { sourRecord =>
-        genealogyDatabaseService.getGenealogyDatabase(baseId).map { database =>
-          BadRequest(sourRecordView(database, formWithErrors, sourRecord))
-        }
+      handleSourRecord(baseId, sourRecordId) { (sourRecord, database, repositories) =>
+        Future.successful(BadRequest(sourRecordView(database, formWithErrors, sourRecord, repositories)))
       }
     }
 
     val successFunction: SourRecordForm => Future[Result] = { dataForm =>
-      handleSourRecord(baseId, sourRecordId) { sourRecord =>
+      handleSourRecord(baseId, sourRecordId) { (sourRecord, _, _) =>
         updateSqlQueries.updateSourRecord(sourRecord.fromForm(dataForm)).flatMap {
           case 1 =>
             dataForm.parentType match {
