@@ -9,4 +9,4 @@ addSbtPlugin("org.scoverage"       % "sbt-scoverage"            % "2.4.4")
 
 addSbtPlugin("org.wartremover" % "sbt-wartremover" % "3.6.1")
 
-addSbtPlugin("com.github.sbt" % "sbt-git" % "2.1.0")
+addSbtPlugin("com.github.sbt" % "sbt-git" % "2.2.0")
