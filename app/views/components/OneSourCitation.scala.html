@@ -7,7 +7,7 @@
   sourRecord: SourRecord,
   govukSummaryList: GovukSummaryList)
 
-@(dbId: Int, source: ModelSourCitation)(implicit request: AuthenticatedRequest[?])
+@(dbId: Int, source: ModelSourCitation)(implicit request: AuthenticatedRequest[?], messages: Messages)
 
   @govukSummaryList(
     SummaryList(
@@ -74,7 +74,7 @@
   )
 
   @for(record <- source.record) {
-    @sourRecord(dbId, record, source.sourceType, source.id) 
+    @sourRecord(dbId, record)
   }
 
   @mediasComponent(dbId, source.id, source.medias)

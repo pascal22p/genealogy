@@ -7,5 +7,5 @@ POST    /base/:baseId/event-detail/:id                   controllers.edit.EditEv
 GET     /base/:baseId/source-citation/:id                controllers.edit.EditSourCitationController.showForm(baseId: Int, id: Int)
 POST    /base/:baseId/source-citation/:id                controllers.edit.EditSourCitationController.onSubmit(baseId: Int, id: Int)
 
-GET     /base/:baseId/source-record/:sourRecordId/:sourCitationType/:sourCitationId                controllers.edit.EditSourRecordController.showForm(baseId: Int, sourRecordId: Int, sourCitationType: SourCitationType, sourCitationId: Int)
-POST    /base/:baseId/source-record/:id                  controllers.edit.EditSourRecordController.onSubmit(baseId: Int, id: Int)
+GET     /base/:baseId/source-record/:sourRecordId        controllers.edit.EditSourRecordController.showForm(baseId: Int, sourRecordId: Int, returnUrl: String)
+POST    /base/:baseId/source-record/:sourRecordId        controllers.edit.EditSourRecordController.onSubmit(baseId: Int, sourRecordId: Int)
