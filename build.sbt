@@ -33,7 +33,7 @@ dockerCommands ++= Seq(
   ExecCmd("RUN", "apt-get", "install", "-y", "graphviz"),
   ExecCmd("RUN", "apt-get", "clean"),
   ExecCmd("RUN", "rm", "-rf", "/var/lib/apt/lists/*"),
-  Cmd("USER", "1001:0")
+  Cmd("USER", "1001:1001")
 )
 dockerBuildOptions ++= Seq("--load")
 

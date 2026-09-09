@@ -723,6 +723,18 @@ final class GetSqlQueries @Inject() (
     }
   }(using databaseExecutionContext)
 
+  def getRepository(baseId: Int, repoId: Int): OptionT[Future, RepositoryQueryData] = OptionT(Future {
+    db.withConnection { implicit conn =>
+      SQL("""SELECT *
+            |FROM genea_repository
+            |LEFT JOIN genea_address ON genea_address.addr_id = genea_repository.addr_id
+            |WHERE genea_repository.base = {baseId} AND genea_repository.repo_id = {repoId}
+            |""".stripMargin)
+        .on("baseId" -> baseId, "repoId" -> repoId)
+        .as[Option[RepositoryQueryData]](RepositoryQueryData.mysqlParserRepository.singleOpt)
+    }
+  }(using databaseExecutionContext))
+
   def findEmptyCaln(baseId: Int): Future[Seq[SourRecord]] = Future {
     db.withConnection { implicit conn =>
       SQL("""SELECT *
