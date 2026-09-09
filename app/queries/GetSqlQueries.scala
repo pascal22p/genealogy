@@ -605,6 +605,18 @@ final class GetSqlQueries @Inject() (
     }
   }(using databaseExecutionContext))
 
+  def getMediaFromFilename(baseId: Int, filename: String): OptionT[Future, Media] = OptionT(Future {
+    db.withConnection { implicit conn =>
+      SQL("""SELECT *
+            |FROM genea_multimedia
+            |WHERE base = {baseId} AND
+            |media_file = {filename}
+            |""".stripMargin)
+        .on("baseId" -> baseId, "filename" -> filename)
+        .as[Option[Media]](Media.mysqlParserMediaOnly.singleOpt)
+    }
+  }(using databaseExecutionContext))
+
   def getOrphanedEvents(baseId: Int): Future[List[EventDetailQueryData]] = Future {
     db.withConnection { implicit conn =>
       SQL("""SELECT *

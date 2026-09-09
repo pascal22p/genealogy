@@ -4,8 +4,10 @@ import java.nio.file.Paths
 import java.time.Instant
 import javax.inject.Inject
 import javax.inject.Singleton
+
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
+
 import actions.AuthJourney
 import config.AppConfig
 import models.Media
@@ -58,8 +60,15 @@ class AddMediaController @Inject() (
             .foldF(Future.successful(NotFound("Genealogy database not found"))) { genealogyDb =>
               picture.ref.copyTo(Paths.get(s"${appConfig.mediaPath}${genealogyDb.name}/$filename"), replace = false)
               val media = Media(0, baseId, "", ext, s"$filename", Instant.now, None, MediaType.UnknownMedia)
-              insertSqlQueries.insertMedia(media).value.map { _ =>
-                Ok(s"File uploaded ${appConfig.mediaPath}${genealogyDb.name}/$filename")
+              getSqlQueries.getMediaFromFilename(baseId, s"$filename").value.flatMap {
+                case Some(_) =>
+                  Future.successful(
+                    Conflict(s"File already exists ${appConfig.mediaPath}${genealogyDb.name}/$filename")
+                  )
+                case None =>
+                  insertSqlQueries.insertMedia(media).value.map { _ =>
+                    Ok(s"File uploaded ${appConfig.mediaPath}${genealogyDb.name}/$filename")
+                  }
               }
             }
         }
