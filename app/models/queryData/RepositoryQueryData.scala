@@ -24,8 +24,17 @@ object RepositoryQueryData {
       case id ~ base ~ name ~ rin ~ addr_id ~ addr_addr ~ addr_city ~ addr_stae ~ addr_post ~ addr_ctry ~ addr_phon1 ~ addr_email1 ~ addr_fax1 ~ addr_www1 =>
         val address = addr_id.flatMap { id =>
           if (
-            Seq(addr_addr, addr_city, addr_stae, addr_post, addr_ctry, addr_phon1, addr_email1, addr_fax1, addr_www1)
-              .forall(_.isEmpty)
+            Seq(
+              addr_addr,
+              addr_city,
+              addr_stae,
+              addr_post,
+              addr_ctry,
+              addr_phon1,
+              addr_email1,
+              addr_fax1,
+              addr_www1
+            ).forall(_.forall(_.isEmpty))
           ) {
             None
           } else {
