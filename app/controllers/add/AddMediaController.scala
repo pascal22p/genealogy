@@ -61,13 +61,13 @@ class AddMediaController @Inject() (
               getSqlQueries.getMediaFromFilename(baseId, s"$filename").value.flatMap {
                 case Some(_) =>
                   Future.successful(
-                    Conflict(s"File already exists ${appConfig.mediaPath}${genealogyDb.name}/$filename")
+                    Conflict(s"File already exists ${appConfig.mediaPath}/${genealogyDb.name}/$filename")
                   )
                 case None =>
-                  picture.ref.copyTo(Paths.get(s"${appConfig.mediaPath}${genealogyDb.name}/$filename"), replace = false)
+                  picture.ref.copyTo(Paths.get(s"${appConfig.mediaPath}/${genealogyDb.name}/$filename"), replace = false)
                   val media = Media(0, baseId, "", ext, s"$filename", Instant.now, None, MediaType.UnknownMedia)
                   insertSqlQueries.insertMedia(media).value.map { _ =>
-                    Ok(s"File uploaded ${appConfig.mediaPath}${genealogyDb.name}/$filename")
+                    Ok(s"File uploaded ${appConfig.mediaPath}/${genealogyDb.name}/$filename")
                   }
               }
             }

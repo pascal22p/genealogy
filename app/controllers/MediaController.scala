@@ -26,7 +26,7 @@ class MediaController @Inject() (
     getSqlQueries.getGenealogyDatabase(dbId).fold(NotFound("Database not found")) { database =>
       Try(new File(filename)) match {
         case Success(file) =>
-          val path = new File(s"${appConfig.mediaPath}${database.medias.getOrElse(database.name)}/$file")
+          val path = new File(s"${appConfig.mediaPath}/${database.medias.getOrElse(database.name)}/$file")
           if (path.exists()) {
             Ok.sendFile(path)
           } else {
