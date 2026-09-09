@@ -52,6 +52,7 @@ class SourRecordsController @Inject() (
         database                <- OptionT(genealogyDatabaseService.getGenealogyDatabase(dbId))
         sourRecord              <- getSqlQueries.getSourRecord(dbId, sourRecordId)
         sourCitations           <- OptionT.liftF(getSqlQueries.getSourCitationsFromRecord(sourRecordId))
+        repository              <- sourRecord.repoId.traverse(getSqlQueries.getRepository(dbId, _))
         sourCitationsWithUsages <-
           OptionT.liftF(sourCitations.traverse { sourCitation =>
             for {
@@ -62,7 +63,7 @@ class SourRecordsController @Inject() (
             }
           })
       } yield {
-        Ok(sourCitationsFromRecordListView(Some(database), sourRecord, sourCitationsWithUsages))
+        Ok(sourCitationsFromRecordListView(Some(database), sourRecord, repository, sourCitationsWithUsages))
       }).getOrElse(NotFound("database or source record not found"))
   }
 

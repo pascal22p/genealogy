@@ -16,12 +16,14 @@ import play.api.mvc.ControllerComponents
 import services.GenealogyDatabaseService
 import queries.GetSqlQueries
 import views.html.RepositoryListView
+import views.html.RepositoryView
 
 @Singleton
-class RepositoryListController @Inject() (
+class RepositoryController @Inject() (
     authAction: AuthAction,
     getSqlQueries: GetSqlQueries,
     repositoryListView: RepositoryListView,
+    repositoryView: RepositoryView,
     genealogyDatabaseService: GenealogyDatabaseService,
     val controllerComponents: ControllerComponents
 )(
@@ -36,6 +38,16 @@ class RepositoryListController @Inject() (
         repos    <- OptionT.liftF(getSqlQueries.getRepositories(dbId))
       } yield {
         Ok(repositoryListView(Some(database), repos.sortBy(_.name)))
+      }).getOrElse(NotFound(s"Genealogy database $dbId not found"))
+  }
+
+  def showRepository(dbId: Int, repoId: Int): Action[AnyContent] = authAction.async {
+    implicit request: AuthenticatedRequest[AnyContent] =>
+      (for {
+        database <- OptionT(genealogyDatabaseService.getGenealogyDatabase(dbId))
+        repo     <- getSqlQueries.getRepository(dbId, repoId)
+      } yield {
+        Ok(repositoryView(Some(database), repo))
       }).getOrElse(NotFound(s"Genealogy database $dbId not found"))
   }
 }

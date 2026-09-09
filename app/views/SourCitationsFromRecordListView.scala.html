@@ -13,6 +13,7 @@
 @(
         database: Option[GenealogyDatabase],
         sourRecord: SourRecord,
+        repository: Option[RepositoryQueryData],
         citations: List[SourCitationViewModel]
 )(implicit request: AuthenticatedRequest[?], messages: Messages)
 
@@ -48,7 +49,15 @@
 
 @main(database) {
 
-  @block(messages("sourCitationsFromRecordListView.sourceRecord")) {
+  @block(
+    messages("sourCitationsFromRecordListView.sourceRecord"),
+    actions = Some(Actions(items = Seq(
+      ActionItem(
+        href = controllers.edit.routes.EditSourRecordController.showForm(dbId, sourRecord.id, request.uri).url,
+        content = Text(messages("Edit"))
+      )
+    )))
+  ) {
     <ul class="govuk-list">
       <li>@messages("sourCitationsFromRecordListView.id") @sourRecord.id</li>
       <li>@messages("sourCitationsFromRecordListView.auth") @sourRecord.auth</li>
@@ -57,9 +66,11 @@
       <li>@messages("sourCitationsFromRecordListView.publ") @sourRecord.publ</li>
       <li>@messages("sourCitationsFromRecordListView.agnc") @sourRecord.agnc</li>
       <li>@messages("sourCitationsFromRecordListView.rin") @sourRecord.rin</li>
-      <li>@messages("sourCitationsFromRecordListView.repo") @sourRecord.repoId</li>
-      <li>@messages("sourCitationsFromRecordListView.repoCaln") @sourRecord.repoCaln</li>
-      <li>@messages("sourCitationsFromRecordListView.repoMedi") @sourRecord.repoMedi</li>
+      @for(repo <- repository) {
+        <li>@messages("sourCitationsFromRecordListView.repo") <a href="@controllers.routes.RepositoryController.showRepository(dbId, repo.id)" class="govuk-link">@repo.name</a></li>
+        <li>@messages("sourCitationsFromRecordListView.repoCaln") @sourRecord.repoCaln</li>
+        <li>@messages("sourCitationsFromRecordListView.repoMedi") @sourRecord.repoMedi</li>
+      }
     </ul>
 
     @govukSummaryList(

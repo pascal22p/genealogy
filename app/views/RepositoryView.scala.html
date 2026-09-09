@@ -1,0 +1,32 @@
+@import models.SessionData
+@import views.html.components.{Block, LastModified}
+@import models.queryData.RepositoryQueryData
+@import models.queryData.AddressQueryData
+
+@this(
+        main: Main,
+        block: Block
+)
+
+@(database: Option[GenealogyDatabase], repo: RepositoryQueryData)(implicit request: AuthenticatedRequest[?], messages: Messages)
+
+@addressContent(address: AddressQueryData) = {
+  Address: <ul class="govuk-list" style="margin-left: 1em;">
+    <li>@{address.address}</li>
+    <li>@{address.city} @{address.postcode}</li>
+    <li>@{address.country}</li>
+    <li>@{address.phone1}</li>
+    <li><a href="@{address.website1}" class="govuk-link">@{address.website1}</a></li>
+  </ul>
+}
+
+@main(database) {
+  @block(repo.name, actions = None) {
+    <ul class="govuk-list">
+      <li>id: @repo.id</li>
+      <li>name: @repo.name</li>
+      <li>rin: @repo.rin</li>
+      <li>@repo.address.fold("")(a => addressContent(a))</li>
+    </ul>
+  }
+}
