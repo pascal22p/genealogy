@@ -28,8 +28,7 @@
         }
 
         @formWithCSRF(controllers.edit.routes.EditSourRecordController.onSubmit(dbId, sourRecord.id)) {
-            <input type="hidden" name="parentType" value="@sourRecordForm("parentType").value.getOrElse("Unknown")">
-            <input type="hidden" name="parentId" value="@sourRecordForm("parentId").value.getOrElse("Unknown")">
+            <input type="hidden" name="returnUrl" value="@sourRecordForm("returnUrl").value.get">
 
             @govukInput(
                 Input(

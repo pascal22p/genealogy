@@ -6,7 +6,6 @@ import anorm.~
 import anorm.RowParser
 import anorm.SqlParser.get
 import models.forms.SourRecordForm
-import models.SourCitationType.SourCitationType
 
 final case class SourRecord(
     id: Int,
@@ -21,8 +20,8 @@ final case class SourRecord(
     repoMedi: String,
     timestamp: Instant
 ) {
-  def toForm(parentId: Int, parentType: SourCitationType): SourRecordForm =
-    SourRecordForm(auth, title, abbr, publ, agnc, rin, repoCaln, repoMedi, repoId, parentId, parentType)
+  def toForm(returnUrl: String): SourRecordForm =
+    SourRecordForm(auth, title, abbr, publ, agnc, rin, repoCaln, repoMedi, repoId, returnUrl)
 
   def fromForm(form: SourRecordForm): SourRecord = SourRecord(
     id,
