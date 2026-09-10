@@ -22,9 +22,10 @@ jobs:
     uses: pascal22p/shared-workflows/.github/workflows/AIreview.yml@main
     with:
       run_id: ${{ github.event.workflow_run.id }}
-      model: "gpt-oss-120b"
-      reasoning_effort: "high"
+      model: "Qwen3.8-27B"
+      reasoning_effort: "medium"
       temperature: "0.0"
+      max_tokens: "60000"
     secrets:
       OVH_AI_ENDPOINTS_API_KEY: ${{ secrets.OVH_AI_ENDPOINTS_API_KEY }}
 
