@@ -22,7 +22,7 @@ jobs:
     uses: pascal22p/shared-workflows/.github/workflows/AIreview.yml@main
     with:
       run_id: ${{ github.event.workflow_run.id }}
-      model: "Qwen3.8-27B"
+      model: "gpt-oss-120b"
       reasoning_effort: "medium"
       temperature: "0.0"
       max_tokens: "60000"
