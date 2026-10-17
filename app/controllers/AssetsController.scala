@@ -24,16 +24,27 @@ class AssetsController @Inject() (
     with I18nSupport {
 
   def get(filename: String): Action[AnyContent] = {
-    Try(new File(filename)) match {
-      case Success(file) =>
-        val path = new File(s"${appConfig.externalAssetsPath}/$file")
-        if (path.exists()) {
-          Action(Ok.sendFile(path))
-        } else {
-          assets.at("/public", file.getPath)
-        }
-      case Failure(exception) =>
-        Action(InternalServerError(s"An error occurred while looking for a filename: ${exception.getMessage}"))
+    Try {
+      val base      = new File(appConfig.externalAssetsPath).getCanonicalFile
+      val requested = new File(base, filename).getCanonicalFile
+
+      if (!requested.toPath.startsWith(base.toPath)) {
+        throw new SecurityException("Invalid asset path")
+      }
+
+      requested
+    } match {
+      case Success(path) if path.exists() && path.isFile =>
+        Action(Ok.sendFile(path))
+
+      case Success(_) =>
+        assets.at("/public", filename)
+
+      case Failure(_: SecurityException) =>
+        Action(NotFound)
+
+      case Failure(_) =>
+        Action(BadRequest)
     }
   }
 }

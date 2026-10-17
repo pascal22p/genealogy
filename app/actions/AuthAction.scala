@@ -1,13 +1,13 @@
 package actions
 
 import java.time.LocalDateTime
-import java.util.UUID
 import javax.inject.Inject
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
 import com.google.inject.ImplementedBy
+import models.Attrs
 import models.AuthenticatedRequest
 import models.GenealogyDatabase
 import models.LoggingWithRequest
@@ -36,9 +36,12 @@ class AuthActionImpl @Inject() (
   protected override val executionContext: ExecutionContext = cc.executionContext
 
   override def invokeBlock[A](request: Request[A], block: AuthenticatedRequest[A] => Future[Result]): Future[Result] = {
-    @SuppressWarnings(Array("org.wartremover.warts.ToString"))
-    val uuid      = UUID.randomUUID().toString
-    val sessionId = request.session.get("sessionId").getOrElse(uuid)
+    val sessionId =
+      request.attrs
+        .get(Attrs.SessionId)
+        .getOrElse {
+          throw new IllegalStateException("Session ID missing from request")
+        }
     val baseRegex = """^/base/([0-9]+)/.*""".r
 
     logger.info(s"AuthAction with session ID: $sessionId")

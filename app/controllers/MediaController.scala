@@ -1,5 +1,7 @@
 package controllers
+
 import java.io.File
+import java.nio.file.Paths
 import javax.inject._
 
 import scala.concurrent.ExecutionContext
@@ -24,16 +26,21 @@ class MediaController @Inject() (
 
   def serveMedia(dbId: Int, filename: String): Action[AnyContent] = Action.async {
     getSqlQueries.getGenealogyDatabase(dbId).fold(NotFound("Database not found")) { database =>
-      Try(new File(filename)) match {
-        case Success(file) =>
-          val path = new File(s"${appConfig.mediaPath}/${database.medias.getOrElse(database.name)}/$file")
+      Try(Paths.get(filename).getFileName.toString) match {
+        case Success(safeFilename) =>
+          val path =
+            new File(s"${appConfig.mediaPath}/${database.medias.getOrElse(database.name)}/$safeFilename")
+
           if (path.exists()) {
             Ok.sendFile(path)
           } else {
             NotFound(s"File `${path.getName}` not found")
           }
+
         case Failure(exception) =>
-          InternalServerError(s"An error occurred while looking for a filename: ${exception.getMessage}")
+          InternalServerError(
+            s"An error occurred while looking for a filename: ${exception.getMessage}"
+          )
       }
     }
   }
