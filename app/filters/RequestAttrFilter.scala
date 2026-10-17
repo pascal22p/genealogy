@@ -7,11 +7,11 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 import scala.util.control.NonFatal
 
-import models.Attrs
-import org.apache.pekko.stream.Materializer
 import play.api.mvc.*
 import play.api.Logging
+import org.apache.pekko.stream.Materializer
 import config.ErrorHandler
+import models.Attrs
 
 class RequestAttrFilter @Inject() (
     errorHandler: ErrorHandler,
@@ -24,7 +24,14 @@ class RequestAttrFilter @Inject() (
 
   override def apply(next: RequestHeader => Future[Result])(request: RequestHeader): Future[Result] = {
     val requestId = request.headers.get(headerName).getOrElse(UUID.randomUUID().toString)
-    val sessionId = request.session.get("sessionId").getOrElse("no-session")
+
+    val sessionId =
+      request.attrs
+        .get(Attrs.SessionId)
+        .orElse(request.session.get("sessionId"))
+        .getOrElse {
+          throw new IllegalStateException("Session ID missing from request")
+        }
 
     // Attach requestId into attrs (server-side context)
     val enrichedRequest = request
