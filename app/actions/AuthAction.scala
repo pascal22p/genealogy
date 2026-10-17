@@ -1,7 +1,6 @@
 package actions
 
 import java.time.LocalDateTime
-import java.util.UUID
 import javax.inject.Inject
 
 import scala.concurrent.ExecutionContext
@@ -43,6 +42,7 @@ class AuthActionImpl @Inject() (
         .getOrElse {
           throw new IllegalStateException("Session ID missing from request")
         }
+    val baseRegex = """^/base/([0-9]+)/.*""".r
 
     logger.info(s"AuthAction with session ID: $sessionId")
 

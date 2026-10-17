@@ -6,6 +6,7 @@ import scala.concurrent.ExecutionContext.global
 import scala.concurrent.Future
 
 import filters.SessionFilter
+import models.Attrs
 import models.AuthenticatedRequest
 import models.Session
 import models.SessionData
@@ -16,6 +17,7 @@ import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.when
 import play.api.http.Status.OK
+import play.api.libs.typedmap.TypedEntry
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.InjectedController
@@ -77,7 +79,13 @@ class AuthActionSpec extends BaseSpec {
       Future.successful(1)
     )
 
-    val result = fakeController.onPageLoad(FakeRequest("GET", "/").withSession(("sessionId", sessionId)))
+    val result = fakeController.onPageLoad(
+      FakeRequest("GET", "/")
+        .withSession(("sessionId", sessionId))
+        .addAttrs(
+          TypedEntry(Attrs.SessionId, sessionId)
+        )
+    )
     status(result) mustBe OK
     contentAsString(result) must include(sessionId)
     contentAsString(result) must include(userData.toString)
