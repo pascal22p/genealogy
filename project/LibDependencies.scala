@@ -12,7 +12,7 @@ object LibDependencies {
     "uk.gov.hmrc"             %% "play-frontend-hmrc-play-30" % "13.17.0",
     "org.apache.xmlgraphics"  %  "fop"                     % "2.12",
     "net.logstash.logback"    % "logstash-logback-encoder" % "9.0",
-    "io.opentelemetry.instrumentation" % "opentelemetry-instrumentation-annotations" % "2.33.1"
+    "io.opentelemetry.instrumentation" % "opentelemetry-instrumentation-annotations" % "2.34.0"
   )
 
   val libraryDependenciesTest: Seq[ModuleID] = Seq(
